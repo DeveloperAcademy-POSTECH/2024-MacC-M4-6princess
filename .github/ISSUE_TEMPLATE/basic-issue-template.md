@@ -1,12 +1,3 @@
----
-name: Basic Issue Template
-about: 기본적인 이슈 템플릿입니다.
-title: "[Prefix] 이슈 타이틀"
-labels: ''
-assignees: ''
-
----
-
 <!-- 
 
 Prefix
