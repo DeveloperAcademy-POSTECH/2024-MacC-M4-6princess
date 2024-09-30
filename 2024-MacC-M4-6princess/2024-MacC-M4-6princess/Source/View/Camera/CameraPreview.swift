@@ -6,35 +6,32 @@
 //
 
 import SwiftUI
+import AVFoundation
 
-struct CameraPreview: View {
-
-    @State private var capturedImage : UIImage? = nil
-    @State private var isCustomCameraViewPresented = false
+///카메라 화면 프리뷰
+struct CameraPreview: UIViewRepresentable{
     
-    var body: some View {
-        ZStack{
-            if capturedImage != nil {
-                Image(uiImage: capturedImage!).resizable().scaledToFill().ignoresSafeArea()
-            }else{
-                Color(UIColor.systemBackground)
-            }
-            VStack{
-                Spacer()
-                Button(action: {isCustomCameraViewPresented.toggle()},
-                       label: {Image(systemName: "camera.fill")
-                        .font(.largeTitle)
-                        .padding()
-                        .background(Color.black)
-                        .foregroundColor(.white)
-                        .clipShape(Circle())
-                }
-                )
-                .padding(.bottom)
-                .sheet(isPresented: $isCustomCameraViewPresented, content: {CustomCameraView(capturedImage: $capturedImage)})
-                // 실시간으로 카메라 영상이 보이는 화면 표시
-            }
-        }
+    @ObservedObject var camera: CameraModel
+    
+    func makeUIView(context: Context) -> UIView {
+        
+        let view = UIView(frame: UIScreen.main.bounds)
+        
+        camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
+        camera.preview.frame = view.frame
+        
+        //다른거 추가할꺼면 추가
+        camera.preview.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(camera.preview)
+        
+        //starting session
+        camera.session.startRunning()
+        
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: Context) {
         
     }
 }
+
