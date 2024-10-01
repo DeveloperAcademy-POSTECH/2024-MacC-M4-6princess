@@ -9,10 +9,16 @@ import SwiftUI
 
 struct IEView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        //        GestureExample()
+        //        ShapeTapView()
+        //        CounterView()
+        IEMagnifyGestureTestView()
+        
     }
 }
 
 #Preview {
     IEView()
 }
+
+
