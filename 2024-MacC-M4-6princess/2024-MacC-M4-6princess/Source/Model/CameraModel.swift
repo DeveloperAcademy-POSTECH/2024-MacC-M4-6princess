@@ -76,14 +76,16 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     ///사진 찍는 함수
     func takePic() {
-        
         DispatchQueue.global(qos: .background).async {
             
-            self.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
-            self.session.stopRunning()
+            let settings = AVCapturePhotoSettings()
+            self.output.capturePhoto(with: settings, delegate: self)
             
+            // self.session.stopRunning()
+            //촬영 시 세션을 멈추게 하는 함수 -> 촬영했을 때 화면이 움직이지 않게 보여줌
+            //이거를 takePic에다 넣으면 picData가 제대로 전달이 안되는 듯
+            //어디에 넣으면 좋을까......
             DispatchQueue.main.async {
-                
                 withAnimation {
                     self.isTaken.toggle()
                 }
@@ -97,9 +99,12 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             self.session.startRunning()
             
             DispatchQueue.main.async {
-                withAnimation{self.isTaken.toggle()}
+                withAnimation {
+                    self.isTaken.toggle()
+                }
                 //변수 초기화
                 self.isSaved = false
+                self.picData = Data(count: 0) // picData 초기화
             }
         }
     }
@@ -107,59 +112,68 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         
         if let error = error {
-            print("사진 처리 중 에러 발생 : \(error.localizedDescription)")
+            print("사진 처리 중 에러 발생: \(error.localizedDescription)")
             return
         }
         
-        print("사진이 찍혔어여")
+        guard let imageData = photo.fileDataRepresentation() else {
+            print("사진 데이터가 유효하지 않음")
+            return
+        }
         
-        guard let imageData = photo.fileDataRepresentation()
-            else { return }
-        
-        self.picData = imageData
+        // 메인 스레드에서 picData 업데이트
+        DispatchQueue.main.async {
+            self.picData = imageData
+            print("사진이 성공적으로 처리되었습니다")
+            self.isTaken = true  // 여기서 사진이 찍혔음을 UI에 반영
+            
+            // 사진 저장 로직 실행
+//            self.savePic()
+        }
     }
     
-//    func requestAlbumAccess() {
-//        Task {
-//            switch await PHPhotoLibrary.requestAuthorization(for: .readWrite) {
-//            case .authorized:
-//                //세션 세팅
-//                savePic()
-//            case .notDetermined:
-//                //권한 재요청
-//                PHPhotoLibrary.requestAuthorization(for: .readWrite) {
-//                    (status) in
-//                    if status.rawValue == 0 {
-//                        savePic()
-//                    }
-//                }
-//            case .denied:
-//                print("앨범에 저장할 수 없음. 권한 deny됨")
-//                return
-//            default:
-//                return
-//            }
-//    }
+    //    func requestAlbumAccess() {
+    //        Task {
+    //            switch await PHPhotoLibrary.requestAuthorization(for: .readWrite) {
+    //            case .authorized:
+    //                //세션 세팅
+    //                savePic()
+    //            case .notDetermined:
+    //                //권한 재요청
+    //                PHPhotoLibrary.requestAuthorization(for: .readWrite) {
+    //                    (status) in
+    //                    if status.rawValue == 0 {
+    //                        savePic()
+    //                    }
+    //                }
+    //            case .denied:
+    //                print("앨범에 저장할 수 없음. 권한 deny됨")
+    //                return
+    //            default:
+    //                return
+    //            }
+    //    }
     ///사진 저장 함수
     //UIImage로 바로 넘겨주는 방법 고안해야 함
     func savePic() {
-            guard let image = UIImage(data: self.picData)
-            else {
-                    print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
-                    return
-                }
-            
-            //이건 그냥 갤러리에 잘 저장되는지 확인용
-            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-            
-            self.isSaved = true
-            
-            print("성공적으로 사진이 저장되었습니다.")
+        guard let image = UIImage(data: self.picData)
+        else {
+            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
+            return
         }
         
+        //이건 그냥 갤러리에 잘 저장되는지 확인용
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
         
+        DispatchQueue.main.async {
+            self.isSaved = true
+            print("성공적으로 사진이 저장되었습니다.")
+        }
     }
     
     
+}
+
+
 
 

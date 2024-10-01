@@ -18,6 +18,7 @@ struct CameraView: View {
         ZStack {
             CameraPreview(camera: camera)
                 .ignoresSafeArea(.all, edges: .all)
+            Image("testFrame") //뷰에 프레임 띄우기 시도 중
             VStack {
                 if camera.isTaken {
                     
@@ -59,7 +60,9 @@ struct CameraView: View {
                         Spacer()
                         
                     }else {
-                        Button(action: camera.takePic, label: {
+                        Button{
+                            camera.takePic()
+                        } label: {
                             
                             ZStack {
                                 
@@ -70,7 +73,7 @@ struct CameraView: View {
                                     .stroke(Color.white, lineWidth: 2)
                                     .frame(width: 75, height: 75)
                             }
-                        })
+                        }
                     }
                     
                 }
