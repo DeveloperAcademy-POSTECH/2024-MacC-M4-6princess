@@ -17,15 +17,21 @@ struct CameraPreview: UIViewRepresentable{
         
         let view = UIView(frame: UIScreen.main.bounds)
         
-        camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
-        camera.preview.frame = view.frame
-        
-        //다른거 추가할꺼면 추가
-        camera.preview.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(camera.preview)
+        // AVCaptureVideoPreviewLayer 생성
+
+        DispatchQueue.main.async {
+            camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
+            camera.preview.frame = view.frame
+            camera.preview.videoGravity = .resizeAspectFill
+            
+            //다른거 추가할꺼면 추가
+            view.layer.addSublayer(camera.preview)
+        }
         
         //starting session
-        camera.session.startRunning()
+        DispatchQueue.global(qos: .background).async {
+            camera.session.startRunning()
+        }
         
         return view
     }
@@ -34,8 +40,9 @@ struct CameraPreview: UIViewRepresentable{
         if camera.isTaken {
             camera.session.stopRunning()
         }else {
-            camera.session.startRunning()
+            DispatchQueue.global(qos: .background).async {
+                camera.session.startRunning()
+            }
         }
     }
 }
-

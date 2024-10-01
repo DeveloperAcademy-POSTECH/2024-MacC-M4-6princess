@@ -24,6 +24,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     //이미지 데이터
     @Published var isSaved = false
     @Published var picData = Data(count: 0)
+
     
     ///비디오 권한 체크
     func Check() {
@@ -68,6 +69,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             }
             
             self.session.commitConfiguration()
+            
         }
         catch {
             print(error.localizedDescription)
@@ -78,14 +80,15 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     func takePic() {
         DispatchQueue.global(qos: .background).async {
             
-            let settings = AVCapturePhotoSettings()
-            self.output.capturePhoto(with: settings, delegate: self)
+            self.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
 
             DispatchQueue.main.async {
                 withAnimation {
                     self.isTaken.toggle()
+                    print("isTaken 값 토글됨")
                 }
             }
+            
         }
     }
     ///사진 재촬영 함수
@@ -96,7 +99,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             
             DispatchQueue.main.async {
                 withAnimation {
-                    self.isTaken.toggle()
+                    self.isTaken = false
                 }
                 //변수 초기화
                 self.isSaved = false
@@ -123,32 +126,9 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("사진이 성공적으로 처리되었습니다")
             self.isTaken = true  // 여기서 사진이 찍혔음을 UI에 반영
             
-            // 사진 저장 로직 실행
-//            self.savePic()
         }
     }
     
-    //    func requestAlbumAccess() {
-    //        Task {
-    //            switch await PHPhotoLibrary.requestAuthorization(for: .readWrite) {
-    //            case .authorized:
-    //                //세션 세팅
-    //                savePic()
-    //            case .notDetermined:
-    //                //권한 재요청
-    //                PHPhotoLibrary.requestAuthorization(for: .readWrite) {
-    //                    (status) in
-    //                    if status.rawValue == 0 {
-    //                        savePic()
-    //                    }
-    //                }
-    //            case .denied:
-    //                print("앨범에 저장할 수 없음. 권한 deny됨")
-    //                return
-    //            default:
-    //                return
-    //            }
-    //    }
     ///사진 저장 함수
     //UIImage로 바로 넘겨주는 방법 고안해야 함
     func savePic() {
@@ -169,7 +149,3 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     
 }
-
-
-
-
