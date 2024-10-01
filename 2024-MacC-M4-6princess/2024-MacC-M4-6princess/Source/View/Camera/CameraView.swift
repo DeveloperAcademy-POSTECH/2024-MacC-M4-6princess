@@ -8,9 +8,6 @@
 import SwiftUI
 import AVFoundation
 
-import SwiftUI
-import AVFoundation
-
 struct CameraView: View {
     @StateObject var camera = CameraModel()
     
@@ -45,6 +42,7 @@ struct CameraView: View {
                         Button {
                             if !camera.isSaved{
                                 camera.savePic()
+                                
                             }
                         } label: {
                             Text(camera.isSaved ? "저장됨!" : "저장하기")

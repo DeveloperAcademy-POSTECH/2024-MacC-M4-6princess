@@ -80,11 +80,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             
             let settings = AVCapturePhotoSettings()
             self.output.capturePhoto(with: settings, delegate: self)
-            
-            // self.session.stopRunning()
-            //촬영 시 세션을 멈추게 하는 함수 -> 촬영했을 때 화면이 움직이지 않게 보여줌
-            //이거를 takePic에다 넣으면 picData가 제대로 전달이 안되는 듯
-            //어디에 넣으면 좋을까......
+
             DispatchQueue.main.async {
                 withAnimation {
                     self.isTaken.toggle()
