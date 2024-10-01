@@ -31,7 +31,8 @@ struct IEMagnifyGestureTestView: View {
                 .frame(width: 200) // 너비만 지정, 높이는 자동으로 맞춤
                 .scaleEffect(magnifyBy) // 확대/축소 상태 반영
                 .gesture(magnification) // 제스처 추가
-
+            
+        
             VStack {
                 Spacer()
                 HStack {
