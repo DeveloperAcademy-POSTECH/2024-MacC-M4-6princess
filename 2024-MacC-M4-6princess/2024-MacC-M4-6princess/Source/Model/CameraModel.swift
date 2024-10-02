@@ -14,7 +14,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     @Published var session = AVCaptureSession()
     
-    @Published var alert = false
+    @Published var isAlert = false
     
     @Published var output = AVCapturePhotoOutput()
     
@@ -27,7 +27,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
 
     
     ///비디오 권한 체크
-    func Check() {
+    func checkVideoAuthorizaion() {
         
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -42,7 +42,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
                 }
             }
         case .denied:
-            self.alert.toggle()
+            self.isAlert.toggle()
             return
         default:
             return

@@ -11,8 +11,7 @@ import SwiftUI
 struct _024_MacC_M4_6princessApp: App {
     var body: some Scene {
         WindowGroup {
-//            ContentView()
-            CameraView()
+            ContentView()
         }
     }
 }

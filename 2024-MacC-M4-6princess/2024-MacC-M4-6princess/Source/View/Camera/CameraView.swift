@@ -79,7 +79,7 @@ struct CameraView: View {
             }
         }
         .onAppear(perform: {
-            camera.Check()
+            camera.checkVideoAuthorizaion()
         })
         
     }
