@@ -1,13 +1,28 @@
 //
-//  IERatioChangeView.swift
+//  IEWidthFixView.swift
 //  2024-MacC-M4-6princess
 //
-//  Created by ram on 10/3/24.
+//  Created by ram on 10/1/24.
 //
-
 import SwiftUI
 
-struct IERatioChangeView: View {
+// 사진 편집시 초기 프레임 크기를 확인하기 위한 aspect ratio를 위한 enum
+enum CropRatio {
+    case horizantal
+    case vertical
+    
+    // CGSize를 미리 지정
+    var cropSize: CGSize {
+        switch self {
+            case .horizantal:
+                return CGSize(width: 4, height: 3)
+            case .vertical:
+                return CGSize(width: 3, height: 4)
+        }
+    }
+}
+
+struct IERatioChangeTestView: View {
     @State private var rawImageName: String = "6공주들"
     @State private var rawImage: UIImage? = nil // 원본 UIImage
     @State private var croppedImage: UIImage? = nil // 크롭된 이미지를 저장할 변수
@@ -16,10 +31,21 @@ struct IERatioChangeView: View {
     var body: some View {
         ZStack {
             /* 크롭 후 사진 보이는 부분 */
-            CropImageView(croppedImage: $croppedImage, rawImage: rawImage)
-                .onAppear {
-                    loadImage() // 뷰가 나타날 때 이미지 로드
+            VStack {
+                if let cropped = croppedImage {
+                    Image(uiImage: cropped)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 10)
+                } else {
+                    Text("이미지를 찾을 수 없습니다.")
+                        .onAppear {
+                            loadImage() // 뷰가 나타날 때 이미지 로드
+                        }
                 }
+            }
+            .padding()
             
             /* 크롭 트리거 버튼 부분 */
             VStack {
@@ -88,41 +114,5 @@ struct IERatioChangeView: View {
 }
 
 #Preview {
-    IERatioChangeView()
-}
-
-struct CropImageView: View {
-    @Binding var croppedImage: UIImage?
-    var rawImage: UIImage? // 원본 이미지를 저장하는 변수
-    // 아이돌 이미지의 위치와 크기를 위한 상태 변수
-    @State private var idolImagePosition: CGPoint = CGPoint(x: 30, y: 30) // 아이돌 이미지의 위치
-    @State private var idolImageSize: CGSize = CGSize(width: 40, height: 40) // 아이돌 이미지의 크기
-    
-    @State private var idolImageName: String = "필릭스디즈니누끼"
-    
-    var body: some View {
-        VStack {
-            if let cropped = croppedImage, let raw = rawImage {
-                ZStack {
-                    // 크롭된 이미지를 배경으로 설정
-                    Image(uiImage: cropped)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: raw.size.width, maxHeight: raw.size.height) // rawImage의 크기로 프레임 설정
-                    
-                    // 아이돌 이미지를 크롭된 이미지 위에 올리기
-                    Image(idolImageName) // Use your image name or asset here
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: idolImageSize.width, height: idolImageSize.height)
-                        .position(x: idolImagePosition.x + idolImageSize.width / 2,
-                                  y: idolImagePosition.y + idolImageSize.height / 2) // 위치 조정
-                }
-                .frame(maxWidth: raw.size.width, maxHeight: raw.size.height) // ZStack이 rawImage 크기에 맞게 설정
-            } else {
-                Text("이미지를 찾을 수 없습니다.")
-            }
-        }
-        .padding()
-    }
+    IERatioChangeTestView()
 }
