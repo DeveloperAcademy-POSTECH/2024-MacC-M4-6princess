@@ -23,7 +23,7 @@ struct IEMagnifyGestureTestView: View {
     
     var body: some View {
         ZStack{
-            Image("포실핑")
+            Image("필릭스디즈니누끼")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 100)
