@@ -148,4 +148,21 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     }
     
     
+//    func delayTimeSet(delayTime: Int) {
+//            switch delayTime {
+//            case 0:
+//                return
+//            case 3:
+//                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+////                    self.takePic()
+//                }
+//            case 5: {
+//                return
+//            }
+//            case 7:
+//            default:
+//                return
+//            }
+//        }
+    
 }

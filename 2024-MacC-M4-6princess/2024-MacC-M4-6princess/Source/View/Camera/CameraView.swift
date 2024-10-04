@@ -10,6 +10,8 @@ import AVFoundation
 
 struct CameraView: View {
     @StateObject var camera = CameraModel()
+    @State var delayTime: Double = 0.0
+    @State var isPushed = false
     
     var body: some View {
         ZStack {
@@ -21,6 +23,7 @@ struct CameraView: View {
                     
                     HStack {
                         Spacer()
+                        
                         
                         Button {
                             camera.reTake()
@@ -34,6 +37,8 @@ struct CameraView: View {
                         .padding(.trailing, 20)
                     }
                 }
+                
+                
                 Spacer()
                 
                 HStack {
@@ -58,8 +63,24 @@ struct CameraView: View {
                         Spacer()
                         
                     }else {
+                        Button {
+                            isPushed.toggle()
+                        } label: {
+                            Image(systemName: "timer")
+                                .foregroundColor(.black)
+                                .padding()
+                                .background(Color.white)
+                                .clipShape(Circle())
+                        }.padding(.trailing, 20)
+                        if isPushed {
+                            CameraTimerView(delayTime: $delayTime)
+                        }
+                        Spacer()
+                        
                         Button{
-                            camera.takePic()
+                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
+                                camera.takePic()
+                            }
                         } label: {
                             
                             ZStack {
