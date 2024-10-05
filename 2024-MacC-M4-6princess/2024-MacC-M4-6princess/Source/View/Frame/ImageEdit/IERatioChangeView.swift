@@ -90,39 +90,70 @@ struct IERatioChangeView: View {
 #Preview {
     IERatioChangeView()
 }
-
 struct CropImageView: View {
     @Binding var croppedImage: UIImage?
     var rawImage: UIImage? // 원본 이미지를 저장하는 변수
+    
     // 아이돌 이미지의 위치와 크기를 위한 상태 변수
     @State private var idolImagePosition: CGPoint = CGPoint(x: 30, y: 30) // 아이돌 이미지의 위치
-    @State private var idolImageSize: CGSize = CGSize(width: 40, height: 40) // 아이돌 이미지의 크기
-    
+    @State private var idolImageSize: CGSize = CGSize(width: 100, height: 100) // 아이돌 이미지의 크기
     @State private var idolImageName: String = "필릭스디즈니누끼"
+    
+    // 아이돌 이미지의 위치를 저장하기 위한 상태 변수
+    @State private var idolImagePositionX: CGFloat = 30.0
+    @State private var idolImagePositionY: CGFloat = 30.0
+    
+    // 상단과 왼쪽으로부터의 거리 저장을 위한 상태 변수
+    @State private var offsetX: CGFloat = 0.0
+    @State private var offsetY: CGFloat = 0.0
     
     var body: some View {
         VStack {
             if let cropped = croppedImage, let raw = rawImage {
-                ZStack {
-                    // 크롭된 이미지를 배경으로 설정
-                    Image(uiImage: cropped)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: raw.size.width, maxHeight: raw.size.height) // rawImage의 크기로 프레임 설정
-                    
-                    // 아이돌 이미지를 크롭된 이미지 위에 올리기
-                    Image(idolImageName) // Use your image name or asset here
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: idolImageSize.width, height: idolImageSize.height)
-                        .position(x: idolImagePosition.x + idolImageSize.width / 2,
-                                  y: idolImagePosition.y + idolImageSize.height / 2) // 위치 조정
+                VStack {
+                    ZStack {
+                        GeometryReader { geometry in
+                            // 크롭된 이미지를 배경으로 설정
+                            Image(uiImage: cropped)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: raw.size.width, maxHeight: raw.size.height) // rawImage의 크기로 프레임 설정
+                                .background(GeometryReader { imgGeometry in
+                                    Color.clear
+                                        .onAppear {
+                                            // GeometryReader를 사용해 이미지의 위치를 얻고, 상단과 왼쪽에서 떨어진 거리를 계산
+                                            let frame = imgGeometry.frame(in: .local)
+                                            offsetX = frame.minX
+                                            offsetY = frame.minY
+                                        }
+                                })
+                            
+                            // 아이돌 이미지를 크롭된 이미지 위에 올리기
+                            Image(idolImageName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: idolImageSize.width, height: idolImageSize.height)
+                                .position(x: idolImagePosition.x+offsetX, y: idolImagePosition.y+offsetY) // 위치 조정
+                                .onChange(of: idolImagePosition) { newValue in
+                                    // 아이돌 이미지 위치가 변경될 때 상태 변수에 저장
+                                    idolImagePositionX = newValue.x
+                                    idolImagePositionY = newValue.y
+                                }
+                        }
+                    }
                 }
-                .frame(maxWidth: raw.size.width, maxHeight: raw.size.height) // ZStack이 rawImage 크기에 맞게 설정
+                .background(Color.red)
+                .frame(maxWidth: raw.size.width, maxHeight: raw.size.height)
+                
+                // 상단과 왼쪽에서 얼마나 떨어져 있는지 텍스트로 표시
+                Text("상단으로부터 거리: \(offsetY, specifier: "%.2f")")
+                Text("왼쪽으로부터 거리: \(offsetX, specifier: "%.2f")")
+                Text("아이돌 이미지 X 위치: \(idolImagePositionX, specifier: "%.2f")")
+                Text("아이돌 이미지 Y 위치: \(idolImagePositionY, specifier: "%.2f")")
             } else {
                 Text("이미지를 찾을 수 없습니다.")
             }
         }
-        .padding()
     }
 }
+

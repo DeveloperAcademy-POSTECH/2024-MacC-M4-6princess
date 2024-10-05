@@ -23,6 +23,7 @@
 		2125C6C72CAE8CAA007F99F0 /* MFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2125C6B32CAE8CAA007F99F0 /* MFView.swift */; };
 		2125C6C82CAE8CAA007F99F0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2125C6B62CAE8CAA007F99F0 /* ContentView.swift */; };
 		2125C6CA2CAE8E0F007F99F0 /* IERatioChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2125C6C92CAE8E0F007F99F0 /* IERatioChangeView.swift */; };
+		2125C6CC2CB02436007F99F0 /* ImageResizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2125C6CB2CB02436007F99F0 /* ImageResizeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		2125C6B32CAE8CAA007F99F0 /* MFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFView.swift; sourceTree = "<group>"; };
 		2125C6B62CAE8CAA007F99F0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2125C6C92CAE8E0F007F99F0 /* IERatioChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IERatioChangeView.swift; sourceTree = "<group>"; };
+		2125C6CB2CB02436007F99F0 /* ImageResizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResizeView.swift; sourceTree = "<group>"; };
 		89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "2024-MacC-M4-6princess.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94ABF2CA9B66300824592 /* 2024-MacC-M4-6princessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94AC92CA9B66300824592 /* 2024-MacC-M4-6princessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,6 +166,7 @@
 				2125C6AF2CAE8CAA007F99F0 /* IETestStack.swift */,
 				2125C6B02CAE8CAA007F99F0 /* IEView.swift */,
 				2125C6B12CAE8CAA007F99F0 /* IEWidthFixView.swift */,
+				2125C6CB2CB02436007F99F0 /* ImageResizeView.swift */,
 			);
 			path = ImageEdit;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 				2125C6BE2CAE8CAA007F99F0 /* Model.swift in Sources */,
 				2125C6BF2CAE8CAA007F99F0 /* CameraView.swift in Sources */,
 				2125C6C02CAE8CAA007F99F0 /* DFView.swift in Sources */,
+				2125C6CC2CB02436007F99F0 /* ImageResizeView.swift in Sources */,
 				2125C6C12CAE8CAA007F99F0 /* IEDevelopView.swift in Sources */,
 				2125C6C22CAE8CAA007F99F0 /* IEMagnifyGestureTestView.swift in Sources */,
 				2125C6C32CAE8CAA007F99F0 /* IERatioChangeTestView.swift in Sources */,
