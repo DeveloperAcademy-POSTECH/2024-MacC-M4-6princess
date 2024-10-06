@@ -25,25 +25,23 @@ struct ImageResizeView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // 이미지 뷰와 Rectangle 오버레이를 함께 그룹화
-                Group {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                    
-                    Rectangle()
-                        .stroke(Color.blue, lineWidth: 2)
-                        .fill(Color.clear)
-                }
-                .frame(width: baseWidth, height: baseWidth / imageAspectRatio)
-                .scaleEffect(imageScale)
-                .offset(dragOffset)
+                // 이미지 뷰
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: baseWidth, height: baseWidth / imageAspectRatio)
+                
+                // Rectangle 오버레이 (3픽셀 더 큼)
+                Rectangle()
+                    .stroke(Color.blue, lineWidth: 1)
+                    .fill(Color.clear)
+                    .frame(width: baseWidth + 6, height: (baseWidth / imageAspectRatio) + 6)
                 
                 // 크기 조정 버튼
-                Image(systemName: "chevron.forward.circle")
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
                     .resizable()
-                    .frame(width: 30, height: 30)
-                    .position(x: (baseWidth * imageScale) - 15, y: ((baseWidth / imageAspectRatio) * imageScale) - 15)
+                    .frame(width: 20, height: 20)
+                    .offset(x: (baseWidth + 6) / 2, y: ((baseWidth / imageAspectRatio) + 6) / 2)
                     .gesture(
                         DragGesture()
                             .onChanged { value in
@@ -55,6 +53,8 @@ struct ImageResizeView: View {
                             }
                     )
             }
+            .scaleEffect(imageScale)
+            .offset(dragOffset)
             .frame(width: geometry.size.width, height: geometry.size.height)
             .background(Color.white)
         }
