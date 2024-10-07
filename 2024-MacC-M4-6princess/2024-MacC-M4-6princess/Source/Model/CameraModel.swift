@@ -14,6 +14,8 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     @Published var session = AVCaptureSession()
     
+    @Published var videoDeviceInput: AVCaptureDeviceInput?
+    
     @Published var isAlert = false
     
     @Published var output = AVCapturePhotoOutput()
@@ -62,6 +64,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             //입력값, 출력값 체크하고 세션에 추가
             if self.session.canAddInput(input) {
                 self.session.addInput(input)
+                self.videoDeviceInput = input
             }
             
             if self.session.canAddOutput(output) {
@@ -132,7 +135,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         DispatchQueue.main.async {
             self.picData = imageData
             print("사진이 성공적으로 처리되었습니다")
-            self.isTaken = true  // 여기서 사진이 찍혔음을 UI에 반영
+//            self.isTaken = true  // 여기서 사진이 찍혔음을 UI에 반영
             
         }
     }
@@ -172,5 +175,68 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
 //                return
 //            }
 //        }
-    
+    func changeCamera() {
+        guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else {
+            print("현재 입력을 찾을 수 없습니다.")
+            return
+        }
+        
+        let currentPosition = currentInput.device.position
+        let preferredPosition: AVCaptureDevice.Position
+        
+        switch currentPosition {
+        case .unspecified, .front:
+            print("후면 카메라로 전환합니다.")
+            preferredPosition = .back
+            
+        case .back:
+            print("전면 카메라로 전환합니다.")
+            preferredPosition = .front
+            
+        @unknown default:
+            print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
+            preferredPosition = .back
+        }
+        
+        // 새로운 카메라 장치 가져오기
+        guard let newVideoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: preferredPosition) else {
+            print("카메라 장치를 찾을 수 없습니다.")
+            return
+        }
+        
+        do {
+            let newVideoDeviceInput = try AVCaptureDeviceInput(device: newVideoDevice)
+            self.session.beginConfiguration()
+            
+            // 기존 입력 제거
+            for input in self.session.inputs {
+                self.session.removeInput(input)
+            }
+            
+            // 새로운 입력 추가
+            if self.session.canAddInput(newVideoDeviceInput) {
+                self.session.addInput(newVideoDeviceInput)
+                self.videoDeviceInput = newVideoDeviceInput // 새로운 입력 저장
+            } else {
+                print("새로운 입력을 추가할 수 없습니다.")
+                self.session.addInput(currentInput) // 기존 입력 복원
+            }
+            
+            // 비디오 안정화 설정
+            if let connection = self.output.connection(with: .video) {
+                if connection.isVideoStabilizationSupported {
+                    connection.preferredVideoStabilizationMode = .auto
+                }
+            }
+            
+            // 출력 설정
+            output.isHighResolutionCaptureEnabled = true
+            output.maxPhotoQualityPrioritization = .quality
+            
+            self.session.commitConfiguration()
+        } catch {
+            print("카메라 전환 중 오류 발생: \(error)")
+        }
+    }
+
 }

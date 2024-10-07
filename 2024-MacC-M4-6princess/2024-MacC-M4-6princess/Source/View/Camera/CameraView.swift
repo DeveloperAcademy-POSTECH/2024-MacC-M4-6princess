@@ -14,7 +14,6 @@ struct CameraView: View {
     @State var isPushed = false
     @State var takePicCount: Int = 1
     @State var isCountPushed = false
-//    var takePicCountDefault: Int = 1
     
     var body: some View {
         ZStack {
@@ -22,11 +21,21 @@ struct CameraView: View {
                 .ignoresSafeArea(.all, edges: .all)
             Image("testFrame") //뷰에 프레임 띄우기
             VStack {
+                Button {
+                    camera.changeCamera()
+                } label: {
+                    Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90.camera")
+                        .foregroundColor(.black)
+                        .padding()
+                        .background(Color.white)
+                        .clipShape(Circle())
+                }.padding(.trailing, 20)
                 if camera.isTaken {
                     
                     HStack {
                         Spacer()
                         
+
                         
                         Button {
                             camera.reTake()
