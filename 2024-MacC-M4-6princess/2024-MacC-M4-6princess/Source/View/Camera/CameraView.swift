@@ -10,14 +10,17 @@ import AVFoundation
 
 struct CameraView: View {
     @StateObject var camera = CameraModel()
-    @State var delayTime: Double = 0.0
+    @State var delayTime: TimeInterval = 0.0
     @State var isPushed = false
+    @State var takePicCount: Int = 1
+    @State var isCountPushed = false
+//    var takePicCountDefault: Int = 1
     
     var body: some View {
         ZStack {
             CameraPreview(camera: camera)
                 .ignoresSafeArea(.all, edges: .all)
-            Image("testFrame") //뷰에 프레임 띄우기 시도 중
+            Image("testFrame") //뷰에 프레임 띄우기
             VStack {
                 if camera.isTaken {
                     
@@ -36,6 +39,9 @@ struct CameraView: View {
                         }
                         .padding(.trailing, 20)
                     }
+                }else {
+                    
+
                 }
                 
                 
@@ -75,11 +81,38 @@ struct CameraView: View {
                         if isPushed {
                             CameraTimerView(delayTime: $delayTime)
                         }
+                        VStack {
+                            if isCountPushed {
+                                CameraTakepicCountView(takePicCount: $takePicCount)
+                            }
+                            Button {
+                                isCountPushed.toggle()
+                            } label: {
+                                Text("찍는횟수")
+                                    .foregroundColor(.black)
+                                    .padding()
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                            }
+                            
+                        }
                         Spacer()
                         
                         Button{
-                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
-                                camera.takePic()
+//                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
+//                                camera.takePic()
+//                            }
+                            if takePicCount == 1 {
+                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
+                                    camera.takePic()
+                                }
+                            }else {
+                                for i in 0..<takePicCount {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + delayTime * Double(i)) {
+                                            camera.takeManyPic()
+                                        }
+                                    }
+                                camera.isTaken = true
                             }
                         } label: {
                             

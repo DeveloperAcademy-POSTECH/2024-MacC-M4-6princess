@@ -13,29 +13,33 @@ struct CameraTimerView: View {
         HStack {
             Button {
                 self.delayTime = 0
-                print("0초 설정됨")
+                print("타이머 설정 꺼짐")
             } label: {
-                Text("0초")
+                Text("OFF")
+                    .foregroundStyle(.white)
             }
             Button {
                 self.delayTime = 3
                 print("3초 설정됨")
             } label: {
                 Text("3초")
+                    .foregroundStyle(.white)
             }
             Button {
                 self.delayTime = 5
                 print("5초 설정됨")
             } label: {
                 Text("5초")
+                    .foregroundStyle(.white)
             }
             Button {
                 self.delayTime = 7
                 print("7초 설정됨")
             } label: {
                 Text("7초")
+                    .foregroundStyle(.white)
             }
-        }.background(Color.white)
+        }.background(Color.black)
 
     }
 }

@@ -91,6 +91,14 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             
         }
     }
+    
+    func takeManyPic() {
+        DispatchQueue.global(qos: .background).async {
+            
+            self.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
+        }
+    }
+    
     ///사진 재촬영 함수
     func reTake() {
         
