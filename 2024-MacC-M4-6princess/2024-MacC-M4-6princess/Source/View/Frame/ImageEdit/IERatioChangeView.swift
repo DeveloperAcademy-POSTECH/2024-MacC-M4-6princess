@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct IERatioChangeView: View {
-    @State private var rawImageName: String = "6공주들"
+    @State private var rawImageName: String = "6princess"
     @State private var rawImage: UIImage? = nil // 원본 UIImage
     @State private var croppedImage: UIImage? = nil // 크롭된 이미지를 저장할 변수
     @State private var currentRatio: CropRatio = .horizantal // 초기값을 4:3으로 지정
@@ -97,7 +97,7 @@ struct CropImageView: View {
     // 아이돌 이미지의 위치와 크기를 위한 상태 변수
     @State private var idolImagePosition: CGPoint = CGPoint(x: 30, y: 30) // 아이돌 이미지의 위치
     @State private var idolImageSize: CGSize = CGSize(width: 100, height: 100) // 아이돌 이미지의 크기
-    @State private var idolImageName: String = "필릭스디즈니누끼"
+    @State private var idolImageName: String = "Felix"
     
     // 아이돌 이미지의 위치를 저장하기 위한 상태 변수
     @State private var idolImagePositionX: CGFloat = 30.0

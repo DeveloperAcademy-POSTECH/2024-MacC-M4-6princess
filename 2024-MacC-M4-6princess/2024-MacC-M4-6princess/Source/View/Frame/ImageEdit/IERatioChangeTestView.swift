@@ -23,7 +23,7 @@ enum CropRatio {
 }
 
 struct IERatioChangeTestView: View {
-    @State private var rawImageName: String = "6공주들"
+    @State private var rawImageName: String = "6princess"
     @State private var rawImage: UIImage? = nil // 원본 UIImage
     @State private var croppedImage: UIImage? = nil // 크롭된 이미지를 저장할 변수
     @State private var currentRatio: CropRatio = .horizantal // 초기값을 4:3으로 지정

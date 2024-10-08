@@ -14,14 +14,16 @@ struct ImageResizeView: View {
     @State private var isSelected: Bool = false
     @State private var rotationAngle: Angle = .zero
     @State private var showingSavedAlert: Bool = false
+    var felix = "Felix"
+    var princess = "6princess"
     
     let backgroundImage: UIImage
     let idolImage: UIImage
     
     init() {
         // 고해상도 이미지를 로드합니다.
-        guard let backgroundImg = UIImage(named: "6공주들")?.cgImage,
-              let idolImg = UIImage(named: "필릭스디즈니누끼")?.cgImage else {
+        guard let backgroundImg = UIImage(named: princess)?.cgImage,
+              let idolImg = UIImage(named: felix)?.cgImage else {
             fatalError("Failed to load images")
         }
         
