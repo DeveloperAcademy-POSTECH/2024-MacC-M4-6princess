@@ -112,7 +112,7 @@ struct ImageResizeView: View {
                     Button(action: {
                         saveHighQualityImage()
                     }) {
-                        Text("Save High Quality Image")
+                        Text("저어장")
                             .padding()
                             .background(Color.blue)
                             .foregroundColor(.white)
@@ -125,19 +125,19 @@ struct ImageResizeView: View {
             .background(Color.white)
         }
         .alert(isPresented: $showingSavedAlert) {
-            Alert(title: Text("Success"), message: Text("High quality image saved successfully!"), dismissButton: .default(Text("OK")))
+            Alert(title: Text("성공"), message: Text("성공성공"), dismissButton: .default(Text("OK")))
         }
     }
     
     func saveHighQualityImage() {
         guard let backgroundCGImage = backgroundImage.cgImage else { return }
-        
+
         let width = backgroundCGImage.width
         let height = backgroundCGImage.height
-        
+
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
-        
+
         guard let context = CGContext(data: nil,
                                       width: width,
                                       height: height,
@@ -145,32 +145,39 @@ struct ImageResizeView: View {
                                       bytesPerRow: 0,
                                       space: colorSpace,
                                       bitmapInfo: bitmapInfo) else { return }
-        
+
         // 배경 이미지 그리기
         context.draw(backgroundCGImage, in: CGRect(x: 0, y: 0, width: width, height: height))
-        
-        // 아이돌 이미지 그리기
-        let idolWidth = CGFloat(width) * (baseWidth / backgroundImage.size.width) * imageScale
+
+        // 현재 GeometryReader 크기를 고려한 스케일링
+        let geometryWidthRatio = CGFloat(width) / UIScreen.main.bounds.width
+        let geometryHeightRatio = CGFloat(height) / UIScreen.main.bounds.height
+
+        // 아이돌 이미지 크기 계산
+        let idolWidth = (baseWidth * imageScale) * geometryWidthRatio
         let idolHeight = idolWidth / imageAspectRatio
-        let idolX = CGFloat(width) * (dragOffset.width / backgroundImage.size.width) + CGFloat(width) / 2 - idolWidth / 2
-        let idolY = CGFloat(height) * (dragOffset.height / backgroundImage.size.height) + CGFloat(height) / 2 - idolHeight / 2
-        
+
+        // 아이돌 이미지의 좌표 계산 (GeometryReader 크기 기준)
+        let idolX = (dragOffset.width * geometryWidthRatio) + CGFloat(width) / 2 - idolWidth / 2
+        let idolY = (dragOffset.height * geometryHeightRatio) + CGFloat(height) / 2 - idolHeight / 2
+
         context.saveGState()
         context.translateBy(x: idolX + idolWidth / 2, y: idolY + idolHeight / 2)
         context.rotate(by: rotationAngle.radians)
         context.translateBy(x: -(idolX + idolWidth / 2), y: -(idolY + idolHeight / 2))
-        
+
         if let idolCGImage = idolImage.cgImage {
             context.draw(idolCGImage, in: CGRect(x: idolX, y: idolY, width: idolWidth, height: idolHeight))
         }
-        
+
         context.restoreGState()
-        
-        // 최종 이미지 생성
+
+        // 최종 이미지 생성 및 저장
         if let finalImage = context.makeImage() {
             let uiImage = UIImage(cgImage: finalImage)
             UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             showingSavedAlert = true
         }
     }
+
 }
