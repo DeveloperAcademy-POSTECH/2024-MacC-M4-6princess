@@ -72,7 +72,7 @@ struct IEDevelopView: View {
             IEWidthFixView()
         }
         .fullScreenCover(isPresented: $imageResizeView) {
-            ImageResizeView()
+            IEImageResizeView()
         }
     }
 }

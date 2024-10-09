@@ -1,12 +1,14 @@
 //
-//  ImageResizeView.swift
+//  IETestResizeView.swift
 //  2024-MacC-M4-6princess
 //
-//  Created by ram on 10/4/24.
+//  Created by ram on 10/9/24.
 //
+
+
 import SwiftUI
 
-struct ImageResizeView: View {
+struct IETestResizeView: View {
     @State private var imageScale: CGFloat = 1.0
     @State private var startScale: CGFloat = 1.0
     @State private var dragOffset: CGSize = .zero
@@ -17,22 +19,24 @@ struct ImageResizeView: View {
     var felix = "Felix"
     var princess = "6princess"
     
-    let backgroundImage: UIImage
-    let idolImage: UIImage
+    var backgroundImg: UIImage
+    var idolImg: UIImage
     
-    init() {
-        // 고해상도 이미지를 로드합니다.
-        guard let backgroundImg = UIImage(named: princess)?.cgImage,
-              let idolImg = UIImage(named: felix)?.cgImage else {
-            fatalError("Failed to load images")
+    init(backgroundImage: UIImage, idolImage: UIImage) {
+        // 고해상도 이미지를 UIImage -> CGImage -> 다시 UIImage로 변환하는 과정 유지
+        guard let backgroundCGImage = backgroundImage.cgImage,
+              let idolCGImage = idolImage.cgImage else {
+            fatalError("이미지 로드 실패")
         }
         
-        self.backgroundImage = UIImage(cgImage: backgroundImg, scale: 1.0, orientation: .up)
-        self.idolImage = UIImage(cgImage: idolImg, scale: 1.0, orientation: .up)
+        // CGImage를 사용하여 새로운 UIImage를 생성
+        self.backgroundImg = UIImage(cgImage: backgroundCGImage, scale: 1.0, orientation: .up)
+        self.idolImg = UIImage(cgImage: idolCGImage, scale: 1.0, orientation: .up)
+        
     }
     
     var imageAspectRatio: CGFloat {
-        return idolImage.size.width / idolImage.size.height
+        return idolImg.size.width / idolImg.size.height
     }
     
     let baseWidth: CGFloat = 100
@@ -40,7 +44,7 @@ struct ImageResizeView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Image(uiImage: backgroundImage)
+                Image(uiImage: backgroundImg)
                     .resizable()
                     .scaledToFit()
                     .frame(width: geometry.size.width, height: geometry.size.height)
@@ -55,7 +59,7 @@ struct ImageResizeView: View {
                             }
                     )
                 
-                Image(uiImage: idolImage)
+                Image(uiImage: idolImg)
                     .resizable()
                     .scaledToFit()
                     .frame(width: baseWidth * imageScale, height: (baseWidth / imageAspectRatio) * imageScale)
@@ -132,14 +136,14 @@ struct ImageResizeView: View {
     }
     
     func saveHighQualityImage() {
-        guard let backgroundCGImage = backgroundImage.cgImage else { return }
-
+        guard let backgroundCGImage = backgroundImg.cgImage else { return }
+        
         let width = backgroundCGImage.width
         let height = backgroundCGImage.height
-
+        
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
-
+        
         guard let context = CGContext(data: nil,
                                       width: width,
                                       height: height,
@@ -147,33 +151,33 @@ struct ImageResizeView: View {
                                       bytesPerRow: 0,
                                       space: colorSpace,
                                       bitmapInfo: bitmapInfo) else { return }
-
+        
         // 배경 이미지 그리기
         context.draw(backgroundCGImage, in: CGRect(x: 0, y: 0, width: width, height: height))
-
+        
         // 현재 GeometryReader 크기를 고려한 스케일링
         let geometryWidthRatio = CGFloat(width) / UIScreen.main.bounds.width
         let geometryHeightRatio = CGFloat(height) / UIScreen.main.bounds.height
-
+        
         // 아이돌 이미지 크기 계산
         let idolWidth = (baseWidth * imageScale) * geometryWidthRatio
         let idolHeight = idolWidth / imageAspectRatio
-
+        
         // 아이돌 이미지의 좌표 계산 (GeometryReader 크기 기준)
         let idolX = (dragOffset.width * geometryWidthRatio) + CGFloat(width) / 2 - idolWidth / 2
         let idolY = (dragOffset.height * geometryHeightRatio) + CGFloat(height) / 2 - idolHeight / 2
-
+        
         context.saveGState()
         context.translateBy(x: idolX + idolWidth / 2, y: idolY + idolHeight / 2)
         context.rotate(by: rotationAngle.radians)
         context.translateBy(x: -(idolX + idolWidth / 2), y: -(idolY + idolHeight / 2))
-
-        if let idolCGImage = idolImage.cgImage {
+        
+        if let idolCGImage = idolImg.cgImage {
             context.draw(idolCGImage, in: CGRect(x: idolX, y: idolY, width: idolWidth, height: idolHeight))
         }
-
+        
         context.restoreGState()
-
+        
         // 최종 이미지 생성 및 저장
         if let finalImage = context.makeImage() {
             let uiImage = UIImage(cgImage: finalImage)
@@ -181,5 +185,5 @@ struct ImageResizeView: View {
             showingSavedAlert = true
         }
     }
-
+    
 }
