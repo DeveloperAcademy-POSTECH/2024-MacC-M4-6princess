@@ -77,7 +77,7 @@ struct IEWidthFixView: View {
     
     private func loadImage() {
         // 추후 바인딩 변수로 받아와야하기 때문에 현재는 UIImage를 로드하여 State 변수에 저장
-        var princess = "6princess"
+        let princess = "6princess"
         uiImage = UIImage(named: princess)
     }
     

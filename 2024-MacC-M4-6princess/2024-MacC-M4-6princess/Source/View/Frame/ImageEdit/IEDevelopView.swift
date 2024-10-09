@@ -12,6 +12,7 @@ struct IEDevelopView: View {
     @State private var showRatioChangeView = false
     @State private var showWidthFixView = false
     @State private var imageResizeView = false
+    @State private var edit = false
     var body: some View {
         ZStack {
             VStack {
@@ -59,6 +60,16 @@ struct IEDevelopView: View {
                         .cornerRadius(10)
                 }
                 .padding()
+                Button(action: {
+                    edit.toggle()
+                }) {
+                    Text("full")
+                        .font(.title)
+                        .padding()
+                        .background(Color.blue.opacity(0.2))
+                        .cornerRadius(10)
+                }
+                .padding()
             }
             .padding()
         }
@@ -73,6 +84,9 @@ struct IEDevelopView: View {
         }
         .fullScreenCover(isPresented: $imageResizeView) {
             IEImageResizeView()
+        }
+        .fullScreenCover(isPresented: $edit) {
+            PhotoEditingView()
         }
     }
 }
