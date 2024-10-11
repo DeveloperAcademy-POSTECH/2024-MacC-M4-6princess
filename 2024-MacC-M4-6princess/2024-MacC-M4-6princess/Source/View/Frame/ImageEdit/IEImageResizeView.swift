@@ -9,10 +9,11 @@ import SwiftUI
 struct IEImageResizeView: View {
     var felix = "Felix"
     var princess = "6princess"
-    var backgroundImage = UIImage(named: "6princess")!
-    var idolImage = UIImage(named: "Felix")!
+    @ObservedObject var viewModel = IEViewModel()
+    @State var backgroundImage = UIImage(named: "6princess")!
+    @State var idolImage = UIImage(named: "Felix")!
     var body: some View {
-        IETestResizeView(backgroundImage: backgroundImage, idolImage: idolImage)
+        IETestResizeView(viewModel: viewModel, backgroundImg: $backgroundImage, idolImg: $idolImage)
     }
     
     

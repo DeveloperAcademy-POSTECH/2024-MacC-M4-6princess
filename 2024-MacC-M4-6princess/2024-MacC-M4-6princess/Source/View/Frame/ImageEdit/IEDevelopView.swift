@@ -14,7 +14,8 @@ struct IEDevelopView: View {
     @State private var imageResizeView = false
     @State private var edit = false
     var body: some View {
-        ZStack {
+        
+        NavigationStack {
             VStack {
                 Button(action: {
                     showMagnifyGestureTestView.toggle()
@@ -41,7 +42,7 @@ struct IEDevelopView: View {
                 Button(action: {
                     showWidthFixView.toggle()
                 }) {
-                    Text("IEWidthFixView")
+                    Text("color")
                         .font(.title)
                         .padding()
                         .background(Color.blue.opacity(0.2))
@@ -60,16 +61,24 @@ struct IEDevelopView: View {
                         .cornerRadius(10)
                 }
                 .padding()
-                Button(action: {
-                    edit.toggle()
-                }) {
+//                Button(action: {
+////                    edit.toggle()
+//                }) {
+//                    Text("full")
+//                        .font(.title)
+//                        .padding()
+//                        .background(Color.blue.opacity(0.2))
+//                        .cornerRadius(10)
+//                }
+//                .padding()
+            
+                NavigationLink(destination:IEWholeEditView()) {
                     Text("full")
                         .font(.title)
                         .padding()
                         .background(Color.blue.opacity(0.2))
                         .cornerRadius(10)
                 }
-                .padding()
             }
             .padding()
         }
@@ -80,13 +89,13 @@ struct IEDevelopView: View {
             IERatioChangeView()
         }
         .fullScreenCover(isPresented: $showWidthFixView) {
-            IEWidthFixView()
+            IEColorView()
         }
         .fullScreenCover(isPresented: $imageResizeView) {
             IEImageResizeView()
         }
         .fullScreenCover(isPresented: $edit) {
-            PhotoEditingView()
+            IEWholeEditView()
         }
     }
 }
