@@ -64,7 +64,6 @@ struct IEColorView: View {
               let cgImage = context.createCGImage(outputCIImage, from: outputCIImage.extent) else {
             return nil
         }
-        
         return UIImage(cgImage: cgImage)
     }
 }

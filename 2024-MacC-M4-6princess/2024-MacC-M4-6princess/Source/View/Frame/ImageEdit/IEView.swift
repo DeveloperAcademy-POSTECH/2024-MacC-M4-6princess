@@ -11,8 +11,8 @@ struct IEView: View {
     var body: some View {
         //        GestureExample()
         //        ShapeTapView()
-                CounterView()
-//        IETest()
+        CounterView()
+        //        IETest()
         
     }
 }

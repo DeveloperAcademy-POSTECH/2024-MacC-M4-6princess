@@ -10,9 +10,9 @@
 import SwiftUI
 
 struct IETestResizeView: View {
-    @ObservedObject var viewModel:IEViewModel
+    @ObservedObject var ievm:IEViewModel
     
-    @Binding var backgroundImg: UIImage
+    @Binding var bgImg: UIImage
     @Binding var idolImg: UIImage
     
     
@@ -20,11 +20,9 @@ struct IETestResizeView: View {
         return idolImg.size.width / idolImg.size.height
     }
     
-    let baseWidth: CGFloat = 100
-    
     var body: some View {
         ZStack {
-            Image(uiImage: backgroundImg)
+            Image(uiImage: bgImg)
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -35,44 +33,44 @@ struct IETestResizeView: View {
                 .gesture(
                     TapGesture()
                         .onEnded {
-                            viewModel.isSelected = false
+                            ievm.isSelected = false
                         }
                 )
-            if let outputImage = viewModel.applyColorAdjustments(originalImage: idolImg) {
+            if let outputImage = ievm.applyColorAdjustments(originalImage: idolImg) {
                 Image(uiImage: outputImage)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: baseWidth * viewModel.imageScale,
-                           height: (baseWidth / imageAspectRatio) * viewModel.imageScale)
-                    .rotationEffect(viewModel.rotationAngle)
+                    .frame(width: ievm.baseWidth * ievm.imageScale,
+                           height: (ievm.baseWidth / imageAspectRatio) * ievm.imageScale)
+                    .rotationEffect(ievm.rotationAngle)
                     .overlay(
                         Rectangle()
-                            .stroke(viewModel.isSelected ? Color.blue : Color.clear, lineWidth: 1)
-                            .frame(width: (baseWidth * viewModel.imageScale) + 6,
-                                   height: ((baseWidth / imageAspectRatio) * viewModel.imageScale) + 6)
-                            .rotationEffect(viewModel.rotationAngle)
+                            .stroke(ievm.isSelected ? Color.blue : Color.clear, lineWidth: 1)
+                            .frame(width: (ievm.baseWidth * ievm.imageScale) + 6,
+                                   height: ((ievm.baseWidth / imageAspectRatio) * ievm.imageScale) + 6)
+                            .rotationEffect(ievm.rotationAngle)
                     )
                     .gesture(
                         TapGesture()
                             .onEnded {
-                                viewModel.toggleSelection()
+                                ievm.toggleSelection()
                             }
                     )
                     .gesture(
                         SimultaneousGesture(
                             MagnificationGesture()
                                 .onChanged { value in
-                                    if viewModel.isSelected {
-                                        viewModel.updateImageScale(with: value)
+                                    if ievm.isSelected {
+                                        ievm.updateImageScale(with: value)
                                     }
                                 }
                                 .onEnded { _ in
-                                    viewModel.endScaling()
+                                    ievm.endScaling()
                                 },
                             RotationGesture()
                                 .onChanged { angle in
-                                    if viewModel.isSelected {
-                                        viewModel.updateRotationAngle(with: angle)
+                                    if ievm.isSelected {
+                                        ievm.updateRotationAngle(with: angle)
                                     }
                                 }
                         )
@@ -80,29 +78,26 @@ struct IETestResizeView: View {
                     .gesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
-                                if viewModel.isSelected {
-                                    
-                                    viewModel.updateDragOffset(with: value.translation)
-    //                                print(value)
+                                if ievm.isSelected {
+                                    ievm.updateDragOffset(with: value.translation)
                                     
                                 }
                             }
                             .onEnded { _ in
-                                viewModel.endDragging()
+                                ievm.endDragging()
                             }
                     )
-                    .scaleEffect(viewModel.imageScale)
-                    .offset(viewModel.dragOffset)
+                    .scaleEffect(ievm.imageScale)
+                    .offset(ievm.dragOffset)
             }
-//            Image(uiImage: idolImg)
-                
+            
         }
         .onAppear{
-            guard let backgroundCGImage = backgroundImg.cgImage,
+            guard let backgroundCGImage = bgImg.cgImage,
                   let idolCGImage = idolImg.cgImage else {
                 fatalError("이미지 로드 실패")
             }
-            backgroundImg = UIImage(cgImage: backgroundCGImage, scale: 1.0, orientation: .up)
+            bgImg = UIImage(cgImage: backgroundCGImage, scale: 1.0, orientation: .up)
             idolImg = UIImage(cgImage: idolCGImage, scale: 1.0, orientation: .up)
             
         }

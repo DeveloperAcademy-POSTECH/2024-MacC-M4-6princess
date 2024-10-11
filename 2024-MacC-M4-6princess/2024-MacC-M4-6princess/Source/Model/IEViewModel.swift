@@ -15,48 +15,51 @@ class IEViewModel: ObservableObject {
     @Published var isSelected: Bool = false
     @Published var rotationAngle: Angle = .zero
     @Published var isModal = false
-    @Published var context = CIContext()
-    @Published var filter = CIFilter.colorControls()
     @Published var sliders: [Float] = [0.0, 1.0, 1.0]
+    @Published var selectedIndex: Int? = nil // 선택된 인덱스를 저장
+    
+    var ciContext = CIContext()
+    var filter = CIFilter.colorControls()
+    let baseWidth: CGFloat = 50
     
     // 이미지 스케일 업데이트 함수
     func updateImageScale(with value: CGFloat) {
         imageScale = max(0.2, min(2, startScale + (value-2) / 10))
     }
-
+    
     // 드래그 제스처 처리 함수
     func updateDragOffset(with translation: CGSize) {
         dragOffset = CGSize(
             width: startOffset.width + translation.width,
             height: startOffset.height + translation.height
         )
-//        dragOffset = translation
+        //        dragOffset = translation
     }
-
+    
     // 회전 제스처 처리 함수
     func updateRotationAngle(with angle: Angle) {
         rotationAngle = angle
     }
-
+    
     // 선택 상태 토글 함수
     func toggleSelection() {
         isSelected.toggle()
     }
-
+    
     // 스케일 종료 시 처리 함수
     func endScaling() {
         startScale = imageScale
     }
-
+    
     // 드래그 종료 시 처리 함수
     func endDragging() {
         startOffset = dragOffset
     }
     
-
+    
     func renderAndSaveImage(backgroundImage: UIImage, idolImage: UIImage) -> UIImage? {
         let backgroundSize = backgroundImage.size
-
+        
         // 배경 이미지의 크기 기준으로 렌더링할 새로운 컨텍스트 생성
         UIGraphicsBeginImageContextWithOptions(backgroundSize, false, 0.0)
         
@@ -70,7 +73,7 @@ class IEViewModel: ObservableObject {
         let idolRect = CGRect(x: (backgroundSize.width - idolSize.width) / 2 + dragOffset.width,
                               y: (backgroundSize.height - idolSize.height) / 2 + dragOffset.height,
                               width: idolSize.width, height: idolSize.height)
-
+        
         // 현재 그래픽 컨텍스트 가져오기
         guard let context = UIGraphicsGetCurrentContext() else {
             UIGraphicsEndImageContext()
@@ -109,11 +112,11 @@ class IEViewModel: ObservableObject {
         filter.contrast = sliders[2]
         
         guard let outputCIImage = filter.outputImage,
-              let cgImage = context.createCGImage(outputCIImage, from: outputCIImage.extent) else {
+              let cgImage = ciContext.createCGImage(outputCIImage, from: outputCIImage.extent) else {
             return nil
         }
         
         return UIImage(cgImage: cgImage)
     }
-
+    
 }

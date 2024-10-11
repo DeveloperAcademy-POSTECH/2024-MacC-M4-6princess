@@ -27,7 +27,7 @@ struct IEDevelopView: View {
                         .cornerRadius(10)
                 }
                 .padding()
-
+                
                 Button(action: {
                     showRatioChangeView.toggle()
                 }) {
@@ -38,7 +38,7 @@ struct IEDevelopView: View {
                         .cornerRadius(10)
                 }
                 .padding()
-
+                
                 Button(action: {
                     showWidthFixView.toggle()
                 }) {
@@ -61,17 +61,17 @@ struct IEDevelopView: View {
                         .cornerRadius(10)
                 }
                 .padding()
-//                Button(action: {
-////                    edit.toggle()
-//                }) {
-//                    Text("full")
-//                        .font(.title)
-//                        .padding()
-//                        .background(Color.blue.opacity(0.2))
-//                        .cornerRadius(10)
-//                }
-//                .padding()
-            
+                //                Button(action: {
+                ////                    edit.toggle()
+                //                }) {
+                //                    Text("full")
+                //                        .font(.title)
+                //                        .padding()
+                //                        .background(Color.blue.opacity(0.2))
+                //                        .cornerRadius(10)
+                //                }
+                //                .padding()
+                
                 NavigationLink(destination:IEWholeEditView()) {
                     Text("full")
                         .font(.title)

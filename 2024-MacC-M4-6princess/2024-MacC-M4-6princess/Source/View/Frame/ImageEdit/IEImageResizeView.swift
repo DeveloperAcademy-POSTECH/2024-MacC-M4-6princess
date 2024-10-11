@@ -13,11 +13,11 @@ struct IEImageResizeView: View {
     @State var backgroundImage = UIImage(named: "6princess")!
     @State var idolImage = UIImage(named: "Felix")!
     var body: some View {
-        IETestResizeView(viewModel: viewModel, backgroundImg: $backgroundImage, idolImg: $idolImage)
+        IETestResizeView(ievm: viewModel, bgImg: $backgroundImage, idolImg: $idolImage)
     }
     
     
-
+    
 }
 
 //
