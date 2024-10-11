@@ -6,7 +6,7 @@
 //
 import SwiftUI
 //코드 이해가 아직 부족함,,,
-struct IEMagnifyGestureTestView: View {
+struct TestMagnifyGestureView: View {
     @State private var scale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
     @State private var magnificationValue = 1.0 // 수동 확대/축소를 위한 상태 변수
     @GestureState private var magnification = 1.0 // 핀치 제스쳐를 위한 State 변수
@@ -23,7 +23,7 @@ struct IEMagnifyGestureTestView: View {
     
     var body: some View {
         ZStack {
-            IERatioChangeTestView() // 이미지 대신 사용자 정의 뷰를 사용
+            TestRatioChangeTestView() // 이미지 대신 사용자 정의 뷰를 사용
                 .scaleEffect(scale * magnification * magnificationValue) // 제스처와 수동 확대/축소를 결합
                 .gesture(magnificationGesture)
                 .frame(maxWidth: .infinity, maxHeight: .infinity) // 뷰가 전체 화면을 차지하도록 설정

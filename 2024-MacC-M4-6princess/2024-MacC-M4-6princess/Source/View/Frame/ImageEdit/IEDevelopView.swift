@@ -83,16 +83,16 @@ struct IEDevelopView: View {
             .padding()
         }
         .fullScreenCover(isPresented: $showMagnifyGestureTestView) {
-            IEMagnifyGestureTestView()
+            TestMagnifyGestureView()
         }
         .fullScreenCover(isPresented: $showRatioChangeView) {
-            IERatioChangeView()
+            TestRatioChangeView()
         }
         .fullScreenCover(isPresented: $showWidthFixView) {
-            IEColorView()
+            TestColorView()
         }
         .fullScreenCover(isPresented: $imageResizeView) {
-            IEImageResizeView()
+            TestResizeView()
         }
         .fullScreenCover(isPresented: $edit) {
             IEWholeEditView()

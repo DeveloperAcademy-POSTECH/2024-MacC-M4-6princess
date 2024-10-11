@@ -7,7 +7,7 @@
 import SwiftUI
 
 // 사진 편집시 초기 프레임 크기를 확인하기 위한 aspect ratio를 위한 enum
-enum CropRatio {
+enum TestCrop {
     case horizantal
     case vertical
     
@@ -22,11 +22,11 @@ enum CropRatio {
     }
 }
 
-struct IERatioChangeTestView: View {
+struct TestRatioChangeTestView: View {
     @State private var rawImageName: String = "6princess"
     @State private var rawImage: UIImage? = nil // 원본 UIImage
     @State private var croppedImage: UIImage? = nil // 크롭된 이미지를 저장할 변수
-    @State private var currentRatio: CropRatio = .horizantal // 초기값을 4:3으로 지정
+    @State private var currentRatio: TestCrop = .horizantal // 초기값을 4:3으로 지정
     
     var body: some View {
         ZStack {
@@ -82,7 +82,7 @@ struct IERatioChangeTestView: View {
         }
     }
     
-    private func cropImage(image: UIImage, aspectRatio: CropRatio) -> UIImage? {
+    private func cropImage(image: UIImage, aspectRatio: TestCrop) -> UIImage? {
         let width = image.size.width
         let height = image.size.height
         let aspectSize = aspectRatio.cropSize
@@ -114,5 +114,5 @@ struct IERatioChangeTestView: View {
 }
 
 #Preview {
-    IERatioChangeTestView()
+    TestRatioChangeTestView()
 }

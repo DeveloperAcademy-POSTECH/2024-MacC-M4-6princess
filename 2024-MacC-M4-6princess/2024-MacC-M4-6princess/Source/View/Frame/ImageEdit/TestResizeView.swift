@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct IEImageResizeView: View {
+struct TestResizeView: View {
     var felix = "Felix"
     var princess = "6princess"
     @ObservedObject var viewModel = IEViewModel()

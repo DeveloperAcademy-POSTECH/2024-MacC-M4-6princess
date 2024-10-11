@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct IERatioChangeView: View {
+struct TestRatioChangeView: View {
     @State private var rawImageName: String = "6princess"
     @State private var rawImage: UIImage? = nil // 원본 UIImage
     @State private var croppedImage: UIImage? = nil // 크롭된 이미지를 저장할 변수
-    @State private var currentRatio: CropRatio = .horizantal // 초기값을 4:3으로 지정
+    @State private var currentRatio: TestCrop = .horizantal // 초기값을 4:3으로 지정
     
     var body: some View {
         ZStack {
@@ -56,7 +56,7 @@ struct IERatioChangeView: View {
         }
     }
     
-    private func cropImage(image: UIImage, aspectRatio: CropRatio) -> UIImage? {
+    private func cropImage(image: UIImage, aspectRatio: TestCrop) -> UIImage? {
         let width = image.size.width
         let height = image.size.height
         let aspectSize = aspectRatio.cropSize
@@ -88,7 +88,7 @@ struct IERatioChangeView: View {
 }
 
 #Preview {
-    IERatioChangeView()
+    TestRatioChangeView()
 }
 struct CropImageView: View {
     @Binding var croppedImage: UIImage?
