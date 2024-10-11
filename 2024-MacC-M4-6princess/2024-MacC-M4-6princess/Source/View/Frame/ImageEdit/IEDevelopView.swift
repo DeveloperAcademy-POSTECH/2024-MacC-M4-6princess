@@ -79,6 +79,13 @@ struct IEDevelopView: View {
                         .background(Color.blue.opacity(0.2))
                         .cornerRadius(10)
                 }
+                NavigationLink(destination:TestPositionView()) {
+                    Text("position")
+                        .font(.title)
+                        .padding()
+                        .background(Color.blue.opacity(0.2))
+                        .cornerRadius(10)
+                }
             }
             .padding()
         }
