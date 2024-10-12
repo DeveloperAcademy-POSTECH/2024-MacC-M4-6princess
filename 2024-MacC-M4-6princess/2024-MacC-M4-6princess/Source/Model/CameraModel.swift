@@ -11,6 +11,7 @@ import Photos
 
 class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     @Published var isTaken = false
+    @Published var isAllTaken = false
     
     @Published var session = AVCaptureSession()
     
@@ -26,7 +27,9 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     //이미지 데이터
     @Published var isSaved = false
     @Published var picData = Data(count: 0)
-
+//    @Published var picData: [Data] = []
+//    @Published var imageViews: [UIImage] = [] // UIImageView 배열
+    
     
     ///비디오 권한 체크
     func checkVideoAuthorizaion() {
@@ -84,21 +87,23 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         DispatchQueue.global(qos: .background).async {
             
             self.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
-
+            
             DispatchQueue.main.async {
                 withAnimation {
                     self.isTaken.toggle()
                     print("isTaken 값 토글됨")
                 }
             }
-            
+            self.session.stopRunning()
         }
     }
     
+    ///이후 찍는 횟수 기능에 쓰이는 사진 촬영 함수
     func takeManyPic() {
         DispatchQueue.global(qos: .background).async {
             
             self.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
+            
         }
     }
     
@@ -114,7 +119,9 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
                 }
                 //변수 초기화
                 self.isSaved = false
-                self.picData = Data(count: 0) // picData 초기화
+                self.picData = Data(count: 0) //picData 초기화
+//                self.imageViews = []
+//                self.picData = [] // picData 초기화
             }
         }
     }
@@ -130,26 +137,29 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("사진 데이터가 유효하지 않음")
             return
         }
+        //여기 imageData를 그냥 변수가 아니라 배열로 바꿔서 저장해야 여러 사진을 저장할 수 있을듯
         
         // 메인 스레드에서 picData 업데이트
         DispatchQueue.main.async {
             self.picData = imageData
+//            self.imageViews.append(UIImage(data: self.picData)!)
             print("사진이 성공적으로 처리되었습니다")
-//            self.isTaken = true  // 여기서 사진이 찍혔음을 UI에 반영
-            
         }
     }
     
     ///사진 저장 함수
     //UIImage로 바로 넘겨주는 방법 고안해야 함
     func savePic() {
-        guard let image = UIImage(data: self.picData)
-        else {
+        guard let image = UIImage(data: self.picData) else{
             print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
             return
         }
+//        guard let image = UIImage(data: self.picData.last ?? Data()) else {
+//            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
+//            return
+//        }
         
-        //이건 그냥 갤러리에 잘 저장되는지 확인용
+        //갤러리에 잘 저장되는지 확인용
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
         
         DispatchQueue.main.async {
@@ -158,23 +168,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         }
     }
     
-    
-//    func delayTimeSet(delayTime: Int) {
-//            switch delayTime {
-//            case 0:
-//                return
-//            case 3:
-//                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
-////                    self.takePic()
-//                }
-//            case 5: {
-//                return
-//            }
-//            case 7:
-//            default:
-//                return
-//            }
-//        }
+    ///전후면 카메라 전환 함수
     func changeCamera() {
         guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else {
             print("현재 입력을 찾을 수 없습니다.")
@@ -238,5 +232,5 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("카메라 전환 중 오류 발생: \(error)")
         }
     }
-
+    
 }

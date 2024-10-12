@@ -18,7 +18,7 @@ struct CameraPreview: UIViewRepresentable{
         let view = UIView(frame: UIScreen.main.bounds)
         
         // AVCaptureVideoPreviewLayer 생성
-
+        
         DispatchQueue.main.async {
             camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
             camera.preview.frame = view.frame
@@ -38,11 +38,11 @@ struct CameraPreview: UIViewRepresentable{
     
     func updateUIView(_ uiView: UIView, context: Context) {
         if camera.isTaken {
-            camera.session.stopRunning()
-        }else {
-            DispatchQueue.global(qos: .background).async {
-                camera.session.startRunning()
-            }
-        }
+                    camera.session.stopRunning()
+                }else {
+                    DispatchQueue.global(qos: .background).async {
+                        camera.session.startRunning()
+                    }
+                }
     }
 }
