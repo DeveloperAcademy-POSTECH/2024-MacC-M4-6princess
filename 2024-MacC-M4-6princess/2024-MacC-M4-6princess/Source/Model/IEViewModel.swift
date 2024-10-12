@@ -15,7 +15,7 @@ class IEViewModel: ObservableObject {
     @Published var isSelected: Bool = false
     @Published var rotationAngle: Angle = .zero
     @Published var isModal = false
-    @Published var sliders: [Float] = [0.0, 1.0, 1.0]
+    @Published var sliderValues: [Float] = [0.0, 1.0, 1.0]
     @Published var selectedIndex: Int? = nil // 선택된 인덱스를 저장
     
     var ciContext = CIContext()
@@ -107,9 +107,9 @@ class IEViewModel: ObservableObject {
         guard let ciImage = CIImage(image: originalImage) else { return nil }
         
         filter.inputImage = ciImage
-        filter.brightness = sliders[0]
-        filter.saturation = sliders[1]
-        filter.contrast = sliders[2]
+        filter.brightness = sliderValues[0]
+        filter.saturation = sliderValues[1]
+        filter.contrast = sliderValues[2]
         
         guard let outputCIImage = filter.outputImage,
               let cgImage = ciContext.createCGImage(outputCIImage, from: outputCIImage.extent) else {

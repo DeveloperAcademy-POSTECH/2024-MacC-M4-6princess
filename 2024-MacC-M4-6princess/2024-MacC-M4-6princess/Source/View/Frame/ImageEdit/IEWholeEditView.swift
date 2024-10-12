@@ -33,7 +33,7 @@ struct IEWholeEditView: View {
                 }
                 
                 if let idx = ievm.selectedIndex{
-                    SliderView(value: $ievm.sliders[idx], range: colorEdit[idx].range, step: colorEdit[idx].step)
+                    SliderView(value: $ievm.sliderValues[idx], range: colorEdit[idx].range, step: colorEdit[idx].step)
                 }
                 
                 // 편집 옵션 버튼들
