@@ -16,7 +16,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "215"
             endingLineNumber = "215"
-            landmarkName = "saveCompositeImage()"
+            landmarkName = "updateIdolCornerPositions(idolWidth:idolHeight:geometry:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

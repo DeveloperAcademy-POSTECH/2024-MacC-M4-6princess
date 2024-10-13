@@ -74,6 +74,12 @@ class IEViewModel: ObservableObject {
                               y: (backgroundSize.height - idolSize.height) / 2 + dragOffset.height,
                               width: idolSize.width, height: idolSize.height)
         
+        // 필터 적용된 아이돌 이미지 가져오기
+        guard let filteredIdolImage = applyColorAdjustments(originalImage: idolImage) else {
+            UIGraphicsEndImageContext()
+            return nil
+        }
+        
         // 현재 그래픽 컨텍스트 가져오기
         guard let context = UIGraphicsGetCurrentContext() else {
             UIGraphicsEndImageContext()
@@ -82,11 +88,11 @@ class IEViewModel: ObservableObject {
         
         // 변환 적용 (회전, 위치 변경)
         context.translateBy(x: idolRect.midX, y: idolRect.midY)  // 아이돌 이미지의 중심으로 이동
-        context.rotate(by: rotationAngle.radians)                         // 회전 적용
+        context.rotate(by: rotationAngle.radians)                // 회전 적용
         context.translateBy(x: -idolRect.midX, y: -idolRect.midY) // 다시 원점으로 이동
         
-        // 아이돌 이미지 그리기
-        idolImage.draw(in: idolRect)
+        // 필터 적용된 아이돌 이미지 그리기
+        filteredIdolImage.draw(in: idolRect)
         
         // 새로 그린 이미지 가져오기
         let renderedImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -102,6 +108,7 @@ class IEViewModel: ObservableObject {
         
         return renderedImage
     }
+
     // 이미지에 색상 조정을 적용하는 함수
     func applyColorAdjustments(originalImage:UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: originalImage) else { return nil }
