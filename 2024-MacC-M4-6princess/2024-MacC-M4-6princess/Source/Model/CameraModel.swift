@@ -91,10 +91,11 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             DispatchQueue.main.async {
                 withAnimation {
                     self.isTaken.toggle()
+                    
                     print("isTaken 값 토글됨")
                 }
             }
-            self.session.stopRunning()
+            
         }
     }
     
