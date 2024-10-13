@@ -4,56 +4,38 @@
 //
 //  Created by ram on 10/14/24.
 //
-
 import SwiftUI
+
 struct TestDragView: View {
-    @State private var location: CGPoint = CGPoint(x: 100, y: 100)
-    @GestureState private var fingerLocation: CGPoint? = nil
-    @GestureState private var startLocation: CGPoint? = nil // 1
-    @State var idolWidth:CGFloat = 100
-    var felix = "Felix"
-    var idolImg: UIImage
-    var idolRatio:CGFloat
-    init() {
-        guard let idolCGImage = UIImage(named: felix)?.cgImage else {
-            fatalError("이미지 로드 실패")
-        }
-        
-        self.idolImg = UIImage(cgImage: idolCGImage, scale: 1.0, orientation: .up)
-        idolRatio = idolImg.size.height/idolImg.size.width
-    }
+    @StateObject private var viewModel = TestDragViewModel()
+    @GestureState private var startLocation: CGPoint? = nil
     
     var simpleDrag: some Gesture {
         DragGesture()
             .onChanged { value in
-                var newLocation = startLocation ?? location // 3
-                newLocation.x += value.translation.width
-                newLocation.y += value.translation.height
-                self.location = newLocation
-            }.updating($startLocation) { (value, startLocation, transaction) in
-                startLocation = startLocation ?? location // 2
+                viewModel.updateLocation(with: value.translation, startLocation: startLocation)
+            }
+            .updating($startLocation) { (value, startLocation, transaction) in
+                startLocation = startLocation ?? viewModel.location
             }
     }
     
-//    var fingerDrag: some Gesture {
-//        DragGesture()
-//            .updating($fingerLocation) { (value, fingerLocation, transaction) in
-//                fingerLocation = value.location
-//            }
-//    }
-    
     var body: some View {
         ZStack {
-            Image(uiImage: idolImg)
+            Image(uiImage: viewModel.idolImg)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: idolWidth, height: idolWidth * idolRatio)
-                .position(location)
-                .gesture(
-                    simpleDrag
-//                        .simultaneously(with: fingerDrag)
-                )
-
+                .frame(width: viewModel.idolWidth, height: viewModel.idolWidth * viewModel.idolRatio)
+                .position(viewModel.location)
+                .gesture(simpleDrag)
+            
+            VStack{
+                Spacer()
+                // 현재 좌표를 화면에 표시하는 텍스트
+                Text("이미지 좌표: (\(Int(viewModel.location.x)), \(Int(viewModel.location.y)))")
+                    
+                    
+            }
         }
     }
 }
