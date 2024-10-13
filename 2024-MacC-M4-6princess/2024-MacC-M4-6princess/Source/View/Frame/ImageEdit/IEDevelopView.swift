@@ -20,7 +20,7 @@ struct IEDevelopView: View {
                 Button(action: {
                     showMagnifyGestureTestView.toggle()
                 }) {
-                    Text("IEMagnifyGestureTestView")
+                    Text("Drag")
                         .font(.title)
                         .padding()
                         .background(Color.blue.opacity(0.2))
@@ -90,7 +90,7 @@ struct IEDevelopView: View {
             .padding()
         }
         .fullScreenCover(isPresented: $showMagnifyGestureTestView) {
-            TestMagnifyGestureView()
+            TestDragView()
         }
         .fullScreenCover(isPresented: $showRatioChangeView) {
             TestRatioChangeView()
@@ -105,8 +105,4 @@ struct IEDevelopView: View {
             IEWholeEditView()
         }
     }
-}
-
-#Preview {
-    IEDevelopView()
 }
