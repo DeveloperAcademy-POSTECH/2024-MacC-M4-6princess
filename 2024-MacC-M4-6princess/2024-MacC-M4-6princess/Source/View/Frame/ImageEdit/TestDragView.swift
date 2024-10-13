@@ -7,17 +7,20 @@
 
 import SwiftUI
 struct TestDragView: View {
-    @State private var location: CGPoint = CGPoint(x: 0, y: 0)
+    @State private var location: CGPoint = CGPoint(x: 100, y: 100)
     @GestureState private var fingerLocation: CGPoint? = nil
     @GestureState private var startLocation: CGPoint? = nil // 1
+    @State var idolWidth:CGFloat = 100
     var felix = "Felix"
     var idolImg: UIImage
+    var idolRatio:CGFloat
     init() {
         guard let idolCGImage = UIImage(named: felix)?.cgImage else {
             fatalError("이미지 로드 실패")
         }
         
         self.idolImg = UIImage(cgImage: idolCGImage, scale: 1.0, orientation: .up)
+        idolRatio = idolImg.size.height/idolImg.size.width
     }
     
     var simpleDrag: some Gesture {
@@ -32,27 +35,25 @@ struct TestDragView: View {
             }
     }
     
-    var fingerDrag: some Gesture {
-        DragGesture()
-            .updating($fingerLocation) { (value, fingerLocation, transaction) in
-                fingerLocation = value.location
-            }
-    }
+//    var fingerDrag: some Gesture {
+//        DragGesture()
+//            .updating($fingerLocation) { (value, fingerLocation, transaction) in
+//                fingerLocation = value.location
+//            }
+//    }
     
     var body: some View {
         ZStack {
             Image(uiImage: idolImg)
-                .frame(width: 100, height: 100)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: idolWidth, height: idolWidth * idolRatio)
                 .position(location)
                 .gesture(
-                    simpleDrag.simultaneously(with: fingerDrag)
+                    simpleDrag
+//                        .simultaneously(with: fingerDrag)
                 )
-            if let fingerLocation = fingerLocation {
-                Circle()
-                    .stroke(Color.clear, lineWidth: 2)
-                    .frame(width: 44, height: 44)
-                    .position(fingerLocation)
-            }
+
         }
     }
 }
