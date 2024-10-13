@@ -20,7 +20,7 @@ class IEViewModel: ObservableObject {
     
     var ciContext = CIContext()
     var filter = CIFilter.colorControls()
-    let baseWidth: CGFloat = 50
+    let baseWidth: CGFloat = 100
     
     // 이미지 스케일 업데이트 함수
     func updateImageScale(with value: CGFloat) {
