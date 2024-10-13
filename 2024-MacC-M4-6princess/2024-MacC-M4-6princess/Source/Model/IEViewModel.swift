@@ -120,3 +120,94 @@ class IEViewModel: ObservableObject {
     }
     
 }
+
+//extension TestPositionView{
+//    func saveCompositeImage() {
+//        // 배경 이미지 비율 계산
+////        let backgroundAspectRatio = backgroundImg.size.width / backgroundImg.size.height
+//        let backgroundWidth = backgroundImg.size.width
+//        let backgroundHeight = backgroundImg.size.height
+//        
+//        // 비트맵 그래픽 컨텍스트 생성
+//        let renderer = UIGraphicsImageRenderer(size: CGSize(width: backgroundWidth, height: backgroundHeight))
+//        
+//        let compositeImage = renderer.image { context in
+//            // 배경 이미지 그리기
+//            backgroundImg.draw(in: CGRect(x: 0, y: 0, width: backgroundWidth, height: backgroundHeight))
+//            
+//            // 아이돌 이미지 크기 계산
+//            let idolWidth = baseWidth * imageScale
+//            let idolHeight = (baseWidth / imageAspectRatio) * imageScale
+//            
+//            // 아이돌 이미지 그리기 위치 계산
+////            let idolX = idolPosition.x
+////            let idolY = idolPosition.y
+//
+//            // 현재 회전을 적용하여 아이돌 이미지를 그립니다.
+////            context.cgContext.saveGState()
+////            context.cgContext.translateBy(x: idolX + (idolWidth / 2), y: idolY + (idolHeight / 2))
+//            context.cgContext.rotate(by: CGFloat(rotationAngle.radians))
+//            idolImg.draw(in: CGRect(x: idolPosition.x, y: idolPosition.y, width: idolWidth*5, height: idolHeight*5))
+//            context.cgContext.restoreGState()
+//        }
+//        
+//        // 포토 라이브러리에 이미지 저장
+//        PHPhotoLibrary.shared().performChanges({
+//            PHAssetChangeRequest.creationRequestForAsset(from: compositeImage)
+//        }) { success, error in
+//            DispatchQueue.main.async {
+//                if success {
+//                    showingSavedAlert = true
+//                } else {
+//                    saveError = true
+//                }
+//            }
+//        }
+//    }
+//
+//}
+//
+// 맨초기버전
+//func saveCompositeImage() {
+//    // 배경 이미지 비율 계산
+//    let backgroundAspectRatio = backgroundImg.size.width / backgroundImg.size.height
+//    let backgroundWidth = backgroundImg.size.width
+//    let backgroundHeight = backgroundWidth / backgroundAspectRatio
+//    
+//    // 비트맵 그래픽 컨텍스트 생성
+//    let renderer = UIGraphicsImageRenderer(size: CGSize(width: backgroundWidth, height: backgroundHeight))
+//    
+//    let compositeImage = renderer.image { context in
+//        // 배경 이미지 그리기
+//        backgroundImg.draw(in: CGRect(x: 0, y: 0, width: backgroundWidth, height: backgroundHeight))
+//        
+//        // 아이돌 이미지 크기 계산
+//        let idolWidth = baseWidth * imageScale
+//        let idolHeight = (baseWidth / imageAspectRatio) * imageScale
+//        
+//        // 아이돌 이미지 그리기 위치 계산
+//        let idolX = dragOffset.width + (backgroundWidth / 2) - (idolWidth / 2)
+//        let idolY = dragOffset.height + (backgroundHeight / 2) - (idolHeight / 2)
+//
+//        // 현재 회전을 적용하여 아이돌 이미지를 그립니다.
+//        context.cgContext.saveGState()
+//        context.cgContext.translateBy(x: idolX + (idolWidth / 2), y: idolY + (idolHeight / 2))
+//        context.cgContext.rotate(by: CGFloat(rotationAngle.radians))
+//        idolImg.draw(in: CGRect(x: -idolWidth / 2, y: -idolHeight / 2, width: idolWidth, height: idolHeight))
+//        context.cgContext.restoreGState()
+//    }
+//    
+//    // 포토 라이브러리에 이미지 저장
+//    PHPhotoLibrary.shared().performChanges({
+//        PHAssetChangeRequest.creationRequestForAsset(from: compositeImage)
+//    }) { success, error in
+//        DispatchQueue.main.async {
+//            if success {
+//                showingSavedAlert = true
+//            } else {
+//                saveError = true
+//            }
+//        }
+//    }
+//}
+//

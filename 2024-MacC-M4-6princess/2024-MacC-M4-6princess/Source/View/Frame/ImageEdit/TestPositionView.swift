@@ -14,6 +14,7 @@ struct TestPositionView: View {
     @State private var bgCornerPositions: [CGPoint] = [CGPoint](repeating: .zero, count: 4)
     @State private var idolCornerPositions: [CGPoint] = [CGPoint](repeating: .zero, count: 4)
     @State private var idolPosition: CGPoint = .zero
+    @State private var bgImgRect: CGRect = .zero
     
     var felix = "Felix"
     var princess = "6princess"
@@ -56,6 +57,9 @@ struct TestPositionView: View {
                         bgCornerPositions[1] = CGPoint(x: backgroundOffsetX + backgroundWidth, y: backgroundOffsetY)
                         bgCornerPositions[2] = CGPoint(x: backgroundOffsetX, y: backgroundOffsetY + backgroundHeight)
                         bgCornerPositions[3] = CGPoint(x: backgroundOffsetX + backgroundWidth, y: backgroundOffsetY + backgroundHeight)
+                        
+                        // backgroundRect 업데이트
+                        bgImgRect = CGRect(x: backgroundOffsetX, y: backgroundOffsetY, width: backgroundWidth, height: backgroundHeight)
                     }
                 
                 Color.clear
@@ -140,15 +144,17 @@ struct TestPositionView: View {
                         .foregroundColor(.black)
                         .padding()
                     
-                    Text("아이돌 크기: (width: \(idolWidth, specifier: "%.2f"), height: \(idolHeight, specifier: "%.2f"))")
-                        .foregroundColor(.black)
-                        .padding()
+                    //                    Text("아이돌 크기: (width: \(idolWidth, specifier: "%.2f"), height: \(idolHeight, specifier: "%.2f"))")
+                    //                        .foregroundColor(.black)
+                    //                        .padding()
+                    //
+                    Text("Top-left: \(bgCornerPositions[0])")
+                    //                    Text("Top-right: \(idolCornerPositions[1])")
+                    //                    Text("Bottom-left: \(idolCornerPositions[2])")
+                    //                    Text("Bottom-right: \(idolCornerPositions[3])")
                     
-                    Text("Top-left: \(idolCornerPositions[0])")
-                    Text("Top-right: \(idolCornerPositions[1])")
-                    Text("Bottom-left: \(idolCornerPositions[2])")
-                    Text("Bottom-right: \(idolCornerPositions[3])")
-                    
+                    //                    Text("중심:(\(bgImgRect.origin.x, specifier: "%.2f"),\(bgImgRect.origin.y, specifier: "%.2f")")
+                    //                    Text("w:\(bgImgRect.width),h:\(bgImgRect.height)")
                     Button(action: {
                         saveCompositeImage()
                     }) {
@@ -198,14 +204,25 @@ struct TestPositionView: View {
                                          y: bottomRight.y + dragOffset.height + geometry.size.height / 2)
         
         // 아이돌 이미지의 중심 좌표 업데이트
-        idolPosition = CGPoint(x: dragOffset.width + geometry.size.width / 2,
-                               y: dragOffset.height + geometry.size.height / 2)
+        idolPosition = CGPoint(x: idolCornerPositions[0].x,
+                               y: idolCornerPositions[0].y)
+//        CGPoint(x: dragOffset.width + geometry.size.width / 2,
+//                               y: dragOffset.height + geometry.size.height / 2)
     }
+    @MainActor
     func saveCompositeImage() {
         // 배경 이미지 비율 계산
-        let backgroundAspectRatio = backgroundImg.size.width / backgroundImg.size.height
+        let rawBackgroundWidth = backgroundImg.size.width
+        let newBackgroundWidth = bgImgRect.width
+        let scaleRatio = rawBackgroundWidth / newBackgroundWidth
+        //            newBackgroundWidth/rawBackgroundWidth
+        print("raw비율:\(rawBackgroundWidth)")
+        print("new비율:\(newBackgroundWidth)")
+        print("확대비율:\(scaleRatio)")
+        
+        //원본 크기를 가져옴
         let backgroundWidth = backgroundImg.size.width
-        let backgroundHeight = backgroundWidth / backgroundAspectRatio
+        let backgroundHeight = backgroundImg.size.height
         
         // 비트맵 그래픽 컨텍스트 생성
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: backgroundWidth, height: backgroundHeight))
@@ -219,14 +236,20 @@ struct TestPositionView: View {
             let idolHeight = (baseWidth / imageAspectRatio) * imageScale
             
             // 아이돌 이미지 그리기 위치 계산
-            let idolX = dragOffset.width + (backgroundWidth / 2) - (idolWidth / 2)
-            let idolY = dragOffset.height + (backgroundHeight / 2) - (idolHeight / 2)
-
+            let idolX = idolPosition.x - bgCornerPositions[0].x
+            let idolY = bgCornerPositions[0].y - idolPosition.y
+            
             // 현재 회전을 적용하여 아이돌 이미지를 그립니다.
             context.cgContext.saveGState()
-            context.cgContext.translateBy(x: idolX + (idolWidth / 2), y: idolY + (idolHeight / 2))
+            //이게 왜 있을까?
+//            context.cgContext.translateBy(x: (idolX + (idolWidth / 2))*scaleRatio, y: (idolY + (idolHeight / 2))*scaleRatio)
             context.cgContext.rotate(by: CGFloat(rotationAngle.radians))
-            idolImg.draw(in: CGRect(x: -idolWidth / 2, y: -idolHeight / 2, width: idolWidth, height: idolHeight))
+            let newRect = CGRect(x: idolX*scaleRatio, y: idolY*scaleRatio, width: idolWidth*scaleRatio, height: idolHeight*scaleRatio)
+            print("x: \(newRect.origin.x)")
+            print("y: \(newRect.origin.y)")
+            print("width: \(newRect.size.width)")
+            print("height: \(newRect.size.height)")
+            idolImg.draw(in: newRect)
             context.cgContext.restoreGState()
         }
         
@@ -243,6 +266,4 @@ struct TestPositionView: View {
             }
         }
     }
-
-
 }
