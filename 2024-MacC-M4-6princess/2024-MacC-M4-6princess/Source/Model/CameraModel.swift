@@ -27,8 +27,8 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     //이미지 데이터
     @Published var isSaved = false
     @Published var picData = Data(count: 0)
-//    @Published var picData: [Data] = []
-//    @Published var imageViews: [UIImage] = [] // UIImageView 배열
+    //    @Published var picData: [Data] = []
+    //    @Published var imageViews: [UIImage] = [] // UIImageView 배열
     
     
     ///비디오 권한 체크
@@ -121,8 +121,8 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
                 //변수 초기화
                 self.isSaved = false
                 self.picData = Data(count: 0) //picData 초기화
-//                self.imageViews = []
-//                self.picData = [] // picData 초기화
+                //                self.imageViews = []
+                //                self.picData = [] // picData 초기화
             }
         }
     }
@@ -143,7 +143,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         // 메인 스레드에서 picData 업데이트
         DispatchQueue.main.async {
             self.picData = imageData
-//            self.imageViews.append(UIImage(data: self.picData)!)
+            //            self.imageViews.append(UIImage(data: self.picData)!)
             print("사진이 성공적으로 처리되었습니다")
         }
     }
@@ -155,10 +155,10 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
             return
         }
-//        guard let image = UIImage(data: self.picData.last ?? Data()) else {
-//            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
-//            return
-//        }
+        //        guard let image = UIImage(data: self.picData.last ?? Data()) else {
+        //            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
+        //            return
+        //        }
         
         //갤러리에 잘 저장되는지 확인용
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
@@ -217,6 +217,10 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
                 self.session.addInput(currentInput) // 기존 입력 복원
             }
             
+            // 새로운 카메라의 활성 포맷 확인
+            let activeFormat = newVideoDevice.activeFormat
+            let maxDimensions = activeFormat.highResolutionStillImageDimensions
+            
             // 비디오 안정화 설정
             if let connection = self.output.connection(with: .video) {
                 if connection.isVideoStabilizationSupported {
@@ -225,7 +229,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             }
             
             // 출력 설정
-            output.isHighResolutionCaptureEnabled = true
+            output.maxPhotoDimensions = maxDimensions
             output.maxPhotoQualityPrioritization = .quality
             
             self.session.commitConfiguration()

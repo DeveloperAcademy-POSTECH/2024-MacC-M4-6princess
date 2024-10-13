@@ -8,43 +8,83 @@
 import SwiftUI
 
 struct CameraTimerView: View {
+    @StateObject var motionManager = MotionManager()
     @Binding var delayTime: Double
+    @Binding var isPushed: Int
     var body: some View {
-        HStack {
+        VStack(alignment: .center, spacing: 4)  {
             Button {
-                self.delayTime = 0
-                print("타이머 설정 꺼짐")
+                isPushed = (isPushed + 1) % 4
             } label: {
-                Text("OFF")
-                    .foregroundStyle(.white)
+                switch isPushed {
+                case 0:
+                    Image("timerIcon")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                        .animation(.easeInOut, value: motionManager.currentOrientation)
+                        .onAppear {
+                            self.delayTime = 0
+                            print("타이며 0초 설정됨")
+                        }
+                case 1:
+                    ZStack {
+                        Image("timerSecondBGIcon")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("3")
+                            .font(Font.custom("SF Pro", size: 17))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                    }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                        .animation(.easeInOut, value: motionManager.currentOrientation)
+                    .onAppear {
+                        self.delayTime = 3
+                        print("타이며 3초 설정됨")
+                    }
+                case 2:
+                    ZStack {
+                        Image("timerSecondBGIcon")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("5")
+                            .font(Font.custom("SF Pro", size: 17))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                    }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                        .animation(.easeInOut, value: motionManager.currentOrientation)
+                    .onAppear {
+                        self.delayTime = 5
+                        print("타이며 5초 설정됨")
+                    }
+                case 3:
+                    ZStack {
+                        Image("timerSecondBGIcon")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                        Text("7")
+                            .font(Font.custom("SF Pro", size: 17))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                    }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                        .animation(.easeInOut, value: motionManager.currentOrientation)
+                    .onAppear {
+                        self.delayTime = 7
+                        print("타이며 7초 설정됨")
+                    }
+                default:
+                    Text("잘못된 값")
+                    
+                    
+                }
+                
             }
-            Button {
-                self.delayTime = 3
-                print("3초 설정됨")
-            } label: {
-                Text("3초")
-                    .foregroundStyle(.white)
-            }
-            Button {
-                self.delayTime = 5
-                print("5초 설정됨")
-            } label: {
-                Text("5초")
-                    .foregroundStyle(.white)
-            }
-            Button {
-                self.delayTime = 7
-                print("7초 설정됨")
-            } label: {
-                Text("7초")
-                    .foregroundStyle(.white)
-            }
-        }.background(Color.black)
-
+            Text("타이머")
+                .font(Font.custom("SF Pro", size: 13))
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+        }
     }
 }
 
-#Preview {
-    CameraTimerView(delayTime: .constant(0))
-}
 

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+//sprint2에 사용합니다
 struct CameraTakepicCountView: View {
     @Binding var takePicCount: Int
     var body: some View {

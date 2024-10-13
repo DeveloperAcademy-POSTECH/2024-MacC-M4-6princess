@@ -37,12 +37,12 @@ struct CameraPreview: UIViewRepresentable{
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        if camera.isTaken {
-                    camera.session.stopRunning()
-                }else {
-                    DispatchQueue.global(qos: .background).async {
-                        camera.session.startRunning()
-                    }
-                }
+//        if camera.isTaken {
+//                    camera.session.stopRunning()
+//                }else {
+//                    DispatchQueue.global(qos: .background).async {
+//                        camera.session.startRunning()
+//                    }
+//                }
     }
 }

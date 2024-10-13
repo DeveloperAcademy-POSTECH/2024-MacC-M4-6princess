@@ -10,43 +10,58 @@ import SwiftUI
 struct CameraFrameSelectView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var imageDataArray: [(name: String, data: Data)] = []  // 여기를 CoreData에서 불러오는 방식으로 수정
-    @Binding var selectedFrame: String
-
+    @Binding var selectedFrame: String?
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3)) {
-                    NavigationLink(destination: CameraView(selectedFrame: selectedFrame)) {
-                        Text("새로운 프레임 만들기")
-                    }
-                    ForEach(imageDataArray, id: \.name) { imageInfo in
-                        Button {
-                            selectedFrame = imageInfo.name
-                            dismiss()
-                        } label: {
-                            if let uiImage = UIImage(data: imageInfo.data) {
-                                Image(uiImage: uiImage)
+            VStack(spacing: 0) {
+                // 제목을 상단에 배치
+                SheetTitleView()
+                
+                ScrollView {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
+                        NavigationLink(destination: CameraView(selectedFrame: selectedFrame)) {
+                            VStack(alignment: .center, spacing: 4) {
+                                Spacer()
+                                Image("plusIcon")
                                     .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 150, height: 150)
-                                    .clipped()
-                                    .padding()
-                            } else {
-                                Color.gray
-                                    .frame(width: 150, height: 150)
-                                    .padding()
+                                    .frame(width: 30, height: 30, alignment: .center)
+                                Text("새로운\n프레임 만들기")
+                                    .font(Font.custom("SF Pro", size: 13))
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+                        }
+                        
+                        ForEach(imageDataArray, id: \.name) { imageInfo in
+                            Button {
+                                selectedFrame = imageInfo.name
+                                dismiss()
+                            } label: {
+                                if let uiImage = UIImage(data: imageInfo.data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .clipped()
+                                } else {
+                                    Color.gray
+                                        .frame(width: 150, height: 150) // 크기 설정
+                                }
                             }
                         }
                     }
                 }
+                .onAppear {
+                    loadImages()
+                }
             }
-            .onAppear {
-                loadImages()
-            }
-            .padding()
         }
     }
-
+    
+    //임시로 프레임 불러오는 함수
     private func loadImages() {
         let imageNames = ["frameTest1", "frameTest2", "frameTest3", "frameTest4", "frameTest5"] // 이미지 파일 이름
         for imageName in imageNames {
@@ -55,5 +70,36 @@ struct CameraFrameSelectView: View {
                 imageDataArray.append((name: imageName, data: data))
             }
         }
+    }
+}
+
+
+struct SheetTitleView: View {
+    var body: some View {
+        ZStack {
+            VStack {
+                Text("프레임 선택")
+                    .font(Font.custom("SF Pro", size: 17))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    
+            }
+            .padding(.vertical, 11)
+            .padding(.top, 10)
+            .overlay(
+                Rectangle()
+                    .fill(.white)
+                    .padding(.bottom, 1)
+                    .background(.sheetBorder)
+            )
+            Text("프레임 선택")
+                .font(.system(size: 17))
+                .fontWeight(.semibold)
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 10)
+        }
+
     }
 }
