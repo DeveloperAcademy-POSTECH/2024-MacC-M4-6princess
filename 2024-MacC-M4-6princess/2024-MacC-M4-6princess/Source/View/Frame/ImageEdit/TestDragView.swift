@@ -7,8 +7,8 @@
 import SwiftUI
 
 struct TestDragView: View {
-    @StateObject private var viewModel = TestDragViewModel()
-    @GestureState private var startLocation: CGPoint? = nil
+    @StateObject var viewModel = TestDragViewModel()
+    @GestureState var startLocation: CGPoint? = nil
     
     var simpleDrag: some Gesture {
         DragGesture()

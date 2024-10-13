@@ -20,7 +20,7 @@ struct IEDevelopView: View {
                 Button(action: {
                     showMagnifyGestureTestView.toggle()
                 }) {
-                    Text("Drag")
+                    Text("사진위치")
                         .font(.title)
                         .padding()
                         .background(Color.blue.opacity(0.2))
@@ -90,10 +90,10 @@ struct IEDevelopView: View {
             .padding()
         }
         .fullScreenCover(isPresented: $showMagnifyGestureTestView) {
-            TestDragView()
+            TestImagePositionView()
         }
         .fullScreenCover(isPresented: $showRatioChangeView) {
-            TestRatioChangeView()
+            TestDragView()
         }
         .fullScreenCover(isPresented: $showWidthFixView) {
             TestColorView()
