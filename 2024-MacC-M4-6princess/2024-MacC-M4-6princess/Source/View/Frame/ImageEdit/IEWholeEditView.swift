@@ -5,6 +5,7 @@
 //  Created by ram on 10/9/24.
 //
 import SwiftUI
+import Photos
 
 struct IEWholeEditView: View {
     @State var bgImg = UIImage(named: "6princess")!
@@ -96,12 +97,21 @@ struct IEWholeEditView: View {
            
            // 전체 뷰의 크기를 사용하여 ImageRenderer 초기화
         let renderer = ImageRenderer(content: resizeView.frame(width: ievm.screenSize.width,height: ievm.screenSize.width * ievm.bgRatio))
-//        renderer.scale = 3.0
-        renderer.scale = UIScreen.main.scale
-           
+        renderer.scale = 8.0
            if let uiImage = renderer.uiImage {
                ievm.rendered = uiImage
                // 여기서 이미지를 저장하거나 공유할 수 있습니다.
+               PHPhotoLibrary.shared().performChanges({
+                   PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
+               }) { success, error in
+                   DispatchQueue.main.async {
+                       if success {
+                           print("성공")
+                       } else {
+                           print("실패")
+                       }
+                   }
+               }
                ievm.isModal = true
            }
         else{
