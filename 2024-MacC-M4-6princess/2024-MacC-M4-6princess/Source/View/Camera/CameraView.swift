@@ -13,6 +13,7 @@ struct CameraView: View {
     @StateObject var motionManager = MotionManager()
     @State var delayTime: TimeInterval = 0.0
     @State var isPushed = 0
+    @State var isTakePic = false
     @State var isFrameSelect = false
     @State var selectedFrame: String? = nil
     @AppStorage("openFirstTime") private var firstTime = false
@@ -69,6 +70,7 @@ struct CameraView: View {
                     
                     //셔터 버튼
                     Button{
+                        self.isTakePic = true
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
                             camera.takePic()
                         }
@@ -97,6 +99,13 @@ struct CameraView: View {
                     .ignoresSafeArea(.all, edges: .all)
                     .zIndex(1)
             }
+            if delayTime != 0 && isTakePic == true {
+                CameraTimerSecondsView(delayTime: $delayTime, isTakePic: $isTakePic)
+                    .ignoresSafeArea(.all, edges: .all)
+            }
+            
+            
+                
         }.ignoresSafeArea(.all, edges: .all)
         //home indicator 잠깐 숨겨봤는데.. 잘 모르겠네요
             .persistentSystemOverlays(.hidden)
@@ -113,7 +122,6 @@ struct CameraView: View {
             .statusBar(hidden: true)
         
     }
-    
 }
 
 
