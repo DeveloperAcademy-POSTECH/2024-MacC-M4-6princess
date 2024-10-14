@@ -35,7 +35,7 @@ struct CameraTimerSecondsView: View {
                 opacity = 1 // 매 초마다 opacity를 1로 초기화
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     withAnimation(.easeOut(duration: 0.3)) {
-                        opacity = 0 // 텍스트를 숨김
+                        opacity = 0
                     }
                 }
             }
@@ -45,9 +45,6 @@ struct CameraTimerSecondsView: View {
     private func startTimer() {
         guard timer == nil else { return } // 이미 타이머가 실행 중이면 종료
         remainingTime = delayTime
-        showCountdown = true
-        opacity = 1.0 // 타이머 시작 시 텍스트 보이게 설정
-        backgroundOpacity = 0 // 배경 투명도 초기화
         
         timer = timerPublisher()
             .sink { [self] _ in
@@ -58,7 +55,6 @@ struct CameraTimerSecondsView: View {
                 }
                 if remainingTime <= 0 {
                     timer?.cancel() // 남은 시간이 0 이하일 때 타이머를 취소
-                    print("타이머가 취소됨")
                     timer = nil // 타이머를 nil로 설정
                     opacity = 0 // 카운트다운 숨기기
                     backgroundOpacity = 0
