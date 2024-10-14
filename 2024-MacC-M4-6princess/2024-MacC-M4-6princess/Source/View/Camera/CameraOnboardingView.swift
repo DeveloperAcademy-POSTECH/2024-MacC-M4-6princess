@@ -28,27 +28,31 @@ struct CameraOnboardingView: View {
                                 .padding(.bottom, 20)
                                 
                             
-                            ZStack {
-                                Rectangle()
-                                    .cornerRadius(5)
-                                    .frame(width: 40, height: 40)
-                                    .foregroundColor(.pointPink)
-                                
-                                Image("frameLoadWhite")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                            }
-                            .padding(.bottom, 4)
-                            .padding(.leading, -8)
-                            
-                            Text("불러오기")
-                                .font(Font.custom("SF Pro", size: 13))
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(.white)
-                                .padding(.bottom, 35)
+                            VStack {
+                                ZStack {
+                                    Rectangle()
+                                        .cornerRadius(5)
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(.pointPink)
+                                    
+                                    Image("frameLoadWhite")
+                                        .resizable()
+                                        .frame(width: 40, height: 40)
+                                }
+                                .padding(.bottom, 4)
                                 .padding(.leading, -8)
-
-
+                                
+                                Text("불러오기")
+                                    .font(Font.custom("SF Pro", size: 13))
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.white)
+                                    .padding(.bottom, 35)
+                                    .padding(.leading, -8)
+                                
+                            }
+                            .onTapGesture {
+                                firstTime = true
+                            }
                         }
                         .padding(.leading, -10)
                         Spacer()
@@ -61,9 +65,7 @@ struct CameraOnboardingView: View {
             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
             .background(.black)
             .opacity(0.8)
-            .onTapGesture {
-                firstTime = true
-            }
+            
     }
 }
 

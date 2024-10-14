@@ -18,10 +18,11 @@ struct CameraTimerSecondsView: View {
             
             if remainingTime > 0 {
                 Text("\(Int(remainingTime))")
-                    .font(.system(size: 100))
+                    .font(.system(size: 200))
                     .foregroundColor(.white)
                     .opacity(opacity) // 텍스트의 투명도 설정
                     .animation(.easeInOut(duration: 0.2), value: opacity) // opacity 애니메이션
+                    .shadow(color: Color.black.opacity(0.4), radius: 10)
             }
             
             

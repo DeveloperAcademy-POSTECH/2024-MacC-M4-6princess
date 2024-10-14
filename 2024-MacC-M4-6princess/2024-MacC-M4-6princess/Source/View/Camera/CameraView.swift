@@ -16,7 +16,8 @@ struct CameraView: View {
     @State var isTakePic = false
     @State var isFrameSelect = false
     @State var selectedFrame: String? = nil
-    @AppStorage("openFirstTime") private var firstTime = false
+    @State private var firstTime = false
+//    @AppStorage("openFirstTime") private var firstTime = false
     
     var body: some View {
         ZStack {
@@ -36,7 +37,7 @@ struct CameraView: View {
                         } label: {
                             Image("cameraReverseIcon")
                                 .resizable()
-                                .frame(width: 30, height: 30)
+                                .frame(width: 40, height: 40)
                                 .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                 .animation(.easeInOut, value: motionManager.currentOrientation)
                             
