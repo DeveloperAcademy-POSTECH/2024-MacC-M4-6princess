@@ -7,7 +7,7 @@
 import SwiftUI
 
 class TestDragViewModel: ObservableObject {
-    //아이돌
+    //아이돌 위치 잡기
     @Published var location: CGPoint = CGPoint(x: 100, y: 100) //뷰가 생길때 재초기화,이건 디폴트값
     @Published var idolWidth: CGFloat
     let idolImg: UIImage

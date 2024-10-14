@@ -28,6 +28,11 @@ struct TestDragView: View {
                 .frame(width: viewModel.idolWidth, height: viewModel.idolWidth * viewModel.idolRatio)
                 .position(viewModel.location)
                 .gesture(simpleDrag)
+                .onGeometryChange(for: CGRect.self) { proxy in
+                    proxy.frame(in: .global)
+                } action: { newValue in
+                    print("Frame is now \(newValue)")
+                }
             
             VStack{
                 Spacer()

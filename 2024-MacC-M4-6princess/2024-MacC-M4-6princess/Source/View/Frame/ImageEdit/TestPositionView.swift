@@ -234,6 +234,7 @@ struct TestPositionView: View {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: rawBGWidth, height: rawBGHeight))
         
         let compositeImage = renderer.image { context in
+            
             // 배경 이미지 그리기
             backgroundImg.draw(in: CGRect(x: 0, y: 0, width: rawBGWidth, height: rawBGHeight))
             
@@ -243,7 +244,7 @@ struct TestPositionView: View {
             
             // 아이돌 이미지 그리기 위치 계산
             let idolX = idolPosition.x - bgCornerPositions[0].x
-            let idolY = (bgCornerPositions[0].y - idolPosition.y)
+            let idolY = (bgCornerPositions[0].y - idolPosition.y) * (-1)
             
             // 현재 회전을 적용하여 아이돌 이미지를 그립니다.
             context.cgContext.saveGState()
@@ -273,3 +274,5 @@ struct TestPositionView: View {
         }
     }
 }
+
+

@@ -17,10 +17,27 @@ class IEViewModel: ObservableObject {
     @Published var isModal = false
     @Published var sliderValues: [Float] = [0.0, 1.0, 1.0]
     @Published var selectedIndex: Int? = nil // 선택된 인덱스를 저장
+    var idolRatio:CGFloat = .zero
+    @Published var rendered:UIImage?
+    @Published var screenSize: CGSize = .zero // bgImg 뷰의 크기를 저장할 State 변수
+    @Published var bgRatio: CGFloat = .zero
+    @Published var location: CGPoint = CGPoint(x: 100, y: 100)
     
+//    @Published var frameScale:CGPoint = .zero
+    
+    // 이미지에 색상 조정하는 객체,변수
     var ciContext = CIContext()
     var filter = CIFilter.colorControls()
+    
     let baseWidth: CGFloat = 100
+    
+    
+    // 편집 옵션 배열
+    let colorEdit: [EditingOption] = [
+        EditingOption(name: "밝기", icon: "sun.max.fill",range:-1...1,step: 0.1),
+        EditingOption(name: "채도", icon: "cloud.rainbow.half",range: 0...2,step: 0.1),
+        EditingOption(name: "대비", icon: "circle.lefthalf.fill",range: 0...2,step: 0.1)
+    ]
     
     // 이미지 스케일 업데이트 함수
     func updateImageScale(with value: CGFloat) {
@@ -56,7 +73,7 @@ class IEViewModel: ObservableObject {
         startOffset = dragOffset
     }
     
-    
+    // 배경이미지에 아이돌이미지를 적절한 위치에 올려서 합성사진을 저장하는 함수
     func renderAndSaveImage(backgroundImage: UIImage, idolImage: UIImage) -> UIImage? {
         let backgroundSize = backgroundImage.size
         
@@ -75,7 +92,7 @@ class IEViewModel: ObservableObject {
                               width: idolSize.width, height: idolSize.height)
         
         // 필터 적용된 아이돌 이미지 가져오기
-        guard let filteredIdolImage = applyColorAdjustments(originalImage: idolImage) else {
+        guard let filteredIdolImage = applyColorFilter(originalImage: idolImage) else {
             UIGraphicsEndImageContext()
             return nil
         }
@@ -110,13 +127,13 @@ class IEViewModel: ObservableObject {
     }
 
     // 이미지에 색상 조정을 적용하는 함수
-    func applyColorAdjustments(originalImage:UIImage) -> UIImage? {
+    func applyColorFilter(originalImage:UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: originalImage) else { return nil }
         
         filter.inputImage = ciImage
-        filter.brightness = sliderValues[0]
-        filter.saturation = sliderValues[1]
-        filter.contrast = sliderValues[2]
+        filter.brightness = sliderValues[0] //밝기
+        filter.saturation = sliderValues[1] //채도
+        filter.contrast = sliderValues[2] //대비
         
         guard let outputCIImage = filter.outputImage,
               let cgImage = ciContext.createCGImage(outputCIImage, from: outputCIImage.extent) else {

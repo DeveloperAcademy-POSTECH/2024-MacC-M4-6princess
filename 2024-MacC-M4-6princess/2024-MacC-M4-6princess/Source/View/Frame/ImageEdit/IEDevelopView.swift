@@ -61,16 +61,7 @@ struct IEDevelopView: View {
                         .cornerRadius(10)
                 }
                 .padding()
-                //                Button(action: {
-                ////                    edit.toggle()
-                //                }) {
-                //                    Text("full")
-                //                        .font(.title)
-                //                        .padding()
-                //                        .background(Color.blue.opacity(0.2))
-                //                        .cornerRadius(10)
-                //                }
-                //                .padding()
+        
                 
                 NavigationLink(destination:IEWholeEditView()) {
                     Text("full")
@@ -79,6 +70,7 @@ struct IEDevelopView: View {
                         .background(Color.blue.opacity(0.2))
                         .cornerRadius(10)
                 }
+                
                 NavigationLink(destination:TestPositionView()) {
                     Text("position")
                         .font(.title)
@@ -96,10 +88,10 @@ struct IEDevelopView: View {
             TestDragView()
         }
         .fullScreenCover(isPresented: $showWidthFixView) {
-            TestColorView()
+            IEWidthFixView()
         }
         .fullScreenCover(isPresented: $imageResizeView) {
-            TestResizeView()
+            TestRatioChangeTestView()
         }
         .fullScreenCover(isPresented: $edit) {
             IEWholeEditView()

@@ -87,9 +87,6 @@ struct TestRatioChangeView: View {
     }
 }
 
-#Preview {
-    TestRatioChangeView()
-}
 struct CropImageView: View {
     @Binding var croppedImage: UIImage?
     var rawImage: UIImage? // 원본 이미지를 저장하는 변수
