@@ -21,10 +21,12 @@ struct Line {
 
 
 struct DFFrameEditView: View {
+    
     @State private var picImage: UIImage?
     @State var selectionModeIndex: Int = 0
     @State var lines: [Line] = []
     @State private var lineWidth = 0.0
+    @State private var isShow: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -72,6 +74,7 @@ struct DFFrameEditView: View {
                         } label: {
                             Text("확인")
                                 .fontWeight(.semibold)
+                                .foregroundStyle(.pointPink)
                                 .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
                         }
                         .padding(1)
@@ -81,6 +84,10 @@ struct DFFrameEditView: View {
                             .resizable()
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 1.3)
                             .padding(.bottom, 20)
+                        Circle()
+                            .stroke(.white)
+                            .opacity(isShow ? 1 : 0)
+                            .frame(width: lineWidth, height: lineWidth)
                         
                         VStack {
                             Spacer()
@@ -100,10 +107,16 @@ struct DFFrameEditView: View {
                                 } maximumValueLabel: {
                                     Text("")
                                 } onEditingChanged: { editing in
+                                    isShow = editing
+                                    print("\(isShow)")
                                 }
-                                .accentColor(.pink)
+                                .accentColor(.pointPink)
                                 .padding(.bottom, 20)
                                 .padding([.leading, .trailing, .top], 10)
+                            }
+                            .onAppear() {
+                                let thumbImage = ImageRenderer(content: Circle().frame(width: 16, height: 16).foregroundStyle(.white)).uiImage
+                                UISlider.appearance().setThumbImage(thumbImage, for: .normal)
                             }
                         }
                     }
@@ -114,10 +127,13 @@ struct DFFrameEditView: View {
                         } label: {
                             ZStack {
                                 Circle()
-                                    .fill(Color(hex: "212121"))                            .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                                    .fill(Color(hex: "212121"))
+                                    .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                                 Image("brush")
                                     .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                                    .colorMultiply(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                                 Text("브러쉬")
+                                    .foregroundStyle(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                                     .font(.custom("Pretendard-medium", size: 13))
                                     .offset(y: 30)
                             }
@@ -129,10 +145,13 @@ struct DFFrameEditView: View {
                         } label: {
                             ZStack {
                                 Circle()
-                                    .fill(Color(hex: "212121"))                            .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                                    .fill(Color(hex: "212121"))
+                                    .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                                 Image("erase")
                                     .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                                    .colorMultiply(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                                 Text("지우개")
+                                    .foregroundStyle(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                                     .font(.custom("Pretendard-medium", size: 13))
                                     .offset(y: 30)
                             }
