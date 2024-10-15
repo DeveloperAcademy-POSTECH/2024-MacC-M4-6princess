@@ -78,7 +78,7 @@ struct IECanvasView: View {
                         .simultaneously(with: rotationGesture)
                              
                     )
-                    .offset(viewModel.dragOffset)
+                    
             }
         }
         .onAppear {
