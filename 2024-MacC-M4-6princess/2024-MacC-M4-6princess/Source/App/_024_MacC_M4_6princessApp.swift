@@ -9,12 +9,17 @@ import SwiftUI
 
 @main
 struct _024_MacC_M4_6princessApp: App {
+    
+    let persistenceController = PersistenceController.shared
+    
     var body: some Scene {
         WindowGroup {
 //            ContentView()
 //            DFPhotoPickView()
 //            DFFrameEditView()
             PhotosPickerView()
+                .environment(\.managedObjectContext,
+                                persistenceController.container.viewContext)
         }
     }
 }

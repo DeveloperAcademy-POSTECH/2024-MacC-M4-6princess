@@ -3,6 +3,7 @@ import SwiftUI
 struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Environment(\.managedObjectContext) var managedContext
     @Binding var resultImage: UIImage?
     @State private var draggedOffset = CGSize.zero
     @State private var accumulatedOffset = CGSize.zero
@@ -13,19 +14,27 @@ struct DFModifyFrame: View {
     @State private var currentAngle = Angle.zero
     @State private var finalAngle = Angle.zero
     @State private var isZoom: Bool = true
+    @State private var btnOpacity: Double = 0.0
+//    @FetchRequest(
+//      entity: StoreImages.entity(),
+//      sortDescriptors: [
+//        NSSortDescriptor(keyPath: \StoreImages.image, ascending: true)
+//      ],
+//      predicate: NSPredicate(format: "genre contains 'Action'")
+//    ) var images: FetchedResults<StoreImages>
     
     var rotate: some Gesture {
         RotateGesture()
-             .onChanged { value in
-                 currentAngle = value.rotation
-             }
-             .onEnded { value in
-                 withAnimation {
-                     finalAngle += currentAngle
-                     currentAngle = .zero
-                     isZoom = true
-                 }
-             }
+            .onChanged { value in
+                currentAngle = value.rotation
+            }
+            .onEnded { value in
+                withAnimation {
+                    finalAngle += currentAngle
+                    currentAngle = .zero
+                    isZoom = true
+                }
+            }
     }
     
     var magnification: some Gesture {
@@ -63,8 +72,8 @@ struct DFModifyFrame: View {
             .scaleEffect(finalSize + currentSize)
             .rotationEffect(currentAngle + finalAngle)
             .gesture(drag)
-//            .gesture(magnification)
-//            .gesture(rotate)
+        //            .gesture(magnification)
+        //            .gesture(rotate)
         
     }
     var body: some View {
@@ -78,6 +87,12 @@ struct DFModifyFrame: View {
                         .gesture(combined)
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image)))
                     //                    Color(.white)
+                    RoundedRectangle(cornerRadius: 30)
+                        .fill(Color.white)
+                        .opacity(btnOpacity)
+                        .frame(width: 175, height: 38)
+                        .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(btnOpacity))
+                        
                 }
             }
         }
@@ -119,7 +134,13 @@ struct DFModifyFrame: View {
                     let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: resultImage!.size.height / scaleCompute(resultImage!)))
                     render.scale = scaleCompute(resultImage!)
                     image = render.uiImage
+                    addImage(data: image?.pngData())
+                    btnOpacity = 1
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+                      btnOpacity = 0
+                    }
                     isShow = true
+//                    print("\(images.count)")
                     
                 } label: {
                     Text("저장")
@@ -137,6 +158,22 @@ struct DFModifyFrame: View {
     func scaleCompute(_ image: UIImage) -> CGFloat {
         let scale = image.size.width / UIScreen.main.bounds.width
         return scale
+    }
+    
+    func saveContext() {
+        do {
+            try managedContext.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
+        }
+    }
+    func addImage(data: Data?) {
+        
+        let newImage = StoreImages(context: managedContext)
+        
+        newImage.image = data
+        
+        saveContext()
     }
 }
 
