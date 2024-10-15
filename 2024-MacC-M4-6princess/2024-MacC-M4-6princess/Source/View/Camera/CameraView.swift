@@ -15,9 +15,12 @@ struct CameraView: View {
     @State var isPushed = 0
     @State var isTakePic = false
     @State var isFrameSelect = false
+    @State var isFullScreenPop: Bool = false
     @State var selectedFrame: String? = nil
-    @State private var firstTime = false
-//    @AppStorage("openFirstTime") private var firstTime = false
+    
+//    @State private var firstTime = false
+    @AppStorage("openFirstTime") private var firstTime = false
+    
     
     var body: some View {
         ZStack {
@@ -93,6 +96,8 @@ struct CameraView: View {
                     .frame(width: UIScreen.main.bounds.width, height: 132)
                     .background(.white)
                 
+            }.fullScreenCover(isPresented: $isFullScreenPop) {
+                CameraFullScreenTestView()
             }
             //처음 실행했을 때
             if !firstTime  {
@@ -115,7 +120,7 @@ struct CameraView: View {
                 motionManager.startDeviceMotionUpdates()
             })
             .sheet(isPresented: $isFrameSelect) {
-                CameraFrameSelectView(selectedFrame: $selectedFrame)
+                CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 
