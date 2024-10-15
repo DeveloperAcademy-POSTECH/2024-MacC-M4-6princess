@@ -1,8 +1,8 @@
 //
-//  PhotoEditingView.swift
+//  IEMainView.swift
 //  2024-MacC-M4-6princess
 //
-//  Created by ram on 10/9/24.
+//  Created by ram on 10/15/24.
 //
 import SwiftUI
 import Photos
@@ -13,10 +13,10 @@ struct IEMainView: View {
     @State var bgImg = UIImage(named: "6princess")!
     @State var idolImg = UIImage(named: "Felix")!
     
-    @ObservedObject var ievm = IEViewModel()
+    @ObservedObject var viewModel = IEViewModel()
     
     var canvasView: some View {
-        IECanvasView(ievm: ievm, bgImg: $bgImg, idolImg: $idolImg)
+        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
     }
     
     var body: some View {
@@ -31,27 +31,27 @@ struct IEMainView: View {
                 }
             }
             
-            if let idx = ievm.selectedIndex {
-                SliderView(value: $ievm.sliderValues[idx], range: ievm.colorEdit[idx].range, step: ievm.colorEdit[idx].step)
+            if let idx = viewModel.selectedIndex {
+                SliderView(value: $viewModel.sliderValues[idx], range: viewModel.colorEdit[idx].range, step: viewModel.colorEdit[idx].step)
             }
             
             // 편집 옵션 버튼들
             HStack {
                 Spacer()
-                ForEach(0..<ievm.colorEdit.count, id: \.self) { index in
+                ForEach(0..<viewModel.colorEdit.count, id: \.self) { index in
                     ZStack {
                         Circle()
                             .fill(Color(hex: "212121") ?? Color.gray)
                             .frame(width: 60)
                         
                         VStack {
-                            Image(systemName: ievm.colorEdit[index].icon) // 아이콘
-                                .foregroundColor(ievm.selectedIndex == index ? .pointPink : .white) // 색상 설정
-                            Text(ievm.colorEdit[index].name) // 텍스트
-                                .foregroundColor(ievm.selectedIndex == index ? .pointPink : .white) // 텍스트 색상 설정
+                            Image(systemName: viewModel.colorEdit[index].icon) // 아이콘
+                                .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 색상 설정
+                            Text(viewModel.colorEdit[index].name) // 텍스트
+                                .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 텍스트 색상 설정
                         }
                         .onTapGesture {
-                            ievm.selectedIndex = index // 선택된 인덱스 업데이트
+                            viewModel.selectedIndex = index // 선택된 인덱스 업데이트
                         }
                     }
                     .padding(.horizontal)
@@ -83,7 +83,7 @@ struct IEMainView: View {
             
             ToolbarItem(placement: .topBarTrailing) { // 사진 저장(테스트 위치)
                 Button(action: {
-                    ievm.saveRenderedView(content: canvasView)
+                    viewModel.saveRenderedView(content: canvasView)
                 }) {
                     Text("완료")
                         .foregroundColor(.pointPink)
@@ -91,8 +91,8 @@ struct IEMainView: View {
             }
         }
         // 저장확인용 시트
-        .sheet(isPresented: $ievm.isModal) {
-            if let rendered = ievm.compositeImage {
+        .sheet(isPresented: $viewModel.isModal) {
+            if let rendered = viewModel.compositeImage {
                 IEOutputImageView(image: rendered)
             }
         }

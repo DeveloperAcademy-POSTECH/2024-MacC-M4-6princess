@@ -127,7 +127,7 @@ class IEViewModel: ObservableObject {
         }
         return renderedImage
     }
-
+    
     // 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: originalImage) else { return nil }
@@ -144,6 +144,13 @@ class IEViewModel: ObservableObject {
         
         return UIImage(cgImage: cgImage)
     }
+    func updateLocation(with translation: CGSize, startLocation: CGPoint?) {
+        var newLocation = startLocation ?? self.location
+        newLocation.x += translation.width
+        newLocation.y += translation.height
+        self.location = newLocation
+    }
+    
     
     @MainActor
     func saveRenderedView<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
@@ -182,18 +189,18 @@ class IEViewModel: ObservableObject {
 ////        let backgroundAspectRatio = backgroundImg.size.width / backgroundImg.size.height
 //        let backgroundWidth = backgroundImg.size.width
 //        let backgroundHeight = backgroundImg.size.height
-//        
+//
 //        // 비트맵 그래픽 컨텍스트 생성
 //        let renderer = UIGraphicsImageRenderer(size: CGSize(width: backgroundWidth, height: backgroundHeight))
-//        
+//
 //        let compositeImage = renderer.image { context in
 //            // 배경 이미지 그리기
 //            backgroundImg.draw(in: CGRect(x: 0, y: 0, width: backgroundWidth, height: backgroundHeight))
-//            
+//
 //            // 아이돌 이미지 크기 계산
 //            let idolWidth = baseWidth * imageScale
 //            let idolHeight = (baseWidth / imageAspectRatio) * imageScale
-//            
+//
 //            // 아이돌 이미지 그리기 위치 계산
 ////            let idolX = idolPosition.x
 ////            let idolY = idolPosition.y
@@ -205,7 +212,7 @@ class IEViewModel: ObservableObject {
 //            idolImg.draw(in: CGRect(x: idolPosition.x, y: idolPosition.y, width: idolWidth*5, height: idolHeight*5))
 //            context.cgContext.restoreGState()
 //        }
-//        
+//
 //        // 포토 라이브러리에 이미지 저장
 //        PHPhotoLibrary.shared().performChanges({
 //            PHAssetChangeRequest.creationRequestForAsset(from: compositeImage)
@@ -228,18 +235,18 @@ class IEViewModel: ObservableObject {
 //    let backgroundAspectRatio = backgroundImg.size.width / backgroundImg.size.height
 //    let backgroundWidth = backgroundImg.size.width
 //    let backgroundHeight = backgroundWidth / backgroundAspectRatio
-//    
+//
 //    // 비트맵 그래픽 컨텍스트 생성
 //    let renderer = UIGraphicsImageRenderer(size: CGSize(width: backgroundWidth, height: backgroundHeight))
-//    
+//
 //    let compositeImage = renderer.image { context in
 //        // 배경 이미지 그리기
 //        backgroundImg.draw(in: CGRect(x: 0, y: 0, width: backgroundWidth, height: backgroundHeight))
-//        
+//
 //        // 아이돌 이미지 크기 계산
 //        let idolWidth = baseWidth * imageScale
 //        let idolHeight = (baseWidth / imageAspectRatio) * imageScale
-//        
+//
 //        // 아이돌 이미지 그리기 위치 계산
 //        let idolX = dragOffset.width + (backgroundWidth / 2) - (idolWidth / 2)
 //        let idolY = dragOffset.height + (backgroundHeight / 2) - (idolHeight / 2)
@@ -251,7 +258,7 @@ class IEViewModel: ObservableObject {
 //        idolImg.draw(in: CGRect(x: -idolWidth / 2, y: -idolHeight / 2, width: idolWidth, height: idolHeight))
 //        context.cgContext.restoreGState()
 //    }
-//    
+//
 //    // 포토 라이브러리에 이미지 저장
 //    PHPhotoLibrary.shared().performChanges({
 //        PHAssetChangeRequest.creationRequestForAsset(from: compositeImage)

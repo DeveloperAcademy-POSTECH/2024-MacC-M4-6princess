@@ -93,8 +93,8 @@ struct IEDevelopView: View {
         .fullScreenCover(isPresented: $imageResizeView) {
             TestRatioChangeTestView()
         }
-        .fullScreenCover(isPresented: $edit) {
-            IEMainView()
-        }
+//        .fullScreenCover(isPresented: $edit) {
+//            IEMainView()
+//        }
     }
 }
