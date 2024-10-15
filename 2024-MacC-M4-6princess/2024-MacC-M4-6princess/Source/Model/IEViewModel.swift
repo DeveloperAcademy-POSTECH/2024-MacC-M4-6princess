@@ -40,9 +40,9 @@ class IEViewModel: ObservableObject {
     
     
     // 편집 옵션 배열
-    let colorEdit: [EditingOption] = [
+    let colorEditOptions: [EditingOption] = [
         EditingOption(name: "밝기", icon: "sun.max.fill",range:-1...1,step: 0.1),
-        EditingOption(name: "채도", icon: "cloud.rainbow.half",range: 0...2,step: 0.1),
+        EditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
         EditingOption(name: "대비", icon: "circle.lefthalf.fill",range: 0...2,step: 0.1)
     ]
     

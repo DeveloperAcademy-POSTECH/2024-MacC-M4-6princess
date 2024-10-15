@@ -12,7 +12,7 @@ struct IEMainView: View {
     // 임의로 넣은 사진 데이터
     @State var bgImg = UIImage(named: "6princess")!
     @State var idolImg = UIImage(named: "Felix")!
-    
+    var img:UIImage
     @ObservedObject var viewModel = IEViewModel()
     
     var canvasView: some View {
@@ -22,37 +22,45 @@ struct IEMainView: View {
     var body: some View {
         VStack {
             Spacer()
-            // 이미지 리사이즈 뷰
             ZStack {
                 VStack{
                     Spacer()
+                    // 후보정 레이어 편집 뷰
                     canvasView
                     Spacer()
                 }
             }
             
             if let idx = viewModel.selectedIndex {
-                SliderView(value: $viewModel.sliderValues[idx], range: viewModel.colorEdit[idx].range, step: viewModel.colorEdit[idx].step)
+                SliderView(value: $viewModel.sliderValues[idx], range: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
             }
             
             // 편집 옵션 버튼들
             HStack {
                 Spacer()
-                ForEach(0..<viewModel.colorEdit.count, id: \.self) { index in
+                ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
                     ZStack {
                         Circle()
-                            .fill(Color(hex: "212121") ?? Color.gray)
+                            .fill(.gray01)
                             .frame(width: 60)
+                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
                         
                         VStack {
-                            Image(systemName: viewModel.colorEdit[index].icon) // 아이콘
-                                .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 색상 설정
-                            Text(viewModel.colorEdit[index].name) // 텍스트
+                            if index == 1{
+                                Image(viewModel.colorEditOptions[index].icon) // 아이콘
+                                    .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 색상 설정
+                            }
+                            else{
+                                Image(systemName: viewModel.colorEditOptions[index].icon) // 아이콘
+                                    .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 색상 설정
+                            }
+                            Text(viewModel.colorEditOptions[index].name) // 텍스트
                                 .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 텍스트 색상 설정
                         }
                         .onTapGesture {
                             viewModel.selectedIndex = index // 선택된 인덱스 업데이트
                         }
+                        .frame(minHeight:116)
                     }
                     .padding(.horizontal)
                     Spacer()
@@ -60,6 +68,11 @@ struct IEMainView: View {
             }
             .padding()
         }
+        .padding()
+        .onAppear{
+            bgImg = img
+        }
+        // 상단 툴바
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 Button(action: {
@@ -98,11 +111,5 @@ struct IEMainView: View {
         }
     }
     
-}
-
-
-
-#Preview {
-    IEMainView()
 }
 

@@ -17,18 +17,20 @@ struct IEDevelopView: View {
         
         NavigationStack {
             VStack {
-                NavigationLink(destination:IEMainView()) {
-                    Text("full")
-                        .font(.title)
-                        .padding()
-                        .background(Color.blue.opacity(0.2))
-                        .cornerRadius(10)
+                
+                Button(action:{
+                    edit = true
                 }
+                ){
+                    Text("test")
+                }
+                
             }
+            .navigationDestination(isPresented: $edit){
+                IEMainView(img: UIImage(named:"6princess")!)
+            }
+            
             .padding()
         }
-      
-       
-       
     }
 }

@@ -64,13 +64,14 @@ struct IECanvasView: View {
                 .resizable()
                 .scaledToFit()
             
+            
             // 아이돌 이미지
             if let outputImage = viewModel.applyColorFilter(originalImage: idolImg) {
                 Image(uiImage: outputImage)
                     .resizable()
                     .scaledToFit()
                     .rotationEffect(viewModel.rotationAngle)
-                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
+                    .frame(width: 100, height: 100 * viewModel.idolRatio)
                 
                     .position(viewModel.location)
                     .gesture(dragGesture
@@ -92,10 +93,11 @@ struct IECanvasView: View {
             
             // IECanvasView의 프레임 크기를 구함 for 이미지 저장
             viewModel.screenSize = UIScreen.main.bounds.size
+            
             print(viewModel.screenSize)
             
             // 화면에 보여줄 이미지 크기를 지정
-            viewModel.frameBGSize = CGSize(width: viewModel.screenSize.width, height: viewModel.bgRatio * viewModel.screenSize.width) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
+            viewModel.frameBGSize = CGSize(width: viewModel.screenSize.width - 20, height: viewModel.bgRatio * (viewModel.screenSize.width - 20)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
             viewModel.frameIdolSize = CGSize(width: viewModel.baseWidth, height: viewModel.bgRatio * viewModel.screenSize.width) // baseWidth를 100으로 지정,세로는 계산
             
             // 뷰생성시 아이돌 이미지 위치 지정
@@ -104,7 +106,7 @@ struct IECanvasView: View {
             
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-        .background(Color.red)
+//        .background(Color.red)
     }
     
     
