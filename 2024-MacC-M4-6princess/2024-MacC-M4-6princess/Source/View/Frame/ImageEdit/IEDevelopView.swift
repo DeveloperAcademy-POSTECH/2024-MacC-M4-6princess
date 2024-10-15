@@ -63,7 +63,7 @@ struct IEDevelopView: View {
                 .padding()
         
                 
-                NavigationLink(destination:IEWholeEditView()) {
+                NavigationLink(destination:IEMainView()) {
                     Text("full")
                         .font(.title)
                         .padding()
@@ -94,7 +94,7 @@ struct IEDevelopView: View {
             TestRatioChangeTestView()
         }
         .fullScreenCover(isPresented: $edit) {
-            IEWholeEditView()
+            IEMainView()
         }
     }
 }

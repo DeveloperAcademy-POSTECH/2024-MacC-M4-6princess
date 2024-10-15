@@ -7,14 +7,17 @@
 import SwiftUI
 import Photos
 
-struct IEWholeEditView: View {
+// 이미지 편집 메인 화면
+struct IEMainView: View {
+    // 임의로 넣은 사진 데이터
     @State var bgImg = UIImage(named: "6princess")!
     @State var idolImg = UIImage(named: "Felix")!
+    
     @ObservedObject var ievm = IEViewModel()
     
-    var resizeView: some View {
-            IETestResizeView(ievm: ievm, bgImg: $bgImg, idolImg: $idolImg)
-        }
+    var canvasView: some View {
+        IECanvasView(ievm: ievm, bgImg: $bgImg, idolImg: $idolImg)
+    }
     
     var body: some View {
         VStack {
@@ -23,11 +26,11 @@ struct IEWholeEditView: View {
             ZStack {
                 VStack{
                     Spacer()
-                    resizeView
+                    canvasView
                     Spacer()
                 }
-                    
             }
+            
             if let idx = ievm.selectedIndex {
                 SliderView(value: $ievm.sliderValues[idx], range: ievm.colorEdit[idx].range, step: ievm.colorEdit[idx].step)
             }
@@ -78,53 +81,28 @@ struct IEWholeEditView: View {
                 .padding(.horizontal)
             }
             
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) { // 사진 저장(테스트 위치)
                 Button(action: {
-                    saveRenderedView()
+                    ievm.saveRenderedView(content: canvasView)
                 }) {
                     Text("완료")
                         .foregroundColor(.pointPink)
                 }
             }
         }
+        // 저장확인용 시트
         .sheet(isPresented: $ievm.isModal) {
-            if let rendered = ievm.rendered {
+            if let rendered = ievm.compositeImage {
                 IEOutputImageView(image: rendered)
             }
         }
     }
-    func saveRenderedView() {
-           
-           // 전체 뷰의 크기를 사용하여 ImageRenderer 초기화
-        let renderer = ImageRenderer(content: resizeView.frame(width: ievm.screenSize.width,height: ievm.screenSize.width * ievm.bgRatio))
-        renderer.scale = 8.0
-           if let uiImage = renderer.uiImage {
-               ievm.rendered = uiImage
-               // 여기서 이미지를 저장하거나 공유할 수 있습니다.
-               PHPhotoLibrary.shared().performChanges({
-                   PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
-               }) { success, error in
-                   DispatchQueue.main.async {
-                       if success {
-                           print("성공")
-                       } else {
-                           print("실패")
-                       }
-                   }
-               }
-               ievm.isModal = true
-           }
-        else{
-            print("렌더링실패")
-        }
-       }
     
-   
 }
 
 
 
 #Preview {
-    IEWholeEditView()
+    IEMainView()
 }
 
