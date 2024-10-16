@@ -13,7 +13,7 @@ struct IECanvasView: View {
     @GestureState var startLocation: CGPoint? = nil
     @Binding var bgImg: UIImage
     @Binding var idolImg: UIImage
-    @State private var scale: CGFloat = 1.0
+    @State var scale: CGFloat = 1.0
     
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
