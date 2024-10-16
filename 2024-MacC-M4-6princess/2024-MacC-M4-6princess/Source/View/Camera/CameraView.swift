@@ -24,6 +24,7 @@ struct CameraView: View {
             ZStack {
                 CameraPreview(camera: camera)
                     .ignoresSafeArea(.all, edges: .all)
+                    
                 Image(selectedFrame ?? "") //뷰에 프레임 띄우기
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -112,10 +113,10 @@ struct CameraView: View {
             }
             .navigationDestination(isPresented: $camera.nextView) {
                 if let takenImg = camera.takenImg{
-                    IETestView(img: takenImg)
+                    IEMainView(img: takenImg)
                 }
                 else{
-                    IETestView(img: defaultImg)
+                    IEMainView(img: defaultImg)
                 
                 }
             }
@@ -133,16 +134,6 @@ struct CameraView: View {
             CameraFrameSelectView(selectedFrame: $selectedFrame)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
-            
-        }
-        .fullScreenCover(isPresented: $camera.nextView) {
-            if let takenImg = camera.takenImg{
-                IEMainView(img: takenImg)
-            }
-            else{
-                IEMainView(img: defaultImg)
-            
-            }
             
         }
         .statusBar(hidden: true)

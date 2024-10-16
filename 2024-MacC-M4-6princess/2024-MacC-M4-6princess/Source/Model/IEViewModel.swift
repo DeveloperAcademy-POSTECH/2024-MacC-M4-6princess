@@ -8,6 +8,7 @@ import SwiftUI
 import UIKit
 import Photos
 import CoreImage.CIFilterBuiltins
+import Combine
 
 //TODO: 아이돌 이미지가 바깥으로 가지못하게하기
 class IEViewModel: ObservableObject {
@@ -39,15 +40,22 @@ class IEViewModel: ObservableObject {
     let baseWidth: CGFloat = 100
     
     @Published var isAppend = false
-    
+    private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
     let colorEditOptions: [EditingOption] = [
-        EditingOption(name: "밝기", icon: "sun.max.fill",range:-1...1,step: 0.1),
-        EditingOption(name: "채도", icon: "drop.fill",range: 0...2,step: 0.1),
-        EditingOption(name: "대비", icon: "circle.righthalf.fill",range: 0...2,step: 0.1)
+        EditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.02),
+        EditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
+        EditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
     ]
-    
+    init() {
+            // location 값이 변경될 때마다 출력
+            $location
+                .sink { newLocation in
+                    print("location 변경됨: \(newLocation)")
+                }
+                .store(in: &cancellables) // 구독을 cancellables에 저장
+        }
     @MainActor
     func appendImg<T: View>(content: T) {
         // ImageRenderer를 이용해서 합성 이미지 생성
@@ -58,7 +66,7 @@ class IEViewModel: ObservableObject {
         
         if let uiImage = renderedImage.uiImage {
             self.imgArray.append(uiImage)
-            
+        
         } else {
             print("언두리두이미지생성실패")
         }
@@ -83,6 +91,30 @@ class IEViewModel: ObservableObject {
 //        }
 //    }
     
+    func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
+        
+        print("-----이곳은 canvas onAppear-----")
+        // 배경 이미지의 aspectRatio를 구함
+        self.bgRatio = bgImg.size.height / bgImg.size.width
+//            self.bgRatio = 500.0 / 375.0
+        print(self.bgRatio)
+        
+        // 아이돌 이미지의 aspectRatio를 구함
+        self.idolRatio = idolImg.size.height / idolImg.size.width
+        print(bgImg.size)
+        
+        // IECanvasView의 프레임 크기를 구함 for 이미지 저장
+        self.screenSize = bounds
+        
+        // 화면에 보여줄 이미지 크기를 지정
+        self.frameBGSize = CGSize(width: self.screenSize.width, height: self.bgRatio * (self.screenSize.width)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
+        self.frameIdolSize = CGSize(width: self.baseWidth, height: self.bgRatio * self.screenSize.width) // baseWidth를 100으로 지정,세로는 계산
+        
+        // 뷰생성시 아이돌 이미지 위치 지정
+        self.location = CGPoint(x: self.frameBGSize.width / 3 * 2, y: self.frameBGSize.height / 2)
+        print("---------")
+        
+    }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: originalImage) else { return nil }
@@ -104,6 +136,7 @@ class IEViewModel: ObservableObject {
         newLocation.x += translation.width
         newLocation.y += translation.height
         self.location = newLocation
+        print("newLocation:\(newLocation)")
     }
     
     
@@ -136,4 +169,5 @@ class IEViewModel: ObservableObject {
             print("렌더링 실패: 이미지 생성 실패")
         }
     }
+    
 }

@@ -11,29 +11,12 @@ import SwiftUI
 struct IECanvasView: View {
     @ObservedObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
-    
     @Binding var bgImg: UIImage
     @Binding var idolImg: UIImage
-    
     @State private var scale: CGFloat = 1.0
-    
-    var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { value in
-                viewModel.updateLocation(with: value.translation, startLocation: startLocation)
-            }
-            .updating($startLocation) { (value, startLocation, transaction) in
-                startLocation = startLocation ?? viewModel.location
-            }
-            .onEnded{ _ in
-                viewModel.isAppend = true
-            }
-            
-    }
     
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
-        
         RotationGesture()
             .onChanged { angle in
                 viewModel.rotationAngle = angle
@@ -41,7 +24,34 @@ struct IECanvasView: View {
             }
         
     }
-    
+    var dragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                // 이게 안되는 이유: 드래그 끝나고 위치가 업데이트 됨
+                //                viewModel.location=value.location
+                viewModel.updateLocation(with: value.translation, startLocation: startLocation)
+            }
+            .updating($startLocation) { (value, startLocation, transaction) in
+                
+                startLocation = startLocation ?? viewModel.location
+                print("undating 시작위치:\(startLocation)")
+            }
+            .onEnded{ value in
+                let finalLocation = CGPoint(
+                            x: viewModel.location.x + value.translation.width,
+                            y: viewModel.location.y + value.translation.height
+                        )
+                        
+                        // 뷰모델에 최종 위치를 업데이트
+                        viewModel.location = finalLocation
+                print("loc:\(viewModel.location)")
+                print("stl:\(startLocation)")
+                print("--------------------")
+                viewModel.isAppend = true
+            }
+        
+        
+    }
     var magnifyGesture: some Gesture{
         MagnifyGesture()
             .onChanged{ value in
@@ -66,7 +76,8 @@ struct IECanvasView: View {
             // 배경 이미지
             Image(uiImage: bgImg)
                 .resizable()
-                .scaledToFit()
+            //                .frame(width:300,height:1000)
+            //                .frame(width:viewModel.screenSize.width,height: viewModel.screenSize.width * viewModel.bgRatio)
             
             
             // 아이돌 이미지
@@ -75,42 +86,21 @@ struct IECanvasView: View {
                     .resizable()
                     .scaledToFit()
                     .rotationEffect(viewModel.rotationAngle)
-                    .frame(width: 100, height: 100 * viewModel.idolRatio)
-                
+                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
                     .position(viewModel.location)
                     .gesture(dragGesture
                         .simultaneously(with: magnifyGesture)
                         .simultaneously(with: rotationGesture)
                              
                     )
-                    
+                
             }
         }
         .onAppear {
-            // 배경 이미지의 aspectRatio를 구함
-            viewModel.bgRatio = bgImg.size.height / bgImg.size.width
-            print(viewModel.bgRatio)
-            
-            // 아이돌 이미지의 aspectRatio를 구함
-            viewModel.idolRatio = idolImg.size.height / idolImg.size.width
-            print(bgImg.size)
-            
-            // IECanvasView의 프레임 크기를 구함 for 이미지 저장
-            viewModel.screenSize = UIScreen.main.bounds.size
-            
-            print(viewModel.screenSize)
-            
-            // 화면에 보여줄 이미지 크기를 지정
-            viewModel.frameBGSize = CGSize(width: viewModel.screenSize.width - 20, height: viewModel.bgRatio * (viewModel.screenSize.width - 20)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
-            viewModel.frameIdolSize = CGSize(width: viewModel.baseWidth, height: viewModel.bgRatio * viewModel.screenSize.width) // baseWidth를 100으로 지정,세로는 계산
-            
-            // 뷰생성시 아이돌 이미지 위치 지정
-            viewModel.location = CGPoint(x: viewModel.frameBGSize.width / 3 * 2, y: viewModel.frameBGSize.height / 2)
-            
-            
+            viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-//        .background(Color.red)
+        //        .background(Color.red)
     }
     
     

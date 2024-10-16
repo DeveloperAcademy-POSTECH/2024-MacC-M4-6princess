@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "saturation.icon.png",
+      "filename" : "Property 1=preview.icon.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "saturation.icon@2x.png",
+      "filename" : "Property 1=preview.icon@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "saturation.icon@3x.png",
+      "filename" : "Property 1=preview.icon@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
