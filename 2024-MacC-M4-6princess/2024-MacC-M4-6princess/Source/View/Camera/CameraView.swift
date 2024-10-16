@@ -120,6 +120,9 @@ struct CameraView: View {
                 .onAppear(perform: {
                     camera.checkVideoAuthorizaion()
                     motionManager.startDeviceMotionUpdates()
+//                    DispatchQueue.main.async {
+//                        camera.session.startRunning()
+//                    }
                 })
                 .fullScreenCover(isPresented: $isFrameSelect) {
                     CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)

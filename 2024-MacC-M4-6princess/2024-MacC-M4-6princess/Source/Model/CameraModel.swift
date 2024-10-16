@@ -33,6 +33,8 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     @Published var takenImg:UIImage?
     
     @Published var nextView = false
+    
+    
     ///비디오 권한 체크
     func checkVideoAuthorizaion() {
         
@@ -147,7 +149,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             //            self.imageViews.append(UIImage(data: self.picData)!)
             self.takenImg = self.dataToUIImage()
             
-            self.session.stopRunning()
+//            self.session.stopRunning()
             self.nextView = true
             print("nextView:\(self.nextView)")
             print("사진이 성공적으로 처리되었습니다")

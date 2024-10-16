@@ -42,31 +42,7 @@ struct CameraFrameSelectView: View {
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
                             }.onTapGesture {
                                 isFullScreenPop.toggle()
-                            }
-
-
-//                            Button {
-//                                dismiss()
-////                                isFullScreenPop.toggle()
-//                                isShow.toggle()
-//                                
-//                            } label: {
-//                                VStack(alignment: .center, spacing: 4) {
-//                                    Spacer()
-//                                    Image("plusIcon")
-//                                        .resizable()
-//                                        .frame(width: 30, height: 30, alignment: .center)
-//                                    Text("새로운\n프레임 만들기")
-//                                        .font(.system(size: 13))
-//                                        .multilineTextAlignment(.center)
-//                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-//                                    Spacer()
-//                                }
-//                                .frame(maxWidth: .infinity)
-//                                .background(Color(red: 0.83, green: 0.83, blue: 0.83))
-//                            }
-                            
-                            
+                            }    
                             ForEach(imageDataArray, id: \.name) { imageInfo in
                                 Button {
                                     selectedFrame = imageInfo.name
@@ -122,38 +98,35 @@ struct CameraFrameSelectView: View {
         for imageName in imageNames {
             if let image = UIImage(named: imageName),
                let data = image.pngData() {
-                    imageDataArray.append((name: imageName, data: data))
+                imageDataArray.append((name: imageName, data: data))
             }
         }
     }
 }
 
-
+//모달 상단 타이틀 뷰
 struct SheetTitleView: View {
+    @Environment(\.dismiss) private var dismiss
     var body: some View {
-        ZStack {
-            VStack {
-                Text("프레임 선택")
-                    .font(Font.custom("SF Pro", size: 17))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                Image("xIcon")
+                    .resizable()
+                    .frame(width: 26, height: 26)
+                    .padding(.leading, 8)
             }
-            .padding(.vertical, 11)
-            .padding(.top, 10)
-            .overlay(
-                Rectangle()
-                    .fill(.white)
-                    .padding(.bottom, 1)
-                    .background(.sheetBorder)
-            )
-            Text("프레임 선택")
-                .font(.system(size: 17))
-                .fontWeight(.semibold)
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 10)
+
+            Spacer()
+            Text("편집")
+                .font(
+                    Font.custom("SF Pro", size: 17)
+                        .weight(.semibold)
+                )
+                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10.49618)
         }
         
     }
