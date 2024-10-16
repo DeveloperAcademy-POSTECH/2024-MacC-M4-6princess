@@ -30,7 +30,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     //    @Published var picData: [Data] = []
     //    @Published var imageViews: [UIImage] = [] // UIImageView 배열
     
-    @Published var takenImg:UIImage?
+    @Published var takenImg: UIImage?
     
     @Published var nextView = false
     

@@ -7,12 +7,18 @@
 
 import SwiftUI
 import PhotosUI
+import CoreData
 
 struct CameraFrameSelectView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var imageDataArray: [(name: String, data: Data)] = []
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)],
+        animation: .default)
+    private var storedImages: FetchedResults<StoreImages>
+    @State private var imageDataArray: [(id: UUID, data: Data)] = []
     @Binding var isFullScreenPop: Bool
-    @Binding var selectedFrame: String?
+    @Binding var selectedFrame: UUID?
     @State private var isShow: Bool = false
     
     var body: some View {
@@ -42,16 +48,18 @@ struct CameraFrameSelectView: View {
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
                             }.onTapGesture {
                                 isFullScreenPop.toggle()
-                            }    
-                            ForEach(imageDataArray, id: \.name) { imageInfo in
+                            }
+                            ForEach(imageDataArray, id: \.id) { imageInfo in
                                 Button {
-                                    selectedFrame = imageInfo.name
+                                    selectedFrame = imageInfo.id
                                     dismiss()
                                 } label: {
                                     if let uiImage = UIImage(data: imageInfo.data) {
                                         Image(uiImage: uiImage)
                                             .resizable()
                                             .aspectRatio(contentMode: .fill)
+                                            .frame(width: UIScreen.main.bounds.width / 3,
+                                                   height: (UIScreen.main.bounds.width / 3) * (598 / 375))
                                             .clipped()
                                     } else {
                                         Color.gray
@@ -93,13 +101,9 @@ struct CameraFrameSelectView: View {
     
     //임시로 프레임 불러오는 함수
     private func loadImages() {
-        // 여기를 CoreData에서 불러오는 방식으로 수정
-        let imageNames = ["frameTest1", "frameTest2", "frameTest3", "frameTest4", "frameTest5"] // 이미지 파일 이름
-        for imageName in imageNames {
-            if let image = UIImage(named: imageName),
-               let data = image.pngData() {
-                imageDataArray.append((name: imageName, data: data))
-            }
+        imageDataArray = storedImages.compactMap { storeImage in
+            guard let imageData = storeImage.image, let id = storeImage.uuid else { return nil }
+            return (id: id, data: imageData)
         }
     }
 }
@@ -117,7 +121,7 @@ struct SheetTitleView: View {
                     .frame(width: 26, height: 26)
                     .padding(.leading, 8)
             }
-
+            
             Spacer()
             Text("편집")
                 .font(
