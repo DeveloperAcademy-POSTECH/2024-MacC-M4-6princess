@@ -30,27 +30,29 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     //    @Published var picData: [Data] = []
     //    @Published var imageViews: [UIImage] = [] // UIImageView 배열
     
+    @Published var takenImg:UIImage?
     
+    @Published var nextView = false
     ///비디오 권한 체크
     func checkVideoAuthorizaion() {
         
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized:
-            //세션 세팅
-            setUp()
-        case .notDetermined:
-            //권한 재요청
-            AVCaptureDevice.requestAccess(for: .video) {
-                (status) in
-                if status {
-                    self.setUp()
+            case .authorized:
+                //세션 세팅
+                setUp()
+            case .notDetermined:
+                //권한 재요청
+                AVCaptureDevice.requestAccess(for: .video) {
+                    (status) in
+                    if status {
+                        self.setUp()
+                    }
                 }
-            }
-        case .denied:
-            self.isAlert.toggle()
-            return
-        default:
-            return
+            case .denied:
+                self.isAlert.toggle()
+                return
+            default:
+                return
         }
     }
     
@@ -143,7 +145,15 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         DispatchQueue.main.async {
             self.picData = imageData
             //            self.imageViews.append(UIImage(data: self.picData)!)
+            self.takenImg = self.dataToUIImage()
+            
+            self.session.stopRunning()
+            self.nextView = true
+            print("nextView:\(self.nextView)")
             print("사진이 성공적으로 처리되었습니다")
+            
+            
+            
         }
     }
     
@@ -185,17 +195,17 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         let preferredPosition: AVCaptureDevice.Position
         
         switch currentPosition {
-        case .unspecified, .front:
-            print("후면 카메라로 전환합니다.")
-            preferredPosition = .back
-            
-        case .back:
-            print("전면 카메라로 전환합니다.")
-            preferredPosition = .front
-            
-        @unknown default:
-            print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
-            preferredPosition = .back
+            case .unspecified, .front:
+                print("후면 카메라로 전환합니다.")
+                preferredPosition = .back
+                
+            case .back:
+                print("전면 카메라로 전환합니다.")
+                preferredPosition = .front
+                
+            @unknown default:
+                print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
+                preferredPosition = .back
         }
         
         // 새로운 카메라 장치 가져오기

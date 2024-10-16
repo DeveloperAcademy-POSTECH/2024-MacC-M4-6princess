@@ -15,11 +15,8 @@ struct _024_MacC_M4_6princessApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-//            DFPhotoPickView()
-//            DFFrameEditView()
-//            PhotosPickerView()
                 .environment(\.managedObjectContext,
-                                persistenceController.container.viewContext)
+                              persistenceController.container.viewContext)
         }
     }
 }
