@@ -17,22 +17,16 @@ struct CameraView: View {
     @State var isFrameSelect = false
     @State var isFullScreenPop: Bool = false
     @State var selectedFrame: String? = nil
-
-    //    @AppStorage("openFirstTime") private var firstTime = false
-    var defaultImg:UIImage = UIImage(named: "6princess")!
-
     
 //    @State private var firstTime = false
     @AppStorage("openFirstTime") private var firstTime = false
     
     
-
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             ZStack {
                 CameraPreview(camera: camera)
                     .ignoresSafeArea(.all, edges: .all)
-                    
                 Image(selectedFrame ?? "") //뷰에 프레임 띄우기
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -99,12 +93,14 @@ struct CameraView: View {
                         CameraTimerView(delayTime: $delayTime, isPushed: $isPushed)
                         
                         
-                    }
-                    .padding(.horizontal, 20)
-                    .frame(width: UIScreen.main.bounds.width, height: 132)
-                    .background(.white)
+                    }.padding(.horizontal, 20)
+                        .frame(width: UIScreen.main.bounds.width, height: 132)
+                        .background(.white)
                     
                 }
+//                .fullScreenCover(isPresented: $isFullScreenPop) {
+//                    PhotosPickerView()
+//                }
                 //처음 실행했을 때
                 if !firstTime  {
                     CameraOnboardingView(firstTime: $firstTime)
@@ -118,38 +114,22 @@ struct CameraView: View {
                 
                 
                 
-            }.fullScreenCover(isPresented: $isFullScreenPop) {
-                CameraFullScreenTestView()
-            }
-            .navigationDestination(isPresented: $camera.nextView) {
-                if let takenImg = camera.takenImg{
-                    IEMainView(img: takenImg)
+            }.ignoresSafeArea(.all, edges: .all)
+            //home indicator 잠깐 숨겨봤는데.. 잘 모르겠네요
+                .persistentSystemOverlays(.hidden)
+                .onAppear(perform: {
+                    camera.checkVideoAuthorizaion()
+                    motionManager.startDeviceMotionUpdates()
+                })
+                .fullScreenCover(isPresented: $isFrameSelect) {
+                    CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
+                    
                 }
-                else{
-                    IEMainView(img: defaultImg)
-                
-                }
-            }
-            
+                .statusBar(hidden: true)
+                .navigationBarBackButtonHidden()
         }
-        
-        .ignoresSafeArea(.all, edges: .all)
-        //home indicator 잠깐 숨겨봤는데.. 잘 모르겠네요
-
-
-            .persistentSystemOverlays(.hidden)
-            .onAppear(perform: {
-                camera.checkVideoAuthorizaion()
-                motionManager.startDeviceMotionUpdates()
-            })
-            .sheet(isPresented: $isFrameSelect) {
-                CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
-                
-            }
-            .statusBar(hidden: true)
-
         
     }
 }

@@ -9,11 +9,14 @@ import SwiftUI
 
 @main
 struct _024_MacC_M4_6princessApp: App {
+    
+    let persistenceController = PersistenceController.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-//            
-                
+                .environment(\.managedObjectContext,
+                                persistenceController.container.viewContext)
         }
     }
 }
