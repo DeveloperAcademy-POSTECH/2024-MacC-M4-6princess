@@ -10,7 +10,7 @@ import UIKit
 import SwiftUICore
 
 extension UIColor {
-    convenience init?(hex: String) {
+    convenience init(hex: String) {
         let r, g, b: CGFloat
         
         var hexColor = hex.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -28,11 +28,9 @@ extension UIColor {
 }
 
 extension Color {
-    init?(hex: String) {
-        if let uiColor = UIColor(hex: hex) {
-            self = Color(uiColor)
-        } else {
-            return nil
-        }
+    init(hex: String) {
+        
+            self = Color(UIColor(hex: hex))
+       
     }
 }

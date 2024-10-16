@@ -16,7 +16,7 @@ struct _024_MacC_M4_6princessApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext,
-                                persistenceController.container.viewContext)
+                              persistenceController.container.viewContext)
         }
     }
 }

@@ -18,9 +18,9 @@ struct CameraView: View {
     @State var isFullScreenPop: Bool = false
     @State var selectedFrame: String? = nil
     
-//    @State private var firstTime = false
+    //    @State private var firstTime = false
     @AppStorage("openFirstTime") private var firstTime = false
-    
+    var defaultImg:UIImage = UIImage(named: "6princess")!
     
     var body: some View {
         NavigationStack {
@@ -98,9 +98,9 @@ struct CameraView: View {
                         .background(.white)
                     
                 }
-//                .fullScreenCover(isPresented: $isFullScreenPop) {
-//                    PhotosPickerView()
-//                }
+                //                .fullScreenCover(isPresented: $isFullScreenPop) {
+                //                    PhotosPickerView()
+                //                }
                 //처음 실행했을 때
                 if !firstTime  {
                     CameraOnboardingView(firstTime: $firstTime)
@@ -129,6 +129,16 @@ struct CameraView: View {
                 }
                 .statusBar(hidden: true)
                 .navigationBarBackButtonHidden()
+                .navigationDestination(isPresented: $camera.nextView) {
+                    if let takenImg = camera.takenImg{
+                        IEMainView(img: takenImg)
+                    }
+                    else{
+                        IEMainView(img: defaultImg)
+                        
+                    }
+                }
+            
         }
         
     }

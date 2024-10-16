@@ -20,7 +20,7 @@ struct IECanvasView: View {
         RotationGesture()
             .onChanged { angle in
                 viewModel.rotationAngle = angle
-                print("angle:\(angle.degrees)")
+//                print("angle:\(angle.degrees)")
             }
         
     }
@@ -34,7 +34,7 @@ struct IECanvasView: View {
             .updating($startLocation) { (value, startLocation, transaction) in
                 
                 startLocation = startLocation ?? viewModel.location
-                print("undating 시작위치:\(startLocation)")
+//                print("undating 시작위치:\(startLocation)")
             }
             .onEnded{ value in
                 let finalLocation = CGPoint(
@@ -44,8 +44,8 @@ struct IECanvasView: View {
                 
                 // 뷰모델에 최종 위치를 업데이트
                 viewModel.location = finalLocation
-                print("loc:\(viewModel.location)")
-                print("stl:\(startLocation)")
+//                print("loc:\(viewModel.location)")
+//                print("stl:\(startLocation)")
                 print("--------------------")
                 viewModel.isAppend = true
             }

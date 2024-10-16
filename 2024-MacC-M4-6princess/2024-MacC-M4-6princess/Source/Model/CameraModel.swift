@@ -146,14 +146,14 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             self.picData = imageData
             //            self.imageViews.append(UIImage(data: self.picData)!)
             self.takenImg = self.dataToUIImage()
-            DispatchQueue.global(qos: .background).async{
-                self.session.stopRunning()
-                self.nextView = true
-                print("nextView:\(self.nextView)")
-                print("사진이 성공적으로 처리되었습니다")
-            }
             
-           
+            self.session.stopRunning()
+            self.nextView = true
+            print("nextView:\(self.nextView)")
+            print("사진이 성공적으로 처리되었습니다")
+            
+            
+            
         }
     }
     
