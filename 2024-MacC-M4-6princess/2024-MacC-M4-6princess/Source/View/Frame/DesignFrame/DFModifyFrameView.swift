@@ -78,21 +78,23 @@ struct DFModifyFrame: View {
     }
     var body: some View {
         let combined = magnification.sequenced(before: rotate)
-        VStack {
-            ZStack {
-                if let image = resultImage {
-                    Color(hex: "32322f")
-                        .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
-                    imageView
-                        .gesture(combined)
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image)))
-                    //                    Color(.white)
-                    RoundedRectangle(cornerRadius: 30)
-                        .fill(Color.white)
-                        .opacity(btnOpacity)
-                        .frame(width: 175, height: 38)
-                        .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(btnOpacity))
+        NavigationStack {
+            VStack {
+                ZStack {
+                    if let image = resultImage {
+                        Color(hex: "32322f")
+                            .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
+                        imageView
+                            .gesture(combined)
+                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image)))
+                        //                    Color(.white)
+                        RoundedRectangle(cornerRadius: 30)
+                            .fill(Color.white)
+                            .opacity(btnOpacity)
+                            .frame(width: 175, height: 38)
+                            .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(btnOpacity))
                         
+                    }
                 }
             }
         }
@@ -151,8 +153,8 @@ struct DFModifyFrame: View {
                 .padding(1)
             }
         }
-        .sheet(isPresented: $isShow) {
-            ResultView(image: $image)
+        .navigationDestination(isPresented: $isShow) {
+            CameraView()
         }
     }
     func scaleCompute(_ image: UIImage) -> CGFloat {
@@ -172,6 +174,7 @@ struct DFModifyFrame: View {
         let newImage = StoreImages(context: managedContext)
         
         newImage.image = data
+        newImage.uuid = UUID()
         
         saveContext()
     }

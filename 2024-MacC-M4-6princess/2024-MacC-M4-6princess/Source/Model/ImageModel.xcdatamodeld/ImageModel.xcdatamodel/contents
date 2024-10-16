@@ -2,5 +2,6 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23231" systemVersion="24A335" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="StoreImages" representedClassName="StoreImages" syncable="YES" codeGenerationType="class">
         <attribute name="image" optional="YES" attributeType="Binary"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
     </entity>
 </model>
