@@ -34,7 +34,7 @@ class IEViewModel: ObservableObject {
     
     @Published var screenSize: CGSize = .zero // bgImg 뷰의 크기를 저장할 State 변수
     
-   var imgArray:[UIImage] = []
+    var imgArray:[UIImage] = []
     // 이미지에 색상 조정하는 객체,변수
     var ciContext = CIContext()
     var filter = CIFilter.colorControls()
@@ -50,13 +50,14 @@ class IEViewModel: ObservableObject {
         EditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
     ]
     init() {
-            // location 값이 변경될 때마다 출력
-            $location
-                .sink { newLocation in
-                    print("location 변경됨: \(newLocation)")
-                }
-                .store(in: &cancellables) // 구독을 cancellables에 저장
-        }
+        // location 값이 변경될 때마다 출력
+        $location
+            .sink { newLocation in
+                print("location 변경됨: \(newLocation)")
+            }
+            .store(in: &cancellables) // 구독을 cancellables에 저장
+    }
+    
     @MainActor
     func appendImg<T: View>(content: T) {
         // ImageRenderer를 이용해서 합성 이미지 생성
@@ -67,7 +68,7 @@ class IEViewModel: ObservableObject {
         
         if let uiImage = renderedImage.uiImage {
             self.imgArray.append(uiImage)
-        
+            
         } else {
             print("언두리두이미지생성실패")
         }
@@ -79,7 +80,7 @@ class IEViewModel: ObservableObject {
         print("-----이곳은 canvas onAppear-----")
         // 배경 이미지의 aspectRatio를 구함
         self.bgRatio = bgImg.size.height / bgImg.size.width
-//            self.bgRatio = 500.0 / 375.0
+        //            self.bgRatio = 500.0 / 375.0
         print(self.bgRatio)
         
         // 아이돌 이미지의 aspectRatio를 구함

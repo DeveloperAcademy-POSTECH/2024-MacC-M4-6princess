@@ -13,7 +13,7 @@ struct IEMainView: View {
     @State var bgImg = UIImage(named: "6princess")!
     @State var idolImg = UIImage(named: "Felix")!
     var img:UIImage
-    @ObservedObject var viewModel = IEViewModel()
+    @StateObject var viewModel = IEViewModel()
     @State var isPreview = false
     
     var canvasView: some View {
@@ -64,7 +64,7 @@ struct IEMainView: View {
                                     }
                             }
                         }
-                            .padding(.horizontal)
+                        .padding(.horizontal)
                     }
                     if let idx = viewModel.selectedIndex {
                         HStack {
@@ -126,20 +126,17 @@ struct IEMainView: View {
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 
-                    Button(action: {
-                        // 뒤로가기
-                        print("back")
-                    }) {
-                        Image(systemName: "arrow.uturn.left")
-                            .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
-                        Image(systemName: "arrow.uturn.right")
-                            .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
-                        
-                    }
-                    .padding(.trailing,100)
+                Button(action: {
+                    // 뒤로가기
+                    print("back")
+                }) {
+                    Image(systemName: "arrow.uturn.left")
+                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
+                    Image(systemName: "arrow.uturn.right")
+                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
                     
-                
-               
+                }
+                .padding(.trailing,100)
             }
             
             ToolbarItem(placement: .topBarTrailing) { // 사진 저장(테스트 위치)

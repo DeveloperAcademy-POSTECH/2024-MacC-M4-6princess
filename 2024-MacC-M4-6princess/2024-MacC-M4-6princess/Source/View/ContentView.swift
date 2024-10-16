@@ -9,9 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            CameraView()
-        }
+        
+        CameraView()
+        //            IEDevelopView()
+        //        CMView()
     }
 }
 

@@ -38,12 +38,12 @@ struct IECanvasView: View {
             }
             .onEnded{ value in
                 let finalLocation = CGPoint(
-                            x: viewModel.location.x + value.translation.width,
-                            y: viewModel.location.y + value.translation.height
-                        )
-                        
-                        // 뷰모델에 최종 위치를 업데이트
-                        viewModel.location = finalLocation
+                    x: viewModel.location.x + value.translation.width,
+                    y: viewModel.location.y + value.translation.height
+                )
+                
+                // 뷰모델에 최종 위치를 업데이트
+                viewModel.location = finalLocation
                 print("loc:\(viewModel.location)")
                 print("stl:\(startLocation)")
                 print("--------------------")
