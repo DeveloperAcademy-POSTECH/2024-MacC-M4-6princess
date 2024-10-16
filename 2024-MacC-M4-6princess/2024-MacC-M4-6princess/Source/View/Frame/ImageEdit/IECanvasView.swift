@@ -76,7 +76,7 @@ struct IECanvasView: View {
             // 배경 이미지
             Image(uiImage: bgImg)
                 .resizable()
-            //                .frame(width:300,height:1000)
+//                .frame(width:UIScreen.main.bounds.width/2, height: UIScreen.main.bounds.height/2)
             //                .frame(width:viewModel.screenSize.width,height: viewModel.screenSize.width * viewModel.bgRatio)
             
             
@@ -101,6 +101,7 @@ struct IECanvasView: View {
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
         //        .background(Color.red)
+        
     }
     
     

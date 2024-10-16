@@ -11,13 +11,13 @@ import Photos
 struct IEMainView: View {
     // 임의로 넣은 사진 데이터
     @State var bgImg = UIImage(named: "6princess")!
-    @State var idolImg = UIImage(named: "Felix")!
+    @Binding var idolImg: UIImage?
     var img:UIImage
     @StateObject var viewModel = IEViewModel()
     @State var isPreview = false
     
     var canvasView: some View {
-        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
+        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: .constant(idolImg!))
     }
     var tap: some Gesture {
         LongPressGesture(minimumDuration: 0)
@@ -39,10 +39,12 @@ struct IEMainView: View {
                 VStack{
                     Spacer()
                     // 후보정 레이어 편집 뷰
-                    canvasView
+                    if idolImg != nil {
+                        canvasView
+                    }
                     Spacer()
                 }
-                
+                Spacer()
                 VStack{
                     Spacer()
                     HStack{
