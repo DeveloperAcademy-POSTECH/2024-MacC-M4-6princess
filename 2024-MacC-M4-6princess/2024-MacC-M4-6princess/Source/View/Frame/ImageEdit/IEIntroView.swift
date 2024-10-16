@@ -15,7 +15,7 @@ struct IEIntroView: View {
     var body: some View {
         VStack {
             ZStack{
-                IEMainView(img: img)
+//                IEMainView(img: img)
                 if !isMain{
                     Group{
                         Color.black.opacity(0.7)
