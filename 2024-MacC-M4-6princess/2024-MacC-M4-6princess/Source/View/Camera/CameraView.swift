@@ -36,8 +36,6 @@ struct CameraView: View {
                         Image(uiImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                    } else {
-                        Text("No frame selected")
                     }
                 }
                 .onAppear {
