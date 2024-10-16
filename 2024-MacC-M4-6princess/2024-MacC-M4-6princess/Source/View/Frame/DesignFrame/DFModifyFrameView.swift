@@ -171,16 +171,17 @@ struct DFModifyFrame: View {
         }
     }
     func addImage(data: Data?) {
-        let context = managedContext
+//        let context = managedContext
+//        
+//        // 현재 저장된 이미지의 개수를 확인
+//        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+//        let count = (try? context.count(for: fetchRequest)) ?? 0
         
-        // 현재 저장된 이미지의 개수를 확인
-        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
-        let count = (try? context.count(for: fetchRequest)) ?? 0
-        
-        let newImage = StoreImages(context: context)
+        let newImage = StoreImages(context: managedContext)
         newImage.image = data
         newImage.uuid = UUID()
-        newImage.order = Int32(count) // 현재 개수를 order로 사용
+        newImage.createAt = Date()
+//        newImage.order = Int32(count)  현재 개수를 order로 사용
         
         print("이미지 코어에 저장됨")
         saveContext()

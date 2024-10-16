@@ -49,7 +49,7 @@ struct CameraFrameSelectView: View {
                             }.onTapGesture {
                                 isFullScreenPop.toggle()
                             }
-                            ForEach(imageDataArray, id: \.id) { imageInfo in
+                            ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
                                 Button {
                                     selectedFrame = imageInfo.id
                                     dismiss()
@@ -72,9 +72,8 @@ struct CameraFrameSelectView: View {
                 }
                 else {
                     Spacer()
-                    Button {
-                        dismiss()
-                        isFullScreenPop.toggle()
+                    NavigationLink {
+                        PhotosPickerView()
                     } label: {
                         VStack(alignment: .center, spacing: 4) {
                             Image("plusIcon")
@@ -85,8 +84,10 @@ struct CameraFrameSelectView: View {
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                         }
+                    }.onTapGesture {
+                        dismiss()
+                        isFullScreenPop.toggle()
                     }
-                    
                     
                     Spacer()
                 }
@@ -99,7 +100,7 @@ struct CameraFrameSelectView: View {
         }
     }
     
-    //임시로 프레임 불러오는 함수
+    //프레임 불러오는 함수
     private func loadImages() {
         imageDataArray = storedImages.compactMap { storeImage in
             guard let imageData = storeImage.image, let id = storeImage.uuid else { return nil }
