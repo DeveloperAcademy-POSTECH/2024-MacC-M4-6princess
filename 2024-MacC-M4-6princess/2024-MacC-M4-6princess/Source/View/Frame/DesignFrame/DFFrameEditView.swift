@@ -264,6 +264,7 @@ struct DFFrameEditView: View {
                     }
                 } label: {
                     Image("back")
+                        .colorMultiply(index > 0 ? .white : .gray01)
                 }
                 .padding(.trailing, 14)
                 
@@ -276,6 +277,7 @@ struct DFFrameEditView: View {
                     }
                 } label: {
                     Image("front")
+                        .colorMultiply(index < maskImages.count - 1 ? .white : .gray01)
                 }
                 .padding(.trailing, 60)
                 

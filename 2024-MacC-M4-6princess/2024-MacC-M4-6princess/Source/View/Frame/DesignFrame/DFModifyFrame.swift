@@ -71,7 +71,7 @@ struct DFModifyFrame: View {
             .offset(draggedOffset)
             .scaleEffect(finalSize + currentSize)
             .rotationEffect(currentAngle + finalAngle)
-            .gesture(drag)
+            .gesture(drag.simultaneously(with: magnification).simultaneously(with: rotate))
         //            .gesture(magnification)
         //            .gesture(rotate)
         
