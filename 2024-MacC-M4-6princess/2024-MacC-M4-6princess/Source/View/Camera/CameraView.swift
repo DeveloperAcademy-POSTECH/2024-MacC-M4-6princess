@@ -15,10 +15,18 @@ struct CameraView: View {
     @State var isPushed = 0
     @State var isTakePic = false
     @State var isFrameSelect = false
+    @State var isFullScreenPop: Bool = false
     @State var selectedFrame: String? = nil
-    @State private var firstTime = false
+
     //    @AppStorage("openFirstTime") private var firstTime = false
     var defaultImg:UIImage = UIImage(named: "6princess")!
+
+    
+//    @State private var firstTime = false
+    @AppStorage("openFirstTime") private var firstTime = false
+    
+    
+
     var body: some View {
         NavigationStack{
             ZStack {
@@ -110,6 +118,8 @@ struct CameraView: View {
                 
                 
                 
+            }.fullScreenCover(isPresented: $isFullScreenPop) {
+                CameraFullScreenTestView()
             }
             .navigationDestination(isPresented: $camera.nextView) {
                 if let takenImg = camera.takenImg{
@@ -125,19 +135,21 @@ struct CameraView: View {
         
         .ignoresSafeArea(.all, edges: .all)
         //home indicator 잠깐 숨겨봤는데.. 잘 모르겠네요
-        .persistentSystemOverlays(.hidden)
-        .onAppear(perform: {
-            camera.checkVideoAuthorizaion()
-            motionManager.startDeviceMotionUpdates()
-        })
-        .sheet(isPresented: $isFrameSelect) {
-            CameraFrameSelectView(selectedFrame: $selectedFrame)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-            
-        }
-        .statusBar(hidden: true)
-        
+
+
+            .persistentSystemOverlays(.hidden)
+            .onAppear(perform: {
+                camera.checkVideoAuthorizaion()
+                motionManager.startDeviceMotionUpdates()
+            })
+            .sheet(isPresented: $isFrameSelect) {
+                CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+                
+            }
+            .statusBar(hidden: true)
+
         
     }
 }
