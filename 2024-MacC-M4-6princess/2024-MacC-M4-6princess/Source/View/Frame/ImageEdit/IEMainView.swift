@@ -11,13 +11,30 @@ import Photos
 struct IEMainView: View {
     // 임의로 넣은 사진 데이터
     @State var bgImg = UIImage(named: "6princess")!
-    @Binding var idolImg: UIImage?
-    var img:UIImage
+    @State var idolImg = UIImage(named: "Felix")!
+    var bg:UIImage
+    var idol:UIImage
     @StateObject var viewModel = IEViewModel()
     @State var isPreview = false
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
+    @State private var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
+    @State private var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
+    @GestureState private var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
+    @State var isMain = false
+    @State var isSave = false
+    @State var isAnimate = false
+    var pinchGesture: some Gesture {
+        MagnifyGesture()
+            .updating($pinchState) { value, gestureState, transaction in
+                gestureState = value.magnification
+            }
+            .onEnded { value in
+                self.pinchScale *= value.magnification // 확대 제스처가 끝났을 때 스케일을 곱함
+            }
+    }
     var canvasView: some View {
-        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: .constant(idolImg!))
+        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
     }
     var tap: some Gesture {
         LongPressGesture(minimumDuration: 0)
@@ -34,136 +51,172 @@ struct IEMainView: View {
     
     var body: some View {
         VStack {
-            Spacer()
-            ZStack {
-                VStack{
+            if !isAnimate{
+                
+                HStack {
+                    Button {
+                        self.presentationMode.wrappedValue.dismiss()
+                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                    } label: {
+                        HStack {
+                            Group{
+                                Image(systemName: "chevron.backward")
+                                    .fontWeight(.semibold)
+                                
+                                Text("다시 찍기")
+                                    .fontWeight(.regular)
+                            }
+                            .foregroundColor(.gray01)
+                        }
+                    }
+                    .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
+                    
+                    Spacer(minLength: UIScreen.main.bounds.width / 20)
+                    
+                    Button {
+                        
+                    } label: {
+                        Image("back")
+                        
+                    }
+                    .padding(.trailing, 14)
+                    
+                    Button {
+                        
+                    } label: {
+                        Image("front")
+                        
+                    }
+                    .padding(.trailing, 60)
+                    
                     Spacer()
+                    Button {
+                        
+                        viewModel.saveRenderedView(content: canvasView)
+                        isAnimate = true
+                        // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            isSave = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                isAnimate = false
+                                isMain = true
+                                
+                            }
+                        }
+                    } label: {
+                        Text("저장")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.pointPink)
+                            .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
+                    }
+                    .padding(1)
+                }
+                ZStack{
                     // 후보정 레이어 편집 뷰
-                    if idolImg != nil {
+                    Group{
                         canvasView
                     }
-                    Spacer()
-                }
-                Spacer()
-                VStack{
-                    Spacer()
-                    HStack{
+//                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
+//                        .gesture(pinchGesture)
+//                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 뷰가 전체 화면을 차지하도록 설정
+                        
+                    VStack{
                         Spacer()
-                        Group{
-                            if isPreview{
-                                Image(systemName:"rectangle.checkered")
-                                    .frame(width: 30,height: 30)
-                                    .foregroundColor(.gray01)
-                                    .gesture(tap)
-                            }
-                            else{
-                                Image(systemName:"rectangle.dashed")
-                                    .frame(width: 30,height: 30)
-                                    .foregroundColor(.gray01)
-                                    .gesture(tap)
-                                    .onTapGesture {
-                                        isPreview = true
-                                    }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                    if let idx = viewModel.selectedIndex {
-                        HStack {
-                            Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
-                                .foregroundColor(.white)
-                                .frame(width:30)
-                                .padding(.horizontal,5)
-                            
-                            // 슬라이더
-                            Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
-                                .tint(Color.pointPink)
-                        }
-                        .frame(height:40)
-                        .background(Color.black.opacity(0.5)) // 배경색
-                    }
-                    // 편집 옵션 버튼들
-                    HStack {
-                        Spacer()
-                        ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
-                            ZStack {
-                                Circle()
-                                    .fill(.gray10.opacity(0.15))
-                                    .frame(width: 60)
-                                    .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
-                                
-                                VStack {
-                                    if viewModel.selectedIndex == index{
-                                        Image("\(viewModel.colorEditOptions[index].icon).selected") // 아이콘
-                                            .foregroundColor(.pointPink)
-                                        
-                                        Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                            .foregroundColor(.pointPink) // 텍스트 색상 설정
-                                    }
-                                    else{
-                                        Image("\(viewModel.colorEditOptions[index].icon).unselected") // 아이콘
-                                            .foregroundColor(.gray01)
-                                        
-                                        Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                            .foregroundColor(.gray01) // 텍스트 색상 설정
-                                    }
+                        HStack{
+                            Spacer()
+                            Group{
+                                if isPreview{
+                                    Image(systemName:"rectangle.checkered")
+                                        .frame(width: 30,height: 30)
+                                        .foregroundColor(.gray01)
+                                        .gesture(tap)
                                 }
-                                .onTapGesture {
-                                    viewModel.selectedIndex = index // 선택된 인덱스 업데이트
+                                else{
+                                    Image(systemName:"rectangle.dashed")
+                                        .frame(width: 30,height: 30)
+                                        .foregroundColor(.gray01)
+                                        .gesture(tap)
+                                        .onTapGesture {
+                                            isPreview = true
+                                        }
                                 }
-                                .frame(minHeight:116)
                             }
                             .padding(.horizontal)
-                            Spacer()
+                        }
+                        if let idx = viewModel.selectedIndex {
+                            HStack {
+                                Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
+                                    .foregroundColor(.white)
+                                    .frame(width:30)
+                                    .padding(.horizontal,5)
+                                
+                                // 슬라이더
+                                Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
+                                    .tint(Color.pointPink)
+                            }
+                            .frame(height:40)
+                            .background(Color.black.opacity(0.5)) // 배경색
                         }
                     }
-                    .frame(maxHeight:116)
                 }
+                
+                // 편집 옵션 버튼들
+                HStack {
+                    Spacer()
+                    ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
+                        ZStack {
+                            Circle()
+                                .fill(.gray10.opacity(0.15))
+                                .frame(width: 60)
+                                .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
+                            
+                            VStack {
+                                if viewModel.selectedIndex == index{
+                                    Image("\(viewModel.colorEditOptions[index].icon).selected") // 아이콘
+                                        .foregroundColor(.pointPink)
+                                    
+                                    Text(viewModel.colorEditOptions[index].name) // 텍스트
+                                        .foregroundColor(.pointPink) // 텍스트 색상 설정
+                                }
+                                else{
+                                    Image("\(viewModel.colorEditOptions[index].icon).unselected") // 아이콘
+                                        .foregroundColor(.gray01)
+                                    
+                                    Text(viewModel.colorEditOptions[index].name) // 텍스트
+                                        .foregroundColor(.gray01) // 텍스트 색상 설정
+                                }
+                            }
+                            .onTapGesture {
+                                viewModel.selectedIndex = index // 선택된 인덱스 업데이트
+                            }
+                            
+                        }
+                        Spacer()
+                    }
+                }
+                .padding()
+                .background(.white)
+                
+            }
+            else{
+                IEProgressView(isSave: $isSave)
             }
         }
         .onAppear{
-            bgImg = img
+            bgImg = bg
+            idolImg = idol
         }
         // 상단 툴바
-        .toolbar {
-            ToolbarItem(placement: .automatic) {
-                
-                Button(action: {
-                    // 뒤로가기
-                    print("back")
-                }) {
-                    Image(systemName: "arrow.uturn.left")
-                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
-                    Image(systemName: "arrow.uturn.right")
-                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
-                    
-                }
-                .padding(.trailing,100)
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) { // 사진 저장(테스트 위치)
-                Button(action: {
-                    viewModel.saveRenderedView(content: canvasView)
-                }) {
-                    Text("완료")
-                        .foregroundColor(.pointPink)
-                }
-            }
+        .navigationBarBackButtonHidden()
+        .navigationDestination(isPresented: $isMain) {
+            CameraView()
         }
-        // 저장확인용 시트
-        .sheet(isPresented: $viewModel.isModal) {
-            if let rendered = viewModel.compositeImage {
-                IEOutputImageView(image: rendered)
-            }
-        }
-        .onChange(of:viewModel.isAppend){
-            if viewModel.isAppend {
-                viewModel.appendImg(content: canvasView)
-            }
-        }
-        //뷰모델이닛할때 퍼블리쉬변수로 해서 싱크거는 방법
         
-        //        .ignoresSafeArea(.all, edges: .all)
+        
+        
     }
     
 }
+
+
+
