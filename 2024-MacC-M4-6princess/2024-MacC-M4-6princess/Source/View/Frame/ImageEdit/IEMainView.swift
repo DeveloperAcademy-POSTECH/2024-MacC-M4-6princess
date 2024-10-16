@@ -15,6 +15,7 @@ struct IEMainView: View {
     var img:UIImage
     @StateObject var viewModel = IEViewModel()
     @State var isPreview = false
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var canvasView: some View {
         IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
@@ -34,15 +35,10 @@ struct IEMainView: View {
     
     var body: some View {
         VStack {
-            Spacer()
-            ZStack {
-                VStack{
-                    Spacer()
-                    // 후보정 레이어 편집 뷰
-                    canvasView
-                    Spacer()
-                }
-                
+            ZStack{
+                // 후보정 레이어 편집 뷰
+                canvasView
+                    
                 VStack{
                     Spacer()
                     HStack{
@@ -80,88 +76,104 @@ struct IEMainView: View {
                         .frame(height:40)
                         .background(Color.black.opacity(0.5)) // 배경색
                     }
-                    // 편집 옵션 버튼들
-                    HStack {
-                        Spacer()
-                        ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
-                            ZStack {
-                                Circle()
-                                    .fill(.gray10.opacity(0.15))
-                                    .frame(width: 60)
-                                    .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
-                                
-                                VStack {
-                                    if viewModel.selectedIndex == index{
-                                        Image("\(viewModel.colorEditOptions[index].icon).selected") // 아이콘
-                                            .foregroundColor(.pointPink)
-                                        
-                                        Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                            .foregroundColor(.pointPink) // 텍스트 색상 설정
-                                    }
-                                    else{
-                                        Image("\(viewModel.colorEditOptions[index].icon).unselected") // 아이콘
-                                            .foregroundColor(.gray01)
-                                        
-                                        Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                            .foregroundColor(.gray01) // 텍스트 색상 설정
-                                    }
-                                }
-                                .onTapGesture {
-                                    viewModel.selectedIndex = index // 선택된 인덱스 업데이트
-                                }
-                                .frame(minHeight:116)
-                            }
-                            .padding(.horizontal)
-                            Spacer()
-                        }
-                    }
-                    .frame(maxHeight:116)
                 }
             }
+            
+            // 편집 옵션 버튼들
+            HStack {
+                Spacer()
+                ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
+                    ZStack {
+                        Circle()
+                            .fill(.gray10.opacity(0.15))
+                            .frame(width: 60)
+                            .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
+                        
+                        VStack {
+                            if viewModel.selectedIndex == index{
+                                Image("\(viewModel.colorEditOptions[index].icon).selected") // 아이콘
+                                    .foregroundColor(.pointPink)
+                                
+                                Text(viewModel.colorEditOptions[index].name) // 텍스트
+                                    .foregroundColor(.pointPink) // 텍스트 색상 설정
+                            }
+                            else{
+                                Image("\(viewModel.colorEditOptions[index].icon).unselected") // 아이콘
+                                    .foregroundColor(.gray01)
+                                
+                                Text(viewModel.colorEditOptions[index].name) // 텍스트
+                                    .foregroundColor(.gray01) // 텍스트 색상 설정
+                            }
+                        }
+                        .onTapGesture {
+                            viewModel.selectedIndex = index // 선택된 인덱스 업데이트
+                        }
+                        
+                    }
+                    Spacer()
+                }
+            }
+            .padding()
         }
         .onAppear{
             bgImg = img
         }
+       
         // 상단 툴바
+        .navigationBarBackButtonHidden()
         .toolbar {
-            ToolbarItem(placement: .automatic) {
+            HStack {
+                Button {
+                    self.presentationMode.wrappedValue.dismiss()
+                    print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                } label: {
+                    HStack {
+                        Group{
+                            Image(systemName: "chevron.backward")
+                                .fontWeight(.semibold)
+                            
+                            Text("다시 찍기")
+                                .fontWeight(.regular)
+                        }
+                        .foregroundColor(.gray01)
+                    }
+                }
+                .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
                 
-                Button(action: {
-                    // 뒤로가기
-                    print("back")
-                }) {
-                    Image(systemName: "arrow.uturn.left")
-                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
-                    Image(systemName: "arrow.uturn.right")
-                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
-                    
+                Spacer(minLength: UIScreen.main.bounds.width / 20)
+                
+                Button {
+                   
+                } label: {
+                    Image("back")
+                        
                 }
-                .padding(.trailing,100)
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) { // 사진 저장(테스트 위치)
-                Button(action: {
+                .padding(.trailing, 14)
+                
+                Button {
+                   
+                } label: {
+                    Image("front")
+                        
+                }
+                .padding(.trailing, 60)
+                
+                Spacer()
+                Button {
                     viewModel.saveRenderedView(content: canvasView)
-                }) {
-                    Text("완료")
-                        .foregroundColor(.pointPink)
+                } label: {
+                    Text("확인")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.pointPink)
+                        .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
                 }
+                .padding(1)
+
             }
+            .padding(.bottom)
         }
-        // 저장확인용 시트
-        .sheet(isPresented: $viewModel.isModal) {
-            if let rendered = viewModel.compositeImage {
-                IEOutputImageView(image: rendered)
-            }
-        }
-        .onChange(of:viewModel.isAppend){
-            if viewModel.isAppend {
-                viewModel.appendImg(content: canvasView)
-            }
-        }
-        //뷰모델이닛할때 퍼블리쉬변수로 해서 싱크거는 방법
         
-        //        .ignoresSafeArea(.all, edges: .all)
+        
     }
     
 }

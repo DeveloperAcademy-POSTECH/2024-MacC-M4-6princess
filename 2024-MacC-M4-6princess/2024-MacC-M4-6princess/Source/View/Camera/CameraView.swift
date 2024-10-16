@@ -131,10 +131,10 @@ struct CameraView: View {
                 .navigationBarBackButtonHidden()
                 .navigationDestination(isPresented: $camera.nextView) {
                     if let takenImg = camera.takenImg{
-                        IEMainView(img: takenImg)
+                        IEIntroView(img: takenImg)
                     }
                     else{
-                        IEMainView(img: defaultImg)
+                        IEIntroView(img: defaultImg)
                         
                     }
                 }
