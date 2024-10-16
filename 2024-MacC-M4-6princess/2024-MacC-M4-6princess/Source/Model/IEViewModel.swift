@@ -32,22 +32,58 @@ class IEViewModel: ObservableObject {
     var idolRatio:CGFloat = .zero
     
     @Published var screenSize: CGSize = .zero // bgImg 뷰의 크기를 저장할 State 변수
-    
+   var imgArray:[UIImage] = []
     // 이미지에 색상 조정하는 객체,변수
     var ciContext = CIContext()
     var filter = CIFilter.colorControls()
     let baseWidth: CGFloat = 100
     
+    @Published var isAppend = false
+    
     
     // 편집 옵션 배열
     let colorEditOptions: [EditingOption] = [
         EditingOption(name: "밝기", icon: "sun.max.fill",range:-1...1,step: 0.1),
-        EditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
-        EditingOption(name: "대비", icon: "circle.lefthalf.fill",range: 0...2,step: 0.1)
+        EditingOption(name: "채도", icon: "drop.fill",range: 0...2,step: 0.1),
+        EditingOption(name: "대비", icon: "circle.righthalf.fill",range: 0...2,step: 0.1)
     ]
     
+    @MainActor
+    func appendImg<T: View>(content: T) {
+        // ImageRenderer를 이용해서 합성 이미지 생성
+        let renderedImage = ImageRenderer(content: content.frame(width: screenSize.width, height: screenSize.width * bgRatio))
+        
+        // 해상도
+        renderedImage.scale = 2.0
+        
+        if let uiImage = renderedImage.uiImage {
+            self.imgArray.append(uiImage)
+            
+        } else {
+            print("언두리두이미지생성실패")
+        }
+        isAppend = false
+    }
+//    / 앙대
+//    func appendImg<T: View>(content: T) {
+//        DispatchQueue.global(qos: .userInitiated).async {
+//            // 백그라운드에서 이미지 렌더링 작업 수행
+//            let renderedImage = ImageRenderer(content: content.frame(width: self.screenSize.width, height: self.screenSize.width * self.bgRatio))
+//            renderedImage.scale = 2.0
+//            
+//            if let uiImage = renderedImage.uiImage {
+//                DispatchQueue.main.async {
+//                    // 메인 스레드에서 UI 업데이트
+//                    self.imgArray.append(uiImage)
+//                    self.isAppend = false
+//                }
+//            } else {
+//                print("언두리두이미지생성실패")
+//            }
+//        }
+//    }
     
-    // 이미지에 색상 조정을 적용하는 함수
+    /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: originalImage) else { return nil }
         

@@ -17,20 +17,18 @@ struct IEDevelopView: View {
         
         NavigationStack {
             VStack {
-                
                 Button(action:{
                     edit = true
                 }
                 ){
                     Text("test")
                 }
-                
             }
             .navigationDestination(isPresented: $edit){
                 IEMainView(img: UIImage(named:"6princess")!)
             }
             
-            .padding()
+            
         }
     }
 }

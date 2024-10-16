@@ -25,6 +25,10 @@ struct IECanvasView: View {
             .updating($startLocation) { (value, startLocation, transaction) in
                 startLocation = startLocation ?? viewModel.location
             }
+            .onEnded{ _ in
+                viewModel.isAppend = true
+            }
+            
     }
     
     // TODO: Angle 변화 속도를 늦추기

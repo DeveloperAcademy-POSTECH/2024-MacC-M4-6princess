@@ -34,8 +34,9 @@ struct SliderView: View {
             Slider(value: $value, in: range, step: Float.Stride(step))
                 .padding()
                 .foregroundColor(.pointPink) // 슬라이더 색상
-                .background(Color.black.opacity(0.2)) // 배경색
+                .background(Color.black.opacity(0.5)) // 배경색
         }
+        .frame(height:40)
     }
 }
 

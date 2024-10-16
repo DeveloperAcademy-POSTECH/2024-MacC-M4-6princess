@@ -32,7 +32,23 @@ struct IEMainView: View {
             }
             
             if let idx = viewModel.selectedIndex {
-                SliderView(value: $viewModel.sliderValues[idx], range: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
+               
+                HStack {
+                    Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
+                        .foregroundColor(.white)
+                        .frame(width:30)
+                        .padding(.horizontal,5)
+                    
+                        
+                    
+                    // 슬라이더
+                    Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
+                        .tint(Color.pointPink)
+                        
+                        
+                }
+                .frame(height:40)
+                .background(Color.black.opacity(0.5)) // 배경색
             }
             
             // 편집 옵션 버튼들
@@ -41,21 +57,17 @@ struct IEMainView: View {
                 ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
                     ZStack {
                         Circle()
-                            .fill(.gray01)
+                            .fill(.gray10.opacity(0.15))
                             .frame(width: 60)
-                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-                        
+                            .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
+                            
                         VStack {
-                            if index == 1{
-                                Image(viewModel.colorEditOptions[index].icon) // 아이콘
-                                    .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 색상 설정
-                            }
-                            else{
-                                Image(systemName: viewModel.colorEditOptions[index].icon) // 아이콘
-                                    .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 색상 설정
-                            }
+                            Image(systemName: viewModel.colorEditOptions[index].icon) // 아이콘
+                                .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01)
+                            
                             Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .white) // 텍스트 색상 설정
+                                .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01) // 텍스트 색상 설정
+                            
                         }
                         .onTapGesture {
                             viewModel.selectedIndex = index // 선택된 인덱스 업데이트
@@ -66,9 +78,10 @@ struct IEMainView: View {
                     Spacer()
                 }
             }
-            .padding()
+            .frame(maxHeight:116)
+            
         }
-        .padding()
+        
         .onAppear{
             bgImg = img
         }
@@ -77,19 +90,22 @@ struct IEMainView: View {
             ToolbarItem(placement: .automatic) {
                 Button(action: {
                     // 뒤로가기
+                    print("back")
                 }) {
+                    
                     Image(systemName: "arrow.uturn.left")
-                        .foregroundColor(.white)
+                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
+                        
                 }
                 .padding(.horizontal)
             }
             
             ToolbarItem(placement: .automatic) {
                 Button(action: {
-                    // 앞으로가기
+                    print("forward")
                 }) {
                     Image(systemName: "arrow.uturn.right")
-                        .foregroundColor(.white)
+                        .foregroundColor(viewModel.imgArray.isEmpty ? .gray01:.gray03)
                 }
                 .padding(.horizontal)
             }
@@ -109,6 +125,11 @@ struct IEMainView: View {
                 IEOutputImageView(image: rendered)
             }
         }
+        .onChange(of:viewModel.isAppend){
+            viewModel.appendImg(content: canvasView)
+        }
+        
+//        .ignoresSafeArea(.all, edges: .all)
     }
     
 }
