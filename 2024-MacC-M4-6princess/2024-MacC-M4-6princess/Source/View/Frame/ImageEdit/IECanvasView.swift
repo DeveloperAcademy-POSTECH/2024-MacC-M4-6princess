@@ -79,6 +79,7 @@ struct IECanvasView: View {
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
         //        .background(Color.red)
+        
     }
     
     

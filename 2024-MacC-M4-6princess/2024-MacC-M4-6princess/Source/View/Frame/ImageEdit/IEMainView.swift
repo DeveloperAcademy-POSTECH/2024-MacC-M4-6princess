@@ -11,7 +11,7 @@ import Photos
 struct IEMainView: View {
     // 임의로 넣은 사진 데이터
     @State var bgImg = UIImage(named: "6princess")!
-    @State var idolImg = UIImage(named: "Felix")!
+    @Binding var idolImg: UIImage?
     var img:UIImage
     @StateObject var viewModel = IEViewModel()
     @State var isPreview = false
@@ -33,7 +33,7 @@ struct IEMainView: View {
             }
     }
     var canvasView: some View {
-        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
+        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: .constant(idolImg!))
     }
     var tap: some Gesture {
         LongPressGesture(minimumDuration: 0)
@@ -50,13 +50,41 @@ struct IEMainView: View {
     
     var body: some View {
         VStack {
-            if !isAnimate{
-                
-                HStack {
-                    Button {
-                        self.presentationMode.wrappedValue.dismiss()
-                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-                    } label: {
+            Spacer()
+            ZStack {
+                VStack{
+                    Spacer()
+                    // 후보정 레이어 편집 뷰
+                    if idolImg != nil {
+                        canvasView
+                    }
+                    Spacer()
+                }
+                Spacer()
+                VStack{
+                    Spacer()
+                    HStack{
+                        Spacer()
+                        Group{
+                            if isPreview{
+                                Image(systemName:"rectangle.checkered")
+                                    .frame(width: 30,height: 30)
+                                    .foregroundColor(.gray01)
+                                    .gesture(tap)
+                            }
+                            else{
+                                Image(systemName:"rectangle.dashed")
+                                    .frame(width: 30,height: 30)
+                                    .foregroundColor(.gray01)
+                                    .gesture(tap)
+                                    .onTapGesture {
+                                        isPreview = true
+                                    }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    if let idx = viewModel.selectedIndex {
                         HStack {
                             Group{
                                 Image(systemName: "chevron.backward")
