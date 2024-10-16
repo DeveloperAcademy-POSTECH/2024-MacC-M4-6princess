@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct CameraFrameSelectView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var imageDataArray: [(name: String, data: Data)] = []
     @Binding var isFullScreenPop: Bool
     @Binding var selectedFrame: String?
+    @State private var isShow: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -22,9 +24,8 @@ struct CameraFrameSelectView: View {
                 if !imageDataArray.isEmpty {
                     ScrollView {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-                            Button {
-                                dismiss()
-                                isFullScreenPop.toggle()
+                            NavigationLink {
+                                PhotosPickerView()
                             } label: {
                                 VStack(alignment: .center, spacing: 4) {
                                     Spacer()
@@ -39,7 +40,31 @@ struct CameraFrameSelectView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+                            }.onTapGesture {
+                                isFullScreenPop.toggle()
                             }
+
+
+//                            Button {
+//                                dismiss()
+////                                isFullScreenPop.toggle()
+//                                isShow.toggle()
+//                                
+//                            } label: {
+//                                VStack(alignment: .center, spacing: 4) {
+//                                    Spacer()
+//                                    Image("plusIcon")
+//                                        .resizable()
+//                                        .frame(width: 30, height: 30, alignment: .center)
+//                                    Text("새로운\n프레임 만들기")
+//                                        .font(.system(size: 13))
+//                                        .multilineTextAlignment(.center)
+//                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+//                                    Spacer()
+//                                }
+//                                .frame(maxWidth: .infinity)
+//                                .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+//                            }
                             
                             
                             ForEach(imageDataArray, id: \.name) { imageInfo in
@@ -84,6 +109,9 @@ struct CameraFrameSelectView: View {
             }.onAppear {
                 loadImages()
             }
+        }
+        .fullScreenCover(isPresented: $isShow) {
+            PhotosPickerView()
         }
     }
     

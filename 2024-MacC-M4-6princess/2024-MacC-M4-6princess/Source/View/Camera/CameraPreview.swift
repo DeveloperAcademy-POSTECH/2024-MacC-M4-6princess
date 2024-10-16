@@ -29,9 +29,12 @@ struct CameraPreview: UIViewRepresentable{
         }
         
         //starting session
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.main.async {
             camera.session.startRunning()
         }
+//        DispatchQueue.global(qos: .background).async {
+//            camera.session.startRunning()
+//        }
         
         return view
     }
