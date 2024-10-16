@@ -13,6 +13,7 @@ struct ContentView: View {
         CameraView()
 //                    IEDevelopView()
         //        CMView()
+//        IEProgressView()
     }
 }
 
