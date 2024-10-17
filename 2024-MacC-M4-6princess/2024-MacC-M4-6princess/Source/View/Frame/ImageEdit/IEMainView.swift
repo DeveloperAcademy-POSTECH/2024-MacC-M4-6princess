@@ -52,67 +52,69 @@ struct IEMainView: View {
     var body: some View {
         VStack {
             if !isAnimate{
-                
-                HStack {
-                    Button {
-                        // 뒤로가기 버튼
-                        self.presentationMode.wrappedValue.dismiss()
-                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-                    } label: {
-                        HStack {
-                            Group{
-                                Image(systemName: "chevron.backward")
-                                    .fontWeight(.semibold)
-                                
-                                Text("다시 찍기")
-                                    .fontWeight(.regular)
+                //툴바 커스텀
+                ZStack {
+                    HStack {
+                        Button {
+                            // 뒤로가기 버튼
+                            self.presentationMode.wrappedValue.dismiss()
+                            print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                        } label: {
+                            HStack(alignment: .center, spacing: 4) {
+                                Group{
+                                    Image(systemName: "chevron.backward")
+                                        .fontWeight(.semibold)
+                                        .padding(.leading, 10)
+                                    Text("다시 찍기")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                                }
+                                .foregroundColor(.gray01)
                             }
-                            .foregroundColor(.gray01)
+                        }.padding(10)
+                        
+                        Spacer()
+                        
+                        Button {
+    //                        pinchScale = 1
+                            
+    //                        pinchValue = 1
+                            viewModel.saveRenderedView(content: canvasView)
+                            isAnimate = true
+                            // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                isSave = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    isAnimate = false
+                                    isMain = true
+                                    
+                                }
+                            }
+                        } label: {
+                            Text("저장")
+                                .font(.system(size: 17))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.pointPink)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10.49618)
+                        }
+                        
+                    }
+                    HStack(alignment: .center, spacing: 14) {
+                        Button {
+                            
+                        } label: {
+                            Image("back")
+                            
+                        }
+                        
+                        Button {
+                            
+                        } label: {
+                            Image("front")
+                            
                         }
                     }
-                    .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
-                    
-                    Spacer(minLength: UIScreen.main.bounds.width / 20)
-                    
-                    Button {
-                        
-                    } label: {
-                        Image("back")
-                        
-                    }
-                    .padding(.trailing, 14)
-                    
-                    Button {
-                        
-                    } label: {
-                        Image("front")
-                        
-                    }
-                    .padding(.trailing, 60)
-                    
-                    Spacer()
-                    Button {
-//                        pinchScale = 1
-                        
-//                        pinchValue = 1
-                        viewModel.saveRenderedView(content: canvasView)
-                        isAnimate = true
-                        // 5초 후에 isSave를 true로 변경하여 이미지로 전환
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            isSave = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                isAnimate = false
-                                isMain = true
-                                
-                            }
-                        }
-                    } label: {
-                        Text("저장")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.pointPink)
-                            .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
-                    }
-                    .padding(1)
                 }
                 ZStack{
                     // 후보정 레이어 편집 뷰
@@ -164,38 +166,45 @@ struct IEMainView: View {
                 }
                 
                 // 편집 옵션 버튼들
-                HStack {
+                HStack() {
                     Spacer()
-                    ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
-                        ZStack {
-                            Circle()
-                                .fill(.gray10.opacity(0.15))
-                                .frame(width: 60)
-                                .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
-                            
-                            VStack {
-                                if viewModel.selectedIndex == index{
-                                    Image("\(viewModel.colorEditOptions[index].icon).selected") // 아이콘
-                                        .foregroundColor(.pointPink)
+                    HStack(spacing: 45) { // 여기에 spacing: 45 추가
+                        ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
+                            VStack(alignment: .center, spacing: 8) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color(red: 0.85, green: 0.85, blue: 0.85).opacity(0.15))
+                                        .frame(width: 40, height: 40) // height 추가
+                                        .overlay(
+                                            Circle().stroke(Color.black.opacity(0.15), lineWidth: 0.5)
+                                                //shadow가 자꾸 적용이 안되서 최대한 비슷하게 맞춰놨습니다
+                                            )
+                                        
                                     
-                                    Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                        .foregroundColor(.pointPink) // 텍스트 색상 설정
+                                    VStack {
+                                        if viewModel.selectedIndex == index {
+                                            Image("\(viewModel.colorEditOptions[index].icon).selected")
+                                                .foregroundColor(.pointPink)
+                                        } else {
+                                            Image("\(viewModel.colorEditOptions[index].icon).unselected")
+                                                .foregroundColor(.gray01)
+                                        }
+                                    }
                                 }
-                                else{
-                                    Image("\(viewModel.colorEditOptions[index].icon).unselected") // 아이콘
-                                        .foregroundColor(.gray01)
-                                    
-                                    Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                        .foregroundColor(.gray01) // 텍스트 색상 설정
+                                .onTapGesture {
+                                    viewModel.selectedIndex = index
                                 }
+                                
+                                Text(viewModel.colorEditOptions[index].name)
+                                    .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01)
                             }
                             .onTapGesture {
-                                viewModel.selectedIndex = index // 선택된 인덱스 업데이트
+                                viewModel.selectedIndex = index
                             }
-                            
                         }
-                        Spacer()
                     }
+                    .padding(.horizontal, 72)
+                    Spacer()
                 }
                 .padding()
                 .background(.white)
