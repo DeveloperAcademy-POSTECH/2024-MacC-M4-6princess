@@ -24,6 +24,7 @@ struct CameraView: View {
     @State private var showAlert = false
     
     
+    @State var idolImg = UIImage(named: "Felix")!
     //    @State private var firstTime = false
     @AppStorage("openFirstTime") private var firstTime = false
     var defaultImg: UIImage = UIImage(named: "6princess")!
@@ -158,11 +159,11 @@ struct CameraView: View {
                 .statusBar(hidden: true)
                 .navigationBarBackButtonHidden()
                 .navigationDestination(isPresented: $camera.nextView) {
-                    if let takenImg = camera.takenImg{
-                        IEMainView(idolImg: $frameImage, img: takenImg)
+                    if let takenImg = camera.takenImg,let frameImg = frameImage{
+                        IEIntroView(bg: takenImg, idol: frameImg)
                     }
                     else{
-                        IEMainView(idolImg: $frameImage, img: defaultImg)
+                        TestImageView(bg: defaultImg,idol: idolImg)
                         
                     }
                 }
@@ -194,5 +195,4 @@ struct CameraView: View {
         }
     }
 }
-
 

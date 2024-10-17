@@ -98,7 +98,7 @@ struct DFFrameEditView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        VStack {
             ZStack {
                 Color(.black)
                     .ignoresSafeArea()

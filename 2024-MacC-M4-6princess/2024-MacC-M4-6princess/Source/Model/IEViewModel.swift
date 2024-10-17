@@ -49,14 +49,7 @@ class IEViewModel: ObservableObject {
         EditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
         EditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
     ]
-    init() {
-        // location 값이 변경될 때마다 출력
-        $location
-            .sink { newLocation in
-                print("location 변경됨: \(newLocation)")
-            }
-            .store(in: &cancellables) // 구독을 cancellables에 저장
-    }
+    
     
     @MainActor
     func appendImg<T: View>(content: T) {
@@ -77,26 +70,39 @@ class IEViewModel: ObservableObject {
     
     func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
         
-        print("-----이곳은 canvas onAppear-----")
+        // 4:3 사진을 기준
+        let normRatio = 4.0 / 3.0
         // 배경 이미지의 aspectRatio를 구함
         self.bgRatio = bgImg.size.height / bgImg.size.width
-        //            self.bgRatio = 500.0 / 375.0
-        print(self.bgRatio)
+        
+        print("bgRatio:\(self.bgRatio)")
         
         // 아이돌 이미지의 aspectRatio를 구함
         self.idolRatio = idolImg.size.height / idolImg.size.width
-        print(bgImg.size)
+        print("bgImg.size:\(bgImg.size)")
         
         // IECanvasView의 프레임 크기를 구함 for 이미지 저장
         self.screenSize = bounds
         
-        // 화면에 보여줄 이미지 크기를 지정
-        self.frameBGSize = CGSize(width: self.screenSize.width, height: self.bgRatio * (self.screenSize.width)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
-        self.frameIdolSize = CGSize(width: self.baseWidth, height: self.bgRatio * self.screenSize.width) // baseWidth를 100으로 지정,세로는 계산
+        // 배경이미지를 scaleToFit하게 만듬
+        // 세로로 긴 이미지
+//        if bgRatio > normRatio{
+//            // 화면에 보여줄 이미지 크기를 지정
+//            let newHeight = self.screenSize.height / 3 * 2 // 화면 높이의 2/3
+//            self.frameBGSize = CGSize(width: newHeight * (bgImg.size.height / bgImg.size.width), height: newHeight) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
+//        }
+//        else{
+//            self.frameBGSize = CGSize(width: self.screenSize.width, height: self.bgRatio * (self.screenSize.width)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
+//            
+//        }
+        
+        let newHeight = self.screenSize.height / 3 * 2
+        self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
+        
+        self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)) // baseWidth를 100으로 지정,세로는 계산
         
         // 뷰생성시 아이돌 이미지 위치 지정
-        self.location = CGPoint(x: self.frameBGSize.width / 3 * 2, y: self.frameBGSize.height / 2)
-        print("---------")
+        self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
     }
     /// 이미지에 색상 조정을 적용하는 함수
@@ -115,6 +121,8 @@ class IEViewModel: ObservableObject {
         
         return UIImage(cgImage: cgImage)
     }
+    
+    /// 드래그 제스처 undating 함수
     func updateLocation(with translation: CGSize, startLocation: CGPoint?) {
         var newLocation = startLocation ?? self.location
         newLocation.x += translation.width
@@ -124,10 +132,11 @@ class IEViewModel: ObservableObject {
     }
     
     
+    /// 사진 저장 함수
     @MainActor
     func saveRenderedView<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
         // ImageRenderer를 이용해서 합성 이미지 생성
-        let renderedImage = ImageRenderer(content: content.frame(width: screenSize.width, height: screenSize.width * bgRatio))
+        let renderedImage = ImageRenderer(content: content.frame(width: frameBGSize.width, height: frameBGSize.height))
         
         // 해상도
         renderedImage.scale = 8.0
@@ -155,3 +164,12 @@ class IEViewModel: ObservableObject {
     }
     
 }
+
+//init() {
+//    // location 값이 변경될 때마다 출력
+//    $location
+//        .sink { newLocation in
+//            print("location 변경됨: \(newLocation)")
+//        }
+//        .store(in: &cancellables) // 구독을 cancellables에 저장
+//}
