@@ -131,7 +131,6 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        
         if let error = error {
             print("사진 처리 중 에러 발생: \(error.localizedDescription)")
             return
@@ -141,34 +140,38 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("사진 데이터가 유효하지 않음")
             return
         }
-        //여기 imageData를 그냥 변수가 아니라 배열로 바꿔서 저장해야 여러 사진을 저장할 수 있을듯
+        
+        guard var image = UIImage(data: imageData) else {
+            print("이미지를 생성할 수 없습니다.")
+            return
+        }
+        
+        // 전면 카메라일 경우 좌우반전 처리
+        if self.videoDeviceInput?.device.position == .front {
+            image = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
+        }
         
         // 메인 스레드에서 picData 업데이트
         DispatchQueue.main.async {
-            self.picData = imageData
-            //            self.imageViews.append(UIImage(data: self.picData)!)
-            self.takenImg = self.dataToUIImage()
-            
-//            self.session.stopRunning()
+            self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
+            self.takenImg = image
             self.nextView = true
             print("nextView:\(self.nextView)")
+            print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
-            
-            
-            
         }
     }
     
     ///picData를 UIImage로 바꿔주는 함수
-    func dataToUIImage() -> UIImage? {
-        guard let image = UIImage(data: self.picData) else{
-            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
-            return nil
-        }
-        print("이미지가 UIImage로 변환되었습니다.")
-        
-        return image
-    }
+//    func dataToUIImage() -> UIImage? {
+//        guard let image = UIImage(data: self.picData) else{
+//            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
+//            return nil
+//        }
+//        print("이미지가 UIImage로 변환되었습니다.")
+//        
+//        return image
+//    }
     
     ///사진 저장 함수
     func savePic() {

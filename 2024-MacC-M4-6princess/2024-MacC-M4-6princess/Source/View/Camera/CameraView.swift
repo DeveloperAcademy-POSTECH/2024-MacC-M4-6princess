@@ -20,6 +20,8 @@ struct CameraView: View {
     @State var isFrameSelect = false
     @State var isFullScreenPop: Bool = false
     @State var selectedFrame: UUID? = nil
+    @State var isFrameSelected: Bool = false
+    @State private var showAlert = false
     
     
     //    @State private var firstTime = false
@@ -88,10 +90,14 @@ struct CameraView: View {
                         Spacer()
                         
                         //셔터 버튼
-                        Button{
-                            self.isTakePic = true
-                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
-                                camera.takePic()
+                        Button {
+                            if isFrameSelected {
+                                self.isTakePic = true
+                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
+                                    camera.takePic()
+                                }
+                            } else {
+                                showAlert = true
                             }
                         } label: {
                             Image("shutterImage")
@@ -99,6 +105,11 @@ struct CameraView: View {
                                 .frame(width: 80, height: 80)
                                 .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                 .animation(.easeInOut, value: motionManager.currentOrientation)
+                        }
+                        .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $showAlert) {
+                            Button("닫기", role: .cancel) { }
+                        } message: {
+                            Text("")
                         }
                         
                         Spacer()
@@ -139,7 +150,7 @@ struct CameraView: View {
                     //                    }
                 })
                 .fullScreenCover(isPresented: $isFrameSelect) {
-                    CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)
+                    CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame, isFrameSelected: $isFrameSelected)
                         .presentationDetents([.large])
                         .presentationDragIndicator(.visible)
                     
