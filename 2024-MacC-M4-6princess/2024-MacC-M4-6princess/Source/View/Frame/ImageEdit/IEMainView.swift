@@ -18,8 +18,8 @@ struct IEMainView: View {
     @State var isPreview = false
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
-    @State private var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
-    @State private var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
+    @State var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
+    @State var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
     @GestureState private var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
     @State var isMain = false
     @State var isSave = false
@@ -55,6 +55,7 @@ struct IEMainView: View {
                 
                 HStack {
                     Button {
+                        // 뒤로가기 버튼
                         self.presentationMode.wrappedValue.dismiss()
                         print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
                     } label: {
@@ -91,7 +92,9 @@ struct IEMainView: View {
                     
                     Spacer()
                     Button {
+//                        pinchScale = 1
                         
+//                        pinchValue = 1
                         viewModel.saveRenderedView(content: canvasView)
                         isAnimate = true
                         // 5초 후에 isSave를 true로 변경하여 이미지로 전환
@@ -113,12 +116,12 @@ struct IEMainView: View {
                 }
                 ZStack{
                     // 후보정 레이어 편집 뷰
-                    Group{
+                    
                         canvasView
-                    }
+                    
 //                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
 //                        .gesture(pinchGesture)
-//                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 뷰가 전체 화면을 차지하도록 설정
+//                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                         
                     VStack{
                         Spacer()
