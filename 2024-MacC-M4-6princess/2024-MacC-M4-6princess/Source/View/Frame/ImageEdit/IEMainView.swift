@@ -53,75 +53,13 @@ struct IEMainView: View {
         VStack {
             if !isAnimate{
                 
-                HStack {
-                    Button {
-                        // 뒤로가기 버튼
-                        self.presentationMode.wrappedValue.dismiss()
-                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-                    } label: {
-                        HStack {
-                            Group{
-                                Image(systemName: "chevron.backward")
-                                    .fontWeight(.semibold)
-                                
-                                Text("다시 찍기")
-                                    .fontWeight(.regular)
-                            }
-                            .foregroundColor(.gray01)
-                        }
-                    }
-                    .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
-                    
-                    Spacer(minLength: UIScreen.main.bounds.width / 20)
-                    
-                    Button {
-                        
-                    } label: {
-                        Image("back")
-                        
-                    }
-                    .padding(.trailing, 14)
-                    
-                    Button {
-                        
-                    } label: {
-                        Image("front")
-                        
-                    }
-                    .padding(.trailing, 60)
-                    
-                    Spacer()
-                    Button {
-//                        pinchScale = 1
-                        
-//                        pinchValue = 1
-                        viewModel.saveRenderedView(content: canvasView)
-                        isAnimate = true
-                        // 5초 후에 isSave를 true로 변경하여 이미지로 전환
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            isSave = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                isAnimate = false
-//                                isMain = true
-                                self.presentationMode.wrappedValue.dismiss()
-                                
-                            }
-                        }
-                    } label: {
-                        Text("저장")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.pointPink)
-                            .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
-                    }
-                    .padding(1)
-                }
                 ZStack{
                     // 후보정 레이어 편집 뷰
                     
                         canvasView
                     
-//                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
-//                        .gesture(pinchGesture)
+                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
+                        .gesture(pinchGesture)
                         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                         
                     VStack{
@@ -162,6 +100,72 @@ struct IEMainView: View {
                             .background(Color.black.opacity(0.5)) // 배경색
                         }
                     }
+                    VStack{
+                        HStack {
+                            Button {
+                                // 뒤로가기 버튼
+                                self.presentationMode.wrappedValue.dismiss()
+                                print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                            } label: {
+                                HStack {
+                                    Group{
+                                        Image(systemName: "chevron.backward")
+                                            .fontWeight(.semibold)
+                                        
+                                        Text("다시 찍기")
+                                            .fontWeight(.regular)
+                                    }
+                                    .foregroundColor(.gray01)
+                                }
+                            }
+                            .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
+                            
+                            Spacer(minLength: UIScreen.main.bounds.width / 20)
+                            
+                            Button {
+                                
+                            } label: {
+                                Image("back")
+                                
+                            }
+                            .padding(.trailing, 14)
+                            
+                            Button {
+                                
+                            } label: {
+                                Image("front")
+                                
+                            }
+                            .padding(.trailing, 60)
+                            
+                            Spacer()
+                            Button {
+                                //                        pinchScale = 1
+                                
+                                //                        pinchValue = 1
+                                viewModel.saveRenderedView(content: canvasView)
+                                isAnimate = true
+                                // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    isSave = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                        isAnimate = false
+                                        //                                isMain = true
+                                        self.presentationMode.wrappedValue.dismiss()
+                                        
+                                    }
+                                }
+                            } label: {
+                                Text("저장")
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.pointPink)
+                                    .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
+                            }
+                            .padding(1)
+                        }
+                        Spacer()
+                    }
+                    .background(.white)
                 }
                 
                 // 편집 옵션 버튼들
