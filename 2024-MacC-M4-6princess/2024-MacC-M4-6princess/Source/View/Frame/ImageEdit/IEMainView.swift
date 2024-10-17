@@ -163,9 +163,10 @@ struct IEMainView: View {
                             }
                             .padding(1)
                         }
+                        .background(.white)
                         Spacer()
                     }
-                    .background(.white)
+                    
                 }
                 
                 // 편집 옵션 버튼들
