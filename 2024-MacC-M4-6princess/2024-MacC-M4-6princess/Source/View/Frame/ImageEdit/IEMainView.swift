@@ -36,7 +36,7 @@ struct IEMainView: View {
     var canvasView: some View {
         IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
     }
-    var tap: some Gesture {
+    var tapGesture: some Gesture {
         LongPressGesture(minimumDuration: 0)
             .onChanged{ _ in
                 isPreview = true
@@ -56,22 +56,14 @@ struct IEMainView: View {
                 ZStack{
                     ZStack{
                         // 후보정 레이어 편집 뷰
-                        
                         canvasView
-                        
                             .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
                             .gesture(pinchGesture)
                             .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-//                        
-//                        VStack{
-//                            Spacer()
-//
-//                        }
+
                     }
                     VStack{
-                        
                         ZStack {
-                            
                             HStack {
                                 Button {
                                     // 뒤로가기 버튼
@@ -90,16 +82,11 @@ struct IEMainView: View {
                                         .foregroundColor(.gray01)
                                     }
                                 }.padding(10)
-                                
                                 Spacer()
-                                
                                 Button {
-                                    //                        pinchScale = 1
-                                    
-                                    //                        pinchValue = 1
                                     viewModel.saveRenderedView(content: canvasView)
                                     isAnimate = true
-                                    // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                                    // 3초 후에 isSave를 true로 변경하여 이미지로 전환
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                         isSave = true
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -147,13 +134,13 @@ struct IEMainView: View {
                                     Image(systemName:"rectangle.checkered")
                                         .frame(width: 30,height: 30)
                                         .foregroundColor(.gray01)
-                                        .gesture(tap)
+                                        .gesture(tapGesture)
                                 }
                                 else{
                                     Image(systemName:"rectangle.dashed")
                                         .frame(width: 30,height: 30)
                                         .foregroundColor(.gray01)
-                                        .gesture(tap)
+                                        .gesture(tapGesture)
                                         .onTapGesture {
                                             isPreview = true
                                         }
