@@ -29,22 +29,9 @@
 		89A94AC92CA9B66300824592 /* 2024-MacC-M4-6princessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		21391B522CC0B0B40021BA71 /* Exceptions for "2024-MacC-M4-6princess" folder in "2024-MacC-M4-6princess" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"-024-MacC-M4-6princess-Info.plist",
-			);
-			target = 89A94AAE2CA9B64C00824592 /* 2024-MacC-M4-6princess */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				21391B522CC0B0B40021BA71 /* Exceptions for "2024-MacC-M4-6princess" folder in "2024-MacC-M4-6princess" target */,
-			);
 			path = "2024-MacC-M4-6princess";
 			sourceTree = "<group>";
 		};
@@ -409,7 +396,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = SixPrincess.com;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -444,7 +431,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = SixPrincess.com;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
