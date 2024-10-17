@@ -62,6 +62,7 @@ struct IECanvasView: View {
                 
                 Image(uiImage: outputImage)
                     .resizable()
+                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
             }
             // 아이돌 이미지
             Image(uiImage: idolImg)

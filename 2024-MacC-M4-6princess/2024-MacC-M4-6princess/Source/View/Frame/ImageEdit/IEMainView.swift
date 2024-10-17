@@ -121,7 +121,7 @@ struct IEMainView: View {
                     
 //                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
 //                        .gesture(pinchGesture)
-//                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                         
                     VStack{
                         Spacer()

@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct IEIntroView: View {
-    var img: UIImage
+    var bg: UIImage
+    var idol: UIImage
     var splash = UIImage(named: "imageEditSplash")!
     @State var isMain = false
     
     var body: some View {
         VStack {
             ZStack{
-//                IEMainView(img: img)
+                IEMainView(bg: bg, idol: idol)
                 if !isMain{
                     Group{
                         Color.black.opacity(0.7)

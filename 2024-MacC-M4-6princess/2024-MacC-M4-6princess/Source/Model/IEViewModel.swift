@@ -86,19 +86,23 @@ class IEViewModel: ObservableObject {
         
         // 배경이미지를 scaleToFit하게 만듬
         // 세로로 긴 이미지
-        if bgRatio > normRatio{
-            // 화면에 보여줄 이미지 크기를 지정
-            let newHeight = self.screenSize.height / 3 * 2 // 화면 높이의 2/3
-            self.frameBGSize = CGSize(width: newHeight / self.bgRatio, height: newHeight) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
-        }
-        else{
-            self.frameBGSize = CGSize(width: self.screenSize.width, height: self.bgRatio * (self.screenSize.width)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
-            
-        }
-        self.frameIdolSize = CGSize(width: self.baseWidth, height: self.idolRatio * self.screenSize.width) // baseWidth를 100으로 지정,세로는 계산
+//        if bgRatio > normRatio{
+//            // 화면에 보여줄 이미지 크기를 지정
+//            let newHeight = self.screenSize.height / 3 * 2 // 화면 높이의 2/3
+//            self.frameBGSize = CGSize(width: newHeight * (bgImg.size.height / bgImg.size.width), height: newHeight) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
+//        }
+//        else{
+//            self.frameBGSize = CGSize(width: self.screenSize.width, height: self.bgRatio * (self.screenSize.width)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
+//            
+//        }
+        
+        let newHeight = self.screenSize.height / 3 * 2
+        self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
+        
+        self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)) // baseWidth를 100으로 지정,세로는 계산
         
         // 뷰생성시 아이돌 이미지 위치 지정
-        self.location = CGPoint(x: self.frameBGSize.width / 3 * 2, y: self.frameBGSize.height / 2)
+        self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
     }
     /// 이미지에 색상 조정을 적용하는 함수
@@ -132,7 +136,7 @@ class IEViewModel: ObservableObject {
     @MainActor
     func saveRenderedView<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
         // ImageRenderer를 이용해서 합성 이미지 생성
-        let renderedImage = ImageRenderer(content: content.frame(width: screenSize.width, height: screenSize.width * bgRatio))
+        let renderedImage = ImageRenderer(content: content.frame(width: frameBGSize.width, height: frameBGSize.height))
         
         // 해상도
         renderedImage.scale = 8.0
