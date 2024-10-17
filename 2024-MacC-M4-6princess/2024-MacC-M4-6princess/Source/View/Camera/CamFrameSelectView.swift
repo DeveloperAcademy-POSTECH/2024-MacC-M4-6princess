@@ -19,6 +19,7 @@ struct CameraFrameSelectView: View {
     @State private var imageDataArray: [(id: UUID, data: Data)] = []
     @Binding var isFullScreenPop: Bool
     @Binding var selectedFrame: UUID?
+    @Binding var isFrameSelected: Bool
     @State private var isShow: Bool = false
     
     var body: some View {
@@ -51,6 +52,7 @@ struct CameraFrameSelectView: View {
                             }
                             ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
                                 Button {
+                                    isFrameSelected = true
                                     selectedFrame = imageInfo.id
                                     dismiss()
                                 } label: {
