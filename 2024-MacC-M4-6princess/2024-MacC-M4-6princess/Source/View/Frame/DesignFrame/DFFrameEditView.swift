@@ -48,7 +48,7 @@ struct DFFrameEditView: View {
                 context.draw(Image(uiImage: image).resizable(), in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             }
             
-            print("w: \(size.width), h: \(size.height)")
+//            print("w: \(size.width), h: \(size.height)")
             
             for line in lines {
                 var path = Path()
@@ -104,25 +104,28 @@ struct DFFrameEditView: View {
             VStack {
                 ZStack {
                     if let image = pickedImage {
+                        let scale = scaleCompute(image)
+                        
                         Image(uiImage: image)
                             .resizable()
                             .opacity(showPreview ? 0 : 1)
-                        //                                .scaledToFit()
-                            .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
                             .padding(.bottom, 20)
                         canvas
                             .offset(y: -10)
                             .opacity(showPreview ? 0 : 1)
-                            .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
                     }
                     
                     if let image = resultImage {
+                        let scale = scaleCompute(image)
                         Image(uiImage: image)
                             .resizable()
                             .opacity(showPreview ? 1 : 0)
-                            .scaledToFit()
+                            .aspectRatio(contentMode: .fit)
                             .background(Color(hex: "32322f").opacity(showPreview ? 1 : 0))
-                            .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
                             .padding(.bottom, 20)
                     }
                     
@@ -224,7 +227,6 @@ struct DFFrameEditView: View {
             }
         }
         .onAppear {
-            //                maskImage = nil
             removeBackground()
             if maskImages.count == 0 && maskImage != nil {
                 maskImages.append(maskImage)
@@ -239,6 +241,7 @@ struct DFFrameEditView: View {
                 Button {
                     self.presentationMode.wrappedValue.dismiss()
                     print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                    print("\(pickedImage!.size.width) x \(pickedImage!.size.height)")
                 } label: {
                     HStack {
                         Image(systemName: "chevron.backward")
@@ -297,17 +300,30 @@ struct DFFrameEditView: View {
         }
     }
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        let width = image.size.width / UIScreen.main.bounds.width
-        let height = image.size.height / UIScreen.main.bounds.height
-        var scale: CGFloat
-        if width > height {
-            scale = width
-        } else {
-            scale = height
+//        let height = image.size.height / UIScreen.main.bounds.height
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        
+        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
+            scale = image.size.width / UIScreen.main.bounds.width
+            print("\(scale)")
         }
         print("\(image.size.width)  \(image.size.height)")
         print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
         return scale
+//        if image.size.width < image.size.height {
+//            scale = image.size.height / (UIScreen.main.bounds.height * 0.76)
+//            
+//            print("\(image.size.width)  \(image.size.height)")
+//            print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+//            print("\(scale)")
+//            return scale
+//        } else {
+//            scale = image.size.width / UIScreen.main.bounds.width
+//            print("\(image.size.width)  \(image.size.height)")
+//            print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+//            print("\(scale)")
+//            return scale
+//        }
     }
     
     func createResult() {
