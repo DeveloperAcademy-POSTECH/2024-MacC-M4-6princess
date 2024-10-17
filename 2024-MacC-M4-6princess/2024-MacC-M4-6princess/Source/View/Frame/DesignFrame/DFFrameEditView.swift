@@ -40,6 +40,16 @@ struct DFFrameEditView: View {
     @State private var state: Bool = false
     @State private var isPresented: Bool = false
     @State var index: Int = 0
+    @State private var inputImage: UIImage?
+    
+    var imageRender: some View {
+        VStack {
+            if let image = pickedImage {
+                Image(uiImage: image)
+//                    .resizable()
+            }
+        }
+    }
     
     var canvas: some View {
         Canvas { context, size in
@@ -103,7 +113,7 @@ struct DFFrameEditView: View {
                 .ignoresSafeArea()
             VStack {
                 ZStack {
-                    if let image = pickedImage {
+                    if let image = inputImage {
                         let scale = scaleCompute(image)
                         
                         Image(uiImage: image)
@@ -227,6 +237,11 @@ struct DFFrameEditView: View {
             }
         }
         .onAppear {
+            print("\(UIScreen.main.scale)")
+            let render = ImageRenderer(content: imageRender)
+            render.scale = 1
+            inputImage = render.uiImage
+            
             removeBackground()
             if maskImages.count == 0 && maskImage != nil {
                 maskImages.append(maskImage)
@@ -328,7 +343,7 @@ struct DFFrameEditView: View {
     
     func createResult() {
         
-        guard let inputImage = CIImage(image: pickedImage ?? UIImage()) else {
+        guard let inputImage = CIImage(image: inputImage ?? UIImage()) else {
             print("Failed to create CIImage")
             return
         }
@@ -349,7 +364,7 @@ struct DFFrameEditView: View {
     
     private func removeBackground() {
         
-        guard let inputImage = CIImage(image: pickedImage ?? UIImage()) else {
+        guard let inputImage = CIImage(image: inputImage ?? UIImage()) else {
             print("Failed to create CIImage")
             return
         }
