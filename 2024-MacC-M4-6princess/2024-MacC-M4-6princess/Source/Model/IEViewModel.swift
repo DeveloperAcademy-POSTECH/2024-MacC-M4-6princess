@@ -44,10 +44,10 @@ class IEViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
-    let colorEditOptions: [EditingOption] = [
-        EditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.02),
-        EditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
-        EditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
+    let colorEditOptions: [IEEditingOption] = [
+        IEEditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.02),
+        IEEditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
+        IEEditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
     ]
     
     

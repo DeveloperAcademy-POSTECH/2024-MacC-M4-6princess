@@ -33,7 +33,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     @Published var takenImg: UIImage?
     
     @Published var nextView = false
-    
+//    
     
     ///비디오 권한 체크
     func checkVideoAuthorizaion() {

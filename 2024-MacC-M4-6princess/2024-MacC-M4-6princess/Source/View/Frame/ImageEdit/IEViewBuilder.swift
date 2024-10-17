@@ -39,11 +39,3 @@ struct SliderView: View {
         .frame(height:40)
     }
 }
-
-// 편집 옵션 데이터 구조체 정의
-struct EditingOption {
-    let name: String
-    let icon: String
-    let range: ClosedRange<Float>
-    var step: Float
-}

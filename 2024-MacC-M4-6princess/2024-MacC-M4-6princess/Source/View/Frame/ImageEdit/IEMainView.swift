@@ -102,7 +102,8 @@ struct IEMainView: View {
                             isSave = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 isAnimate = false
-                                isMain = true
+//                                isMain = true
+                                self.presentationMode.wrappedValue.dismiss()
                                 
                             }
                         }
@@ -208,12 +209,13 @@ struct IEMainView: View {
         .onAppear{
             bgImg = bg
             idolImg = idol
+            
         }
         // 상단 툴바
         .navigationBarBackButtonHidden()
-        .navigationDestination(isPresented: $isMain) {
-            CameraView()
-        }
+//        .navigationDestination(isPresented: $isMain) {
+//            CameraView()
+//        }
         
         
         
