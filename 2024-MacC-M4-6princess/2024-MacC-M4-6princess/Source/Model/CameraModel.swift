@@ -163,15 +163,15 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     }
     
     ///picData를 UIImage로 바꿔주는 함수
-//    func dataToUIImage() -> UIImage? {
-//        guard let image = UIImage(data: self.picData) else{
-//            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
-//            return nil
-//        }
-//        print("이미지가 UIImage로 변환되었습니다.")
-//        
-//        return image
-//    }
+    func dataToUIImage() -> UIImage? {
+        guard let image = UIImage(data: self.picData) else{
+            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
+            return nil
+        }
+        print("이미지가 UIImage로 변환되었습니다.")
+        
+        return image
+    }
     
     ///사진 저장 함수
     func savePic() {
