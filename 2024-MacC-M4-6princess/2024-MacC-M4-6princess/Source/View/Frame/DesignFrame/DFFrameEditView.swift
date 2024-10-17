@@ -315,7 +315,6 @@ struct DFFrameEditView: View {
         }
     }
     func scaleCompute(_ image: UIImage) -> CGFloat {
-//        let height = image.size.height / UIScreen.main.bounds.height
         var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
@@ -325,20 +324,6 @@ struct DFFrameEditView: View {
         print("\(image.size.width)  \(image.size.height)")
         print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
         return scale
-//        if image.size.width < image.size.height {
-//            scale = image.size.height / (UIScreen.main.bounds.height * 0.76)
-//            
-//            print("\(image.size.width)  \(image.size.height)")
-//            print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-//            print("\(scale)")
-//            return scale
-//        } else {
-//            scale = image.size.width / UIScreen.main.bounds.width
-//            print("\(image.size.width)  \(image.size.height)")
-//            print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-//            print("\(scale)")
-//            return scale
-//        }
     }
     
     func createResult() {
@@ -395,8 +380,8 @@ struct DFFrameEditView: View {
     func makeImage() {
         opacState = 1
         colorState = .white
-        let render = ImageRenderer(content: self.canvas.frame(width: UIScreen.main.bounds.width, height: pickedImage!.size.height / scaleCompute(pickedImage!)))
-        render.scale = scaleCompute(pickedImage!)
+        let render = ImageRenderer(content: self.canvas.frame(width: inputImage!.size.width / scaleCompute(inputImage!), height: inputImage!.size.height / scaleCompute(inputImage!)))
+        render.scale = scaleCompute(inputImage!)
         print("\(render.uiImage)")
         if let rend = render.uiImage {
             if index < maskImages.count - 1 {
