@@ -108,21 +108,22 @@ struct DFFrameEditView: View {
                             Image(uiImage: image)
                                 .resizable()
                                 .opacity(showPreview ? 0 : 1)
-                                .scaledToFit()
-                                .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
+//                                .scaledToFit()
+                                .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
                                 .padding(.bottom, 20)
                             canvas
                                 .offset(y: -10)
                                 .opacity(showPreview ? 0 : 1)
-                                .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
+                                .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
                         }
+                        
                         if let image = resultImage {
                             Image(uiImage: image)
                                 .resizable()
                                 .opacity(showPreview ? 1 : 0)
                                 .scaledToFit()
                                 .background(Color(hex: "32322f").opacity(showPreview ? 1 : 0))
-                                .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
+                                .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
                                 .padding(.bottom, 20)
                         }
                         
@@ -298,9 +299,19 @@ struct DFFrameEditView: View {
         }
     }
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        let scale = image.size.width / UIScreen.main.bounds.width
+        let width = image.size.width / UIScreen.main.bounds.width
+        let height = image.size.height / UIScreen.main.bounds.height
+        var scale: CGFloat
+        if width > height {
+            scale = width
+        } else {
+            scale = height
+        }
+        print("\(image.size.width)  \(image.size.height)")
+        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
         return scale
     }
+    
     func createResult() {
 
         guard let inputImage = CIImage(image: pickedImage ?? UIImage()) else {
@@ -334,10 +345,14 @@ struct DFFrameEditView: View {
                 print("Failed to create mask image")
                 return
             }
-            
+//            guard let mask = subjectMaskImage(from: maskImage) else {
+//                print("Failed to create mask image")
+//                return
+//            }
             // maskImage 상태 변수 업데이트
             DispatchQueue.main.async {
-                self.maskImage = render(ciImage: maskImage) // maskImage를 UIImage로 변환하여 저장
+                let m = apply(mask: maskImage, to: maskImage)
+                self.maskImage = render(ciImage: m) // maskImage를 UIImage로 변환하여 저장
             }
             
             let resultImage = apply(mask: maskImage, to: inputImage)
@@ -372,8 +387,8 @@ struct DFFrameEditView: View {
     
     private func subjectMaskImage(from inputImage: CIImage) -> CIImage? {
         let handler = VNImageRequestHandler(ciImage: inputImage)
-//        let request = VNGenerateForegroundInstanceMaskRequest()
-        let request = VNGeneratePersonInstanceMaskRequest()
+        let request = VNGenerateForegroundInstanceMaskRequest()
+//        let request = VNGeneratePersonInstanceMaskRequest()
         
         do {
             try handler.perform([request])
