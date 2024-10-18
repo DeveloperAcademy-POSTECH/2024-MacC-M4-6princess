@@ -39,6 +39,7 @@ class IEViewModel: ObservableObject {
     var filter = CIFilter.colorControls()
     let baseWidth: CGFloat = 100
     
+    
     @Published var scale: CGFloat = 1.0
     @Published var savePhoto = false
     @Published var isAnimate = false
@@ -52,8 +53,7 @@ class IEViewModel: ObservableObject {
     
     @Published var undoHistory:[History] = []
     @Published var redoHistory:[History] = []
-    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
-    
+    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 바뀌기전 현재 정보
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
@@ -87,6 +87,8 @@ class IEViewModel: ObservableObject {
         // 뷰생성시 아이돌 이미지 위치 지정
         self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
+        self.firstOne = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
+        
     }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
@@ -111,7 +113,7 @@ class IEViewModel: ObservableObject {
         newLocation.x += translation.width
         newLocation.y += translation.height
         self.location = newLocation
-        //        print("newLocation:\(newLocation)")
+        
     }
     
     /// 사진 저장 함수

@@ -45,7 +45,6 @@ struct IEMainView: View {
     var body: some View {
         VStack {
             if !viewModel.isAnimate{
-                
                 HStack {
                     Button {
                         // 뒤로가기 버튼
@@ -68,18 +67,35 @@ struct IEMainView: View {
                     Spacer(minLength: UIScreen.main.bounds.width / 20)
                     
                     Button {
-                        
+                        if !viewModel.undoHistory.isEmpty{
+                            guard let lastHistory = viewModel.undoHistory.popLast() else { return }
+                            viewModel.redoHistory.append(viewModel.firstOne)
+                            viewModel.location = lastHistory.loc
+                            viewModel.frameIdolSize = lastHistory.size
+                            viewModel.rotationAngle = lastHistory.ang
+                            viewModel.sliderValues = lastHistory.sliderValues
+                            viewModel.firstOne = lastHistory
+                            print(lastHistory)
+                            
+                        }
                     } label: {
-                        
+                        Image(viewModel.undoHistory.isEmpty ? "undo.gray" : "undo.black")
                         
                     }
                     .padding(.trailing, 14)
                     
                     Button {
-                        
+                        if !viewModel.redoHistory.isEmpty{
+                            guard let lastHistory = viewModel.redoHistory.popLast() else { return }
+                            viewModel.undoHistory.append(viewModel.firstOne)
+                            viewModel.location = lastHistory.loc
+                            viewModel.frameIdolSize = lastHistory.size
+                            viewModel.rotationAngle = lastHistory.ang
+                            viewModel.sliderValues = lastHistory.sliderValues
+                            viewModel.firstOne = lastHistory
+                        }
                     } label: {
-                        Image("front")
-                        
+                        Image(viewModel.redoHistory.isEmpty ? "redo.gray" : "redo.black")
                     }
                     .padding(.trailing, 60)
                     
@@ -138,16 +154,30 @@ struct IEMainView: View {
                             HStack {
                                 Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
                                     .foregroundColor(.white)
-                                    .frame(width:30)
-                                    .padding(.horizontal,5)
+                                    .frame(width: 30)
+                                    .padding(.horizontal, 5)
                                 
                                 // 슬라이더
-                                Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
-                                    .tint(Color.pointPink)
+                                        Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
+                                            .tint(Color.pointPink)
+                                            
                             }
-                            .frame(height:40)
+                            .frame(height: 40)
                             .background(Color.black.opacity(0.5)) // 배경색
+//                            .gesture(
+//                                DragGesture()
+//                                    .onEnded { _ in
+//                                        if viewModel.sliderValues[idx] != viewModel.firstOne.sliderValues[idx]{
+//                                            viewModel.undoHistory.append(viewModel.firstOne)
+//                                            viewModel.firstOne.loc = viewModel.location
+//                                            if !viewModel.redoHistory.isEmpty{
+//                                                viewModel.redoHistory = []
+//                                            }
+//                                        }
+//                                    }
+//                            )
                         }
+                        
                     }
                 }
                 
