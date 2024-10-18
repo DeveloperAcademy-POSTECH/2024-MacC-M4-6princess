@@ -108,15 +108,6 @@ struct DFFrameEditView: View {
     }
     
     var body: some View {
-<<<<<<< HEAD
-        ZStack {
-            Color(.black)
-                .ignoresSafeArea()
-            VStack {
-                ZStack {
-                    if let image = inputImage {
-                        let scale = scaleCompute(image)
-=======
         VStack {
             ZStack {
                 Color(.black)
@@ -144,18 +135,6 @@ struct DFFrameEditView: View {
                                 .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
                                 .padding(.bottom, 20)
                         }
->>>>>>> develop
-                        
-                        Image(uiImage: image)
-                            .resizable()
-                            .opacity(showPreview ? 0 : 1)
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: image.size.width / scale, height: image.size.height / scale)
-                            .padding(.bottom, 20)
-                        canvas
-                            .offset(y: -10)
-                            .opacity(showPreview ? 0 : 1)
-                            .frame(width: image.size.width / scale, height: image.size.height / scale)
                     }
                     
                     if let image = resultImage {
