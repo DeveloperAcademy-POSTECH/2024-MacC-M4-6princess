@@ -9,7 +9,7 @@ import SwiftUI
 
 // 배경이미지 + 아이돌 이미지를 후보정(편집)하는 뷰
 struct IECanvasView: View {
-    @ObservedObject var viewModel: IEViewModel
+    @StateObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
     @Binding var bgImg: UIImage
     @Binding var idolImg: UIImage
@@ -21,7 +21,6 @@ struct IECanvasView: View {
             .onChanged { angle in
                 viewModel.rotationAngle = angle
             }
-        
     }
     var dragGesture: some Gesture {
         DragGesture()
@@ -39,7 +38,7 @@ struct IECanvasView: View {
         MagnifyGesture()
             .onChanged{ value in
                 scale = value.magnification
-
+                
                 // 확대/축소가 한번에 변할 수 있는 최대/최소값 지정
                 if scale >= 1{
                     scale = min((scale - 1) * 0.01 + 1,1.3) // 한번에 최대 확대는 1.3배까지만 가능(미세조정 기능)
@@ -47,8 +46,9 @@ struct IECanvasView: View {
                 else{
                     scale = max((scale - 1) * 0.1 + 1,0.5) // 한번에 축소는 절반이 이하로 되지않음
                 }
-                //                print("scale:\(scale)")
                 let newWidth = viewModel.frameIdolSize.width * scale
+                
+                // 축소된 가로 길이에 사진 비율을 곱해서 새로운 아이돌 이미지의 크기를 수정
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
                 
             }
@@ -59,33 +59,28 @@ struct IECanvasView: View {
         ZStack {
             // 배경 이미지
             if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
+                
                 Image(uiImage: outputImage)
-                .resizable()
-                .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-            }
-            
-
-            // 아이돌 이미지
-            
-            Image(uiImage: idolImg)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .rotationEffect(viewModel.rotationAngle)
-                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
-                    .position(viewModel.location)
-                    .gesture(dragGesture
-                        .simultaneously(with: magnifyGesture)
-                        .simultaneously(with: rotationGesture)
-                    )
-           
+                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+            }
+            // 아이돌 이미지
+            Image(uiImage: idolImg)
+                .resizable()
+                .scaledToFit()
+                .rotationEffect(viewModel.rotationAngle)
+                .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
+                .position(viewModel.location)
+                .gesture(dragGesture
+                    .simultaneously(with: magnifyGesture)
+                    .simultaneously(with: rotationGesture)
+                )
+            
         }
-        .background(.red)
         .onAppear {
             viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
         }
-        
-        //        .background(Color.red)
-        
+        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
     }
     
     

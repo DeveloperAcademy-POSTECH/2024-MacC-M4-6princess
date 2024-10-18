@@ -21,7 +21,7 @@ struct IEMainView: View {
     @State var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
     @State var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
     @GestureState private var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
-    @State var isMain = false
+    
     @State var isSave = false
     @State var isAnimate = false
     var pinchGesture: some Gesture {
@@ -92,9 +92,6 @@ struct IEMainView: View {
                     
                     Spacer()
                     Button {
-//                        pinchScale = 1
-                        
-//                        pinchValue = 1
                         viewModel.saveRenderedView(content: canvasView)
                         isAnimate = true
                         // 5초 후에 isSave를 true로 변경하여 이미지로 전환
@@ -102,8 +99,7 @@ struct IEMainView: View {
                             isSave = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 isAnimate = false
-                                isMain = true
-                                
+                                self.presentationMode.wrappedValue.dismiss()
                             }
                         }
                     } label: {
@@ -115,14 +111,13 @@ struct IEMainView: View {
                     .padding(1)
                 }
                 ZStack{
+                    
                     // 후보정 레이어 편집 뷰
-                    
-                        canvasView
-                    
-//                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
-//                        .gesture(pinchGesture)
+                    canvasView
+                    //                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
+                    //                        .gesture(pinchGesture)
                         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-                        
+                    
                     VStack{
                         Spacer()
                         HStack{
@@ -164,38 +159,44 @@ struct IEMainView: View {
                 }
                 
                 // 편집 옵션 버튼들
-                HStack {
+                HStack() {
                     Spacer()
-                    ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
-                        ZStack {
-                            Circle()
-                                .fill(.gray10.opacity(0.15))
-                                .frame(width: 60)
-                                .shadow(color: Color.gray10, radius: 2, x: 0, y: 0)
-                            
-                            VStack {
-                                if viewModel.selectedIndex == index{
-                                    Image("\(viewModel.colorEditOptions[index].icon).selected") // 아이콘
-                                        .foregroundColor(.pointPink)
+                    HStack(spacing: 45) { // 여기에 spacing: 45 추가
+                        ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
+                            VStack(alignment: .center, spacing: 8) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color(red: 0.85, green: 0.85, blue: 0.85).opacity(0.15))
+                                        .frame(width: 40, height: 40) // height 추가
+                                        .overlay(
+                                            Circle().stroke(Color.black.opacity(0.15), lineWidth: 0.5)
+                                            //shadow가 자꾸 적용이 안되서 최대한 비슷하게 맞춰놨습니다
+                                        )
                                     
-                                    Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                        .foregroundColor(.pointPink) // 텍스트 색상 설정
+                                    VStack {
+                                        if viewModel.selectedIndex == index {
+                                            Image("\(viewModel.colorEditOptions[index].icon).selected")
+                                                .foregroundColor(.pointPink)
+                                        } else {
+                                            Image("\(viewModel.colorEditOptions[index].icon).unselected")
+                                                .foregroundColor(.gray01)
+                                        }
+                                    }
                                 }
-                                else{
-                                    Image("\(viewModel.colorEditOptions[index].icon).unselected") // 아이콘
-                                        .foregroundColor(.gray01)
-                                    
-                                    Text(viewModel.colorEditOptions[index].name) // 텍스트
-                                        .foregroundColor(.gray01) // 텍스트 색상 설정
+                                .onTapGesture {
+                                    viewModel.selectedIndex = index
                                 }
+                                
+                                Text(viewModel.colorEditOptions[index].name)
+                                    .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01)
                             }
                             .onTapGesture {
-                                viewModel.selectedIndex = index // 선택된 인덱스 업데이트
+                                viewModel.selectedIndex = index
                             }
-                            
                         }
-                        Spacer()
                     }
+                    .padding(.horizontal, 72)
+                    Spacer()
                 }
                 .padding()
                 .background(.white)
@@ -211,12 +212,6 @@ struct IEMainView: View {
         }
         // 상단 툴바
         .navigationBarBackButtonHidden()
-        .navigationDestination(isPresented: $isMain) {
-            CameraView()
-        }
-        
-        
-        
     }
     
 }

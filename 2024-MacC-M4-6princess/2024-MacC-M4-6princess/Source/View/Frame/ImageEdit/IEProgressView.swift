@@ -21,6 +21,9 @@ struct IEProgressView: View {
                     .scaledToFit()
                     .frame(width: 50, height: 50)
                     .padding()
+                    .onAppear{
+                        isAnimating = false
+                    }
                 Text("저장완료!")
                     .foregroundColor(.pointPink)
                     .fontWeight(.bold)
@@ -43,8 +46,13 @@ struct IEProgressView: View {
                     .fontWeight(.bold)
             }
         }
+        .onAppear{
+            isAnimating = true
+            isSave = false
+        }
        
         
     }
 }
+
 
