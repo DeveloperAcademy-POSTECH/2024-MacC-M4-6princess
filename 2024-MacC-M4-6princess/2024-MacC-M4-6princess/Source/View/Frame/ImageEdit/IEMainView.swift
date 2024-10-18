@@ -42,83 +42,163 @@ struct IEMainView: View {
             }
     }
     
+    
     var body: some View {
         VStack {
-            if !viewModel.isAnimate{
-                HStack {
-                    Button {
-                        // 뒤로가기 버튼
-                        self.presentationMode.wrappedValue.dismiss()
-                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-                    } label: {
-                        HStack {
-                            Group{
-                                Image(systemName: "chevron.backward")
-                                    .fontWeight(.semibold)
-                                
-                                Text("다시 찍기")
-                                    .fontWeight(.regular)
+            if !viewModel.saveAnimate{
+                ZStack {
+                    HStack {
+                        Button {
+                            // 뒤로가기 버튼
+                            self.presentationMode.wrappedValue.dismiss()
+                            print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                        } label: {
+                            HStack(alignment: .center, spacing: 4) {
+                                Group{
+                                    Image(systemName: "chevron.backward")
+                                        .fontWeight(.semibold)
+                                        .padding(.leading, 10)
+                                    Text("다시 찍기")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                                }
+                                .foregroundColor(.gray01)
                             }
-                            .foregroundColor(.gray01)
+                        }.padding(10)
+                        Spacer()
+                        Button {
+                            viewModel.saveRenderedView(content: canvasView)
+                            viewModel.saveAnimate = true
+                            // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                viewModel.savePhoto = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    viewModel.saveAnimate = false
+                                    self.presentationMode.wrappedValue.dismiss()
+                                }
+                            }
+                        } label: {
+                            Text("저장")
+                                .font(.system(size: 17))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.pointPink)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10.49618)
                         }
-                    }
-                    .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
-                    
-                    Spacer(minLength: UIScreen.main.bounds.width / 20)
-                    
-                    Button {
-                        if !viewModel.undoHistory.isEmpty{
-                            guard let lastHistory = viewModel.undoHistory.popLast() else { return }
-                            viewModel.redoHistory.append(viewModel.firstOne)
-                            viewModel.location = lastHistory.loc
-                            viewModel.frameIdolSize = lastHistory.size
-                            viewModel.rotationAngle = lastHistory.ang
-                            viewModel.sliderValues = lastHistory.sliderValues
-                            viewModel.firstOne = lastHistory
-                            print(lastHistory)
-                            
-                        }
-                    } label: {
-                        Image(viewModel.undoHistory.isEmpty ? "undo.gray" : "undo.black")
                         
                     }
-                    .padding(.trailing, 14)
-                    
-                    Button {
-                        if !viewModel.redoHistory.isEmpty{
-                            guard let lastHistory = viewModel.redoHistory.popLast() else { return }
-                            viewModel.undoHistory.append(viewModel.firstOne)
-                            viewModel.location = lastHistory.loc
-                            viewModel.frameIdolSize = lastHistory.size
-                            viewModel.rotationAngle = lastHistory.ang
-                            viewModel.sliderValues = lastHistory.sliderValues
-                            viewModel.firstOne = lastHistory
-                        }
-                    } label: {
-                        Image(viewModel.redoHistory.isEmpty ? "redo.gray" : "redo.black")
-                    }
-                    .padding(.trailing, 60)
-                    
-                    Spacer()
-                    Button {
-                        viewModel.saveRenderedView(content: canvasView)
-                        viewModel.isAnimate = true
-                        // 5초 후에 isSave를 true로 변경하여 이미지로 전환
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            viewModel.savePhoto = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                viewModel.isAnimate = false
-                                self.presentationMode.wrappedValue.dismiss()
+                    HStack(alignment: .center, spacing: 14) {
+                        Button {
+                            if !viewModel.undoHistory.isEmpty{
+                                guard let lastHistory = viewModel.undoHistory.popLast() else { return }
+                                viewModel.redoHistory.append(viewModel.firstOne)
+                                viewModel.location = lastHistory.loc
+                                viewModel.frameIdolSize = lastHistory.size
+                                viewModel.rotationAngle = lastHistory.ang
+                                viewModel.sliderValues = lastHistory.sliderValues
+                                viewModel.firstOne = lastHistory
+                                print(lastHistory)
+                                
                             }
+                        } label: {
+                            Image(systemName: "arrow.uturn.backward")
+                                .foregroundColor(viewModel.undoHistory.isEmpty ? .gray10:.gray01)
                         }
-                    } label: {
-                        Text("저장")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.pointPink)
-                            .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
+                        
+                        Button {
+                            if !viewModel.redoHistory.isEmpty{
+                                guard let lastHistory = viewModel.redoHistory.popLast() else { return }
+                                viewModel.undoHistory.append(viewModel.firstOne)
+                                viewModel.location = lastHistory.loc
+                                viewModel.frameIdolSize = lastHistory.size
+                                viewModel.rotationAngle = lastHistory.ang
+                                viewModel.sliderValues = lastHistory.sliderValues
+                                viewModel.firstOne = lastHistory
+                            }
+                        } label: {
+                            Image(systemName: "arrow.uturn.forward")
+                                .foregroundColor(viewModel.redoHistory.isEmpty ? .gray10:.gray01)
+                            
+                        }
                     }
-                    .padding(1)
+                   
+
                 }
+                .background(.white)
+//                HStack {
+//                    Button {
+//                        // 뒤로가기 버튼
+//                        self.presentationMode.wrappedValue.dismiss()
+//                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+//                    } label: {
+//                        HStack {
+//                            Group{
+//                                Image(systemName: "chevron.backward")
+//                                    .fontWeight(.semibold)
+//                                
+//                                Text("다시 찍기")
+//                                    .fontWeight(.regular)
+//                            }
+//                            .foregroundColor(.gray01)
+//                        }
+//                    }
+//                    .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
+//                    
+//                    Spacer(minLength: UIScreen.main.bounds.width / 20)
+//                    
+//                    Button {
+//                        if !viewModel.undoHistory.isEmpty{
+//                            guard let lastHistory = viewModel.undoHistory.popLast() else { return }
+//                            viewModel.redoHistory.append(viewModel.firstOne)
+//                            viewModel.location = lastHistory.loc
+//                            viewModel.frameIdolSize = lastHistory.size
+//                            viewModel.rotationAngle = lastHistory.ang
+//                            viewModel.sliderValues = lastHistory.sliderValues
+//                            viewModel.firstOne = lastHistory
+//                            print(lastHistory)
+//                            
+//                        }
+//                    } label: {
+//                        Image(viewModel.undoHistory.isEmpty ? "undo.gray" : "undo.black")
+//                        
+//                    }
+//                    .padding(.trailing, 14)
+//                    
+//                    Button {
+//                        if !viewModel.redoHistory.isEmpty{
+//                            guard let lastHistory = viewModel.redoHistory.popLast() else { return }
+//                            viewModel.undoHistory.append(viewModel.firstOne)
+//                            viewModel.location = lastHistory.loc
+//                            viewModel.frameIdolSize = lastHistory.size
+//                            viewModel.rotationAngle = lastHistory.ang
+//                            viewModel.sliderValues = lastHistory.sliderValues
+//                            viewModel.firstOne = lastHistory
+//                        }
+//                    } label: {
+//                        Image(viewModel.redoHistory.isEmpty ? "redo.gray" : "redo.black")
+//                    }
+//                    .padding(.trailing, 60)
+//                    
+//                    Spacer()
+//                    Button {
+//                        viewModel.saveRenderedView(content: canvasView)
+//                        viewModel.isAnimate = true
+//                        // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                            viewModel.savePhoto = true
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                viewModel.isAnimate = false
+//                                self.presentationMode.wrappedValue.dismiss()
+//                            }
+//                        }
+//                    } label: {
+//                        Text("저장")
+//                            .fontWeight(.semibold)
+//                            .foregroundStyle(.pointPink)
+//                            .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
+//                    }
+//                    .padding(1)
+//                }
                 ZStack{
                     
                     // 후보정 레이어 편집 뷰
@@ -150,6 +230,7 @@ struct IEMainView: View {
                             }
                             .padding(.horizontal)
                         }
+                        
                         if let idx = viewModel.selectedIndex {
                             HStack {
                                 Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
@@ -158,26 +239,19 @@ struct IEMainView: View {
                                     .padding(.horizontal, 5)
                                 
                                 // 슬라이더
-                                        Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
-                                            .tint(Color.pointPink)
-                                            
+                                Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
+                                    .tint(Color.pointPink)
+//                                    .gesture(
+//                                        TapGesture()
+//                                            .onEnded {
+//                                                print("탭 제스처가 끝났습니다.")
+//                                            }
+//                                    )
                             }
                             .frame(height: 40)
                             .background(Color.black.opacity(0.5)) // 배경색
-//                            .gesture(
-//                                DragGesture()
-//                                    .onEnded { _ in
-//                                        if viewModel.sliderValues[idx] != viewModel.firstOne.sliderValues[idx]{
-//                                            viewModel.undoHistory.append(viewModel.firstOne)
-//                                            viewModel.firstOne.loc = viewModel.location
-//                                            if !viewModel.redoHistory.isEmpty{
-//                                                viewModel.redoHistory = []
-//                                            }
-//                                        }
-//                                    }
-//                            )
+                            
                         }
-                        
                     }
                 }
                 

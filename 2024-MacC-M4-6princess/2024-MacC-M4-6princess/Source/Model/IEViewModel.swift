@@ -42,7 +42,7 @@ class IEViewModel: ObservableObject {
     
     @Published var scale: CGFloat = 1.0
     @Published var savePhoto = false
-    @Published var isAnimate = false
+    @Published var saveAnimate = false
     @Published var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
     @Published var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
     @Published var isPreview = false
