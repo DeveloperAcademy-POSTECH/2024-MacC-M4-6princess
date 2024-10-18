@@ -24,9 +24,9 @@ struct IEDevelopView: View {
                     Text("test")
                 }
             }
-            .navigationDestination(isPresented: $edit){
-                IEMainView(img: UIImage(named:"6princess")!)
-            }
+//            .navigationDestination(isPresented: $edit){
+//                IEMainView(img: UIImage(named:"6princess")!, idolImg: )
+//            }
         }
     }
 }

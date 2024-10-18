@@ -58,13 +58,18 @@ struct IECanvasView: View {
     var body: some View {
         ZStack {
             // 배경 이미지
-            Image(uiImage: bgImg)
-                .resizable()
-            // 아이돌 이미지
-            if let outputImage = viewModel.applyColorFilter(originalImage: idolImg) {
+            if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
                 Image(uiImage: outputImage)
+                .resizable()
+                .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+            }
+            
+
+            // 아이돌 이미지
+            
+            Image(uiImage: idolImg)
                     .resizable()
-                    .scaledToFit()
+                    .aspectRatio(contentMode: .fit)
                     .rotationEffect(viewModel.rotationAngle)
                     .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
                     .position(viewModel.location)
@@ -72,13 +77,15 @@ struct IECanvasView: View {
                         .simultaneously(with: magnifyGesture)
                         .simultaneously(with: rotationGesture)
                     )
-            }
+           
         }
+        .background(.red)
         .onAppear {
             viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
         }
-        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+        
         //        .background(Color.red)
+        
     }
     
     
