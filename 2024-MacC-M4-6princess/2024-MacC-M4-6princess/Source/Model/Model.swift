@@ -14,3 +14,14 @@ struct IEEditingOption {
     let range: ClosedRange<Float>
     var step: Float
 }
+
+
+/// combin 기능
+//init() {
+//    // location 값이 변경될 때마다 출력
+//    $location
+//        .sink { newLocation in
+//            print("location 변경됨: \(newLocation)")
+//        }
+//        .store(in: &cancellables) // 구독을 cancellables에 저장
+//}

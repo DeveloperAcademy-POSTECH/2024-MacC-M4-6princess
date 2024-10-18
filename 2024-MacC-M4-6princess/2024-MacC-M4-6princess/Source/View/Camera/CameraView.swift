@@ -44,7 +44,7 @@ struct CameraView: View {
                 .onAppear {
                     loadSelectedFrame()
                 }
-                .onChange(of: selectedFrame) { _ in
+                .onChange(of: selectedFrame) {
                     loadSelectedFrame()
                 }
                 VStack {
@@ -195,4 +195,3 @@ struct CameraView: View {
         }
     }
 }
-
