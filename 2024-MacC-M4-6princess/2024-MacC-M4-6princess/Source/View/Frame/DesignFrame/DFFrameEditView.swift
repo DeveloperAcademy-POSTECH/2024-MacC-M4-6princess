@@ -113,6 +113,8 @@ struct DFFrameEditView: View {
                 Color(.black)
                     .ignoresSafeArea()
                 VStack {
+                    
+                    Spacer()
                     ZStack {
                         if let image = pickedImage {
                             Image(uiImage: image)
@@ -135,17 +137,6 @@ struct DFFrameEditView: View {
                                 .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
                                 .padding(.bottom, 20)
                         }
-                    }
-                    
-                    if let image = resultImage {
-                        let scale = scaleCompute(image)
-                        Image(uiImage: image)
-                            .resizable()
-                            .opacity(showPreview ? 1 : 0)
-                            .aspectRatio(contentMode: .fit)
-                            .background(Color(hex: "32322f").opacity(showPreview ? 1 : 0))
-                            .frame(width: image.size.width / scale, height: image.size.height / scale)
-                            .padding(.bottom, 20)
                     }
                     
                     Circle()
