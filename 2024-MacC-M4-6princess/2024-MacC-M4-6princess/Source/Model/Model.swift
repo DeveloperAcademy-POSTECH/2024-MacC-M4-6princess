@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+// 편집 옵션 데이터 구조체 정의
+struct IEEditingOption {
+    let name: String
+    let icon: String
+    let range: ClosedRange<Float>
+    var step: Float
+}

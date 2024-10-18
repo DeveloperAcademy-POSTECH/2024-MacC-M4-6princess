@@ -9,7 +9,7 @@ import SwiftUI
 
 // 배경이미지 + 아이돌 이미지를 후보정(편집)하는 뷰
 struct IECanvasView: View {
-    @ObservedObject var viewModel: IEViewModel
+    @StateObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
     @Binding var bgImg: UIImage
     @Binding var idolImg: UIImage
@@ -59,7 +59,6 @@ struct IECanvasView: View {
         ZStack {
             // 배경 이미지
             if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
-                
                 Image(uiImage: outputImage)
                     .resizable()
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
@@ -81,7 +80,6 @@ struct IECanvasView: View {
             viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-        //        .background(Color.red)
         
     }
     
