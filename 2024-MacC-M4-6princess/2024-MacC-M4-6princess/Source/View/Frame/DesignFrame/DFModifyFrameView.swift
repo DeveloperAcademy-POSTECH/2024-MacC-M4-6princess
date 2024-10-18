@@ -8,7 +8,7 @@ struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
-    @AppStorage("_isFirstLaunching") var isFirstLaunching: Bool = true
+    @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var draggedOffset = CGSize.zero
     @State private var accumulatedOffset = CGSize.zero
