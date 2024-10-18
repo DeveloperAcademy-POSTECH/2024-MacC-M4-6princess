@@ -106,7 +106,7 @@ class IEViewModel: ObservableObject {
         newLocation.x += translation.width
         newLocation.y += translation.height
         self.location = newLocation
-        print("newLocation:\(newLocation)")
+//        print("newLocation:\(newLocation)")
     }
     
     /// 사진 저장 함수
