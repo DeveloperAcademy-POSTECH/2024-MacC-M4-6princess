@@ -17,6 +17,13 @@ struct DFModifyFrame: View {
     @State private var isZoom: Bool = true
     @State private var btnOpacity: Double = 0.0
     @State private var imageHistory: [UIImage?] = []
+//    @FetchRequest(
+//      entity: StoreImages.entity(),
+//      sortDescriptors: [
+//        NSSortDescriptor(keyPath: \StoreImages.image, ascending: true)
+//      ],
+//      predicate: NSPredicate(format: "genre contains 'Action'")
+//    ) var images: FetchedResults<StoreImages>
     
     var rotate: some Gesture {
         RotateGesture()
@@ -72,6 +79,7 @@ struct DFModifyFrame: View {
         
     }
     var body: some View {
+        let combined = magnification.sequenced(before: rotate)
         NavigationStack {
             VStack {
                 ZStack {
@@ -115,7 +123,6 @@ struct DFModifyFrame: View {
                 Button {
                 } label: {
                     Image("back")
-                        .colorMultiply(.gray03)
                 }
                 .padding(.trailing, 14)
                 
@@ -152,16 +159,8 @@ struct DFModifyFrame: View {
             CameraView()
         }
     }
-    
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
-        
-        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
-            scale = image.size.width / UIScreen.main.bounds.width
-            print("\(scale)")
-        }
-        print("\(image.size.width)  \(image.size.height)")
-        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+        let scale = image.size.width / UIScreen.main.bounds.width
         return scale
     }
     
