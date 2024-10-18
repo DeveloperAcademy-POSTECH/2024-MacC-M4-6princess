@@ -39,13 +39,22 @@ class IEViewModel: ObservableObject {
     var filter = CIFilter.colorControls()
     let baseWidth: CGFloat = 100
     
+    @Published var scale: CGFloat = 1.0
+    @Published var isSave = false
+    @Published var isAnimate = false
+    @Published var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
+    @Published var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
+    @Published var isPreview = false
+    @Published var bgImg = UIImage(named: "6princess")!
+    @Published var idolImg = UIImage(named: "Felix")!
+    
     @Published var isAppend = false
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
     let colorEditOptions: [IEEditingOption] = [
         IEEditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.02),
-        IEEditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
+        IEEditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.05),
         IEEditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
     ]
     
@@ -99,7 +108,6 @@ class IEViewModel: ObservableObject {
         self.location = newLocation
         print("newLocation:\(newLocation)")
     }
-    
     
     /// 사진 저장 함수
     @MainActor

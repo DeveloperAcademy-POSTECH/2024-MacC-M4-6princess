@@ -9,49 +9,42 @@ import Photos
 
 // 이미지 편집 메인 화면
 struct IEMainView: View {
-    // 임의로 넣은 사진 데이터
-    @State var bgImg = UIImage(named: "6princess")!
-    @State var idolImg = UIImage(named: "Felix")!
     var bg:UIImage
     var idol:UIImage
     @StateObject var viewModel = IEViewModel()
-    @State var isPreview = false
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
-    @State var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
-    @State var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @GestureState private var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
     
-    @State var isSave = false
-    @State var isAnimate = false
+    
     var pinchGesture: some Gesture {
         MagnifyGesture()
             .updating($pinchState) { value, gestureState, transaction in
                 gestureState = value.magnification
             }
             .onEnded { value in
-                self.pinchScale *= value.magnification // 확대 제스처가 끝났을 때 스케일을 곱함
+                viewModel.pinchScale *= value.magnification // 확대 제스처가 끝났을 때 스케일을 곱함
             }
     }
     var canvasView: some View {
-        IECanvasView(viewModel: viewModel, bgImg: $bgImg, idolImg: $idolImg)
+        IECanvasView(viewModel: viewModel, bgImg: $viewModel.bgImg, idolImg: $viewModel.idolImg)
     }
     var tap: some Gesture {
         LongPressGesture(minimumDuration: 0)
             .onChanged{ _ in
-                isPreview = true
+                viewModel.isPreview = true
                 print("프리뷰:true")
                 
             }
             .onEnded { _ in
-                isPreview = false
+                viewModel.isPreview = false
                 print("프리뷰:false")
             }
     }
     
     var body: some View {
         VStack {
-            if !isAnimate{
+            if !viewModel.isAnimate{
                 
                 HStack {
                     Button {
@@ -77,7 +70,7 @@ struct IEMainView: View {
                     Button {
                         
                     } label: {
-                        Image("back")
+                        
                         
                     }
                     .padding(.trailing, 14)
@@ -93,12 +86,12 @@ struct IEMainView: View {
                     Spacer()
                     Button {
                         viewModel.saveRenderedView(content: canvasView)
-                        isAnimate = true
+                        viewModel.isAnimate = true
                         // 5초 후에 isSave를 true로 변경하여 이미지로 전환
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            isSave = true
+                            viewModel.isSave = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                isAnimate = false
+                                viewModel.isAnimate = false
                                 self.presentationMode.wrappedValue.dismiss()
                             }
                         }
@@ -123,7 +116,7 @@ struct IEMainView: View {
                         HStack{
                             Spacer()
                             Group{
-                                if isPreview{
+                                if viewModel.isPreview{
                                     Image(systemName:"rectangle.checkered")
                                         .frame(width: 30,height: 30)
                                         .foregroundColor(.gray01)
@@ -135,7 +128,7 @@ struct IEMainView: View {
                                         .foregroundColor(.gray01)
                                         .gesture(tap)
                                         .onTapGesture {
-                                            isPreview = true
+                                            viewModel.isPreview = true
                                         }
                                 }
                             }
@@ -203,12 +196,12 @@ struct IEMainView: View {
                 
             }
             else{
-                IEProgressView(isSave: $isSave)
+                IEProgressView(isSave: $viewModel.isSave)
             }
         }
         .onAppear{
-            bgImg = bg
-            idolImg = idol
+            viewModel.bgImg = bg
+            viewModel.idolImg = idol
         }
         // 상단 툴바
         .navigationBarBackButtonHidden()
