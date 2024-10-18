@@ -27,9 +27,9 @@ struct IEMainView: View {
             }
     }
     var canvasView: some View {
-        IECanvasView(viewModel: viewModel, bgImg: $viewModel.bgImg, idolImg: $viewModel.idolImg)
+        IECanvasView(viewModel: viewModel)
     }
-    var tap: some Gesture {
+    var rawImageTab: some Gesture {
         LongPressGesture(minimumDuration: 0)
             .onChanged{ _ in
                 viewModel.isPreview = true
@@ -89,7 +89,7 @@ struct IEMainView: View {
                         viewModel.isAnimate = true
                         // 5초 후에 isSave를 true로 변경하여 이미지로 전환
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            viewModel.isSave = true
+                            viewModel.savePhoto = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 viewModel.isAnimate = false
                                 self.presentationMode.wrappedValue.dismiss()
@@ -120,13 +120,13 @@ struct IEMainView: View {
                                     Image(systemName:"rectangle.checkered")
                                         .frame(width: 30,height: 30)
                                         .foregroundColor(.gray01)
-                                        .gesture(tap)
+                                        .gesture(rawImageTab)
                                 }
                                 else{
                                     Image(systemName:"rectangle.dashed")
                                         .frame(width: 30,height: 30)
                                         .foregroundColor(.gray01)
-                                        .gesture(tap)
+                                        .gesture(rawImageTab)
                                         .onTapGesture {
                                             viewModel.isPreview = true
                                         }
@@ -196,7 +196,7 @@ struct IEMainView: View {
                 
             }
             else{
-                IEProgressView(isSave: $viewModel.isSave)
+                IEProgressView(isSave: $viewModel.savePhoto)
             }
         }
         .onAppear{

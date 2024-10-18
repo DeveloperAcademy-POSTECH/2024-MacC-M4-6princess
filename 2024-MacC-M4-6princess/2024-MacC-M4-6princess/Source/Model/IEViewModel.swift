@@ -40,7 +40,7 @@ class IEViewModel: ObservableObject {
     let baseWidth: CGFloat = 100
     
     @Published var scale: CGFloat = 1.0
-    @Published var isSave = false
+    @Published var savePhoto = false
     @Published var isAnimate = false
     @Published var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
     @Published var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
@@ -49,6 +49,11 @@ class IEViewModel: ObservableObject {
     @Published var idolImg = UIImage(named: "Felix")!
     
     @Published var isAppend = false
+    
+    @Published var undoHistory:[History] = []
+    @Published var redoHistory:[History] = []
+    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
+    
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
@@ -106,7 +111,7 @@ class IEViewModel: ObservableObject {
         newLocation.x += translation.width
         newLocation.y += translation.height
         self.location = newLocation
-//        print("newLocation:\(newLocation)")
+        //        print("newLocation:\(newLocation)")
     }
     
     /// 사진 저장 함수

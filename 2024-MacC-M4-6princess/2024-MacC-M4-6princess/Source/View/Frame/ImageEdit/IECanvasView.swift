@@ -11,9 +11,6 @@ import SwiftUI
 struct IECanvasView: View {
     @StateObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
-    @Binding var bgImg: UIImage
-    @Binding var idolImg: UIImage
-    
     
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
@@ -58,14 +55,14 @@ struct IECanvasView: View {
     var body: some View {
         ZStack {
             // 배경 이미지
-            if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
+            if let outputImage = viewModel.applyColorFilter(originalImage: viewModel.bgImg) {
                 
                 Image(uiImage: outputImage)
                     .resizable()
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
             }
             // 아이돌 이미지
-            Image(uiImage: idolImg)
+            Image(uiImage: viewModel.idolImg)
                 .resizable()
                 .scaledToFit()
                 .rotationEffect(viewModel.rotationAngle)
@@ -78,7 +75,7 @@ struct IECanvasView: View {
             
         }
         .onAppear {
-            viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
+            viewModel.canvasOnAppear(bgImg: viewModel.bgImg, idolImg: viewModel.idolImg, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
     }
