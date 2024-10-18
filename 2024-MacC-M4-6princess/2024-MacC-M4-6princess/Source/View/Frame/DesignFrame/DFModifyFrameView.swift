@@ -1,10 +1,6 @@
 import SwiftUI
 import CoreData
 
-
-struct imageHistory {
-    
-}
 struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -21,8 +17,7 @@ struct DFModifyFrame: View {
     @State private var isZoom: Bool = true
     @State private var btnOpacity: Double = 0.0
     @State private var imageHistory: [UIImage?] = []
-    @State private var index: Int = 0
-
+    
     var rotate: some Gesture {
         RotateGesture()
             .onChanged { value in
@@ -34,7 +29,6 @@ struct DFModifyFrame: View {
                     currentAngle = .zero
                     isZoom = true
                 }
-//                makeImage()
             }
     }
     
@@ -49,7 +43,6 @@ struct DFModifyFrame: View {
                     currentSize = 0
                     isZoom = false
                 }
-//                makeImage()
             }
     }
     
@@ -57,23 +50,25 @@ struct DFModifyFrame: View {
         DragGesture()
             .onChanged { gesture in
                 print("\(draggedOffset.width) \(draggedOffset.height)")
+                print("\(UIScreen.main.bounds.width), \(resultImage!.size.height / scaleCompute(resultImage!))")
                 draggedOffset = accumulatedOffset + gesture.translation
             }
             .onEnded { gesture in
                 accumulatedOffset = accumulatedOffset + gesture.translation
-//                makeImage()
             }
     }
     var imageView: some View {
         Image(uiImage: resultImage ?? UIImage())
             .resizable()
             .scaledToFit()
-            .frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!))
+            .frame(width: UIScreen.main.bounds.width, height: resultImage!.size.height / scaleCompute(resultImage!))
             .padding(.bottom, 20)
             .offset(draggedOffset)
             .scaleEffect(finalSize + currentSize)
             .rotationEffect(currentAngle + finalAngle)
             .gesture(drag.simultaneously(with: magnification).simultaneously(with: rotate))
+        //            .gesture(magnification)
+        //            .gesture(rotate)
         
     }
     var body: some View {
@@ -82,23 +77,10 @@ struct DFModifyFrame: View {
                 ZStack {
                     if let image = resultImage {
                         Color(hex: "32322f")
-                            .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                            .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
                         imageView
-                            .mask(Rectangle().frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image)))
+                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image)))
                         //                    Color(.white)
-//                        VStack {
-//                            Spacer()
-//                            Button {
-//                                
-//                            } label: {
-//                                Image(checkScreenState(image))
-//                                    .resizable()
-//                                    .scaledToFit()
-//                                    .frame(width: 83, height: 38)
-//                            }
-//                            .padding(.bottom, 40)
-//                        }
-
                         RoundedRectangle(cornerRadius: 30)
                             .fill(Color.white)
                             .opacity(btnOpacity)
@@ -114,7 +96,7 @@ struct DFModifyFrame: View {
             HStack {
                 Button {
                     self.presentationMode.wrappedValue.dismiss()
-//                    print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                    print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
                 } label: {
                     HStack {
                         Image(systemName: "chevron.backward")
@@ -131,34 +113,22 @@ struct DFModifyFrame: View {
                 Spacer(minLength: UIScreen.main.bounds.width / 20)
                 
                 Button {
-                    if index > 0 {
-                        index -= 1
-//                        print("range: \(imageHistory.count), index: \(index)")
-                        resultImage = imageHistory[index]
-//                        state = true
-                    }
                 } label: {
                     Image("back")
-                        .colorMultiply(index > 0 ? .black : .gray03)
+                        .colorMultiply(.gray03)
                 }
                 .padding(.trailing, 14)
                 
                 Button {
-                    if imageHistory.count - 1 > index {
-                        index += 1
-//                        print("range: \(imageHistory.count), index:\(index)")
-                        resultImage = imageHistory[index]
-//                        state = true
-                    }
                 } label: {
                     Image("front")
-                        .colorMultiply(index < imageHistory.count - 1 ? .black: .gray03)
+                        .colorMultiply(.gray03)
                 }
                 .padding(.trailing, 60)
                 
                 Spacer()
                 Button {
-                    let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!)))
+                    let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: resultImage!.size.height / scaleCompute(resultImage!)))
                     render.scale = scaleCompute(resultImage!)
                     image = render.uiImage
                     addImage(data: image?.pngData())
@@ -180,12 +150,6 @@ struct DFModifyFrame: View {
         }
         .navigationDestination(isPresented: $isShow) {
             CameraView()
-        }
-        .onAppear {
-            let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / (scaleCompute(resultImage!) * 2), height: resultImage!.size.height / scaleCompute(resultImage!)))
-            render.scale = scaleCompute(resultImage!)
-            image = render.uiImage
-            imageHistory.append(image!)
         }
     }
     
@@ -223,34 +187,6 @@ struct DFModifyFrame: View {
         
         print("이미지 코어에 저장됨")
         saveContext()
-    }
-    func makeImage() {
-        let render = ImageRenderer(content: self.imageView)
-//        render.scale = (1 / resultImage!.scale)
-        render.scale = scaleCompute(resultImage!)
-        
-        print("\(render.scale ), \(scaleCompute(resultImage!))")
-        print("\(resultImage!.size.width) \(resultImage!.size.height)")
-        if let rend = render.uiImage {
-            if index < imageHistory.count - 1 {
-                for _ in index+1..<imageHistory.count {
-                    imageHistory.removeLast()
-                }
-            }
-            imageHistory.append(rend)
-            index += 1
-            print("\(index)")
-            
-        }
-        resultImage = imageHistory[index]
-    }
-    
-    func checkScreenState(_ image: UIImage?) -> String {
-        if image!.size.width > image!.size.height {
-            return "horizon"
-        } else {
-            return "vertical"
-        }
     }
 }
 
