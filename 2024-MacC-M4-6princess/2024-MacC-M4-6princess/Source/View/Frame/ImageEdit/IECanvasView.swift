@@ -21,6 +21,18 @@ struct IECanvasView: View {
             .onChanged { angle in
                 viewModel.rotationAngle = angle
             }
+            .onEnded{ value in
+                viewModel.undoHistory.append(viewModel.firstOne)
+                
+                viewModel.firstOne.ang = value
+                viewModel.resetRedo()
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
+                
+                
+            }
+            
         
     }
     var dragGesture: some Gesture {
@@ -32,6 +44,17 @@ struct IECanvasView: View {
             }
             .updating($startLocation) { (value, startLocation, transaction) in
                 startLocation = startLocation ?? viewModel.location
+            }
+            .onEnded{ value in
+                print("onended:\(value.location)")
+                print("viewModel:\(viewModel.location)")
+                viewModel.undoHistory.append(viewModel.firstOne)
+                viewModel.firstOne.loc = viewModel.location
+                viewModel.resetRedo()
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
+                
             }
     }
     // 아이돌 이미지 확대/축소 제스쳐
@@ -52,6 +75,14 @@ struct IECanvasView: View {
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
                 
             }
+            .onEnded{ value in
+                viewModel.undoHistory.append(viewModel.firstOne)
+                viewModel.firstOne.size = viewModel.frameIdolSize
+                viewModel.resetRedo()
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
+            }
     }
     
     
@@ -63,6 +94,7 @@ struct IECanvasView: View {
                     .resizable()
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
             }
+                
             // 아이돌 이미지
             Image(uiImage: idolImg)
                 .resizable()

@@ -81,7 +81,7 @@ struct IEMainView: View {
                                     viewModel.isAnimate = true
                                     // 3초 후에 isSave를 true로 변경하여 이미지로 전환
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        viewModel.isSave = true
+                                        viewModel.isPhotoSave = true
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                             viewModel.isAnimate = false
                                             self.presentationMode.wrappedValue.dismiss()
@@ -100,16 +100,33 @@ struct IEMainView: View {
                             }
                             HStack(alignment: .center, spacing: 14) {
                                 Button {
-                                    
+                                    if !viewModel.undoHistory.isEmpty{
+                                        guard let lastHistory = viewModel.undoHistory.popLast() else { return }
+                                        viewModel.redoHistory.append(lastHistory)
+                                        viewModel.location = lastHistory.loc
+                                        viewModel.frameIdolSize = lastHistory.size
+                                        viewModel.rotationAngle = lastHistory.ang
+                                        viewModel.sliderValues = lastHistory.sliderValues
+                                        
+                                    }
                                 } label: {
-                                    Image("back")
+                                    Image(systemName: "arrow.uturn.backward")
+                                        .foregroundColor(viewModel.undoHistory.isEmpty ? .gray10:.gray01)
                                     
                                 }
                                 
                                 Button {
-                                    
+                                    if !viewModel.redoHistory.isEmpty{
+                                        guard let lastHistory = viewModel.redoHistory.popLast() else { return }
+                                        viewModel.undoHistory.append(lastHistory)
+                                        viewModel.location = lastHistory.loc
+                                        viewModel.frameIdolSize = lastHistory.size
+                                        viewModel.rotationAngle = lastHistory.ang
+                                        viewModel.sliderValues = lastHistory.sliderValues
+                                    }
                                 } label: {
-                                    Image("front")
+                                    Image(systemName: "arrow.uturn.forward")
+                                        .foregroundColor(viewModel.redoHistory.isEmpty ? .gray10:.gray01)
                                     
                                 }
                             }
@@ -152,9 +169,14 @@ struct IEMainView: View {
                                 // 슬라이더
                                 Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
                                     .tint(Color.pointPink)
+                                    
                             }
                             .frame(height:40)
                             .background(Color.black.opacity(0.5)) // 배경색
+                            .onTapGesture {
+                                viewModel.undoHistory.append(viewModel.firstOne)
+                                viewModel.firstOne.sliderValues = viewModel.sliderValues
+                            }
                         }
                         // 편집 옵션 버튼들
                         HStack() {
@@ -204,7 +226,7 @@ struct IEMainView: View {
                 
             }
             else{
-                IEProgressView(isSave: $viewModel.isSave)
+                IEProgressView(isSave: $viewModel.isPhotoSave)
             }
         }
         .onAppear{

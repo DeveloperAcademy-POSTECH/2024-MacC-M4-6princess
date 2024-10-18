@@ -16,7 +16,7 @@ class IEViewModel: ObservableObject {
     @Published var idolImg = UIImage(named: "Felix")!
     @Published var imageScale: CGFloat = 1.0
     @Published var rotationAngle: Angle = .zero
-    @Published var isModal = false
+    
     @Published var sliderValues: [Float] = [0.0, 1.0, 1.0]
     @Published var selectedIndex: Int? = nil // 하단바 색조 조정 인덱스
     
@@ -27,8 +27,6 @@ class IEViewModel: ObservableObject {
     @Published var location: CGPoint = CGPoint(x: 100, y: 100)
     
     // 원본/축소된 이미지 크기
-    @Published var rawBGSize: CGSize = .zero // 원본 배경이미지의 크기
-    @Published var rawIdolSize: CGSize = .zero // 원본 아이돌이미지의 크기
     @Published var frameBGSize: CGSize = .zero // 프레임상의 축소된 배경 이미지 크기
     @Published var frameIdolSize: CGSize = .zero // 프레임상 아이돌 이미지 크기
 
@@ -48,11 +46,14 @@ class IEViewModel: ObservableObject {
     // 이미지에 색상 조정하는 객체,변수
     var ciContext = CIContext()
     var filter = CIFilter.colorControls()
-    let baseWidth: CGFloat = 100
     
-    @Published var isSave = false
+    @Published var isPhotoSave = false
     
-    @Published var isAppend = false
+    @Published var undoHistory:[History] = []
+    @Published var redoHistory:[History] = []
+    
+    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
+    
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
@@ -76,6 +77,7 @@ class IEViewModel: ObservableObject {
         // 뷰생성시 아이돌 이미지 위치 지정
         self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
+        self.firstOne = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
     }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
@@ -90,6 +92,7 @@ class IEViewModel: ObservableObject {
               let cgImage = ciContext.createCGImage(outputCIImage, from: outputCIImage.extent) else {
             return nil
         }
+//        firstOne.sliderValues =
         
         return UIImage(cgImage: cgImage)
     }
@@ -123,15 +126,20 @@ class IEViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     if success {
                         print("성공")
-                    } else {
+                } else {
                         print("실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
                     }
                 }
             }
             // 테스트 모달창
-            self.isModal = true
+            
         } else {
             print("렌더링 실패: 이미지 생성 실패")
+        }
+    }
+    func resetRedo(){
+        if !redoHistory.isEmpty{
+            redoHistory = []
         }
     }
     
@@ -145,3 +153,10 @@ class IEViewModel: ObservableObject {
 //        }
 //        .store(in: &cancellables) // 구독을 cancellables에 저장
 //}
+
+struct History{
+    var size:CGSize
+    var loc:CGPoint
+    var ang:Angle
+    var sliderValues:[Float]
+}
