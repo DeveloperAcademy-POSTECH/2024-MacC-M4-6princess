@@ -12,11 +12,8 @@ import Combine
 
 //TODO: 아이돌 이미지가 바깥으로 가지못하게하기
 class IEViewModel: ObservableObject {
-    @Published var bgImg = UIImage(named: "6princess")!
-    @Published var idolImg = UIImage(named: "Felix")!
     @Published var imageScale: CGFloat = 1.0
     @Published var rotationAngle: Angle = .zero
-    
     @Published var sliderValues: [Float] = [0.0, 1.0, 1.0]
     @Published var selectedIndex: Int? = nil // 하단바 색조 조정 인덱스
     
@@ -27,33 +24,22 @@ class IEViewModel: ObservableObject {
     @Published var location: CGPoint = CGPoint(x: 100, y: 100)
     
     // 원본/축소된 이미지 크기
+    @Published var rawBGSize: CGSize = .zero // 원본 배경이미지의 크기
+    @Published var rawIdolSize: CGSize = .zero // 원본 아이돌이미지의 크기
     @Published var frameBGSize: CGSize = .zero // 프레임상의 축소된 배경 이미지 크기
     @Published var frameIdolSize: CGSize = .zero // 프레임상 아이돌 이미지 크기
-
+    var bgRatio: CGFloat = .zero
     var idolRatio:CGFloat = .zero
     
     @Published var screenSize: CGSize = .zero // bgImg 뷰의 크기를 저장할 State 변수
-    
-    /// 뷰관련 bool 변수
-    @Published var isAnimate = false
-    @Published var isPreview = false
-    
-    /// pinchGesture 변수
-    @Published var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
-    @Published var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
     
     var imgArray:[UIImage] = []
     // 이미지에 색상 조정하는 객체,변수
     var ciContext = CIContext()
     var filter = CIFilter.colorControls()
+    let baseWidth: CGFloat = 100
     
-    @Published var isPhotoSave = false
-    
-    @Published var undoHistory:[History] = []
-    @Published var redoHistory:[History] = []
-    
-    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
-    
+    @Published var isAppend = false
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
@@ -63,21 +49,30 @@ class IEViewModel: ObservableObject {
         IEEditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
     ]
     
+    
     func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
         
+        // 배경 이미지의 aspectRatio를 구함
+        self.bgRatio = bgImg.size.height / bgImg.size.width
+        
+        print("bgRatio:\(self.bgRatio)")
+        
+        // 아이돌 이미지의 aspectRatio를 구함
+        self.idolRatio = idolImg.size.height / idolImg.size.width
+        print("bgImg.size:\(bgImg.size)")
+        
         // IECanvasView의 프레임 크기를 구함 for 이미지 저장
-//        self.screenSize = bounds
+        self.screenSize = bounds
         
         // 배경이미지를 scaleToFit하게 만듬
-        let newHeight = bounds.height / 3 * 2
+        let newHeight = self.screenSize.height / 3 * 2
         self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
         
-        self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width))
+        self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)) // baseWidth를 100으로 지정,세로는 계산
         
         // 뷰생성시 아이돌 이미지 위치 지정
         self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
-        self.firstOne = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
     }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
@@ -92,7 +87,6 @@ class IEViewModel: ObservableObject {
               let cgImage = ciContext.createCGImage(outputCIImage, from: outputCIImage.extent) else {
             return nil
         }
-//        firstOne.sliderValues =
         
         return UIImage(cgImage: cgImage)
     }
@@ -126,37 +120,13 @@ class IEViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     if success {
                         print("성공")
-                } else {
+                    } else {
                         print("실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
                     }
                 }
             }
-            // 테스트 모달창
-            
         } else {
             print("렌더링 실패: 이미지 생성 실패")
         }
     }
-    func resetRedo(){
-        if !redoHistory.isEmpty{
-            redoHistory = []
-        }
-    }
-    
-}
-
-//init() {
-//    // location 값이 변경될 때마다 출력
-//    $location
-//        .sink { newLocation in
-//            print("location 변경됨: \(newLocation)")
-//        }
-//        .store(in: &cancellables) // 구독을 cancellables에 저장
-//}
-
-struct History{
-    var size:CGSize
-    var loc:CGPoint
-    var ang:Angle
-    var sliderValues:[Float]
 }

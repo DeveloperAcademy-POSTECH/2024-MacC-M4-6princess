@@ -21,19 +21,6 @@ struct IECanvasView: View {
             .onChanged { angle in
                 viewModel.rotationAngle = angle
             }
-            .onEnded{ value in
-                viewModel.undoHistory.append(viewModel.firstOne)
-                
-                viewModel.firstOne.ang = value
-                viewModel.resetRedo()
-                if !viewModel.redoHistory.isEmpty{
-                    viewModel.redoHistory = []
-                }
-                
-                
-            }
-            
-        
     }
     var dragGesture: some Gesture {
         DragGesture()
@@ -44,17 +31,6 @@ struct IECanvasView: View {
             }
             .updating($startLocation) { (value, startLocation, transaction) in
                 startLocation = startLocation ?? viewModel.location
-            }
-            .onEnded{ value in
-                print("onended:\(value.location)")
-                print("viewModel:\(viewModel.location)")
-                viewModel.undoHistory.append(viewModel.firstOne)
-                viewModel.firstOne.loc = viewModel.location
-                viewModel.resetRedo()
-                if !viewModel.redoHistory.isEmpty{
-                    viewModel.redoHistory = []
-                }
-                
             }
     }
     // 아이돌 이미지 확대/축소 제스쳐
@@ -70,18 +46,11 @@ struct IECanvasView: View {
                 else{
                     scale = max((scale - 1) * 0.1 + 1,0.5) // 한번에 축소는 절반이 이하로 되지않음
                 }
-                //                print("scale:\(scale)")
                 let newWidth = viewModel.frameIdolSize.width * scale
+                
+                // 축소된 가로 길이에 사진 비율을 곱해서 새로운 아이돌 이미지의 크기를 수정
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
                 
-            }
-            .onEnded{ value in
-                viewModel.undoHistory.append(viewModel.firstOne)
-                viewModel.firstOne.size = viewModel.frameIdolSize
-                viewModel.resetRedo()
-                if !viewModel.redoHistory.isEmpty{
-                    viewModel.redoHistory = []
-                }
             }
     }
     
@@ -90,11 +59,11 @@ struct IECanvasView: View {
         ZStack {
             // 배경 이미지
             if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
+                
                 Image(uiImage: outputImage)
                     .resizable()
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
             }
-                
             // 아이돌 이미지
             Image(uiImage: idolImg)
                 .resizable()
@@ -112,7 +81,6 @@ struct IECanvasView: View {
             viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-        
     }
     
     
