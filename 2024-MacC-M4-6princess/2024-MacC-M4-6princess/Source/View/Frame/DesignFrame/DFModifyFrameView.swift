@@ -8,6 +8,7 @@ struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
+    @AppStorage("_isFirstLaunching") var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var draggedOffset = CGSize.zero
     @State private var accumulatedOffset = CGSize.zero
@@ -71,14 +72,18 @@ struct DFModifyFrame: View {
             .padding(.bottom, 20)
             .offset(draggedOffset)
             .scaleEffect(finalSize + currentSize)
-            .rotationEffect(currentAngle + finalAngle)
-            .gesture(drag.simultaneously(with: magnification).simultaneously(with: rotate))
+//            .rotationEffect(currentAngle + finalAngle)
+            .gesture(drag.simultaneously(with: magnification))
         
     }
     var body: some View {
         NavigationStack {
             VStack {
                 ZStack {
+                    if isFirstLaunching == true {
+                        DFOnboardingView(isFirstLaunching: $isFirstLaunching)
+                            .zIndex(1)
+                    }
                     if let image = resultImage {
                         Color(hex: "32322f")
                             .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))

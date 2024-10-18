@@ -33,6 +33,7 @@ struct IECanvasView: View {
             .updating($startLocation) { (value, startLocation, transaction) in
                 startLocation = startLocation ?? viewModel.location
             }
+           
     }
     // 아이돌 이미지 확대/축소 제스쳐
     var magnifyGesture: some Gesture{
