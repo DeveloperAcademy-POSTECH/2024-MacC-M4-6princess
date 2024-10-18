@@ -40,15 +40,25 @@ struct DFFrameEditView: View {
     @State private var state: Bool = false
     @State private var isPresented: Bool = false
     @State var index: Int = 0
+    @State private var inputImage: UIImage?
+    
+    var imageRender: some View {
+        VStack {
+            if let image = pickedImage {
+                Image(uiImage: image)
+//                    .resizable()
+            }
+        }
+    }
     
     var canvas: some View {
         Canvas { context, size in
-
+            
             if let image = maskImage {
                 context.draw(Image(uiImage: image).resizable(), in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             }
             
-            print("w: \(size.width), h: \(size.height)")
+//            print("w: \(size.width), h: \(size.height)")
             
             for line in lines {
                 var path = Path()
@@ -98,139 +108,143 @@ struct DFFrameEditView: View {
     }
     
     var body: some View {
-        VStack {
-            ZStack {
-                Color(.black)
-                    .ignoresSafeArea()
-                VStack {
+        ZStack {
+            Color(.black)
+                .ignoresSafeArea()
+            VStack {
+                ZStack {
+                    if let image = inputImage {
+                        let scale = scaleCompute(image)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .opacity(showPreview ? 0 : 1)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
+                            .padding(.bottom, 20)
+                        canvas
+                            .offset(y: -10)
+                            .opacity(showPreview ? 0 : 1)
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
+                    }
                     
-                    Spacer()
-                    ZStack {
-                        if let image = pickedImage {
-                            Image(uiImage: image)
-                                .resizable()
-                                .opacity(showPreview ? 0 : 1)
-                                .scaledToFit()
-                                .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
-                                .padding(.bottom, 20)
-                            canvas
-                                .offset(y: -10)
-                                .opacity(showPreview ? 0 : 1)
-                                .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
-                        }
-                        if let image = resultImage {
-                            Image(uiImage: image)
-                                .resizable()
-                                .opacity(showPreview ? 1 : 0)
-                                .scaledToFit()
-                                .background(Color(hex: "32322f").opacity(showPreview ? 1 : 0))
-                                .frame(width: UIScreen.main.bounds.width, height: image.size.height / scaleCompute(image))
-                                .padding(.bottom, 20)
-                        }
-                        
-                        Circle()
-                            .stroke(.white)
-                            .opacity(isShow ? 1 : 0)
-                            .frame(width: thickness, height: thickness)
-                        
-                        VStack {
+                    if let image = resultImage {
+                        let scale = scaleCompute(image)
+                        Image(uiImage: image)
+                            .resizable()
+                            .opacity(showPreview ? 1 : 0)
+                            .aspectRatio(contentMode: .fit)
+                            .background(Color(hex: "32322f").opacity(showPreview ? 1 : 0))
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
+                            .padding(.bottom, 20)
+                    }
+                    
+                    Circle()
+                        .stroke(.white)
+                        .opacity(isShow ? 1 : 0)
+                        .frame(width: thickness, height: thickness)
+                    
+                    VStack {
+                        Spacer()
+                        HStack {
                             Spacer()
-                            HStack {
-                                Spacer()
-                                Button {
-                                    showPreview.toggle()
-                                    createResult()
-                                    print("\(showPreview)")
-                                } label: {
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(showPreview ? Color.gray02 : Color.white)
-                                            .frame(width: 72, height: 27)
-                                        Text("미리보기")
-                                            .font(.custom("pretendard-medium", size: 16))
-                                            .foregroundStyle(showPreview ? Color.gray03 : Color.gray02)
-                                    }
+                            Button {
+                                showPreview.toggle()
+                                createResult()
+                                print("\(showPreview)")
+                            } label: {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(showPreview ? Color.gray02 : Color.white)
+                                        .frame(width: 72, height: 27)
+                                    Text("미리보기")
+                                        .font(.custom("pretendard-medium", size: 16))
+                                        .foregroundStyle(showPreview ? Color.gray03 : Color.gray02)
                                 }
-                                .padding(.trailing)
                             }
-                            ZStack {
-                                Rectangle()
-                                    .fill(Color.black.opacity(0.5))
-                                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 20)
-                                Slider(
-                                    value: $thickness,
-                                    in: 0...50,
-                                    step: 1
-                                ) {
-                                    Text("Title")
-                                } minimumValueLabel: {
-                                    Text("\(Int(thickness))")
-                                        .foregroundStyle(.white)
-                                } maximumValueLabel: {
-                                    Text("")
-                                } onEditingChanged: { editing in
-                                    isShow = editing
-                                    print("\(isShow)")
-                                }
-                                .accentColor(.pointPink)
-                                .frame(width: UIScreen.main.bounds.width / 1.2, height: 22)
-                                .padding(.bottom, 20)
-                                .padding([.leading, .trailing, .top], 10)
+                            .padding(.trailing)
+                        }
+                        ZStack {
+                            Rectangle()
+                                .fill(Color.black.opacity(0.5))
+                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 20)
+                            Slider(
+                                value: $thickness,
+                                in: 0...50,
+                                step: 1
+                            ) {
+                                Text("Title")
+                            } minimumValueLabel: {
+                                Text("\(Int(thickness))")
+                                    .foregroundStyle(.white)
+                            } maximumValueLabel: {
+                                Text("")
+                            } onEditingChanged: { editing in
+                                isShow = editing
+                                print("\(isShow)")
                             }
-                            .onAppear() {
-                                let render = ImageRenderer(content: Circle().frame(width: 16, height: 16).foregroundStyle(.white))
-                                render.scale = UIScreen.main.scale
-                                let thumbImage = render.uiImage
-                                UISlider.appearance().setThumbImage(thumbImage, for: .normal)
-                            }
+                            .accentColor(.pointPink)
+                            .frame(width: UIScreen.main.bounds.width / 1.2, height: 22)
+                            .padding(.bottom, 20)
+                            .padding([.leading, .trailing, .top], 10)
+                        }
+                        .onAppear() {
+                            let render = ImageRenderer(content: Circle().frame(width: 16, height: 16).foregroundStyle(.white))
+                            render.scale = UIScreen.main.scale
+                            let thumbImage = render.uiImage
+                            UISlider.appearance().setThumbImage(thumbImage, for: .normal)
+                        }
+                    }
+                }
+                
+                HStack(spacing: UIScreen.main.bounds.width / 2.4) {
+                    Button {
+                        selectionModeIndex = 0
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "212121"))
+                                .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                            Image("brush")
+                                .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                                .colorMultiply(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                            Text("브러쉬")
+                                .foregroundStyle(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                                .font(.custom("Pretendard-medium", size: 13))
+                                .offset(y: 30)
                         }
                     }
                     
-                    HStack(spacing: UIScreen.main.bounds.width / 2.4) {
-                        Button {
-                            selectionModeIndex = 0
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(Color(hex: "212121"))
-                                    .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                                Image("brush")
-                                    .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                                    .colorMultiply(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
-                                Text("브러쉬")
-                                    .foregroundStyle(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
-                                    .font(.custom("Pretendard-medium", size: 13))
-                                    .offset(y: 30)
-                            }
-                        }
+                    Button {
+                        selectionModeIndex = 1
                         
-                        Button {
-                            selectionModeIndex = 1
-                            
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(Color(hex: "212121"))
-                                    .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                                Image("erase")
-                                    .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                                    .colorMultiply(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
-                                Text("지우개")
-                                    .foregroundStyle(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
-                                    .font(.custom("Pretendard-medium", size: 13))
-                                    .offset(y: 30)
-                            }
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "212121"))
+                                .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                            Image("erase")
+                                .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                                .colorMultiply(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                            Text("지우개")
+                                .foregroundStyle(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                                .font(.custom("Pretendard-medium", size: 13))
+                                .offset(y: 30)
                         }
-                        
                     }
+                    
                 }
             }
-            .onAppear {
-//                maskImage = nil
-                removeBackground()
-                if maskImages.count == 0 && maskImage != nil {
-                    maskImages.append(maskImage)
-                }
+        }
+        .onAppear {
+            print("\(UIScreen.main.scale)")
+            let render = ImageRenderer(content: imageRender)
+            render.scale = 1
+            inputImage = render.uiImage
+            
+            removeBackground()
+            if maskImages.count == 0 && maskImage != nil {
+                maskImages.append(maskImage)
             }
         }
         .navigationDestination(isPresented: $isPresented, destination: {
@@ -242,6 +256,7 @@ struct DFFrameEditView: View {
                 Button {
                     self.presentationMode.wrappedValue.dismiss()
                     print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+                    print("\(pickedImage!.size.width) x \(pickedImage!.size.height)")
                 } label: {
                     HStack {
                         Image(systemName: "chevron.backward")
@@ -295,17 +310,25 @@ struct DFFrameEditView: View {
                         .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
                 }
                 .padding(1)
-
+                
             }
         }
     }
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        let scale = image.size.width / UIScreen.main.bounds.width
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        
+        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
+            scale = image.size.width / UIScreen.main.bounds.width
+            print("\(scale)")
+        }
+        print("\(image.size.width)  \(image.size.height)")
+        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
         return scale
     }
+    
     func createResult() {
-
-        guard let inputImage = CIImage(image: pickedImage ?? UIImage()) else {
+        
+        guard let inputImage = CIImage(image: inputImage ?? UIImage()) else {
             print("Failed to create CIImage")
             return
         }
@@ -326,7 +349,7 @@ struct DFFrameEditView: View {
     
     private func removeBackground() {
         
-        guard let inputImage = CIImage(image: pickedImage ?? UIImage()) else {
+        guard let inputImage = CIImage(image: inputImage ?? UIImage()) else {
             print("Failed to create CIImage")
             return
         }
@@ -336,10 +359,14 @@ struct DFFrameEditView: View {
                 print("Failed to create mask image")
                 return
             }
-            
+            //            guard let mask = subjectMaskImage(from: maskImage) else {
+            //                print("Failed to create mask image")
+            //                return
+            //            }
             // maskImage 상태 변수 업데이트
             DispatchQueue.main.async {
-                self.maskImage = render(ciImage: maskImage) // maskImage를 UIImage로 변환하여 저장
+                let m = apply(mask: maskImage, to: maskImage)
+                self.maskImage = render(ciImage: m) // maskImage를 UIImage로 변환하여 저장
             }
             
             let resultImage = apply(mask: maskImage, to: inputImage)
@@ -353,8 +380,8 @@ struct DFFrameEditView: View {
     func makeImage() {
         opacState = 1
         colorState = .white
-        let render = ImageRenderer(content: self.canvas.frame(width: UIScreen.main.bounds.width, height: pickedImage!.size.height / scaleCompute(pickedImage!)))
-        render.scale = scaleCompute(pickedImage!)
+        let render = ImageRenderer(content: self.canvas.frame(width: inputImage!.size.width / scaleCompute(inputImage!), height: inputImage!.size.height / scaleCompute(inputImage!)))
+        render.scale = scaleCompute(inputImage!)
         print("\(render.uiImage)")
         if let rend = render.uiImage {
             if index < maskImages.count - 1 {
@@ -365,7 +392,7 @@ struct DFFrameEditView: View {
             maskImages.append(rend)
             index += 1
             print("\(index)")
-                
+            
         }
         maskImage = maskImages[index]
         opacState = 0.4
@@ -374,8 +401,8 @@ struct DFFrameEditView: View {
     
     private func subjectMaskImage(from inputImage: CIImage) -> CIImage? {
         let handler = VNImageRequestHandler(ciImage: inputImage)
-//        let request = VNGenerateForegroundInstanceMaskRequest()
-        let request = VNGeneratePersonInstanceMaskRequest()
+        let request = VNGenerateForegroundInstanceMaskRequest()
+        //        let request = VNGeneratePersonInstanceMaskRequest()
         
         do {
             try handler.perform([request])
@@ -390,7 +417,7 @@ struct DFFrameEditView: View {
         }
         do {
             let maskPixelBuffer = try result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler)
-//            let maskPixelBuffer = try result.generateMask(forInstances: result.allInstances)
+            //            let maskPixelBuffer = try result.generateMask(forInstances: result.allInstances)
             return CIImage(cvPixelBuffer: maskPixelBuffer)
         } catch {
             print(error)
