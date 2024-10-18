@@ -163,7 +163,7 @@ struct CameraView: View {
                         IEIntroView(bg: takenImg, idol: frameImg)
                     }
                     else{
-                        TestImageView(bg: defaultImg,idol: idolImg)
+                        IEIntroView(bg: defaultImg,idol: idolImg)
                         
                     }
                 }
