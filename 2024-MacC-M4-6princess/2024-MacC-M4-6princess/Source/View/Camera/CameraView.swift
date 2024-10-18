@@ -7,8 +7,11 @@
 
 import SwiftUI
 import AVFoundation
+import CoreData
 
 struct CameraView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @State var frameImage: UIImage?
     @StateObject var camera = CameraModel()
     @StateObject var motionManager = MotionManager()
     @State var delayTime: TimeInterval = 0.0
@@ -16,20 +19,34 @@ struct CameraView: View {
     @State var isTakePic = false
     @State var isFrameSelect = false
     @State var isFullScreenPop: Bool = false
-    @State var selectedFrame: String? = nil
+    @State var selectedFrame: UUID? = nil
+    @State var isFrameSelected: Bool = false
+    @State private var showAlert = false
     
-//    @State private var firstTime = false
+    
+    @State var idolImg = UIImage(named: "Felix")!
+    //    @State private var firstTime = false
     @AppStorage("openFirstTime") private var firstTime = false
-    
+    var defaultImg: UIImage = UIImage(named: "6princess")!
     
     var body: some View {
         NavigationStack {
             ZStack {
                 CameraPreview(camera: camera)
                     .ignoresSafeArea(.all, edges: .all)
-                Image(selectedFrame ?? "") //뷰에 프레임 띄우기
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
+                VStack {
+                    if let image = frameImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    }
+                }
+                .onAppear {
+                    loadSelectedFrame()
+                }
+                .onChange(of: selectedFrame) { _ in
+                    loadSelectedFrame()
+                }
                 VStack {
                     
                     HStack(alignment: .bottom) {
@@ -74,10 +91,14 @@ struct CameraView: View {
                         Spacer()
                         
                         //셔터 버튼
-                        Button{
-                            self.isTakePic = true
-                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
-                                camera.takePic()
+                        Button {
+                            if isFrameSelected {
+                                self.isTakePic = true
+                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
+                                    camera.takePic()
+                                }
+                            } else {
+                                showAlert = true
                             }
                         } label: {
                             Image("shutterImage")
@@ -85,6 +106,11 @@ struct CameraView: View {
                                 .frame(width: 80, height: 80)
                                 .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                 .animation(.easeInOut, value: motionManager.currentOrientation)
+                        }
+                        .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $showAlert) {
+                            Button("닫기", role: .cancel) { }
+                        } message: {
+                            Text("")
                         }
                         
                         Spacer()
@@ -98,9 +124,9 @@ struct CameraView: View {
                         .background(.white)
                     
                 }
-//                .fullScreenCover(isPresented: $isFullScreenPop) {
-//                    PhotosPickerView()
-//                }
+                //                .fullScreenCover(isPresented: $isFullScreenPop) {
+                //                    PhotosPickerView()
+                //                }
                 //처음 실행했을 때
                 if !firstTime  {
                     CameraOnboardingView(firstTime: $firstTime)
@@ -120,21 +146,53 @@ struct CameraView: View {
                 .onAppear(perform: {
                     camera.checkVideoAuthorizaion()
                     motionManager.startDeviceMotionUpdates()
+                    //                    DispatchQueue.main.async {
+                    //                        camera.session.startRunning()
+                    //                    }
                 })
                 .fullScreenCover(isPresented: $isFrameSelect) {
-                    CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame)
+                    CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame, isFrameSelected: $isFrameSelected)
                         .presentationDetents([.large])
                         .presentationDragIndicator(.visible)
                     
                 }
                 .statusBar(hidden: true)
                 .navigationBarBackButtonHidden()
+                .navigationDestination(isPresented: $camera.nextView) {
+                    if let takenImg = camera.takenImg,let frameImg = frameImage{
+                        IEIntroView(bg: takenImg, idol: frameImg)
+                    }
+                    else{
+                        TestImageView(bg: defaultImg,idol: idolImg)
+                        
+                    }
+                }
+            
         }
         
     }
+    //이미지 렌더링해서 불러오기
+    private func loadSelectedFrame() {
+        guard let frameId = selectedFrame else {
+            frameImage = nil
+            return
+        }
+        
+        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try viewContext.fetch(fetchRequest)
+            if let storedImage = results.first, let imageData = storedImage.image {
+                frameImage = UIImage(data: imageData)
+            } else {
+                frameImage = nil
+            }
+        } catch {
+            print("Error fetching frame: \(error)")
+            frameImage = nil
+        }
+    }
 }
 
-
-#Preview {
-    CameraView(camera: CameraModel(), delayTime: 0, isPushed: 0, isFrameSelect: false, selectedFrame: "")
-}

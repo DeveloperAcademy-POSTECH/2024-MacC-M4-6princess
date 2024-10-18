@@ -30,27 +30,31 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     //    @Published var picData: [Data] = []
     //    @Published var imageViews: [UIImage] = [] // UIImageView 배열
     
+    @Published var takenImg: UIImage?
+    
+    @Published var nextView = false
+    
     
     ///비디오 권한 체크
     func checkVideoAuthorizaion() {
         
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized:
-            //세션 세팅
-            setUp()
-        case .notDetermined:
-            //권한 재요청
-            AVCaptureDevice.requestAccess(for: .video) {
-                (status) in
-                if status {
-                    self.setUp()
+            case .authorized:
+                //세션 세팅
+                setUp()
+            case .notDetermined:
+                //권한 재요청
+                AVCaptureDevice.requestAccess(for: .video) {
+                    (status) in
+                    if status {
+                        self.setUp()
+                    }
                 }
-            }
-        case .denied:
-            self.isAlert.toggle()
-            return
-        default:
-            return
+            case .denied:
+                self.isAlert.toggle()
+                return
+            default:
+                return
         }
     }
     
@@ -127,7 +131,6 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        
         if let error = error {
             print("사진 처리 중 에러 발생: \(error.localizedDescription)")
             return
@@ -137,12 +140,24 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("사진 데이터가 유효하지 않음")
             return
         }
-        //여기 imageData를 그냥 변수가 아니라 배열로 바꿔서 저장해야 여러 사진을 저장할 수 있을듯
+        
+        guard var image = UIImage(data: imageData) else {
+            print("이미지를 생성할 수 없습니다.")
+            return
+        }
+        
+        // 전면 카메라일 경우 좌우반전 처리
+        if self.videoDeviceInput?.device.position == .front {
+            image = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
+        }
         
         // 메인 스레드에서 picData 업데이트
         DispatchQueue.main.async {
-            self.picData = imageData
-            //            self.imageViews.append(UIImage(data: self.picData)!)
+            self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
+            self.takenImg = image
+            self.nextView = true
+            print("nextView:\(self.nextView)")
+            print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
         }
     }
@@ -185,17 +200,17 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         let preferredPosition: AVCaptureDevice.Position
         
         switch currentPosition {
-        case .unspecified, .front:
-            print("후면 카메라로 전환합니다.")
-            preferredPosition = .back
-            
-        case .back:
-            print("전면 카메라로 전환합니다.")
-            preferredPosition = .front
-            
-        @unknown default:
-            print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
-            preferredPosition = .back
+            case .unspecified, .front:
+                print("후면 카메라로 전환합니다.")
+                preferredPosition = .back
+                
+            case .back:
+                print("전면 카메라로 전환합니다.")
+                preferredPosition = .front
+                
+            @unknown default:
+                print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
+                preferredPosition = .back
         }
         
         // 새로운 카메라 장치 가져오기
