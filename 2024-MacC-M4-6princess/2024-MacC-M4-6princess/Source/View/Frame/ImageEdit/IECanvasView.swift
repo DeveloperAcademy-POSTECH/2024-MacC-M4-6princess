@@ -11,15 +11,19 @@ import SwiftUI
 struct IECanvasView: View {
     @StateObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
-    @Binding var bgImg: UIImage
-    @Binding var idolImg: UIImage
-    
     
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
         RotationGesture()
             .onChanged { angle in
                 viewModel.rotationAngle = angle
+            }
+            .onEnded{ value in
+                viewModel.undoHistory.append(viewModel.firstOne)
+                viewModel.firstOne.ang = value
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
             }
     }
     var dragGesture: some Gesture {
@@ -32,7 +36,14 @@ struct IECanvasView: View {
             .updating($startLocation) { (value, startLocation, transaction) in
                 startLocation = startLocation ?? viewModel.location
             }
-           
+            .onEnded{ _ in
+                viewModel.undoHistory.append(viewModel.firstOne)
+                viewModel.firstOne.loc = viewModel.location
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
+                
+            }
     }
     // 아이돌 이미지 확대/축소 제스쳐
     var magnifyGesture: some Gesture{
@@ -51,7 +62,14 @@ struct IECanvasView: View {
                 
                 // 축소된 가로 길이에 사진 비율을 곱해서 새로운 아이돌 이미지의 크기를 수정
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
+            }
+            .onEnded{ value in
+                viewModel.undoHistory.append(viewModel.firstOne)
+                viewModel.firstOne.size = viewModel.frameIdolSize
                 
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
             }
     }
     
@@ -59,14 +77,13 @@ struct IECanvasView: View {
     var body: some View {
         ZStack {
             // 배경 이미지
-            if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
-                
+            if let outputImage = viewModel.applyColorFilter(originalImage: viewModel.bgImg) {
                 Image(uiImage: outputImage)
                     .resizable()
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
             }
             // 아이돌 이미지
-            Image(uiImage: idolImg)
+            Image(uiImage: viewModel.idolImg)
                 .resizable()
                 .scaledToFit()
                 .rotationEffect(viewModel.rotationAngle)
@@ -79,7 +96,7 @@ struct IECanvasView: View {
             
         }
         .onAppear {
-            viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
+            viewModel.canvasOnAppear(bgImg: viewModel.bgImg, idolImg: viewModel.idolImg, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
     }

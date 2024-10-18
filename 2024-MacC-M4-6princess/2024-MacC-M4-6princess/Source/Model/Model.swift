@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // 편집 옵션 데이터 구조체 정의
 struct IEEditingOption {
@@ -15,6 +16,12 @@ struct IEEditingOption {
     var step: Float
 }
 
+struct History{
+    var size:CGSize
+    var loc:CGPoint
+    var ang:Angle
+    var sliderValues:[Float]
+}
 
 /// combin 기능
 //init() {
