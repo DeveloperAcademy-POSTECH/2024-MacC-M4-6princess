@@ -46,6 +46,7 @@ struct IEMainView: View {
                     viewModel.showRawImage = false
                 }
                 else{
+                    viewModel.selectedIndex = nil
                     // 현재 정보를 넣기
                     viewModel.tmpHistory.size = viewModel.frameIdolSize
                     viewModel.tmpHistory.ang = viewModel.rotationAngle
@@ -75,6 +76,7 @@ struct IEMainView: View {
         VStack {
             if !viewModel.saveAnimate{
                 ZStack {
+                    
                     HStack {
                         Button {
                             // 뒤로가기 버튼
@@ -115,6 +117,8 @@ struct IEMainView: View {
                         }
                         
                     }
+                    .disabled(viewModel.showRawImage)
+                   
                     HStack(alignment: .center, spacing: 14) {
                         Button {
                             if !viewModel.undoHistory.isEmpty{
@@ -149,6 +153,7 @@ struct IEMainView: View {
                             
                         }
                     }
+                    .disabled(viewModel.showRawImage)
                 }
                 .background(.white)
                 
@@ -182,16 +187,23 @@ struct IEMainView: View {
                         
                         if let idx = viewModel.selectedIndex {
                             HStack {
-                                Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
-                                    .foregroundColor(.white)
-                                    .frame(width: 30)
-                                    .padding(.horizontal, 5)
-                                
-                                // 슬라이더
-                                Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
-                                    .tint(Color.pointPink)
+//                                Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
+//                                    .foregroundColor(.white)
+//                                    .frame(width: 30)
+//                                    .padding(.horizontal, 5)
+//                                
+//                                // 슬라이더
+//                                Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
+//                                    .tint(Color.pointPink)
+                                CustomSliderView(
+                                        value: $viewModel.sliderValues[idx],
+                                        range: viewModel.colorEditOptions[idx].range,
+                                        step: viewModel.colorEditOptions[idx].step,
+                                        viewModel: viewModel,
+                                        idx: idx
+                                    )
                             }
-                            .frame(height: 40)
+                            .frame(width: viewModel.screenSize.width,height: 40)
                             .background(Color.black.opacity(0.5)) // 배경색
                             
                         }
@@ -260,6 +272,7 @@ struct IEMainView: View {
                     .padding(.horizontal, 72)
                     Spacer()
                 }
+                .disabled(viewModel.showRawImage)
                 .padding()
                 .background(.white)
                 

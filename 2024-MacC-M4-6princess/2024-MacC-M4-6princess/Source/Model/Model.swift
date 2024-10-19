@@ -21,6 +21,7 @@ struct History{
     var loc:CGPoint
     var ang:Angle
     var sliderValues:[Float]
+//    var idolRect:CGRect
 }
 
 /// combin 기능

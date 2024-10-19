@@ -62,9 +62,9 @@ class IEViewModel: ObservableObject {
     
     // 편집 옵션 배열
     let colorEditOptions: [IEEditingOption] = [
-        IEEditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.02),
-        IEEditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.05),
-        IEEditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
+        IEEditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.001),
+        IEEditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.01),
+        IEEditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.001)
     ]
     
     
