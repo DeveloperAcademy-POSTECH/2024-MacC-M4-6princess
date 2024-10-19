@@ -26,7 +26,8 @@ struct CameraView: View {
     
     @State var idolImg = UIImage(named: "Felix")!
     //    @State private var firstTime = false
-    @AppStorage("openFirstTime") private var firstTime = false
+//    @AppStorage("openFirstTime") private var firstTime = false
+    @State var firstTime = false
     var defaultImg: UIImage = UIImage(named: "6princess")!
     
     var body: some View {
