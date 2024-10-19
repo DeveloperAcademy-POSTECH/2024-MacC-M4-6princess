@@ -30,17 +30,45 @@ struct IEMainView: View {
         IECanvasView(viewModel: viewModel)
     }
     var rawImageTab: some Gesture {
-        LongPressGesture(minimumDuration: 0)
-            .onChanged{ _ in
-                viewModel.isPreview = true
-                print("프리뷰:true")
+        TapGesture()
+            .onEnded{
+                if viewModel.showRawImage{
+                    
+                    let one = viewModel.tmpHistory
+                    print("firstOne:\(viewModel.firstOne)")
+                    print("recentPop:\(viewModel.recentPop)")
+                    viewModel.recentPop = one
+                    
+                    viewModel.frameIdolSize = one.size
+                    viewModel.location = one.loc
+                    viewModel.rotationAngle = one.ang
+                    viewModel.sliderValues = one.sliderValues
+                    viewModel.showRawImage = false
+                }
+                else{
+                    // 현재 정보를 넣기
+                    viewModel.tmpHistory.size = viewModel.frameIdolSize
+                    viewModel.tmpHistory.ang = viewModel.rotationAngle
+                    viewModel.tmpHistory.loc = viewModel.location
+                    viewModel.tmpHistory.sliderValues = viewModel.sliderValues
+                    
+                    let one = viewModel.firstOne
+                    viewModel.frameIdolSize = one.size
+                    viewModel.location = one.loc
+                    viewModel.rotationAngle = one.ang
+                    viewModel.sliderValues = one.sliderValues
+                    
+                    viewModel.showRawImage = true
+                    viewModel.showRawAlert = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        viewModel.showRawAlert = false
+                    }
+                    
+                }
                 
             }
-            .onEnded { _ in
-                viewModel.isPreview = false
-                print("프리뷰:false")
-            }
     }
+    
     
     
     var body: some View {
@@ -91,12 +119,12 @@ struct IEMainView: View {
                         Button {
                             if !viewModel.undoHistory.isEmpty{
                                 guard let lastHistory = viewModel.undoHistory.popLast() else { return }
-                                viewModel.redoHistory.append(viewModel.firstOne)
+                                viewModel.redoHistory.append(viewModel.recentPop)
                                 viewModel.location = lastHistory.loc
                                 viewModel.frameIdolSize = lastHistory.size
                                 viewModel.rotationAngle = lastHistory.ang
                                 viewModel.sliderValues = lastHistory.sliderValues
-                                viewModel.firstOne = lastHistory
+                                viewModel.recentPop = lastHistory
                                 print(lastHistory)
                                 
                             }
@@ -108,12 +136,12 @@ struct IEMainView: View {
                         Button {
                             if !viewModel.redoHistory.isEmpty{
                                 guard let lastHistory = viewModel.redoHistory.popLast() else { return }
-                                viewModel.undoHistory.append(viewModel.firstOne)
+                                viewModel.undoHistory.append(viewModel.recentPop)
                                 viewModel.location = lastHistory.loc
                                 viewModel.frameIdolSize = lastHistory.size
                                 viewModel.rotationAngle = lastHistory.ang
                                 viewModel.sliderValues = lastHistory.sliderValues
-                                viewModel.firstOne = lastHistory
+                                viewModel.recentPop = lastHistory
                             }
                         } label: {
                             Image(systemName: "arrow.uturn.forward")
@@ -121,84 +149,9 @@ struct IEMainView: View {
                             
                         }
                     }
-                   
-
                 }
                 .background(.white)
-//                HStack {
-//                    Button {
-//                        // 뒤로가기 버튼
-//                        self.presentationMode.wrappedValue.dismiss()
-//                        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-//                    } label: {
-//                        HStack {
-//                            Group{
-//                                Image(systemName: "chevron.backward")
-//                                    .fontWeight(.semibold)
-//                                
-//                                Text("다시 찍기")
-//                                    .fontWeight(.regular)
-//                            }
-//                            .foregroundColor(.gray01)
-//                        }
-//                    }
-//                    .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
-//                    
-//                    Spacer(minLength: UIScreen.main.bounds.width / 20)
-//                    
-//                    Button {
-//                        if !viewModel.undoHistory.isEmpty{
-//                            guard let lastHistory = viewModel.undoHistory.popLast() else { return }
-//                            viewModel.redoHistory.append(viewModel.firstOne)
-//                            viewModel.location = lastHistory.loc
-//                            viewModel.frameIdolSize = lastHistory.size
-//                            viewModel.rotationAngle = lastHistory.ang
-//                            viewModel.sliderValues = lastHistory.sliderValues
-//                            viewModel.firstOne = lastHistory
-//                            print(lastHistory)
-//                            
-//                        }
-//                    } label: {
-//                        Image(viewModel.undoHistory.isEmpty ? "undo.gray" : "undo.black")
-//                        
-//                    }
-//                    .padding(.trailing, 14)
-//                    
-//                    Button {
-//                        if !viewModel.redoHistory.isEmpty{
-//                            guard let lastHistory = viewModel.redoHistory.popLast() else { return }
-//                            viewModel.undoHistory.append(viewModel.firstOne)
-//                            viewModel.location = lastHistory.loc
-//                            viewModel.frameIdolSize = lastHistory.size
-//                            viewModel.rotationAngle = lastHistory.ang
-//                            viewModel.sliderValues = lastHistory.sliderValues
-//                            viewModel.firstOne = lastHistory
-//                        }
-//                    } label: {
-//                        Image(viewModel.redoHistory.isEmpty ? "redo.gray" : "redo.black")
-//                    }
-//                    .padding(.trailing, 60)
-//                    
-//                    Spacer()
-//                    Button {
-//                        viewModel.saveRenderedView(content: canvasView)
-//                        viewModel.isAnimate = true
-//                        // 5초 후에 isSave를 true로 변경하여 이미지로 전환
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                            viewModel.savePhoto = true
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                viewModel.isAnimate = false
-//                                self.presentationMode.wrappedValue.dismiss()
-//                            }
-//                        }
-//                    } label: {
-//                        Text("저장")
-//                            .fontWeight(.semibold)
-//                            .foregroundStyle(.pointPink)
-//                            .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
-//                    }
-//                    .padding(1)
-//                }
+                
                 ZStack{
                     
                     // 후보정 레이어 편집 뷰
@@ -211,24 +164,20 @@ struct IEMainView: View {
                         Spacer()
                         HStack{
                             Spacer()
-                            Group{
-                                if viewModel.isPreview{
-                                    Image(systemName:"rectangle.checkered")
-                                        .frame(width: 30,height: 30)
-                                        .foregroundColor(.gray01)
-                                        .gesture(rawImageTab)
-                                }
-                                else{
-                                    Image(systemName:"rectangle.dashed")
-                                        .frame(width: 30,height: 30)
-                                        .foregroundColor(.gray01)
-                                        .gesture(rawImageTab)
-                                        .onTapGesture {
-                                            viewModel.isPreview = true
-                                        }
-                                }
-                            }
-                            .padding(.horizontal)
+                            
+                            //                            Button(action: {
+                            //                                viewModel.showImage = true
+                            //                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            //                                    viewModel.showImage = false
+                            //                                }
+                            //                            }) {
+                            //                                Image(systemName: "rawImage.\(viewModel.showImage ? "selected" : "unselected")")
+                            //                                    .frame(width: 50, height: 50)
+                            //                            }
+                            Image("rawImage.\(viewModel.showRawImage ? "selected" : "unselected")")
+                                .frame(width: 100, height: 100)
+                                .gesture(rawImageTab)
+                                .padding(.horizontal)
                         }
                         
                         if let idx = viewModel.selectedIndex {
@@ -241,19 +190,19 @@ struct IEMainView: View {
                                 // 슬라이더
                                 Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
                                     .tint(Color.pointPink)
-//                                    .gesture(
-//                                        TapGesture()
-//                                            .onEnded {
-//                                                print("탭 제스처가 끝났습니다.")
-//                                            }
-//                                    )
                             }
                             .frame(height: 40)
                             .background(Color.black.opacity(0.5)) // 배경색
                             
                         }
                     }
-                }
+                    if viewModel.showRawAlert{
+                        Image("rawImageAlert")
+                            .frame(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.height/4)
+                    }
+                   
+                } //end
+                
                 
                 // 편집 옵션 버튼들
                 HStack() {
@@ -274,6 +223,11 @@ struct IEMainView: View {
                                         if viewModel.selectedIndex == index {
                                             Image("\(viewModel.colorEditOptions[index].icon).selected")
                                                 .foregroundColor(.pointPink)
+                                                .onTapGesture{
+                                                    
+                                                    viewModel.selectedIndex = nil // 다시 선택하면 슬라이더 내려감
+                                                    
+                                                }
                                         } else {
                                             Image("\(viewModel.colorEditOptions[index].icon).unselected")
                                                 .foregroundColor(.gray01)
@@ -281,14 +235,25 @@ struct IEMainView: View {
                                     }
                                 }
                                 .onTapGesture {
-                                    viewModel.selectedIndex = index
+                                    if viewModel.selectedIndex == index{ // 이미 선택되어 있으면 슬라이더가 내려감
+                                        viewModel.selectedIndex = nil
+                                    }
+                                    else{
+                                        viewModel.selectedIndex = index
+                                    }
                                 }
                                 
                                 Text(viewModel.colorEditOptions[index].name)
                                     .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01)
                             }
                             .onTapGesture {
-                                viewModel.selectedIndex = index
+                                if viewModel.selectedIndex == index{ // 이미 선택되어 있으면 슬라이더가 내려감
+                                    viewModel.selectedIndex = nil
+                                }
+                                else{
+                                    viewModel.selectedIndex = index
+                                }
+                                
                             }
                         }
                     }
@@ -297,6 +262,7 @@ struct IEMainView: View {
                 }
                 .padding()
                 .background(.white)
+                
                 
             }
             else{
