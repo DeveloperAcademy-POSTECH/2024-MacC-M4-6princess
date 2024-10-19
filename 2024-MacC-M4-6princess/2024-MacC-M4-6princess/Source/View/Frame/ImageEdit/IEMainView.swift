@@ -30,7 +30,7 @@ struct IEMainView: View {
         IECanvasView(viewModel: viewModel)
     }
     var rawImageTab: some Gesture {
-        LongPressGesture(minimumDuration: 0)
+        LongPressGesture(minimumDuration: 1)
             .onChanged{ _ in
                 viewModel.isPreview = true
                 print("프리뷰:true")
@@ -91,12 +91,12 @@ struct IEMainView: View {
                         Button {
                             if !viewModel.undoHistory.isEmpty{
                                 guard let lastHistory = viewModel.undoHistory.popLast() else { return }
-                                viewModel.redoHistory.append(viewModel.firstOne)
+                                viewModel.redoHistory.append(viewModel.recentPop)
                                 viewModel.location = lastHistory.loc
                                 viewModel.frameIdolSize = lastHistory.size
                                 viewModel.rotationAngle = lastHistory.ang
                                 viewModel.sliderValues = lastHistory.sliderValues
-                                viewModel.firstOne = lastHistory
+                                viewModel.recentPop = lastHistory
                                 print(lastHistory)
                                 
                             }
@@ -108,12 +108,12 @@ struct IEMainView: View {
                         Button {
                             if !viewModel.redoHistory.isEmpty{
                                 guard let lastHistory = viewModel.redoHistory.popLast() else { return }
-                                viewModel.undoHistory.append(viewModel.firstOne)
+                                viewModel.undoHistory.append(viewModel.recentPop)
                                 viewModel.location = lastHistory.loc
                                 viewModel.frameIdolSize = lastHistory.size
                                 viewModel.rotationAngle = lastHistory.ang
                                 viewModel.sliderValues = lastHistory.sliderValues
-                                viewModel.firstOne = lastHistory
+                                viewModel.recentPop = lastHistory
                             }
                         } label: {
                             Image(systemName: "arrow.uturn.forward")
@@ -206,29 +206,48 @@ struct IEMainView: View {
                     //                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
                     //                        .gesture(pinchGesture)
                         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                        .gesture(rawImageTab)
                     
                     VStack{
                         Spacer()
                         HStack{
                             Spacer()
-                            Group{
-                                if viewModel.isPreview{
-                                    Image(systemName:"rectangle.checkered")
-                                        .frame(width: 30,height: 30)
+                            Group {
+                                if viewModel.isPreview {
+                                    Image(systemName: "rectangle.checkered")
+                                        .frame(width: 40, height: 40)
                                         .foregroundColor(.gray01)
-                                        .gesture(rawImageTab)
-                                }
-                                else{
-                                    Image(systemName:"rectangle.dashed")
-                                        .frame(width: 30,height: 30)
+                                        .gesture(DragGesture(minimumDistance: 0)
+                                            .onChanged { _ in
+                                                viewModel.isPreview = true
+                                            }
+                                            .onEnded { _ in
+                                                viewModel.isPreview = false
+                                            }
+                                        )
+                                        .onTapGesture {
+                                            viewModel.isPreview = false
+                                        }
+                                } else {
+                                    Image(systemName: "rectangle.dashed")
+                                        .frame(width: 40, height: 40)
                                         .foregroundColor(.gray01)
-                                        .gesture(rawImageTab)
+                                        .gesture(DragGesture(minimumDistance: 0)
+                                            .onChanged { _ in
+                                                viewModel.isPreview = true
+                                            }
+                                            .onEnded { _ in
+                                                viewModel.isPreview = false
+                                            }
+                                        )
                                         .onTapGesture {
                                             viewModel.isPreview = true
                                         }
                                 }
                             }
                             .padding(.horizontal)
+
+
                         }
                         
                         if let idx = viewModel.selectedIndex {

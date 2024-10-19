@@ -53,7 +53,10 @@ class IEViewModel: ObservableObject {
     
     @Published var undoHistory:[History] = []
     @Published var redoHistory:[History] = []
-    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 바뀌기전 현재 정보
+    @Published var recentPop:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 바뀌기전 현재 정보
+    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본
+    
+    
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
@@ -87,8 +90,8 @@ class IEViewModel: ObservableObject {
         // 뷰생성시 아이돌 이미지 위치 지정
         self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
+        self.recentPop = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
         self.firstOne = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
-        
     }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {

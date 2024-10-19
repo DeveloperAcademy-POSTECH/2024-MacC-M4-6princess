@@ -19,8 +19,8 @@ struct IECanvasView: View {
                 viewModel.rotationAngle = angle
             }
             .onEnded{ value in
-                viewModel.undoHistory.append(viewModel.firstOne)
-                viewModel.firstOne.ang = value
+                viewModel.undoHistory.append(viewModel.recentPop)
+                viewModel.recentPop.ang = value
                 if !viewModel.redoHistory.isEmpty{
                     viewModel.redoHistory = []
                 }
@@ -37,8 +37,8 @@ struct IECanvasView: View {
                 startLocation = startLocation ?? viewModel.location
             }
             .onEnded{ _ in
-                viewModel.undoHistory.append(viewModel.firstOne)
-                viewModel.firstOne.loc = viewModel.location
+                viewModel.undoHistory.append(viewModel.recentPop)
+                viewModel.recentPop.loc = viewModel.location
                 if !viewModel.redoHistory.isEmpty{
                     viewModel.redoHistory = []
                 }
@@ -64,8 +64,8 @@ struct IECanvasView: View {
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
             }
             .onEnded{ value in
-                viewModel.undoHistory.append(viewModel.firstOne)
-                viewModel.firstOne.size = viewModel.frameIdolSize
+                viewModel.undoHistory.append(viewModel.recentPop)
+                viewModel.recentPop.size = viewModel.frameIdolSize
                 
                 if !viewModel.redoHistory.isEmpty{
                     viewModel.redoHistory = []
