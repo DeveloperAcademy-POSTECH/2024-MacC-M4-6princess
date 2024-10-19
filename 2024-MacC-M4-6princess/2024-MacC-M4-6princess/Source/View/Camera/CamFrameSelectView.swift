@@ -19,14 +19,19 @@ struct CameraFrameSelectView: View {
     @State private var imageDataArray: [(id: UUID, data: Data)] = []
     @Binding var isFullScreenPop: Bool
     @Binding var selectedFrame: UUID?
+    //프레임을 카메라뷰에 적용시킬 때 선택되었다는 변수
     @Binding var isFrameSelected: Bool
     @State private var isShow: Bool = false
+    @State private var isEditing: Bool = false
+    //프레임을 편집(삭제)할 때 선택되었다는 변수
+    @State private var isFrameEditSelected: Bool = false
+    
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // 제목을 상단에 배치
-                SheetTitleView()
+                SheetTitleView(isEditing: $isEditing)
                 
                 if !imageDataArray.isEmpty {
                     ScrollView {
@@ -50,58 +55,84 @@ struct CameraFrameSelectView: View {
                             }.onTapGesture {
                                 isFullScreenPop.toggle()
                             }
+                            .disabled(isEditing)
+                            
                             ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
-                                Button {
-                                    isFrameSelected = true
-                                    selectedFrame = imageInfo.id
-                                    dismiss()
-                                } label: {
-                                    if let uiImage = UIImage(data: imageInfo.data) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: UIScreen.main.bounds.width / 3,
-                                                   height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                            .clipped()
-                                    } else {
-                                        Color.gray
-                                            .frame(width: 150, height: 150) // 크기 설정
+                                ZStack {
+                                    VStack(alignment: .trailing) {
+                                        if isEditing {
+                                                if isFrameEditSelected {
+                                                    Image("frameCheckIcon")
+                                                        .padding(.trailing, 10)
+                                                        .padding(.top, 10)
+                                                } else {
+                                                    Circle()
+                                                        .fill(.gray03)
+                                                        .frame(width: 24, height: 24)
+                                                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 1, y: 1)
+                                                        .padding(.trailing, 10)
+                                                        .padding(.top, 10)
+                                                }
+                                        }
+                                        
+                                    }.frame(width: UIScreen.main.bounds.width / 3,
+                                            height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                    Button {
+                                        isFrameSelected = true
+                                        selectedFrame = imageInfo.id
+                                        dismiss()
+                                    } label: {
+                                        if let uiImage = UIImage(data: imageInfo.data) {
+                                            Image(uiImage: uiImage)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: UIScreen.main.bounds.width / 3,
+                                                       height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                                .clipped()
+                                            //임시로 테두리 적용 - 그리드 확인용
+                                                .border(Color.black, width: 1)
+                                        } else {
+                                            Color.gray
+                                                .frame(width: 150, height: 150) // 크기 설정
+                                        }
                                     }
+                                    
+                                    
                                 }
                             }
                         }
                     }
                 }
-                else {
-                    Spacer()
-                    NavigationLink {
-                        PhotosPickerView()
-                    } label: {
-                        VStack(alignment: .center, spacing: 4) {
-                            Image("plusIcon")
-                                .resizable()
-                                .frame(width: 30, height: 30, alignment: .center)
-                            Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
-                                .font(.system(size: 17))
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                    else {
+                        Spacer()
+                        NavigationLink {
+                            PhotosPickerView()
+                        } label: {
+                            VStack(alignment: .center, spacing: 4) {
+                                Image("plusIcon")
+                                    .resizable()
+                                    .frame(width: 30, height: 30, alignment: .center)
+                                Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
+                                    .font(.system(size: 17))
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                            }
+                        }.onTapGesture {
+                            dismiss()
+                            isFullScreenPop.toggle()
                         }
-                    }.onTapGesture {
-                        dismiss()
-                        isFullScreenPop.toggle()
+                        
+                        Spacer()
                     }
-                    
-                    Spacer()
+                }.onAppear {
+                    loadImages()
                 }
-            }.onAppear {
-                loadImages()
             }
-        }
-        .fullScreenCover(isPresented: $isShow) {
-            PhotosPickerView()
-        }
+            .fullScreenCover(isPresented: $isShow) {
+                PhotosPickerView()
+            }
+        
     }
-    
     //프레임 불러오는 함수
     private func loadImages() {
         imageDataArray = storedImages.compactMap { storeImage in
@@ -109,32 +140,42 @@ struct CameraFrameSelectView: View {
             return (id: id, data: imageData)
         }
     }
-}
-
-//모달 상단 타이틀 뷰
-struct SheetTitleView: View {
-    @Environment(\.dismiss) private var dismiss
-    var body: some View {
-        HStack {
-            Button {
-                dismiss()
-            } label: {
-                Image("xIcon")
-                    .resizable()
-                    .frame(width: 26, height: 26)
-                    .padding(.leading, 8)
-            }
-            
-            Spacer()
-            Text("편집")
-                .font(
-                    Font.custom("SF Pro", size: 17)
-                        .weight(.semibold)
-                )
-                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10.49618)
-        }
-        
+    
+    //선택 이미지 삭제 함수
+    private func deletdImage(_ id: UUID) {
+        imageDataArray.removeAll(where: { $0.id == id })
     }
 }
+    
+    //모달 상단 타이틀 뷰
+    struct SheetTitleView: View {
+        @Environment(\.dismiss) private var dismiss
+        @Binding var isEditing: Bool
+        var body: some View {
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image("xIcon")
+                        .resizable()
+                        .frame(width: 26, height: 26)
+                        .padding(.leading, 8)
+                }
+                
+                Spacer()
+                Button {
+                    isEditing.toggle()
+                    print("편집 버튼 눌림")
+                } label: {
+                    Text(isEditing ? "취소" : "편집")
+                        .font(.system(size: 17))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.gray01)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10.49618)
+                }
+                
+            }
+            
+        }
+    }

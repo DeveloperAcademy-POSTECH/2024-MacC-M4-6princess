@@ -180,7 +180,7 @@ struct DFModifyFrame: View {
         let newImage = StoreImages(context: managedContext)
         newImage.image = data
         newImage.uuid = UUID()
-        newImage.createAt = Date()
+        newImage.isSelected = false
 //        newImage.order = Int32(count)  현재 개수를 order로 사용
         
         print("이미지 코어에 저장됨")
