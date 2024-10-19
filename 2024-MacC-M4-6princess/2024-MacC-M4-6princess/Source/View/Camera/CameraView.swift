@@ -29,7 +29,7 @@ struct CameraView: View {
     //    @AppStorage("openFirstTime") private var firstTime = false
     @State var firstTime = false
     var defaultImg: UIImage = UIImage(named: "6princess")!
-    
+    @State var frameRatio:CGFloat = 4/3
     var body: some View {
         NavigationStack {
             ZStack {
@@ -71,7 +71,6 @@ struct CameraView: View {
                         }
                     }
                     VStack{
-                        Spacer()
                         HStack (alignment: .center){
                             
                             //프레임 불러오기 버튼
@@ -122,10 +121,9 @@ struct CameraView: View {
                             CameraTimerView(delayTime: $delayTime, isPushed: $isPushed)
                         }
                         Spacer()
-                        
-                        
                     }
                     .padding(.horizontal, 20)
+                    
                     .frame(width: UIScreen.main.bounds.width, height: 132)
                     .background(.white)
                 }
