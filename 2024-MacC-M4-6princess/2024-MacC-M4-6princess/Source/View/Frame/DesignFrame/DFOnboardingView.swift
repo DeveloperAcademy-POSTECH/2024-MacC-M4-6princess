@@ -10,21 +10,6 @@ struct DFOnboardingView: View {
                 .ignoresSafeArea()
             
             VStack {
-                HStack {
-                    Spacer()
-                    Button {
-                            isFirstLaunching.toggle()
-                        
-                    } label: {
-                        Image(systemName: "xmark")
-                            .resizable()
-                            .frame(width: 30, height: 30)
-                            .foregroundStyle(.white)
-                    }
-                    .padding(.bottom)
-                    .padding(.trailing, 20)
-
-                }
 
                 Spacer()
                 
@@ -65,6 +50,9 @@ struct DFOnboardingView: View {
                     .font(.footnote)
                 Spacer()
             }
+        }
+        .onTapGesture {
+            isFirstLaunching.toggle()
         }
     }
 }
