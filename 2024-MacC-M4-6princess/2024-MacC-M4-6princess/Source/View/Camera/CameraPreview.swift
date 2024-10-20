@@ -12,7 +12,7 @@ import AVFoundation
 struct CameraPreview: UIViewRepresentable{
     
     @ObservedObject var camera: CameraModel
-    
+//    let frame : CGRect // 프레임 크기
     func makeUIView(context: Context) -> UIView {
         
         let view = UIView(frame: UIScreen.main.bounds)
@@ -21,7 +21,8 @@ struct CameraPreview: UIViewRepresentable{
         
         DispatchQueue.main.async {
             camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
-            camera.preview.frame = view.frame
+            camera.preview.frame = view.frame // 크기 수정
+            //            camera.preview.frame = frame // 크기 수정
             camera.preview.videoGravity = .resizeAspectFill
             
             //다른거 추가할꺼면 추가
