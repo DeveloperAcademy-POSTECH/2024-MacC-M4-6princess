@@ -39,22 +39,22 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     func checkVideoAuthorizaion() {
         
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-            case .authorized:
-                //세션 세팅
-                setUp()
-            case .notDetermined:
-                //권한 재요청
-                AVCaptureDevice.requestAccess(for: .video) {
-                    (status) in
-                    if status {
-                        self.setUp()
-                    }
+        case .authorized:
+            //세션 세팅
+            setUp()
+        case .notDetermined:
+            //권한 재요청
+            AVCaptureDevice.requestAccess(for: .video) {
+                (status) in
+                if status {
+                    self.setUp()
                 }
-            case .denied:
-                self.isAlert.toggle()
-                return
-            default:
-                return
+            }
+        case .denied:
+            self.isAlert.toggle()
+            return
+        default:
+            return
         }
     }
     
@@ -153,6 +153,8 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         
         // 메인 스레드에서 picData 업데이트
         DispatchQueue.main.async {
+            print("[Camera]: Silent sound activated")
+            AudioServicesDisposeSystemSoundID(1108)
             self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
             self.takenImg = image
             self.nextView = true
@@ -200,17 +202,17 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         let preferredPosition: AVCaptureDevice.Position
         
         switch currentPosition {
-            case .unspecified, .front:
-                print("후면 카메라로 전환합니다.")
-                preferredPosition = .back
-                
-            case .back:
-                print("전면 카메라로 전환합니다.")
-                preferredPosition = .front
-                
-            @unknown default:
-                print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
-                preferredPosition = .back
+        case .unspecified, .front:
+            print("후면 카메라로 전환합니다.")
+            preferredPosition = .back
+            
+        case .back:
+            print("전면 카메라로 전환합니다.")
+            preferredPosition = .front
+            
+        @unknown default:
+            print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
+            preferredPosition = .back
         }
         
         // 새로운 카메라 장치 가져오기

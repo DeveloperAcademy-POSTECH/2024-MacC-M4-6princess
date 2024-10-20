@@ -16,7 +16,7 @@ struct CameraFrameSelectView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)],
         animation: .default)
     private var storedImages: FetchedResults<StoreImages>
-    @State private var imageDataArray: [(id: UUID, data: Data)] = []
+    @State var imageDataArray: [(id: UUID, data: Data)] = []
     @Binding var isFullScreenPop: Bool
     @Binding var selectedFrame: UUID?
     //프레임을 카메라뷰에 적용시킬 때 선택되었다는 변수
@@ -25,13 +25,14 @@ struct CameraFrameSelectView: View {
     @State private var isEditing: Bool = false
     //프레임을 편집(삭제)할 때 선택되었다는 변수
     @State private var isFrameEditSelected: Bool = false
+    @State private var isGotoPhotosPicker: Bool = false
     
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // 제목을 상단에 배치
-                SheetTitleView(isEditing: $isEditing)
+                SheetTitleView(isEditing: $isEditing, imageDataArray: $imageDataArray)
                 
                 if !imageDataArray.isEmpty {
                     ScrollView {
@@ -61,18 +62,18 @@ struct CameraFrameSelectView: View {
                                 ZStack {
                                     VStack(alignment: .trailing) {
                                         if isEditing {
-                                                if isFrameEditSelected {
-                                                    Image("frameCheckIcon")
-                                                        .padding(.trailing, 10)
-                                                        .padding(.top, 10)
-                                                } else {
-                                                    Circle()
-                                                        .fill(.gray03)
-                                                        .frame(width: 24, height: 24)
-                                                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 1, y: 1)
-                                                        .padding(.trailing, 10)
-                                                        .padding(.top, 10)
-                                                }
+                                            if isFrameEditSelected {
+                                                Image("frameCheckIcon")
+                                                    .padding(.trailing, 10)
+                                                    .padding(.top, 10)
+                                            } else {
+                                                Circle()
+                                                    .fill(.gray03)
+                                                    .frame(width: 24, height: 24)
+                                                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 1, y: 1)
+                                                    .padding(.trailing, 10)
+                                                    .padding(.top, 10)
+                                            }
                                         }
                                         
                                     }.frame(width: UIScreen.main.bounds.width / 3,
@@ -103,36 +104,49 @@ struct CameraFrameSelectView: View {
                         }
                     }
                 }
-                    else {
+                else {
+                    ZStack {
+                        Rectangle()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .ignoresSafeArea(.all)
+                            .foregroundColor(Color.white)
                         Spacer()
-                        NavigationLink {
-                            PhotosPickerView()
-                        } label: {
-                            VStack(alignment: .center, spacing: 4) {
-                                Image("plusIcon")
-                                    .resizable()
-                                    .frame(width: 30, height: 30, alignment: .center)
-                                Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
-                                    .font(.system(size: 17))
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                            }
-                        }.onTapGesture {
-                            dismiss()
-                            isFullScreenPop.toggle()
+                        VStack(alignment: .center, spacing: 30) {
+                            Image("noFrameIcon")
+                                .resizable()
+                                .frame(width: 106, height: 79, alignment: .center)
+                            Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
+                                .font(.system(size: 17))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                         }
-                        
                         Spacer()
+                        
                     }
-                }.onAppear {
-                    loadImages()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .navigationDestination(isPresented: $isGotoPhotosPicker) {
+                            PhotosPickerView()
+                        }
+                    .onTapGesture {
+//                            dismiss()
+                        isGotoPhotosPicker.toggle()
+                            isFullScreenPop.toggle()
+                        
+                            
+                    }
                 }
+                
+                
             }
-            .fullScreenCover(isPresented: $isShow) {
-                PhotosPickerView()
-            }
-        
+        }.onAppear {
+            loadImages()
+        }.fullScreenCover(isPresented: $isShow) {
+            PhotosPickerView()
+        }
     }
+    
+    
+    
     //프레임 불러오는 함수
     private func loadImages() {
         imageDataArray = storedImages.compactMap { storeImage in
@@ -146,23 +160,25 @@ struct CameraFrameSelectView: View {
         imageDataArray.removeAll(where: { $0.id == id })
     }
 }
-    
-    //모달 상단 타이틀 뷰
-    struct SheetTitleView: View {
-        @Environment(\.dismiss) private var dismiss
-        @Binding var isEditing: Bool
-        var body: some View {
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image("xIcon")
-                        .resizable()
-                        .frame(width: 26, height: 26)
-                        .padding(.leading, 8)
-                }
-                
-                Spacer()
+
+//모달 상단 타이틀 뷰
+struct SheetTitleView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var isEditing: Bool
+    @Binding var imageDataArray: [(id: UUID, data: Data)]
+    var body: some View {
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                Image("xIcon")
+                    .resizable()
+                    .frame(width: 26, height: 26)
+                    .padding(.leading, 8)
+            }
+            
+            Spacer()
+            if !imageDataArray.isEmpty {
                 Button {
                     isEditing.toggle()
                     print("편집 버튼 눌림")
@@ -174,8 +190,10 @@ struct CameraFrameSelectView: View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10.49618)
                 }
-                
             }
             
+            
         }
+        
     }
+}
