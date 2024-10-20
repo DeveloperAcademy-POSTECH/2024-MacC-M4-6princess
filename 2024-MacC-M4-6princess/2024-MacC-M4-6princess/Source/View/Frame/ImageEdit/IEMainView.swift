@@ -131,25 +131,26 @@ struct IEMainView: View {
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 10.49618)
                         }
+                        .disabled(viewModel.showRawImage)
                         
                     }
                     //                    .disabled(viewModel.showRawImage)
                     
                     HStack(alignment: .center, spacing: 14) {
                         Button {
-//                            if viewModel.showRawImage{
-//                                
-//                                let one = viewModel.tmpHistory
-//                                print("firstOne:\(viewModel.firstOne)")
-//                                print("recentPop:\(viewModel.recentPop)")
-//                                viewModel.recentPop = one
-//                                
-//                                viewModel.frameIdolSize = one.size
-//                                viewModel.location = one.loc
-//                                viewModel.rotationAngle = one.ang
-//                                viewModel.sliderValues = one.sliderValues
-//                                viewModel.showRawImage = false
-//                            }
+                            //                            if viewModel.showRawImage{
+                            //
+                            //                                let one = viewModel.tmpHistory
+                            //                                print("firstOne:\(viewModel.firstOne)")
+                            //                                print("recentPop:\(viewModel.recentPop)")
+                            //                                viewModel.recentPop = one
+                            //
+                            //                                viewModel.frameIdolSize = one.size
+                            //                                viewModel.location = one.loc
+                            //                                viewModel.rotationAngle = one.ang
+                            //                                viewModel.sliderValues = one.sliderValues
+                            //                                viewModel.showRawImage = false
+                            //                            }
                             if !viewModel.undoHistory.isEmpty{
                                 guard let lastHistory = viewModel.undoHistory.popLast() else { return }
                                 viewModel.redoHistory.append(viewModel.recentPop)
@@ -167,19 +168,19 @@ struct IEMainView: View {
                         }
                         
                         Button {
-//                            if viewModel.showRawImage{
-//                                
-//                                let one = viewModel.tmpHistory
-//                                print("firstOne:\(viewModel.firstOne)")
-//                                print("recentPop:\(viewModel.recentPop)")
-//                                viewModel.recentPop = one
-//                                
-//                                viewModel.frameIdolSize = one.size
-//                                viewModel.location = one.loc
-//                                viewModel.rotationAngle = one.ang
-//                                viewModel.sliderValues = one.sliderValues
-//                                viewModel.showRawImage = false
-//                            }
+                            //                            if viewModel.showRawImage{
+                            //
+                            //                                let one = viewModel.tmpHistory
+                            //                                print("firstOne:\(viewModel.firstOne)")
+                            //                                print("recentPop:\(viewModel.recentPop)")
+                            //                                viewModel.recentPop = one
+                            //
+                            //                                viewModel.frameIdolSize = one.size
+                            //                                viewModel.location = one.loc
+                            //                                viewModel.rotationAngle = one.ang
+                            //                                viewModel.sliderValues = one.sliderValues
+                            //                                viewModel.showRawImage = false
+                            //                            }
                             if !viewModel.redoHistory.isEmpty{
                                 guard let lastHistory = viewModel.redoHistory.popLast() else { return }
                                 viewModel.undoHistory.append(viewModel.recentPop)
@@ -300,7 +301,7 @@ struct IEMainView: View {
                     .padding(.horizontal, 72)
                     Spacer()
                 }
-//                .disabled(viewModel.showRawImage)
+                //                .disabled(viewModel.showRawImage)
                 .padding()
                 .background(.white)
                 

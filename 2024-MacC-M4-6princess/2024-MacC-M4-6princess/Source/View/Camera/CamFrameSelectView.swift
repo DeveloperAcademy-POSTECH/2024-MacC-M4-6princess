@@ -72,7 +72,7 @@ struct CameraFrameSelectView: View {
                                                     .frame(width: UIScreen.main.bounds.width / 3,
                                                            height: (UIScreen.main.bounds.width / 3) * (598 / 375))
                                                     .clipped()
-                                                    .border(Color.black, width: 1)
+//                                                    .border(Color.black, width: 1)
                                             }
                                         }.frame(width: UIScreen.main.bounds.width / 3,
                                                 height: (UIScreen.main.bounds.width / 3) * (598 / 375))
