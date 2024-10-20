@@ -27,7 +27,48 @@ struct CameraFrameSelectView: View {
             VStack(spacing: 0) {
                 // 제목을 상단에 배치
                 SheetTitleView()
-                
+                //                ScrollView {
+                //                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
+                //                        NavigationLink {
+                //                            PhotosPickerView()
+                //                        } label: {
+                //                            VStack(alignment: .center, spacing: 4) {
+                //                                Spacer()
+                //                                Image("plusIcon")
+                //                                    .resizable()
+                //                                    .frame(width: 30, height: 30, alignment: .center)
+                //                                Text("새로운\n프레임 만들기")
+                //                                    .font(.system(size: 13))
+                //                                    .multilineTextAlignment(.center)
+                //                                    .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                //                                Spacer()
+                //                            }
+                //                            .frame(maxWidth: .infinity)
+                //                            .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+                //                        }.onTapGesture {
+                //                            isFullScreenPop.toggle()
+                //                        }
+                //                        ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
+                //                            Button {
+                //                                isFrameSelected = true
+                //                                selectedFrame = imageInfo.id
+                //                                dismiss()
+                //                            } label: {
+                //                                if let uiImage = UIImage(data: imageInfo.data) {
+                //                                    Image(uiImage: uiImage)
+                //                                        .resizable()
+                //                                        .aspectRatio(contentMode: .fill)
+                //                                        .frame(width: UIScreen.main.bounds.width / 3,
+                //                                               height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                //                                        .clipped()
+                //                                } else {
+                //                                    Color.gray
+                //                                        .frame(width: 150, height: 150) // 크기 설정
+                //                                }
+                //                            }
+                //                        }
+                //                    }
+                //                }
                 if !imageDataArray.isEmpty {
                     ScrollView {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {

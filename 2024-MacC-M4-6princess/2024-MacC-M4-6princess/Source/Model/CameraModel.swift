@@ -33,7 +33,7 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     @Published var takenImg: UIImage?
     
     @Published var nextView = false
-    
+    @Published var frameSize = CGRect(origin: .zero, size: .zero)
     
     ///비디오 권한 체크
     func checkVideoAuthorizaion() {
@@ -181,10 +181,16 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
         if self.videoDeviceInput?.device.position == .front {
             image = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
         }
-        
+
+        // 이미지 크기를 frameSize로 조정
+        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+        image = renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
+        }
+
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
-        
+
         // 메인 스레드에서 picData 업데이트
         DispatchQueue.main.async {
             self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
@@ -194,7 +200,43 @@ class CameraModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
             print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
         }
+
     }
+
+//    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+//        if let error = error {
+//            print("사진 처리 중 에러 발생: \(error.localizedDescription)")
+//            return
+//        }
+//        
+//        guard let imageData = photo.fileDataRepresentation() else {
+//            print("사진 데이터가 유효하지 않음")
+//            return
+//        }
+//        
+//        guard var image = UIImage(data: imageData) else {
+//            print("이미지를 생성할 수 없습니다.")
+//            return
+//        }
+//        
+//        // 전면 카메라일 경우 좌우 반전 처리
+//        if self.videoDeviceInput?.device.position == .front {
+//            image = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
+//        }
+//        
+//        // 이미지의 방향을 .up으로 수정
+//        image = fixOrientation(image)
+//        
+//        // 메인 스레드에서 picData 업데이트
+//        DispatchQueue.main.async {
+//            self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
+//            self.takenImg = image
+//            self.nextView = true
+//            print("nextView:\(self.nextView)")
+//            print("이미지 사이즈: \(image.size)")
+//            print("사진이 성공적으로 처리되었습니다")
+//        }
+//    }
     func fixOrientation(_ image: UIImage) -> UIImage {
         // 이미지의 방향이 이미 .up이면 그대로 반환
         if image.imageOrientation == .up {
