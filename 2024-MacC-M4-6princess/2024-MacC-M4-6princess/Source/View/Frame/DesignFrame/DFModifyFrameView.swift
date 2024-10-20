@@ -86,9 +86,11 @@ struct DFModifyFrame: View {
                     }
                     if let image = resultImage {
                         Color(hex: "32322f")
-                            .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+//                            .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
                         imageView
-                            .mask(Rectangle().frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image)))
+//                            .mask(Rectangle().frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image)))
+                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
                         //                    Color(.white)
 //                        VStack {
 //                            Spacer()
@@ -132,38 +134,41 @@ struct DFModifyFrame: View {
                 }
                 .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
                 
-                Spacer(minLength: UIScreen.main.bounds.width / 20)
+                Spacer(minLength: UIScreen.main.bounds.width / 10)
                 
-                Button {
-                    if index > 0 {
-                        index -= 1
-//                        print("range: \(imageHistory.count), index: \(index)")
-                        resultImage = imageHistory[index]
-//                        state = true
-                    }
-                } label: {
-                    Image("back")
-                        .colorMultiply(index > 0 ? .black : .gray03)
-                }
-                .padding(.trailing, 14)
-                
-                Button {
-                    if imageHistory.count - 1 > index {
-                        index += 1
-//                        print("range: \(imageHistory.count), index:\(index)")
-                        resultImage = imageHistory[index]
-//                        state = true
-                    }
-                } label: {
-                    Image("front")
-                        .colorMultiply(index < imageHistory.count - 1 ? .black: .gray03)
-                }
-                .padding(.trailing, 60)
+//                Button {
+//                    if index > 0 {
+//                        index -= 1
+////                        print("range: \(imageHistory.count), index: \(index)")
+//                        resultImage = imageHistory[index]
+////                        state = true
+//                    }
+//                } label: {
+//                    Image("back")
+//                        .colorMultiply(index > 0 ? .black : .gray03)
+//                }
+//                .padding(.trailing, 14)
+//                
+//                Button {
+//                    if imageHistory.count - 1 > index {
+//                        index += 1
+////                        print("range: \(imageHistory.count), index:\(index)")
+//                        resultImage = imageHistory[index]
+////                        state = true
+//                    }
+//                } label: {
+//                    Image("front")
+//                        .colorMultiply(index < imageHistory.count - 1 ? .black: .gray03)
+//                }
+//                .padding(.trailing, 60)
                 
                 Spacer()
                 Button {
-                    let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!)))
+//                    let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!)))
+                    let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+//                    let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!)))
                     render.scale = scaleCompute(resultImage!)
+//                    render.scale = 1
                     image = render.uiImage
                     addImage(data: image?.pngData())
                     btnOpacity = 1
@@ -179,7 +184,8 @@ struct DFModifyFrame: View {
                         .foregroundStyle(.pointPink)
                         .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
                 }
-                .padding(1)
+                .padding(.leading, 150)
+                
             }
         }
         .navigationDestination(isPresented: $isShow) {
@@ -194,7 +200,7 @@ struct DFModifyFrame: View {
     }
     
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
