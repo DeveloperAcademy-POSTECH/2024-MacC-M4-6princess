@@ -68,7 +68,25 @@ struct IEMainView: View {
             }
     }
     
-    
+    var rawImageUnrock: some Gesture {
+        TapGesture()
+            .onEnded{
+                if viewModel.showRawImage{
+                    
+                    let one = viewModel.tmpHistory
+                    print("firstOne:\(viewModel.firstOne)")
+                    print("recentPop:\(viewModel.recentPop)")
+                    viewModel.recentPop = one
+                    
+                    viewModel.frameIdolSize = one.size
+                    viewModel.location = one.loc
+                    viewModel.rotationAngle = one.ang
+                    viewModel.sliderValues = one.sliderValues
+                    viewModel.showRawImage = false
+                }
+                
+            }
+    }
     
     var body: some View {
         VStack {
@@ -119,6 +137,19 @@ struct IEMainView: View {
                     
                     HStack(alignment: .center, spacing: 14) {
                         Button {
+                            if viewModel.showRawImage{
+                                
+                                let one = viewModel.tmpHistory
+                                print("firstOne:\(viewModel.firstOne)")
+                                print("recentPop:\(viewModel.recentPop)")
+                                viewModel.recentPop = one
+                                
+                                viewModel.frameIdolSize = one.size
+                                viewModel.location = one.loc
+                                viewModel.rotationAngle = one.ang
+                                viewModel.sliderValues = one.sliderValues
+                                viewModel.showRawImage = false
+                            }
                             if !viewModel.undoHistory.isEmpty{
                                 guard let lastHistory = viewModel.undoHistory.popLast() else { return }
                                 viewModel.redoHistory.append(viewModel.recentPop)
@@ -136,6 +167,19 @@ struct IEMainView: View {
                         }
                         
                         Button {
+                            if viewModel.showRawImage{
+                                
+                                let one = viewModel.tmpHistory
+                                print("firstOne:\(viewModel.firstOne)")
+                                print("recentPop:\(viewModel.recentPop)")
+                                viewModel.recentPop = one
+                                
+                                viewModel.frameIdolSize = one.size
+                                viewModel.location = one.loc
+                                viewModel.rotationAngle = one.ang
+                                viewModel.sliderValues = one.sliderValues
+                                viewModel.showRawImage = false
+                            }
                             if !viewModel.redoHistory.isEmpty{
                                 guard let lastHistory = viewModel.redoHistory.popLast() else { return }
                                 viewModel.undoHistory.append(viewModel.recentPop)
@@ -151,7 +195,7 @@ struct IEMainView: View {
                             
                         }
                     }
-                    .disabled(viewModel.showRawImage)
+//                    .disabled(viewModel.showRawImage)
                 }
                 .background(.white)
                 
@@ -175,7 +219,6 @@ struct IEMainView: View {
                         
                         if let idx = viewModel.selectedIndex {
                             HStack {
-                                
                                 CustomSliderView(
                                     value: $viewModel.sliderValues[idx],
                                     range: viewModel.colorEditOptions[idx].range,
@@ -232,6 +275,19 @@ struct IEMainView: View {
                                         viewModel.selectedIndex = nil
                                     }
                                     else{
+                                        if viewModel.showRawImage{
+                                            
+                                            let one = viewModel.tmpHistory
+                                            print("firstOne:\(viewModel.firstOne)")
+                                            print("recentPop:\(viewModel.recentPop)")
+                                            viewModel.recentPop = one
+                                            
+                                            viewModel.frameIdolSize = one.size
+                                            viewModel.location = one.loc
+                                            viewModel.rotationAngle = one.ang
+                                            viewModel.sliderValues = one.sliderValues
+                                            viewModel.showRawImage = false
+                                        }
                                         viewModel.selectedIndex = index
                                     }
                                 }
@@ -239,20 +295,12 @@ struct IEMainView: View {
                                 Text(viewModel.colorEditOptions[index].name)
                                     .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01)
                             }
-                            .onTapGesture {
-                                if viewModel.selectedIndex == index{ // 이미 선택되어 있으면 슬라이더가 내려감
-                                    viewModel.selectedIndex = nil
-                                }
-                                else{
-                                    viewModel.selectedIndex = index
-                                }
-                            }
                         }
                     }
                     .padding(.horizontal, 72)
                     Spacer()
                 }
-                .disabled(viewModel.showRawImage)
+//                .disabled(viewModel.showRawImage)
                 .padding()
                 .background(.white)
                 

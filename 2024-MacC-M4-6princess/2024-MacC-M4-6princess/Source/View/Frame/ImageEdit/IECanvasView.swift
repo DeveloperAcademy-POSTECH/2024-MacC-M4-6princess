@@ -37,12 +37,26 @@ struct IECanvasView: View {
                 startLocation = startLocation ?? viewModel.location
             }
             .onEnded{ _ in
-                viewModel.undoHistory.append(viewModel.recentPop)
-                viewModel.recentPop.loc = viewModel.location
-                if !viewModel.redoHistory.isEmpty{
-                    viewModel.redoHistory = []
+                if viewModel.showRawImage{
+                    
+                    let one = viewModel.tmpHistory
+                    print("firstOne:\(viewModel.firstOne)")
+                    print("recentPop:\(viewModel.recentPop)")
+                    viewModel.recentPop = one
+                    
+                    viewModel.frameIdolSize = one.size
+                    viewModel.location = one.loc
+                    viewModel.rotationAngle = one.ang
+                    viewModel.sliderValues = one.sliderValues
+                    viewModel.showRawImage = false
                 }
-                
+                else{
+                    viewModel.undoHistory.append(viewModel.recentPop)
+                    viewModel.recentPop.loc = viewModel.location
+                    if !viewModel.redoHistory.isEmpty{
+                        viewModel.redoHistory = []
+                    }
+                }
             }
     }
     // 아이돌 이미지 확대/축소 제스쳐
@@ -64,15 +78,48 @@ struct IECanvasView: View {
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
             }
             .onEnded{ value in
-                viewModel.undoHistory.append(viewModel.recentPop)
-                viewModel.recentPop.size = viewModel.frameIdolSize
-                
-                if !viewModel.redoHistory.isEmpty{
-                    viewModel.redoHistory = []
+                if viewModel.showRawImage{
+                    
+                    let one = viewModel.tmpHistory
+                    print("firstOne:\(viewModel.firstOne)")
+                    print("recentPop:\(viewModel.recentPop)")
+                    viewModel.recentPop = one
+                    
+                    viewModel.frameIdolSize = one.size
+                    viewModel.location = one.loc
+                    viewModel.rotationAngle = one.ang
+                    viewModel.sliderValues = one.sliderValues
+                    viewModel.showRawImage = false
+                }
+                else{
+                    viewModel.undoHistory.append(viewModel.recentPop)
+                    viewModel.recentPop.size = viewModel.frameIdolSize
+                    
+                    if !viewModel.redoHistory.isEmpty{
+                        viewModel.redoHistory = []
+                    }
                 }
             }
     }
-    
+    var rawImageUnrock: some Gesture {
+        TapGesture()
+            .onEnded{
+                if viewModel.showRawImage{
+                    
+                    let one = viewModel.tmpHistory
+                    print("firstOne:\(viewModel.firstOne)")
+                    print("recentPop:\(viewModel.recentPop)")
+                    viewModel.recentPop = one
+                    
+                    viewModel.frameIdolSize = one.size
+                    viewModel.location = one.loc
+                    viewModel.rotationAngle = one.ang
+                    viewModel.sliderValues = one.sliderValues
+                    viewModel.showRawImage = false
+                }
+                
+            }
+    }
     
     var body: some View {
         ZStack {
@@ -92,6 +139,7 @@ struct IECanvasView: View {
                 .gesture(dragGesture
                     .simultaneously(with: magnifyGesture)
                     .simultaneously(with: rotationGesture)
+                    .simultaneously(with: rawImageUnrock)
                 )
         }
         .onAppear {

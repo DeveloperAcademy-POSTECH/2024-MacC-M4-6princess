@@ -80,7 +80,7 @@ class IEViewModel: ObservableObject {
         print("bgImg.size:\(bgImg.size)")
         
         // IECanvasView의 프레임 크기를 구함 for 이미지 저장
-        self.sfekcreenSize = bounds
+        self.screenSize = bounds
         
         // 배경이미지를 scaleToFit하게 만듬
         let newHeight = self.screenSize.height * 0.7
