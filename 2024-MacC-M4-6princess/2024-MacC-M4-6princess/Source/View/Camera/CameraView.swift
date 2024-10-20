@@ -173,7 +173,7 @@ struct CameraView: View {
         }
         //        .ignoresSafeArea(.all)
         .onAppear{
-            camera.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 82 - 132)
+            camera.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 82 - 132 - 10)
         }
         
     }

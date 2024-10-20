@@ -64,9 +64,7 @@ struct IEMainView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         viewModel.showRawAlert = false
                     }
-                    
                 }
-                
             }
     }
     
@@ -117,8 +115,8 @@ struct IEMainView: View {
                         }
                         
                     }
-                    .disabled(viewModel.showRawImage)
-                   
+                    //                    .disabled(viewModel.showRawImage)
+                    
                     HStack(alignment: .center, spacing: 14) {
                         Button {
                             if !viewModel.undoHistory.isEmpty{
@@ -169,39 +167,22 @@ struct IEMainView: View {
                         Spacer()
                         HStack{
                             Spacer()
-                            
-                            //                            Button(action: {
-                            //                                viewModel.showImage = true
-                            //                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            //                                    viewModel.showImage = false
-                            //                                }
-                            //                            }) {
-                            //                                Image(systemName: "rawImage.\(viewModel.showImage ? "selected" : "unselected")")
-                            //                                    .frame(width: 50, height: 50)
-                            //                            }
                             Image("rawImage.\(viewModel.showRawImage ? "selected" : "unselected")")
-                                .frame(width: 100, height: 100)
+                                .frame(width: 60, height: 30)
                                 .gesture(rawImageTab)
-                                .padding(.horizontal)
+                                .padding(.horizontal,15)
                         }
                         
                         if let idx = viewModel.selectedIndex {
                             HStack {
-//                                Text(String(format: "%.0f", viewModel.sliderValues[idx] * 100)) // 텍스트 (밝기 퍼센트)
-//                                    .foregroundColor(.white)
-//                                    .frame(width: 30)
-//                                    .padding(.horizontal, 5)
-//                                
-//                                // 슬라이더
-//                                Slider(value: $viewModel.sliderValues[idx], in: viewModel.colorEditOptions[idx].range, step: viewModel.colorEditOptions[idx].step)
-//                                    .tint(Color.pointPink)
+                                
                                 CustomSliderView(
-                                        value: $viewModel.sliderValues[idx],
-                                        range: viewModel.colorEditOptions[idx].range,
-                                        step: viewModel.colorEditOptions[idx].step,
-                                        viewModel: viewModel,
-                                        idx: idx
-                                    )
+                                    value: $viewModel.sliderValues[idx],
+                                    range: viewModel.colorEditOptions[idx].range,
+                                    step: viewModel.colorEditOptions[idx].step,
+                                    viewModel: viewModel,
+                                    idx: idx
+                                )
                             }
                             .frame(width: viewModel.screenSize.width,height: 40)
                             .background(Color.black.opacity(0.5)) // 배경색
@@ -212,7 +193,7 @@ struct IEMainView: View {
                         Image("rawImageAlert")
                             .frame(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.height/4)
                     }
-                   
+                    
                 } //end
                 
                 
@@ -265,7 +246,6 @@ struct IEMainView: View {
                                 else{
                                     viewModel.selectedIndex = index
                                 }
-                                
                             }
                         }
                     }
