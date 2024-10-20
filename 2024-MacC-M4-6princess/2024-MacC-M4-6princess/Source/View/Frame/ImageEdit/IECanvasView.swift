@@ -9,11 +9,8 @@ import SwiftUI
 
 // 배경이미지 + 아이돌 이미지를 후보정(편집)하는 뷰
 struct IECanvasView: View {
-    @ObservedObject var viewModel: IEViewModel
+    @StateObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
-    @Binding var bgImg: UIImage
-    @Binding var idolImg: UIImage
-    @State var scale: CGFloat = 1.0
     
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
@@ -21,7 +18,13 @@ struct IECanvasView: View {
             .onChanged { angle in
                 viewModel.rotationAngle = angle
             }
-        
+            .onEnded{ value in
+                viewModel.undoHistory.append(viewModel.recentPop)
+                viewModel.recentPop.ang = value
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
+            }
     }
     var dragGesture: some Gesture {
         DragGesture()
@@ -33,24 +36,40 @@ struct IECanvasView: View {
             .updating($startLocation) { (value, startLocation, transaction) in
                 startLocation = startLocation ?? viewModel.location
             }
+            .onEnded{ _ in
+                viewModel.undoHistory.append(viewModel.recentPop)
+                viewModel.recentPop.loc = viewModel.location
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
+                
+            }
     }
     // 아이돌 이미지 확대/축소 제스쳐
     var magnifyGesture: some Gesture{
         MagnifyGesture()
             .onChanged{ value in
-                scale = value.magnification
+                viewModel.scale = value.magnification
                 
                 // 확대/축소가 한번에 변할 수 있는 최대/최소값 지정
-                if scale >= 1{
-                    scale = min((scale - 1) * 0.01 + 1,1.3) // 한번에 최대 확대는 1.3배까지만 가능(미세조정 기능)
+                if viewModel.scale >= 1{
+                    viewModel.scale = min((viewModel.scale - 1) * 0.01 + 1,1.3) // 한번에 최대 확대는 1.3배까지만 가능(미세조정 기능)
                 }
                 else{
-                    scale = max((scale - 1) * 0.1 + 1,0.5) // 한번에 축소는 절반이 이하로 되지않음
+                    viewModel.scale = max((viewModel.scale - 1) * 0.1 + 1,0.5) // 한번에 축소는 절반이 이하로 되지않음
                 }
-                //                print("scale:\(scale)")
-                let newWidth = viewModel.frameIdolSize.width * scale
-                viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
+                let newWidth = viewModel.frameIdolSize.width * viewModel.scale
                 
+                // 축소된 가로 길이에 사진 비율을 곱해서 새로운 아이돌 이미지의 크기를 수정
+                viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
+            }
+            .onEnded{ value in
+                viewModel.undoHistory.append(viewModel.recentPop)
+                viewModel.recentPop.size = viewModel.frameIdolSize
+                
+                if !viewModel.redoHistory.isEmpty{
+                    viewModel.redoHistory = []
+                }
             }
     }
     
@@ -58,14 +77,13 @@ struct IECanvasView: View {
     var body: some View {
         ZStack {
             // 배경 이미지
-            if let outputImage = viewModel.applyColorFilter(originalImage: bgImg) {
-                
+            if let outputImage = viewModel.applyColorFilter(originalImage: viewModel.bgImg) {
                 Image(uiImage: outputImage)
                     .resizable()
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
             }
             // 아이돌 이미지
-            Image(uiImage: idolImg)
+            Image(uiImage: viewModel.idolImg)
                 .resizable()
                 .scaledToFit()
                 .rotationEffect(viewModel.rotationAngle)
@@ -75,14 +93,11 @@ struct IECanvasView: View {
                     .simultaneously(with: magnifyGesture)
                     .simultaneously(with: rotationGesture)
                 )
-            
         }
         .onAppear {
-            viewModel.canvasOnAppear(bgImg: bgImg, idolImg: idolImg, bounds: UIScreen.main.bounds.size)
+            viewModel.canvasOnAppear(bgImg: viewModel.bgImg, idolImg: viewModel.idolImg, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-        //        .background(Color.red)
-        
     }
     
     

@@ -14,7 +14,6 @@ import Combine
 class IEViewModel: ObservableObject {
     @Published var imageScale: CGFloat = 1.0
     @Published var rotationAngle: Angle = .zero
-    @Published var isModal = false
     @Published var sliderValues: [Float] = [0.0, 1.0, 1.0]
     @Published var selectedIndex: Int? = nil // 하단바 색조 조정 인덱스
     
@@ -40,38 +39,37 @@ class IEViewModel: ObservableObject {
     var filter = CIFilter.colorControls()
     let baseWidth: CGFloat = 100
     
+    
+    @Published var scale: CGFloat = 1.0
+    @Published var savePhoto = false
+    @Published var saveAnimate = false
+    @Published var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
+    @Published var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
+    @Published var showRawImage = false
+    @Published var bgImg = UIImage(named: "6princess")!
+    @Published var idolImg = UIImage(named: "Felix")!
+    
     @Published var isAppend = false
+    
+    @Published var undoHistory:[History] = []
+    @Published var redoHistory:[History] = []
+    @Published var recentPop:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 바뀌기전 현재 정보
+    @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본
+    @Published var tmpHistory = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본
+    
+    @Published var showRawAlert = false
     private var cancellables = Set<AnyCancellable>()
     
     // 편집 옵션 배열
-    let colorEditOptions: [EditingOption] = [
-        EditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.02),
-        EditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.1),
-        EditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.01)
+    let colorEditOptions: [IEEditingOption] = [
+        IEEditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.001),
+        IEEditingOption(name: "채도", icon: "saturation",range: 0...2,step: 0.01),
+        IEEditingOption(name: "대비", icon: "contrast",range: 0.9...1.1,step: 0.001)
     ]
     
     
-    @MainActor
-    func appendImg<T: View>(content: T) {
-        // ImageRenderer를 이용해서 합성 이미지 생성
-        let renderedImage = ImageRenderer(content: content.frame(width: screenSize.width, height: screenSize.width * bgRatio))
-        
-        // 해상도
-        renderedImage.scale = 2.0
-        
-        if let uiImage = renderedImage.uiImage {
-            self.imgArray.append(uiImage)
-            
-        } else {
-            print("언두리두이미지생성실패")
-        }
-        isAppend = false
-    }
-    
     func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
         
-        // 4:3 사진을 기준
-        let normRatio = 4.0 / 3.0
         // 배경 이미지의 aspectRatio를 구함
         self.bgRatio = bgImg.size.height / bgImg.size.width
         
@@ -85,17 +83,6 @@ class IEViewModel: ObservableObject {
         self.screenSize = bounds
         
         // 배경이미지를 scaleToFit하게 만듬
-        // 세로로 긴 이미지
-//        if bgRatio > normRatio{
-//            // 화면에 보여줄 이미지 크기를 지정
-//            let newHeight = self.screenSize.height / 3 * 2 // 화면 높이의 2/3
-//            self.frameBGSize = CGSize(width: newHeight * (bgImg.size.height / bgImg.size.width), height: newHeight) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
-//        }
-//        else{
-//            self.frameBGSize = CGSize(width: self.screenSize.width, height: self.bgRatio * (self.screenSize.width)) // 가로로 꽉차도록 지정,세로는 비율에 맞게 계산함
-//            
-//        }
-        
         let newHeight = self.screenSize.height / 3 * 2
         self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
         
@@ -104,6 +91,8 @@ class IEViewModel: ObservableObject {
         // 뷰생성시 아이돌 이미지 위치 지정
         self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
         
+        self.recentPop = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
+        self.firstOne = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
     }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
@@ -128,9 +117,9 @@ class IEViewModel: ObservableObject {
         newLocation.x += translation.width
         newLocation.y += translation.height
         self.location = newLocation
-        print("newLocation:\(newLocation)")
+        
     }
-    
+   
     
     /// 사진 저장 함수
     @MainActor
@@ -156,20 +145,8 @@ class IEViewModel: ObservableObject {
                     }
                 }
             }
-            // 테스트 모달창
-            self.isModal = true
         } else {
             print("렌더링 실패: 이미지 생성 실패")
         }
     }
-    
 }
-
-//init() {
-//    // location 값이 변경될 때마다 출력
-//    $location
-//        .sink { newLocation in
-//            print("location 변경됨: \(newLocation)")
-//        }
-//        .store(in: &cancellables) // 구독을 cancellables에 저장
-//}
