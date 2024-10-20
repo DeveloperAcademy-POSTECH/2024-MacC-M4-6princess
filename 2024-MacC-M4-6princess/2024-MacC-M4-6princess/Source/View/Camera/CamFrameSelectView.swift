@@ -19,81 +19,72 @@ struct CameraFrameSelectView: View {
     @State var imageDataArray: [(id: UUID, data: Data)] = []
     @Binding var isFullScreenPop: Bool
     @Binding var selectedFrame: UUID?
-    //프레임을 카메라뷰에 적용시킬 때 선택되었다는 변수
     @Binding var isFrameSelected: Bool
     @State private var isShow: Bool = false
     @State private var isEditing: Bool = false
-    //프레임을 편집(삭제)할 때 선택되었다는 변수
-    @State private var isFrameEditSelected: Bool = false
     @State private var isGotoPhotosPicker: Bool = false
+    @State private var selectedImageIds: Set<UUID> = []
     
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // 제목을 상단에 배치
-                SheetTitleView(isEditing: $isEditing, imageDataArray: $imageDataArray)
-                
-                if !imageDataArray.isEmpty {
-                    ScrollView {
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-                            NavigationLink {
-                                PhotosPickerView()
-                            } label: {
-                                VStack(alignment: .center, spacing: 4) {
-                                    Spacer()
-                                    Image("plusIcon")
-                                        .resizable()
-                                        .frame(width: 30, height: 30, alignment: .center)
-                                    Text("새로운\n프레임 만들기")
-                                        .font(.system(size: 13))
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                                    Spacer()
+            ZStack(alignment: .bottom) {
+                VStack(spacing: 0) {
+                    SheetTitleView(isEditing: $isEditing, imageDataArray: $imageDataArray)
+                    
+                    if !imageDataArray.isEmpty {
+                        ScrollView {
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
+                                NavigationLink {
+                                    PhotosPickerView()
+                                } label: {
+                                    VStack(alignment: .center, spacing: 4) {
+                                        Spacer()
+                                        Image("plusIcon")
+                                            .resizable()
+                                            .frame(width: 30, height: 30, alignment: .center)
+                                        Text("새로운\n프레임 만들기")
+                                            .font(.system(size: 13))
+                                            .multilineTextAlignment(.center)
+                                            .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                                        Spacer()
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+                                }.onTapGesture {
+                                    isFullScreenPop.toggle()
                                 }
-                                .frame(maxWidth: .infinity)
-                                .background(Color(red: 0.83, green: 0.83, blue: 0.83))
-                            }.onTapGesture {
-                                isFullScreenPop.toggle()
-                            }
-                            .disabled(isEditing)
-                            
-                            ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
-                                ZStack(alignment: .topTrailing) {
-                                    Button {
-                                        isFrameSelected = true
-                                        selectedFrame = imageInfo.id
-                                        dismiss()
-                                    } label: {
-                                        if let uiImage = UIImage(data: imageInfo.data) {
-                                            Image(uiImage: uiImage)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: UIScreen.main.bounds.width / 3,
-                                                       height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                                .clipped()
-                                            //임시로 테두리 적용 - 그리드 확인용
-                                                .border(Color.black, width: 1)
-                                        }
-                                    }.frame(width: UIScreen.main.bounds.width / 3,
-                                            height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                    .disabled(isEditing)
-                                    
-                                    if isEditing {
+                                .disabled(isEditing)
+                                
+                                ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
+                                    ZStack(alignment: .topTrailing) {
                                         Button {
-                                            isFrameEditSelected.toggle()
+                                            if !isEditing {
+                                                isFrameSelected = true
+                                                selectedFrame = imageInfo.id
+                                                dismiss()
+                                            }
                                         } label: {
-                                            if isFrameEditSelected {
-                                                Image("frameCheckIcon")
+                                            if let uiImage = UIImage(data: imageInfo.data) {
+                                                Image(uiImage: uiImage)
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: UIScreen.main.bounds.width / 3,
+                                                           height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                                    .clipped()
+                                                    .border(Color.black, width: 1)
+                                            }
+                                        }.frame(width: UIScreen.main.bounds.width / 3,
+                                                height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                        
+                                        if isEditing {
+                                            Button {
+                                                toggleSelection(for: imageInfo.id)
+                                            } label: {
+                                                Image(selectedImageIds.contains(imageInfo.id) ? "frameCheckIcon" : "")
                                                     .resizable()
                                                     .frame(width: 24, height: 24)
-                                                    .padding(.trailing, 10)
-                                                    .padding(.top, 10)
-                                            } else {
-                                                Circle()
-                                                    .fill(.gray03)
-                                                    .frame(width: 24, height: 24)
-                                                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 1, y: 1)
+                                                    .background(Circle().fill(Color.gray03))
                                                     .padding(.trailing, 10)
                                                     .padding(.top, 10)
                                             }
@@ -102,41 +93,55 @@ struct CameraFrameSelectView: View {
                                 }
                             }
                         }
-                    }
-                }
-                else {
-                    ZStack {
-                        Rectangle()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .ignoresSafeArea(.all)
-                            .foregroundColor(Color.white)
-                        Spacer()
-                        VStack(alignment: .center, spacing: 30) {
-                            Image("noFrameIcon")
-                                .resizable()
-                                .frame(width: 106, height: 79, alignment: .center)
-                            Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
-                                .font(.system(size: 17))
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                    } else {
+                        ZStack {
+                            Rectangle()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .ignoresSafeArea(.all)
+                                .foregroundColor(Color.white)
+                            Spacer()
+                            VStack(alignment: .center, spacing: 30) {
+                                Image("noFrameIcon")
+                                    .resizable()
+                                    .frame(width: 106, height: 79, alignment: .center)
+                                Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
+                                    .font(.system(size: 17))
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                            }
+                            Spacer()
+                            
                         }
-                        Spacer()
-                        
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .navigationDestination(isPresented: $isGotoPhotosPicker) {
-                        PhotosPickerView()
-                    }
-                    .onTapGesture {
-                        //                            dismiss()
-                        isGotoPhotosPicker.toggle()
-                        isFullScreenPop.toggle()
-                        
-                        
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .navigationDestination(isPresented: $isGotoPhotosPicker) {
+                            PhotosPickerView()
+                        }
+                        .onTapGesture {
+                            isGotoPhotosPicker.toggle()
+                            isFullScreenPop.toggle()
+                            
+                            
+                        }
                     }
                 }
-                
-                
+                if isEditing {
+                    Button {
+                        deleteSelectedImages()
+                    } label: {
+                        ZStack {
+                            Rectangle()
+                              .foregroundColor(.clear)
+                              .frame(width: 240, height: 60)
+                              .background(.pointPink)
+                              .cornerRadius(10)
+                              .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 0)
+                            Text("\(selectedImageIds.count)장의 프레임 삭제")
+                                .font(.system(size: 17))
+                              .foregroundColor(.white)
+                        }
+                          
+                    }.padding(.bottom, 40)
+                }
             }
         }.onAppear {
             loadImages()
@@ -145,9 +150,6 @@ struct CameraFrameSelectView: View {
         }
     }
     
-    
-    
-    //프레임 불러오는 함수
     private func loadImages() {
         imageDataArray = storedImages.compactMap { storeImage in
             guard let imageData = storeImage.image, let id = storeImage.uuid else { return nil }
@@ -155,17 +157,35 @@ struct CameraFrameSelectView: View {
         }
     }
     
-    //선택 이미지 삭제 함수
-    private func deletdImage(_ id: UUID) {
-        imageDataArray.removeAll(where: { $0.id == id })
+    private func toggleSelection(for id: UUID) {
+        if selectedImageIds.contains(id) {
+            selectedImageIds.remove(id)
+        } else {
+            selectedImageIds.insert(id)
+        }
+    }
+    
+    private func deleteSelectedImages() {
+        viewContext.performAndWait {
+            for id in selectedImageIds {
+                if let imageToDelete = storedImages.first(where: { $0.uuid == id }) {
+                    viewContext.delete(imageToDelete)
+                }
+            }
+            try? viewContext.save()
+        }
+        loadImages()
+        selectedImageIds.removeAll()
+        isEditing = false
     }
 }
 
-//모달 상단 타이틀 뷰
 struct SheetTitleView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var isEditing: Bool
     @Binding var imageDataArray: [(id: UUID, data: Data)]
+    
+    
     var body: some View {
         HStack {
             Button {
@@ -178,10 +198,10 @@ struct SheetTitleView: View {
             }
             
             Spacer()
+            
             if !imageDataArray.isEmpty {
                 Button {
                     isEditing.toggle()
-                    print("편집 버튼 눌림")
                 } label: {
                     Text(isEditing ? "취소" : "편집")
                         .font(.system(size: 17))
@@ -191,9 +211,6 @@ struct SheetTitleView: View {
                         .padding(.vertical, 10.49618)
                 }
             }
-            
-            
         }
-        
     }
 }
