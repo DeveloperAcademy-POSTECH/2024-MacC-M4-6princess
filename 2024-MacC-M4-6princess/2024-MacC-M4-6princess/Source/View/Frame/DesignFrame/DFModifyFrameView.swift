@@ -218,7 +218,8 @@ struct DFModifyFrame: View {
         
         newImage.image = data
         newImage.uuid = UUID()
-        
+        newImage.isSelected = false
+//        newImage.order = Int32(count)  현재 개수를 order로 사용
         saveContext()
     }
     func makeImage() {
