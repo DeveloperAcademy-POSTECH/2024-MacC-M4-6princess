@@ -59,25 +59,7 @@ struct CameraFrameSelectView: View {
                             .disabled(isEditing)
                             
                             ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
-                                ZStack {
-                                    VStack(alignment: .trailing) {
-                                        if isEditing {
-                                            if isFrameEditSelected {
-                                                Image("frameCheckIcon")
-                                                    .padding(.trailing, 10)
-                                                    .padding(.top, 10)
-                                            } else {
-                                                Circle()
-                                                    .fill(.gray03)
-                                                    .frame(width: 24, height: 24)
-                                                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 1, y: 1)
-                                                    .padding(.trailing, 10)
-                                                    .padding(.top, 10)
-                                            }
-                                        }
-                                        
-                                    }.frame(width: UIScreen.main.bounds.width / 3,
-                                            height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                ZStack(alignment: .topTrailing) {
                                     Button {
                                         isFrameSelected = true
                                         selectedFrame = imageInfo.id
@@ -92,13 +74,31 @@ struct CameraFrameSelectView: View {
                                                 .clipped()
                                             //임시로 테두리 적용 - 그리드 확인용
                                                 .border(Color.black, width: 1)
-                                        } else {
-                                            Color.gray
-                                                .frame(width: 150, height: 150) // 크기 설정
+                                        }
+                                    }.frame(width: UIScreen.main.bounds.width / 3,
+                                            height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                    .disabled(isEditing)
+                                    
+                                    if isEditing {
+                                        Button {
+                                            isFrameEditSelected.toggle()
+                                        } label: {
+                                            if isFrameEditSelected {
+                                                Image("frameCheckIcon")
+                                                    .resizable()
+                                                    .frame(width: 24, height: 24)
+                                                    .padding(.trailing, 10)
+                                                    .padding(.top, 10)
+                                            } else {
+                                                Circle()
+                                                    .fill(.gray03)
+                                                    .frame(width: 24, height: 24)
+                                                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 1, y: 1)
+                                                    .padding(.trailing, 10)
+                                                    .padding(.top, 10)
+                                            }
                                         }
                                     }
-                                    
-                                    
                                 }
                             }
                         }
@@ -125,14 +125,14 @@ struct CameraFrameSelectView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .navigationDestination(isPresented: $isGotoPhotosPicker) {
-                            PhotosPickerView()
-                        }
+                        PhotosPickerView()
+                    }
                     .onTapGesture {
-//                            dismiss()
+                        //                            dismiss()
                         isGotoPhotosPicker.toggle()
-                            isFullScreenPop.toggle()
+                        isFullScreenPop.toggle()
                         
-                            
+                        
                     }
                 }
                 
