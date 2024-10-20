@@ -11,9 +11,9 @@ struct ContentView: View {
     var body: some View {
         
         CameraView()
-//                    IEDevelopView()
+//        IEDevelopView()
         //        CMView()
-//        IEProgressView()
+        //        IEProgressView()
     }
 }
 
