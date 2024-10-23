@@ -91,10 +91,12 @@ struct CustomSliderView: View {
                         viewModel.redoHistory = []
                     }
                 }
-            })
+            }
+            )
             .tint(Color.pointPink)
             .padding(.horizontal)
         }
+        .frame(width: viewModel.screenSize.width,height: 40)
         .background(Color.black.opacity(0.5)) // 배경색
         .onAppear {
             // 중간값 사용 예시

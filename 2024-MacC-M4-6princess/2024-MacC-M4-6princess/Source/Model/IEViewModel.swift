@@ -83,7 +83,7 @@ class IEViewModel: ObservableObject {
         self.screenSize = bounds
         
         // 배경이미지를 scaleToFit하게 만듬
-        let newHeight = self.screenSize.height * 0.7
+        let newHeight = self.screenSize.height * 0.68
         // 0.75 0.6
         self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
         
@@ -94,6 +94,8 @@ class IEViewModel: ObservableObject {
         
         self.recentPop = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
         self.firstOne = History(size: self.frameIdolSize, loc: self.location, ang: .zero, sliderValues: [0.0, 1.0, 1.0])
+        
+        print("idolsize:\(self.frameIdolSize)")
     }
     /// 이미지에 색상 조정을 적용하는 함수
     func applyColorFilter(originalImage:UIImage) -> UIImage? {
