@@ -29,29 +29,28 @@ struct IEMainView: View {
     var canvasView: some View {
         IECanvasView(viewModel: viewModel)
     }
+    
     var rawImageTab: some Gesture {
         TapGesture()
             .onEnded{
-                if viewModel.showRawImage{
+                if viewModel.isRawImage{ // 원본보기 상태일 때
                     
-                    let one = viewModel.tmpHistory
-                    print("firstOne:\(viewModel.firstOne)")
-                    print("recentPop:\(viewModel.recentPop)")
+                    let one = viewModel.temp // 이전 데이터 꺼내오기
                     viewModel.recentPop = one
                     
                     viewModel.frameIdolSize = one.size
                     viewModel.location = one.loc
                     viewModel.rotationAngle = one.ang
                     viewModel.sliderValues = one.sliderValues
-                    viewModel.showRawImage = false
+                    viewModel.isRawImage.toggle()
                 }
                 else{
                     viewModel.selectedIndex = nil
-                    // 현재 정보를 넣기
-                    viewModel.tmpHistory.size = viewModel.frameIdolSize
-                    viewModel.tmpHistory.ang = viewModel.rotationAngle
-                    viewModel.tmpHistory.loc = viewModel.location
-                    viewModel.tmpHistory.sliderValues = viewModel.sliderValues
+                    // 현재 정보를 임시로 넣어놓기
+                    viewModel.temp.size = viewModel.frameIdolSize
+                    viewModel.temp.loc = viewModel.location
+                    viewModel.temp.ang = viewModel.rotationAngle
+                    viewModel.temp.sliderValues = viewModel.sliderValues
                     
                     let one = viewModel.firstOne
                     viewModel.frameIdolSize = one.size
@@ -59,7 +58,7 @@ struct IEMainView: View {
                     viewModel.rotationAngle = one.ang
                     viewModel.sliderValues = one.sliderValues
                     
-                    viewModel.showRawImage = true
+                    viewModel.isRawImage.toggle()
                     viewModel.showRawAlert = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         viewModel.showRawAlert = false
@@ -71,9 +70,9 @@ struct IEMainView: View {
     var rawImageUnrock: some Gesture {
         TapGesture()
             .onEnded{
-                if viewModel.showRawImage{
+                if viewModel.isRawImage{
                     
-                    let one = viewModel.tmpHistory
+                    let one = viewModel.temp
                     print("firstOne:\(viewModel.firstOne)")
                     print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
@@ -82,7 +81,7 @@ struct IEMainView: View {
                     viewModel.location = one.loc
                     viewModel.rotationAngle = one.ang
                     viewModel.sliderValues = one.sliderValues
-                    viewModel.showRawImage = false
+                    viewModel.isRawImage = false
                 }
                 
             }
@@ -196,7 +195,7 @@ struct IEMainView: View {
                                     .padding(.horizontal, 20)
                                     .padding(.vertical, 10.49618)
                             }
-                            .disabled(viewModel.showRawImage)
+                            .disabled(viewModel.isRawImage)
                             .padding(.horizontal)
                             
                         }
@@ -211,7 +210,7 @@ struct IEMainView: View {
                             Spacer()
                             HStack{
                                 Spacer()
-                                Image("rawImage.\(viewModel.showRawImage ? "selected" : "unselected")")
+                                Image("rawImage.\(viewModel.isRawImage ? "selected" : "unselected")")
                                     .frame(width: 60, height: 30)
                                     .gesture(rawImageTab)
                                     .padding(.horizontal,15)
@@ -266,9 +265,9 @@ struct IEMainView: View {
                                                 viewModel.selectedIndex = nil
                                             }
                                             else{
-                                                if viewModel.showRawImage{
+                                                if viewModel.isRawImage{
                                                     
-                                                    let one = viewModel.tmpHistory
+                                                    let one = viewModel.temp
                                                     print("firstOne:\(viewModel.firstOne)")
                                                     print("recentPop:\(viewModel.recentPop)")
                                                     viewModel.recentPop = one
@@ -277,7 +276,7 @@ struct IEMainView: View {
                                                     viewModel.location = one.loc
                                                     viewModel.rotationAngle = one.ang
                                                     viewModel.sliderValues = one.sliderValues
-                                                    viewModel.showRawImage = false
+                                                    viewModel.isRawImage = false
                                                 }
                                                 viewModel.selectedIndex = index
                                             }

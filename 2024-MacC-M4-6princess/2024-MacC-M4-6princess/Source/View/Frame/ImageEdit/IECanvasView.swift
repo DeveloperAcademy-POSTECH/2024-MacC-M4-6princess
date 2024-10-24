@@ -37,9 +37,9 @@ struct IECanvasView: View {
                 startLocation = startLocation ?? viewModel.location
             }
             .onEnded{ _ in
-                if viewModel.showRawImage{
+                if viewModel.isRawImage{
                     
-                    let one = viewModel.tmpHistory
+                    let one = viewModel.temp
                     print("firstOne:\(viewModel.firstOne)")
                     print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
@@ -48,7 +48,7 @@ struct IECanvasView: View {
                     viewModel.location = one.loc
                     viewModel.rotationAngle = one.ang
                     viewModel.sliderValues = one.sliderValues
-                    viewModel.showRawImage = false
+                    viewModel.isRawImage = false
                 }
                 else{
                     viewModel.undoHistory.append(viewModel.recentPop)
@@ -78,9 +78,9 @@ struct IECanvasView: View {
                 viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
             }
             .onEnded{ value in
-                if viewModel.showRawImage{
+                if viewModel.isRawImage{
                     
-                    let one = viewModel.tmpHistory
+                    let one = viewModel.temp
                     print("firstOne:\(viewModel.firstOne)")
                     print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
@@ -89,7 +89,7 @@ struct IECanvasView: View {
                     viewModel.location = one.loc
                     viewModel.rotationAngle = one.ang
                     viewModel.sliderValues = one.sliderValues
-                    viewModel.showRawImage = false
+                    viewModel.isRawImage = false
                 }
                 else{
                     viewModel.undoHistory.append(viewModel.recentPop)
@@ -104,9 +104,9 @@ struct IECanvasView: View {
     var rawImageUnrock: some Gesture {
         TapGesture()
             .onEnded{
-                if viewModel.showRawImage{
+                if viewModel.isRawImage{
                     
-                    let one = viewModel.tmpHistory
+                    let one = viewModel.temp
                     print("firstOne:\(viewModel.firstOne)")
                     print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
@@ -115,7 +115,7 @@ struct IECanvasView: View {
                     viewModel.location = one.loc
                     viewModel.rotationAngle = one.ang
                     viewModel.sliderValues = one.sliderValues
-                    viewModel.showRawImage = false
+                    viewModel.isRawImage = false
                 }
                 
             }

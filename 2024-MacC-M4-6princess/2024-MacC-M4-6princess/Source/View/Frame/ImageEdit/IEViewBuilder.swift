@@ -104,3 +104,10 @@ struct CustomSliderView: View {
         }
     }
 }
+
+extension CGPoint {
+    func printPoint() {
+        print("x: \(self.x), y: \(self.y)")
+    }
+}
+ 

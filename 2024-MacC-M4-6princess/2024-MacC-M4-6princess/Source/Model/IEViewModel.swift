@@ -45,7 +45,7 @@ class IEViewModel: ObservableObject {
     @Published var saveAnimate = false
     @Published var pinchScale = 1.0 // 전체 보기를 위한 초기 비율을 1.0으로 설정
     @Published var pinchValue = 1.0 // 수동 확대/축소를 위한 상태 변수
-    @Published var showRawImage = false
+    @Published var isRawImage = false
     @Published var bgImg = UIImage(named: "6princess")!
     @Published var idolImg = UIImage(named: "Felix")!
     
@@ -55,7 +55,7 @@ class IEViewModel: ObservableObject {
     @Published var redoHistory:[History] = []
     @Published var recentPop:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 바뀌기전 현재 정보
     @Published var firstOne:History = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본
-    @Published var tmpHistory = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본
+    @Published var temp = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본보기 클릭시 데이터 저장용
     
     @Published var showRawAlert = false
     private var cancellables = Set<AnyCancellable>()
