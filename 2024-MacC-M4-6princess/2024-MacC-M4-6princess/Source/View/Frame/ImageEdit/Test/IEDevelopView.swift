@@ -13,6 +13,7 @@ struct IEDevelopView: View {
     @State private var showWidthFixView = false
     @State private var imageResizeView = false
     @State private var edit = false
+    @StateObject var viewModel = IEViewModel()
     var body: some View {
         
         NavigationStack {
@@ -25,7 +26,7 @@ struct IEDevelopView: View {
                 }
             }
             .navigationDestination(isPresented: $edit){
-                IEMainView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!)
+                IEMainView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
             }
         }
     }

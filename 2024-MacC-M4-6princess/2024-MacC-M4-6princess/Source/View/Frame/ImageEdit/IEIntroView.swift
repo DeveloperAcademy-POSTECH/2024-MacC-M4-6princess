@@ -12,27 +12,32 @@ struct IEIntroView: View {
     var idol: UIImage
     var splash = UIImage(named: "imageEditSplash")!
     @State var isMain = false
-    
+    @StateObject var viewModel = IEViewModel()
     var body: some View {
         VStack {
             ZStack{
-                IEMainView(bg: bg, idol: idol)
-//                Image(uiImage: bg)
-//                    .resizable()
+                if !viewModel.saveAnimate{
+                    IEMainView(bg: bg, idol: idol, viewModel: viewModel)
+                    //                Image(uiImage: bg)
+                    //                    .resizable()
                     
-                if !isMain{
-                    Group{
-                        Color.black.opacity(0.7)
-                        Image(uiImage: splash)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 200)
-                            .aspectRatio(contentMode: .fill)
-                            .onTapGesture {
-                                isMain = true
-                            }
+                    if !isMain{ // 온보딩
+                        Group{
+                            Color.black.opacity(0.7)
+                            Image(uiImage: splash)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 200)
+                                .aspectRatio(contentMode: .fill)
+                                .onTapGesture {
+                                    isMain = true
+                                }
+                        }
+                        .ignoresSafeArea(.all)
                     }
-                    .ignoresSafeArea(.all)
+                }
+                else{ // 저장시 애니매이션 뷰
+                    IEProgressView(isSave: $viewModel.savePhoto)
                 }
             }
         }

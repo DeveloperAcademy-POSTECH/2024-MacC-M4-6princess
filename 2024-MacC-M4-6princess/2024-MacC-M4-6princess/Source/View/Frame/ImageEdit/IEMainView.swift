@@ -11,7 +11,7 @@ import Photos
 struct IEMainView: View {
     var bg:UIImage
     var idol:UIImage
-    @StateObject var viewModel = IEViewModel()
+    @StateObject var viewModel: IEViewModel
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @GestureState private var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
@@ -262,59 +262,48 @@ struct IEMainView: View {
     }
     
     var body: some View {
-        VStack{//empty
-            
-            if !viewModel.saveAnimate{
-                ZStack{
-                    VStack{
-                       
-                        Spacer()
-                        ZStack{
-                            
-                            // 후보정 레이어 편집 뷰
-                            canvasView
-                            //                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
-                            //                        .gesture(pinchGesture)
-                                .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-                        } //end
-                        Spacer()
-                        Spacer()
-                            .frame(height: 60)
-                        
-                        /// 원본 보기 클릭시 1초간 "원본" 표시가 남
-                        if viewModel.showRawAlert{
-                            Image("rawImageAlert")
-                                .frame(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.height/4)
-                        }
-                    }
-                    
-                    VStack{
-                        
-                        TopBar()
-                        Spacer()
-                    }
-                    VStack{
-                        Spacer()
-                        // 편집 옵션 버튼들
-                        VStack{
-                            Spacer()
-                            RawImageButton()
-                            
-                            if let idx = viewModel.selectedIndex {
-                                ColorSlider(idx)
-                            }
-                        }
-                        BottomBar()
-                    }
-                    
-                }
+        
+        ZStack{
+            VStack{
                 
-               
-            }
-            else{
-                IEProgressView(isSave: $viewModel.savePhoto)
+                Spacer()
+                ZStack{
+                    
+                    // 후보정 레이어 편집 뷰
+                    canvasView
+                    //                        .scaleEffect(pinchScale * pinchState * pinchValue) // 제스처와 수동 확대/축소를 결합
+                    //                        .gesture(pinchGesture)
+                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                } //end
+                Spacer()
+                Spacer()
+                    .frame(height: 60)
+                
+                /// 원본 보기 클릭시 1초간 "원본" 표시가 남
+                if viewModel.showRawAlert{
+                    Image("rawImageAlert")
+                        .frame(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.height/4)
+                }
             }
             
+            VStack{
+                
+                TopBar()
+                Spacer()
+            }
+            VStack{
+                Spacer()
+                // 편집 옵션 버튼들
+                VStack{
+                    Spacer()
+                    RawImageButton()
+                    
+                    if let idx = viewModel.selectedIndex {
+                        ColorSlider(idx)
+                    }
+                }
+                BottomBar()
+            }
             
         }
         .onAppear{
