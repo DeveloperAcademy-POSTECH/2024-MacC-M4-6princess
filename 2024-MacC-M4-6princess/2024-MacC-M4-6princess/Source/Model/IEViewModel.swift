@@ -73,11 +73,11 @@ class IEViewModel: ObservableObject {
         // 배경 이미지의 aspectRatio를 구함
         self.bgRatio = bgImg.size.height / bgImg.size.width
         
-        print("bgRatio:\(self.bgRatio)")
+//        print("bgRatio:\(self.bgRatio)")
         
         // 아이돌 이미지의 aspectRatio를 구함
         self.idolRatio = idolImg.size.height / idolImg.size.width
-        print("bgImg.size:\(bgImg.size)")
+//        print("bgImg.size:\(bgImg.size)")
         
         // IECanvasView의 프레임 크기를 구함 for 이미지 저장
         self.screenSize = bounds

@@ -17,6 +17,9 @@ struct IEIntroView: View {
         VStack {
             ZStack{
                 IEMainView(bg: bg, idol: idol)
+//                Image(uiImage: bg)
+//                    .resizable()
+                    
                 if !isMain{
                     Group{
                         Color.black.opacity(0.7)
