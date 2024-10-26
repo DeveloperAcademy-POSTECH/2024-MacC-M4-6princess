@@ -83,9 +83,10 @@ class IEViewModel: ObservableObject {
         self.screenSize = bounds
         
         // 배경이미지를 scaleToFit하게 만듬
-        let newHeight = self.screenSize.height * 0.68
+//        let newHeight = self.screenSize.height * 0.68
         // 0.75 0.6
-        self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
+//        self.frameBGSize = CGSize(width: newHeight * (bgImg.size.width / bgImg.size.height), height: newHeight)
+        self.frameBGSize = CGSize(width: screenSize.width, height: screenSize.width / 3 * 4 )
         
         self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)) // baseWidth를 100으로 지정,세로는 계산
         
