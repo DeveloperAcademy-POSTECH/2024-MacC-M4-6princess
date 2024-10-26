@@ -11,7 +11,7 @@ import AVFoundation
 ///카메라 화면 프리뷰
 struct CameraPreview: UIViewRepresentable{
     
-    @ObservedObject var camera: CameraModel
+    @ObservedObject var camera: CameraViewModel
 //    let frame : CGRect // 프레임 크기
     func makeUIView(context: Context) -> UIView {
         
@@ -41,7 +41,7 @@ struct CameraPreview: UIViewRepresentable{
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-//        if camera.isTaken {
+//        if camera.isTakenPhoto {
 //                    camera.session.stopRunning()
 //                }else {
 //                    DispatchQueue.global(qos: .background).async {

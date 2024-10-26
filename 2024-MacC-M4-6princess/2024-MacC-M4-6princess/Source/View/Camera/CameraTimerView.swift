@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CameraTimerView: View {
-    @StateObject var motionManager = MotionManager()
+    @StateObject var motionManager = MotionViewModel()
     @Binding var delayTime: Double
     @Binding var isPushed: Int
     var body: some View {
