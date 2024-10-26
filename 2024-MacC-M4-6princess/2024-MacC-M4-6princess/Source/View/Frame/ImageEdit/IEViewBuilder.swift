@@ -20,6 +20,7 @@ struct IEOutputImageView: View {
         
     }
 }
+
 struct SliderView: View {
     @Binding var value: Float// 슬라이더 값
     var range: ClosedRange<Float> // 슬라이더 범위
@@ -83,10 +84,9 @@ struct CustomSliderView: View {
             ), in: range, step: step, onEditingChanged: { editing in
                 // 사용자가 슬라이더 조작을 종료했을 때
                 if !editing {
-                    print("안녕")
+                    
                     viewModel.undoHistory.append(viewModel.recentPop)
                     viewModel.recentPop.sliderValues[idx] = value
-                    
                     if !viewModel.redoHistory.isEmpty{
                         viewModel.redoHistory = []
                     }
@@ -98,10 +98,6 @@ struct CustomSliderView: View {
         }
         .frame(width: viewModel.screenSize.width,height: 40)
         .background(Color.black.opacity(0.5)) // 배경색
-        .onAppear {
-            // 중간값 사용 예시
-            print("중간값: \(midValue)")
-        }
     }
 }
 
@@ -110,7 +106,7 @@ extension CGPoint {
         print("x: \(self.x), y: \(self.y)")
     }
 }
- 
+
 extension IECanvasView{
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
@@ -140,8 +136,6 @@ extension IECanvasView{
                 if viewModel.isRawImage{
                     
                     let one = viewModel.temp
-                    print("firstOne:\(viewModel.firstOne)")
-                    print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
                     
                     viewModel.frameIdolSize = one.size
@@ -160,55 +154,50 @@ extension IECanvasView{
             }
     }
     // 아이돌 이미지 확대/축소 제스쳐
-    var magnifyGesture: some Gesture{
-        MagnifyGesture()
-            .onChanged{ value in
-                viewModel.scale = value.magnification
-                
-                // 확대/축소가 한번에 변할 수 있는 최대/최소값 지정
-                if viewModel.scale >= 1{
-                    viewModel.scale = min((viewModel.scale - 1) * 0.01 + 1,1.3) // 한번에 최대 확대는 1.3배까지만 가능(미세조정 기능)
-                }
-                else{
-                    viewModel.scale = max((viewModel.scale - 1) * 0.1 + 1,0.5) // 한번에 축소는 절반이 이하로 되지않음
-                }
-                let newWidth = viewModel.frameIdolSize.width * viewModel.scale
-                
-                // 축소된 가로 길이에 사진 비율을 곱해서 새로운 아이돌 이미지의 크기를 수정
-                viewModel.frameIdolSize = CGSize(width:  newWidth, height: newWidth * viewModel.idolRatio)
+    fileprivate func endedMagnify() {
+        if viewModel.isRawImage{
+            let one = viewModel.temp
+            viewModel.recentPop = one
+            
+            viewModel.frameIdolSize = one.size
+            viewModel.location = one.loc
+            viewModel.rotationAngle = one.ang
+            viewModel.sliderValues = one.sliderValues
+            viewModel.isRawImage = false
+        }
+        else{
+            viewModel.undoHistory.append(viewModel.recentPop)
+            viewModel.recentPop.size = viewModel.frameIdolSize
+            
+            if !viewModel.redoHistory.isEmpty{
+                viewModel.redoHistory = []
             }
-            .onEnded{ value in
-                if viewModel.isRawImage{
-                    
-                    let one = viewModel.temp
-                    print("firstOne:\(viewModel.firstOne)")
-                    print("recentPop:\(viewModel.recentPop)")
-                    viewModel.recentPop = one
-                    
-                    viewModel.frameIdolSize = one.size
-                    viewModel.location = one.loc
-                    viewModel.rotationAngle = one.ang
-                    viewModel.sliderValues = one.sliderValues
-                    viewModel.isRawImage = false
-                }
-                else{
-                    viewModel.undoHistory.append(viewModel.recentPop)
-                    viewModel.recentPop.size = viewModel.frameIdolSize
-                    
-                    if !viewModel.redoHistory.isEmpty{
-                        viewModel.redoHistory = []
-                    }
-                }
+        }
+    }
+    
+    
+
+    var magnifyGesture: some Gesture {
+        MagnifyGesture()
+            .updating($scale) { value, scale, _ in
+                scale = value.magnification
+                let newWidth = viewModel.frameIdolSize.width * value.magnification
+                let newHeight = viewModel.frameIdolSize.height * value.magnification
+                viewModel.frameIdolSize = CGSize(width: newWidth, height: newHeight)
+            }
+            .onEnded { _ in
+                endedMagnify()
             }
     }
+
+
+
     var rawImageUnrock: some Gesture {
         TapGesture()
             .onEnded{
                 if viewModel.isRawImage{
                     
                     let one = viewModel.temp
-                    print("firstOne:\(viewModel.firstOne)")
-                    print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
                     
                     viewModel.frameIdolSize = one.size
@@ -274,8 +263,6 @@ extension IEMainView{
                 if viewModel.isRawImage{
                     
                     let one = viewModel.temp
-                    print("firstOne:\(viewModel.firstOne)")
-                    print("recentPop:\(viewModel.recentPop)")
                     viewModel.recentPop = one
                     
                     viewModel.frameIdolSize = one.size
@@ -355,10 +342,7 @@ extension IEMainView{
                                 if viewModel.isRawImage{
                                     
                                     let one = viewModel.temp
-                                    print("firstOne:\(viewModel.firstOne)")
-                                    print("recentPop:\(viewModel.recentPop)")
                                     viewModel.recentPop = one
-                                    
                                     viewModel.frameIdolSize = one.size
                                     viewModel.location = one.loc
                                     viewModel.rotationAngle = one.ang
@@ -380,93 +364,91 @@ extension IEMainView{
         }
         .padding(.horizontal,20)
         .frame(height: 80)
-        .background(.white)
     }
     
     func TopBar() -> some View {
-        return HStack {
-            Spacer()
-                .frame(width: 20)
-            Button {
-                // 뒤로가기 버튼
-                self.presentationMode.wrappedValue.dismiss()
-                print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
-            } label: {
-                HStack(alignment: .center, spacing: 4) {
-                    Group{
-                        Image(systemName: "chevron.backward")
-                            .fontWeight(.semibold)
-                            .padding(.leading, 10)
-                        Text("다시 찍기")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+        return VStack{
+            HStack {
+                Spacer()
+                    .frame(width: 20)
+                Button {
+                    // 뒤로가기 버튼
+                    self.presentationMode.wrappedValue.dismiss()
+                } label: {
+                    HStack(alignment: .center, spacing: 4) {
+                        Group{
+                            Image(systemName: "chevron.backward")
+                                .fontWeight(.semibold)
+                                .padding(.leading, 10)
+                            Text("다시 찍기")
+                                .font(.system(size: 16))
+                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                        }
+                        .foregroundColor(.gray01)
                     }
-                    .foregroundColor(.gray01)
                 }
-            }
-            
-            Spacer()
-            
-            Button {
-                if !viewModel.undoHistory.isEmpty{
-                    guard let lastHistory = viewModel.undoHistory.popLast() else { return }
-                    viewModel.redoHistory.append(viewModel.recentPop)
-                    viewModel.location = lastHistory.loc
-                    viewModel.frameIdolSize = lastHistory.size
-                    viewModel.rotationAngle = lastHistory.ang
-                    viewModel.sliderValues = lastHistory.sliderValues
-                    viewModel.recentPop = lastHistory
-                    print(lastHistory)
+                
+                Spacer()
+                
+                Button {
+                    if !viewModel.undoHistory.isEmpty{
+                        guard let lastHistory = viewModel.undoHistory.popLast() else { return }
+                        viewModel.redoHistory.append(viewModel.recentPop)
+                        viewModel.location = lastHistory.loc
+                        viewModel.frameIdolSize = lastHistory.size
+                        viewModel.rotationAngle = lastHistory.ang
+                        viewModel.sliderValues = lastHistory.sliderValues
+                        viewModel.recentPop = lastHistory
+                    }
+                } label: {
+                    Image(systemName: "arrow.uturn.backward")
+                        .foregroundColor(viewModel.undoHistory.isEmpty ? .gray10:.gray01)
+                }
+                Spacer()
+                    .frame(width: 20)
+                Button {
+                    
+                    if !viewModel.redoHistory.isEmpty{
+                        guard let lastHistory = viewModel.redoHistory.popLast() else { return }
+                        viewModel.undoHistory.append(viewModel.recentPop)
+                        viewModel.location = lastHistory.loc
+                        viewModel.frameIdolSize = lastHistory.size
+                        viewModel.rotationAngle = lastHistory.ang
+                        viewModel.sliderValues = lastHistory.sliderValues
+                        viewModel.recentPop = lastHistory
+                    }
+                } label: {
+                    Image(systemName: "arrow.uturn.forward")
+                        .foregroundColor(viewModel.redoHistory.isEmpty ? .gray10:.gray01)
                     
                 }
-            } label: {
-                Image(systemName: "arrow.uturn.backward")
-                    .foregroundColor(viewModel.undoHistory.isEmpty ? .gray10:.gray01)
-            }
-            Spacer()
-                .frame(width: 20)
-            Button {
-                
-                if !viewModel.redoHistory.isEmpty{
-                    guard let lastHistory = viewModel.redoHistory.popLast() else { return }
-                    viewModel.undoHistory.append(viewModel.recentPop)
-                    viewModel.location = lastHistory.loc
-                    viewModel.frameIdolSize = lastHistory.size
-                    viewModel.rotationAngle = lastHistory.ang
-                    viewModel.sliderValues = lastHistory.sliderValues
-                    viewModel.recentPop = lastHistory
-                }
-            } label: {
-                Image(systemName: "arrow.uturn.forward")
-                    .foregroundColor(viewModel.redoHistory.isEmpty ? .gray10:.gray01)
-                
-            }
-            Spacer()
-            Button {
-                viewModel.saveRenderedView(content: canvasView)
-                viewModel.saveAnimate = true
-                // 5초 후에 isSave를 true로 변경하여 이미지로 전환
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    viewModel.savePhoto = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        viewModel.saveAnimate = false
-                        self.presentationMode.wrappedValue.dismiss()
+                Spacer()
+                Button {
+                    viewModel.saveRenderedView(content: canvasView)
+                    viewModel.saveAnimate = true
+                    // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        viewModel.savePhoto = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            viewModel.saveAnimate = false
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
                     }
+                } label: {
+                    Text("저장")
+                        .font(.system(size: 17))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.pointPink)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10.49618)
                 }
-            } label: {
-                Text("저장")
-                    .font(.system(size: 17))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.pointPink)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10.49618)
+                .disabled(viewModel.isRawImage)
+                .padding(.horizontal)
+                
             }
-            .disabled(viewModel.isRawImage)
-            .padding(.horizontal)
-            
+            Spacer()
         }
         .frame(height: 40)
-        .background(.white)
     }
     
 }

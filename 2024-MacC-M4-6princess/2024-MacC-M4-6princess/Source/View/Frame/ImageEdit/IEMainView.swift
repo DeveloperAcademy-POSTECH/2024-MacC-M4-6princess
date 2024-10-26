@@ -12,23 +12,43 @@ struct IEMainView: View {
     var bg:UIImage
     var idol:UIImage
     @StateObject var viewModel: IEViewModel
-
+    
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @GestureState var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
-
+    
     var body: some View {
         ZStack{
-            VStack{
-                TopBar()
-                ZStack{
+            ZStack{
+                VStack{// 캔버스 뷰를 vetical center 정렬
+                    Spacer()
                     // 후보정 레이어 편집 뷰
                     canvasView
                         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                    Spacer()
                 }
-                RawImageButton()
-
-                if let idx = viewModel.selectedIndex {
-                    ColorSlider(idx)
+                VStack{
+                    Color.white
+                        .frame(width:viewModel.frameBGSize.width,height: (viewModel.screenSize.height - viewModel.frameBGSize.height)/2 )
+                    Spacer()
+                    Color.white
+                        .frame(width:viewModel.frameBGSize.width,height: (viewModel.screenSize.height - viewModel.frameBGSize.height)/2 )
+                }
+                .ignoresSafeArea(.all)
+            }
+            
+            VStack{
+                TopBar()
+                Spacer()
+            }
+            VStack{
+                Spacer()
+                // 편집 옵션 버튼들
+                VStack{
+                    Spacer()
+                    RawImageButton()
+                    if let idx = viewModel.selectedIndex {
+                        ColorSlider(idx)
+                    }
                 }
                 BottomBar()
             }
@@ -45,8 +65,6 @@ struct IEMainView: View {
         // 상단 툴바
         .navigationBarBackButtonHidden()
     }
-
+    
 }
-
-
 

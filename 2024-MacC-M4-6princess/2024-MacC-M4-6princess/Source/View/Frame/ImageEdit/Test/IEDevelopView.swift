@@ -26,7 +26,8 @@ struct IEDevelopView: View {
                 }
             }
             .navigationDestination(isPresented: $edit){
-                IEMainView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
+                IEIntroView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
+                //                IEMainView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
             }
         }
     }
