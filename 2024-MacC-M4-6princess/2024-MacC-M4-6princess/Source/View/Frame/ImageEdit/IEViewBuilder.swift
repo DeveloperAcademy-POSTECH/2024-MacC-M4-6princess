@@ -179,18 +179,19 @@ extension IECanvasView{
 
     var magnifyGesture: some Gesture {
         MagnifyGesture()
-            .updating($scale) { value, scale, _ in
+            .onChanged{ value in
+                currentScale = value.magnification 
+                print("scale: \(currentScale)")
+                
+            }
+            .updating($zoomFactor) { value, scale, transaction in
                 scale = value.magnification
-                let newWidth = viewModel.frameIdolSize.width * value.magnification
-                let newHeight = viewModel.frameIdolSize.height * value.magnification
-                viewModel.frameIdolSize = CGSize(width: newWidth, height: newHeight)
+                currentScale += value.magnification
             }
             .onEnded { _ in
                 endedMagnify()
             }
     }
-
-
 
     var rawImageUnrock: some Gesture {
         TapGesture()

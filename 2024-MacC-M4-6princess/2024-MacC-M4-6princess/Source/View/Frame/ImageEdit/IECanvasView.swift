@@ -11,7 +11,8 @@ import SwiftUI
 struct IECanvasView: View {
     @StateObject var viewModel: IEViewModel
     @GestureState var startLocation: CGPoint? = nil
-    @GestureState var scale: CGFloat = 1.0
+    @State var currentScale: CGFloat = 1.0
+    @GestureState var zoomFactor: CGFloat = 1.0
     
     var body: some View {
         ZStack {
@@ -29,7 +30,7 @@ struct IECanvasView: View {
                 .scaledToFit()
                 .rotationEffect(viewModel.rotationAngle)
                 .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
-//                .scaleEffect(magnifyBy)
+                .scaleEffect(zoomFactor * currentScale)
                 .position(viewModel.location)
                 .gesture(dragGesture
                     .simultaneously(with: magnifyGesture)
