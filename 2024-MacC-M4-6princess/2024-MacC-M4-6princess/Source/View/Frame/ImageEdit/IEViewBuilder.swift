@@ -153,7 +153,7 @@ extension IECanvasView{
                 }
             }
     }
-    // 아이돌 이미지 확대/축소 제스쳐
+    // 아이돌 이미지 확대/축소 제스쳐가 끝나면 Undo 리스트에 이전 정보를 추가
     fileprivate func endedMagnify() {
         if viewModel.isRawImage{
             let one = viewModel.temp
@@ -180,15 +180,14 @@ extension IECanvasView{
     var magnifyGesture: some Gesture {
         MagnifyGesture()
             .onChanged{ value in
-                currentScale = value.magnification 
-                print("scale: \(currentScale)")
+                currentScale = value.magnification
                 
             }
-            .updating($zoomFactor) { value, scale, transaction in
-                scale = value.magnification
-                currentScale += value.magnification
-            }
             .onEnded { _ in
+                viewModel.frameIdolSize.width *= currentScale
+                viewModel.frameIdolSize.height *= currentScale
+                currentScale = 1
+                
                 endedMagnify()
             }
     }

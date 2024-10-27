@@ -24,13 +24,14 @@ struct IECanvasView: View {
                     .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     .aspectRatio(contentMode: .fit)
             }
+            
             // 아이돌 이미지
             Image(uiImage: viewModel.idolImg)
                 .resizable()
                 .scaledToFit()
                 .rotationEffect(viewModel.rotationAngle)
                 .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
-                .scaleEffect(zoomFactor * currentScale)
+                .scaleEffect(currentScale)
                 .position(viewModel.location)
                 .gesture(dragGesture
                     .simultaneously(with: magnifyGesture)
