@@ -19,7 +19,8 @@ struct IEMainView: View {
     var body: some View {
         ZStack{
             ZStack{
-                VStack{// 캔버스 뷰를 vetical center 정렬
+                // 캔버스 뷰를 vetical center 정렬
+                VStack{
                     Spacer()
                     // 후보정 레이어 편집 뷰
                     canvasView

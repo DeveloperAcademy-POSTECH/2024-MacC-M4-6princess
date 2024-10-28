@@ -9,11 +9,9 @@ import SwiftUI
 
 struct IEProgressView: View {
     @State var isAnimating = false
-    
     @Binding var isSave:Bool
     
     var body: some View {
-        
         VStack{
             if isSave {
                 Image("check.save")
@@ -29,7 +27,6 @@ struct IEProgressView: View {
                     .fontWeight(.bold)
                 
             } else {
-                
                 Circle()
                     .strokeBorder(style: StrokeStyle(lineWidth: 7, dash: [5]))
                     .frame(width: 50, height: 50)
@@ -50,9 +47,23 @@ struct IEProgressView: View {
             isAnimating = true
             isSave = false
         }
-       
+        
         
     }
 }
 
+struct VisualEffectView: UIViewRepresentable {
+    var effect: UIVisualEffect?
+    var alpha: CGFloat = 0.5 // 기본 알파 값 설정
+    
+    func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
+        let visualEffectView = UIVisualEffectView()
+        return visualEffectView
+    }
+    
+    func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
+        uiView.effect = effect
+        uiView.alpha = alpha // 알파 값 설정
+    }
+}
 

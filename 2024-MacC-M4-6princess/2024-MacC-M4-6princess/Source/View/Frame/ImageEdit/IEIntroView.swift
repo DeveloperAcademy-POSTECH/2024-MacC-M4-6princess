@@ -18,14 +18,10 @@ struct IEIntroView: View {
             ZStack{
                 if !viewModel.saveAnimate{
                     IEMainView(bg: bg, idol: idol, viewModel: viewModel)
-                    //                                    Image(uiImage: bg)
-                    //                                        .resizable()
                     
                     if !isMain{ // 온보딩
                         ZStack{
                             Color.black.opacity(0.7)
-                            //                                    .blur(radius: 5)
-                            //                            VisualEffectView(effect: UIBlurEffect(style: .light))
                             VisualEffectView(effect: UIBlurEffect(style: .dark), alpha: 0.6)
                                 .ignoresSafeArea()
                             VStack{
@@ -68,17 +64,4 @@ struct IEIntroView: View {
     }
     
 }
-struct VisualEffectView: UIViewRepresentable {
-    var effect: UIVisualEffect?
-    var alpha: CGFloat = 0.5 // 기본 알파 값 설정
-    
-    func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
-        let visualEffectView = UIVisualEffectView()
-        return visualEffectView
-    }
-    
-    func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
-        uiView.effect = effect
-        uiView.alpha = alpha // 알파 값 설정
-    }
-}
+
