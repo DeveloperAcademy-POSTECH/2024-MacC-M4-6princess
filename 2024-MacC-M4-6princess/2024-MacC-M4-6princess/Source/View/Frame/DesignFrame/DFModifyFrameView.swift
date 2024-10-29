@@ -50,7 +50,7 @@ struct DFModifyFrame: View {
     }
 }
 
-extension CGSize {
+private extension CGSize {
     static func + (lhs: Self, rhs: Self) -> Self {
         CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
     }
