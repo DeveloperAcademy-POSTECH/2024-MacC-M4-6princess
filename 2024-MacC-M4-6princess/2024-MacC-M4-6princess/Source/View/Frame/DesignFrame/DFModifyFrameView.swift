@@ -92,7 +92,7 @@ private extension DFModifyFrame {
             } label: {
                 Text("저장")
                     .fontWeight(.semibold)
-                    .foregroundStyle(.pointPink)
+                    .foregroundStyle(isFirstLaunching ? .gray01 : .pointPink)
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
             .padding(.leading, 150)

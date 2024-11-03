@@ -10,6 +10,7 @@ struct DFFrameEditView: View {
     @State private var lines: [Line] = []
     @State private var thickness: Double = 10.0
     @Binding var pickedImage: UIImage?
+    @State private var anchor: UnitPoint = .zero
     
     var body: some View {
         ZStack {
@@ -19,7 +20,7 @@ struct DFFrameEditView: View {
                 ZStack {
                     
                     inputImageWithMask
-                        .scaleEffect(viewModel.magnifyScale)
+                        .scaleEffect(viewModel.magnifyScale, anchor: anchor)
                         .gesture(magnification)
                     
                     if let image = viewModel.resultImage {
@@ -116,6 +117,7 @@ private extension DFFrameEditView {
                 let scaleVolume = value.magnification / viewModel.lastScale
                 viewModel.magnifyScale *= scaleVolume
                 viewModel.lastScale = value.magnification
+                anchor = value.startAnchor
             }
             .onEnded { value in
                 viewModel.lastScale = 1.0
