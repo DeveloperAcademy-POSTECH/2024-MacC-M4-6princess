@@ -11,7 +11,7 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject var viewModel = CameraViewModel() //viewmodel 가져옴
+    @StateObject private var viewModel : CameraViewModel
     @StateObject var motionManager = MotionViewModel()
     @State var frameImage: UIImage?
     @State var delayTime: TimeInterval = 0.0
@@ -27,6 +27,20 @@ struct CameraView: View {
     @State var firstTime = false
     var defaultImg: UIImage = UIImage(named: "6princess")!
     @State var frameRatio:CGFloat = 4/3
+    
+    init() {
+            // CameraManager 생성
+            let cameraManager = CameraManager()
+            
+            // Preview Layer 생성
+            let preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
+            preview.videoGravity = .resizeAspectFill
+            
+            // ViewModel 초기화
+            _viewModel = StateObject(wrappedValue: CameraViewModel(
+                cameraManager: cameraManager
+            ))
+        }
     
     
     var body: some View {
@@ -52,7 +66,7 @@ struct CameraView: View {
                     .frame(width: UIScreen.main.bounds.width, height: 82)
                     .background(.white)
                     ZStack{
-                        CameraPreview(camera: viewModel)
+                        CameraPreview(viewModel: viewModel)
                             .frame(width: viewModel.frameSize.width,height: viewModel.frameSize.height)
                             .ignoresSafeArea(.all, edges: .all)
                         Group{
@@ -143,7 +157,7 @@ struct CameraView: View {
             }
             .persistentSystemOverlays(.hidden)
             .onAppear(perform: {
-                viewModel.checkVideoAuthorizaion()
+                viewModel.startCamera()
                 motionManager.startDeviceMotionUpdates()
                 //                    DispatchQueue.main.async {
                 //                        camera.session.startRunning()

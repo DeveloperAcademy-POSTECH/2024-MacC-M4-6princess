@@ -9,44 +9,37 @@ import SwiftUI
 import AVFoundation
 
 ///카메라 화면 프리뷰
-struct CameraPreview: UIViewRepresentable{
+//
+//  CameraPreview.swift
+//  2024-MacC-M4-6princess
+//
+//  Created by 김이예은 on 9/30/24.
+//
+
+import SwiftUI
+import AVFoundation
+
+struct CameraPreview: UIViewRepresentable {
+    @ObservedObject var viewModel: CameraViewModel
     
-    @ObservedObject var camera: CameraViewModel
-//    let frame : CGRect // 프레임 크기
     func makeUIView(context: Context) -> UIView {
-        
         let view = UIView(frame: UIScreen.main.bounds)
         
-        // AVCaptureVideoPreviewLayer 생성
+        // Preview layer는 이미 ViewModel 초기화 시점에서 설정되어 있음
+        viewModel.preview.frame = view.frame
+        viewModel.preview.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(viewModel.preview)
         
+        // 세션 시작
         DispatchQueue.main.async {
-            camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
-            camera.preview.frame = view.frame // 크기 수정
-            //            camera.preview.frame = frame // 크기 수정
-            camera.preview.videoGravity = .resizeAspectFill
-            
-            //다른거 추가할꺼면 추가
-            view.layer.addSublayer(camera.preview)
+            viewModel.cameraManager.startSession()
         }
-        
-        //starting session
-        DispatchQueue.main.async {
-            camera.session.startRunning()
-        }
-//        DispatchQueue.global(qos: .background).async {
-//            camera.session.startRunning()
-//        }
         
         return view
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-//        if camera.isTakenPhoto {
-//                    camera.session.stopRunning()
-//                }else {
-//                    DispatchQueue.global(qos: .background).async {
-//                        camera.session.startRunning()
-//                    }
-//                }
+        // Preview layer 프레임 업데이트
+        viewModel.preview.frame = uiView.frame
     }
 }
