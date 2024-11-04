@@ -11,8 +11,8 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var viewModel : CameraViewModel
-    @StateObject var motionManager = MotionViewModel()
+    @StateObject private var viewModel = CameraViewModel()
+    @StateObject var motionManager = MotionManager()
     @State var frameImage: UIImage?
     @State var delayTime: TimeInterval = 0.0
     @State var isPushedTimer = 0
@@ -27,21 +27,6 @@ struct CameraView: View {
     @State var firstTime = false
     var defaultImg: UIImage = UIImage(named: "6princess")!
     @State var frameRatio:CGFloat = 4/3
-    
-    init() {
-            // CameraManager 생성
-            let cameraManager = CameraManager()
-            
-            // Preview Layer 생성
-            let preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
-            preview.videoGravity = .resizeAspectFill
-            
-            // ViewModel 초기화
-            _viewModel = StateObject(wrappedValue: CameraViewModel(
-                cameraManager: cameraManager
-            ))
-        }
-    
     
     var body: some View {
         NavigationStack {
@@ -66,7 +51,7 @@ struct CameraView: View {
                     .frame(width: UIScreen.main.bounds.width, height: 82)
                     .background(.white)
                     ZStack{
-                        CameraPreview(viewModel: viewModel)
+                        CameraPreview(camera: viewModel)
                             .frame(width: viewModel.frameSize.width,height: viewModel.frameSize.height)
                             .ignoresSafeArea(.all, edges: .all)
                         Group{
@@ -97,7 +82,7 @@ struct CameraView: View {
                                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                         .animation(.easeInOut, value: motionManager.currentOrientation)
                                     Text("불러오기")
-                                        .font(Font.custom("SF Pro", size: 13))
+                                        .font(.system(size: 13))
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                                 }

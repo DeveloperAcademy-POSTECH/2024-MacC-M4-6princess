@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CameraTimerView: View {
-    @StateObject var motionManager = MotionViewModel()
+    @StateObject var motionManager = MotionManager()
     @Binding var delayTime: Double
     @Binding var isPushed: Int
     var body: some View {
@@ -33,7 +33,7 @@ struct CameraTimerView: View {
                             .resizable()
                             .frame(width: 40, height: 40)
                         Text("3")
-                            .font(Font.custom("SF Pro", size: 17))
+                            .font(.system(size: 17))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                     }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
@@ -48,7 +48,7 @@ struct CameraTimerView: View {
                             .resizable()
                             .frame(width: 40, height: 40)
                         Text("5")
-                            .font(Font.custom("SF Pro", size: 17))
+                            .font(.system(size: 17))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                     }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
@@ -63,7 +63,7 @@ struct CameraTimerView: View {
                             .resizable()
                             .frame(width: 40, height: 40)
                         Text("7")
-                            .font(Font.custom("SF Pro", size: 17))
+                            .font(.system(size: 17))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                     }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
@@ -80,7 +80,7 @@ struct CameraTimerView: View {
                 
             }
             Text("타이머")
-                .font(Font.custom("SF Pro", size: 13))
+                .font(.system(size: 13))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
         }

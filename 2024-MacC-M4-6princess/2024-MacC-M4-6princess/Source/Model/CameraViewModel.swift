@@ -68,6 +68,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         cameraManager.checkVideoAuthorizaion()
     }
     
+    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        print("카메라 셔터음 무음으로 변경됨")
+        AudioServicesDisposeSystemSoundID(1108)
+        
+    }
+    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        AudioServicesDisposeSystemSoundID(1108)
+    }
+    
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
             print("사진 처리 중 에러 발생: \(error.localizedDescription)")

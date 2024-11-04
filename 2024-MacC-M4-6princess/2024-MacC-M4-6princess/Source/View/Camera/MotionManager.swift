@@ -8,9 +8,9 @@
 import SwiftUI
 import CoreMotion
 
-class MotionViewModel: ObservableObject {
-    private var motionManager = CMMotionManager()
+class MotionManager: ObservableObject {
     @Published var currentOrientation: UIDeviceOrientation = .portrait //이걸 model로 따로 빼야하는데
+    private var motionManager = CMMotionManager()
     private var lastUpdate: Date = Date()
 
     init() {
