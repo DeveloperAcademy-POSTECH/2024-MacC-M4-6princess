@@ -17,11 +17,12 @@ struct IECanvasView: View {
     var body: some View {
         ZStack {
             // 배경 이미지
-            if let originalImage = viewModel.applyColorFilter(originalImage: viewModel.bgImg),
-               let croppedImage = originalImage.cropToAspectRatio(3.0 / 4.0) {
-                Image(uiImage: croppedImage)
+            if let originalImage = viewModel.applyColorFilter(originalImage: viewModel.bgImg)
+//                ,let croppedImage = originalImage.cropToAspectRatio(3.0 / 4.0)
+            {
+                Image(uiImage: originalImage)
                     .resizable()
-                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+//                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     .aspectRatio(contentMode: .fit)
             }
             
