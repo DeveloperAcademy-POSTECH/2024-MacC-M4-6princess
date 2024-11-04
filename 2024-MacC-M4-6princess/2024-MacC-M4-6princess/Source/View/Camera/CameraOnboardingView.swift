@@ -14,7 +14,7 @@ struct CameraOnboardingView: View {
         VStack {
             ZStack {
                 Text("최애와 사진을 찍기 위해\n프레임 선택하기")
-                    .font(Font.custom("SF Pro", size: 17))
+                    .font(.system(size: 17))
                     .multilineTextAlignment(.center)
                     .foregroundColor(.white)
                 VStack(alignment: .leading){
@@ -43,7 +43,7 @@ struct CameraOnboardingView: View {
                                 .padding(.leading, -8)
                                 
                                 Text("불러오기")
-                                    .font(Font.custom("SF Pro", size: 13))
+                                    .font(.system(size: 13))
                                     .multilineTextAlignment(.center)
                                     .foregroundColor(.white)
                                     .padding(.bottom, 35)
