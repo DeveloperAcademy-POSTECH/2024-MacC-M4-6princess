@@ -20,19 +20,21 @@ struct IEMainView: View {
         ZStack{
             ZStack{
                 // 캔버스 뷰를 vetical center 정렬
-                VStack{
-                    Spacer()
-                    // 후보정 레이어 편집 뷰
-                    canvasView
-                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-                    Spacer()
-                }
+                //                VStack{
+                //                    Spacer()
+                //                    // 후보정 레이어 편집 뷰
+                //                    canvasView
+                //                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                //                    Spacer()
+                //                }
+                canvasView
+                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                 VStack{
                     Color.white
-                        .frame(width:viewModel.frameBGSize.width,height: (viewModel.screenSize.height - viewModel.frameBGSize.height)/2 )
+                        .frame(width:viewModel.frameBGSize.width,height:82 )
                     Spacer()
                     Color.white
-                        .frame(width:viewModel.frameBGSize.width,height: (viewModel.screenSize.height - viewModel.frameBGSize.height)/2 )
+                        .frame(width:viewModel.frameBGSize.width,height:132)
                 }
                 .ignoresSafeArea(.all)
             }

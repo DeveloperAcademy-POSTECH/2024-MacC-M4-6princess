@@ -385,22 +385,14 @@ extension UIImage {
     func cropToAspectRatio(_ targetAspectRatio: CGFloat) -> UIImage? {
         let originalWidth = size.width
         let originalHeight = size.height
-        let originalAspectRatio = originalWidth / originalHeight
         
         var cropRect: CGRect
         
-        if originalAspectRatio > targetAspectRatio {
-            // 이미지가 너무 넓은 경우, 너비를 줄여서 크롭
-            let newWidth = originalHeight * targetAspectRatio
-            let xOffset = (originalWidth - newWidth) / 2
-            cropRect = CGRect(x: xOffset, y: 0, width: newWidth, height: originalHeight)
-        } else {
-            // 이미지가 너무 높은 경우, 높이를 줄여서 크롭
-            let newHeight = originalWidth / targetAspectRatio
-            let yOffset = (originalHeight - newHeight) / 2
-            cropRect = CGRect(x: 0, y: yOffset, width: originalWidth, height: newHeight)
-        }
+
         
+        let newWidth = originalHeight * targetAspectRatio
+
+        cropRect = CGRect(x: 0, y: 0, width: size.width, height: size.width * targetAspectRatio)
         // 크롭 영역을 설정하여 CGImage로 변환
         guard let cgImage = self.cgImage?.cropping(to: cropRect) else { return nil }
         
