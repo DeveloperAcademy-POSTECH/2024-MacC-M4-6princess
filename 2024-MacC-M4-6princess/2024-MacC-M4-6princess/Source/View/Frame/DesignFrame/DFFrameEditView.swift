@@ -118,6 +118,7 @@ private extension DFFrameEditView {
             .onChanged{ dragValue in
                 if selectionModeIndex == 0 || selectionModeIndex == 1 {
                     drawLines(startLocation: dragValue.startLocation, location: dragValue.location)
+                    print("\(dragValue.startLocation)")
                     
                 }
             }
@@ -236,10 +237,10 @@ private extension DFFrameEditView {
                 path.addLines(line.points)
                 if line.mode == .draw {
                     context.blendMode = .normal
-                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth))
+                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
                 } else {
                     context.blendMode = .clear
-                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth))
+                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
                 }
             }
         }
