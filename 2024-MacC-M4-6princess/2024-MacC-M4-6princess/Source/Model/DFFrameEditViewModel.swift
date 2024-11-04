@@ -17,6 +17,30 @@ class DFFrameEditViewModel: ObservableObject {
     @Published var isShowModifyFrame: Bool = false
     @Published var magnifyScale = 1.0
     @Published var lastScale = 1.0
+    @Published var draggedOffSet: CGSize = .zero
+    @Published var accumulatedOffSet: CGSize = .zero
+    
+    func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
+        
+        if magnifyScale < minimum {
+            
+            magnifyScale = minimum
+            draggedOffSet = .zero
+            accumulatedOffSet = .zero
+            
+        } else if magnifyScale > maximum {
+            magnifyScale = maximum
+        }
+        lastScale = 1.0
+        
+    }
+    
+    func setScaleVolume(_ magnify: CGFloat) {
+        
+        let scaleVolume = magnify / lastScale
+        magnifyScale *= scaleVolume
+        lastScale = magnify
+    }
     
     func getWidth() -> CGFloat {
         return inputImage?.size.width ?? 0
@@ -98,6 +122,7 @@ class DFFrameEditViewModel: ObservableObject {
     }
     
     private func createMask(from inputImage: CIImage) -> CIImage? {
+        
         let handler = VNImageRequestHandler(ciImage: inputImage)
         let request = VNGenerateForegroundInstanceMaskRequest()
         

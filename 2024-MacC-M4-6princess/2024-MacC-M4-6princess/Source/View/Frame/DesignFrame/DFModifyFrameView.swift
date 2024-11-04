@@ -11,22 +11,26 @@ struct DFModifyFrame: View {
     @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
+    @State private var draggedOffSet: CGSize = .zero
+    @State private var accumulatedOffSet: CGSize = .zero
     
     var body: some View {
         NavigationStack {
             VStack {
                 ZStack {
+                    Color(hex: "32322f")
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+                    
                     if isFirstLaunching == true {
                         DFOnboardingView(isFirstLaunching: $isFirstLaunching)
                             .zIndex(1)
                     }
                     
-                    if let image = resultImage {
-                        Color(hex: "32322f")
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+                    if let _ = resultImage {
+                        
                         imageView
                             .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
-
+                        
                         RoundedRectangle(cornerRadius: 30)
                             .fill(Color.white)
                             .opacity(viewModel.btnOpacity)
@@ -50,19 +54,41 @@ struct DFModifyFrame: View {
     }
 }
 
-private extension CGSize {
-    static func + (lhs: Self, rhs: Self) -> Self {
-        CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
-    }
-}
-
 private extension DFModifyFrame {
+    
+    
+    var moveImage: some Gesture {
+        
+        DragGesture()
+            .onChanged { value in
+                print("change")
+                draggedOffSet.width = accumulatedOffSet.width + value.translation.width
+                draggedOffSet.height = accumulatedOffSet.height + value.translation.height
+                print("\(value.startLocation)")
+            }
+            .onEnded { value in
+                print("stop")
+                accumulatedOffSet.width += value.translation.width
+                accumulatedOffSet.height += value.translation.height
+            }
+        
+    }
+    
     var imageView: some View {
-        Image(uiImage: resultImage ?? UIImage())
-            .resizable()
-            .scaledToFit()
-            .frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!))
-            .padding(.bottom, 20)
+        ZStack {
+            
+            if let image = resultImage {
+                
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                    .padding(.bottom, 20)
+                    .offset(draggedOffSet)
+                    .gesture(moveImage)
+                
+            }
+        }
     }
     
     var toolBarButtons: some View {
@@ -105,10 +131,13 @@ private extension DFModifyFrame {
     
     func makeHistory() {
         
-        let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / (scaleCompute(resultImage!) * 2), height: resultImage!.size.height / scaleCompute(resultImage!)))
-        render.scale = scaleCompute(resultImage!)
-        viewModel.image = render.uiImage
-        viewModel.imageHistory.append(viewModel.image!)
+        if let image = resultImage {
+            
+            let render = ImageRenderer(content: self.imageView.frame(width: image.size.width / (scaleCompute(image) * 2), height: image.size.height / scaleCompute(image)))
+            render.scale = scaleCompute(image)
+            viewModel.image = render.uiImage
+            viewModel.imageHistory.append(viewModel.image!)
+        }
         
     }
     
