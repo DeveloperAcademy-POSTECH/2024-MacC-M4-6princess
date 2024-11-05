@@ -11,6 +11,7 @@ struct CameraTimerView: View {
     @StateObject var motionManager = MotionManager()
     @Binding var delayTime: Double
     @Binding var isPushed: Int
+    
     var body: some View {
         VStack(alignment: .center, spacing: 4)  {
             Button {

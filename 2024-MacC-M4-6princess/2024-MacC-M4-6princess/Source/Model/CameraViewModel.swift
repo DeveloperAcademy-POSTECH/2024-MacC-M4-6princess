@@ -11,6 +11,9 @@ import Photos
 
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
+    @AppStorage("openFirstTime") var firstTime = false
+    //    @State var firstTime = false
+    
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false
     @Published var isSavedPhotoData = false
@@ -20,10 +23,33 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var frameSize = CGRect(origin: .zero, size: .zero)
     @Published var preview: AVCaptureVideoPreviewLayer!
     
+    // 프레임 관련 상태
+    @Published var frameImage: UIImage?
+    @Published var frameRatio: CGFloat = 4/3
+    
+    // 타이머 관련 상태
+    @Published var delayTime: TimeInterval = 0.0
+    @Published var isPushedTimer = 0
+    @Published var isTakePic = false
+    
+    // 프레임 선택 관련 상태
+    @Published var isFrameSelect = false
+    @Published var isFullScreenPop: Bool = false
+    @Published var selectedFrame: UUID? = nil
+    @Published var isFrameSelected: Bool = false
+    @Published var showAlert = false
+    
+    // 이미지 관련
+    @Published var idolImg: UIImage
+    let defaultImg: UIImage
+    
+    
     let cameraManager: CameraManager
     
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
+        self.idolImg = UIImage(named: "Felix") ?? UIImage()
+        self.defaultImg = UIImage(named: "6princess") ?? UIImage()
         super.init()
         setupPreviewLayer()
     }
@@ -145,18 +171,5 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         
         return normalizedImage
     }
-    
-    
-    func dataToUIImage() -> UIImage? {
-        guard let image = UIImage(data: self.picData) else{
-            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
-            return nil
-        }
-        print("이미지가 UIImage로 변환되었습니다.")
-        
-        return image
-    }
-    
-    
 }
 

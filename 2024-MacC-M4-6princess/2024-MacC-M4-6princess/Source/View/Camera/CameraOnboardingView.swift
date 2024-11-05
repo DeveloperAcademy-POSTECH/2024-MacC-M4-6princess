@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CameraOnboardingView: View {
-    @Binding var firstTime: Bool
+    @ObservedObject var viewModel: CameraViewModel
     
     var body: some View {
         VStack {
@@ -51,7 +51,7 @@ struct CameraOnboardingView: View {
                                 
                             }
                             .onTapGesture {
-                                firstTime = true
+                                viewModel.firstTime = true
                             }
                         }
                         .padding(.leading, -10)

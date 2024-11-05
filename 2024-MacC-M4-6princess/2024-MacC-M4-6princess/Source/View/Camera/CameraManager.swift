@@ -21,150 +21,129 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     @Published var output: AVCapturePhotoOutput
     
     init(session: AVCaptureSession = AVCaptureSession(),
-             videoDeviceInput: AVCaptureDeviceInput? = nil,
-             output: AVCapturePhotoOutput = AVCapturePhotoOutput()) {
-            self.session = session
-            self.videoDeviceInput = videoDeviceInput
-            self.output = output
-            super.init()
-        }
+         videoDeviceInput: AVCaptureDeviceInput? = nil,
+         output: AVCapturePhotoOutput = AVCapturePhotoOutput()) {
+        self.session = session
+        self.videoDeviceInput = videoDeviceInput
+        self.output = output
+        super.init()
+    }
     
     enum AuthorizationStatus {
-            case authorized
-            case notDetermined
-            case denied
-            case restricted
-            
-            static func fromAVAuthorizationStatus(_ status: AVAuthorizationStatus) -> AuthorizationStatus {
-                switch status {
-                case .authorized: return .authorized
-                case .notDetermined: return .notDetermined
-                case .denied: return .denied
-                case .restricted: return .restricted
-                @unknown default: return .denied
-                }
+        case authorized
+        case notDetermined
+        case denied
+        case restricted
+        
+        static func fromAVAuthorizationStatus(_ status: AVAuthorizationStatus) -> AuthorizationStatus {
+            switch status {
+            case .authorized: return .authorized
+            case .notDetermined: return .notDetermined
+            case .denied: return .denied
+            case .restricted: return .restricted
+            @unknown default: return .denied
             }
         }
+    }
     
     enum SetupResult {
-            case success
-            case failed(Error)
-            case notAuthorized
-        }
-
+        case success
+        case failed(Error)
+        case notAuthorized
+    }
+    
+    // In CameraManager.swift, modify checkVideoAuthorizaion():
     func checkVideoAuthorizaion() {
-            switch AVCaptureDevice.authorizationStatus(for: .video) {
-            case .authorized:
-                setUp()
-            case .notDetermined:
-                AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
-                    if granted {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.setUp()
+            }
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+                if granted {
+                    DispatchQueue.global(qos: .userInitiated).async {
                         self?.setUp()
                     }
                 }
-            case .denied:
-                return
-            case .restricted:
-                return
-            @unknown default:
-                return
             }
+        case .denied:
+            print("카메라 접근권한 denied")
+        case .restricted:
+            print("카메라 접근권한 restricted")
+        @unknown default:
+            print("카메라 접근권한 알 수 없는 상태")
         }
+    }
     
     func setUp() {
-        do {
-            //config 세팅
+        
+        self.session.automaticallyConfiguresCaptureDeviceForWideColor = false
+            
+            // 이미 실행 중이면 중단
+            if self.session.isRunning {
+                return
+            }
+            
+            // 세션 구성 시작
+            self.session = AVCaptureSession()
             self.session.beginConfiguration()
-            let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
             
-            let input = try AVCaptureDeviceInput(device: device!)
+            // 기존 입력/출력 모두 제거
+            self.session.inputs.forEach { self.session.removeInput($0) }
+            self.session.outputs.forEach { self.session.removeOutput($0) }
             
-            //입력값, 출력값 체크하고 세션에 추가
-            if self.session.canAddInput(input) {
-                self.session.addInput(input)
-                self.videoDeviceInput = input
+            do {
+                // 카메라 디바이스 설정
+                guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else {
+                    print("카메라를 찾을 수 없습니다")
+                    return
+                }
+                
+                // 새 입력 생성
+                let input = try AVCaptureDeviceInput(device: device)
+                if self.session.canAddInput(input) {
+                    self.session.addInput(input)
+                    self.videoDeviceInput = input
+                }
+                
+                // 출력 설정
+                if self.session.canAddOutput(self.output) {
+                    self.session.addOutput(self.output)
+                }
+                
+                // 세션 구성 완료
+                self.session.commitConfiguration()
+                
+                // 메인 큐에서 세션 시작
+                DispatchQueue.main.async {
+                    self.session.startRunning()
+                }
+            } catch {
+                print("카메라 설정 오류: \(error)")
             }
-            
-            if self.session.canAddOutput(output) {
-                self.session.addOutput(output)
-            }
-            
-            self.session.commitConfiguration()
-            
         }
-        catch {
-            print(error.localizedDescription)
-        }
-    }
     
     func changeCamera() {
-        guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else {
-            print("현재 입력을 찾을 수 없습니다.")
-            return
+        guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else { return }
+        
+        session.beginConfiguration()
+        
+        // 기존 입력 제거
+        session.removeInput(currentInput)
+        
+        let newPosition: AVCaptureDevice.Position = currentInput.device.position == .front ? .back : .front
+        guard let newDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition),
+              let newInput = try? AVCaptureDeviceInput(device: newDevice) else { return }
+        
+        // 새로운 입력 추가
+        if session.canAddInput(newInput) {
+            session.addInput(newInput)
+            self.videoDeviceInput = newInput
         }
         
-        let currentPosition = currentInput.device.position
-        let preferredPosition: AVCaptureDevice.Position
-        
-        switch currentPosition {
-        case .unspecified, .front:
-            print("후면 카메라로 전환합니다.")
-            preferredPosition = .back
-            
-        case .back:
-            print("전면 카메라로 전환합니다.")
-            preferredPosition = .front
-            
-        @unknown default:
-            print("알 수 없는 포지션. 후면 카메라로 전환합니다.")
-            preferredPosition = .back
-        }
-        
-        // 새로운 카메라 장치 가져오기
-        guard let newVideoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: preferredPosition) else {
-            print("카메라 장치를 찾을 수 없습니다.")
-            return
-        }
-        
-        do {
-            let newVideoDeviceInput = try AVCaptureDeviceInput(device: newVideoDevice)
-            self.session.beginConfiguration()
-            
-            // 기존 입력 제거
-            for input in self.session.inputs {
-                self.session.removeInput(input)
-            }
-            
-            // 새로운 입력 추가
-            if self.session.canAddInput(newVideoDeviceInput) {
-                self.session.addInput(newVideoDeviceInput)
-                self.videoDeviceInput = newVideoDeviceInput // 새로운 입력 저장
-            } else {
-                print("새로운 입력을 추가할 수 없습니다.")
-                self.session.addInput(currentInput) // 기존 입력 복원
-            }
-            
-            // 새로운 카메라의 활성 포맷 확인
-            let activeFormat = newVideoDevice.activeFormat
-            let maxDimensions = activeFormat.highResolutionStillImageDimensions
-            
-            // 비디오 안정화 설정
-            if let connection = self.output.connection(with: .video) {
-                if connection.isVideoStabilizationSupported {
-                    connection.preferredVideoStabilizationMode = .auto
-                }
-            }
-            
-            // 출력 설정
-            output.maxPhotoDimensions = maxDimensions
-            output.maxPhotoQualityPrioritization = .quality
-            
-            self.session.commitConfiguration()
-        } catch {
-            print("카메라 전환 중 오류 발생: \(error)")
-        }
+        session.commitConfiguration()
     }
-    
     
     func startSession() {
         DispatchQueue.main.async {
@@ -179,7 +158,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func takePicture(delegate: AVCapturePhotoCaptureDelegate) {
-            let settings = AVCapturePhotoSettings()
-            output.capturePhoto(with: settings, delegate: delegate)
-        }
+        let settings = AVCapturePhotoSettings()
+        output.capturePhoto(with: settings, delegate: delegate)
+    }
 }
