@@ -86,7 +86,6 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             }
             
             // 세션 구성 시작
-            self.session = AVCaptureSession()
             self.session.beginConfiguration()
             
             // 기존 입력/출력 모두 제거

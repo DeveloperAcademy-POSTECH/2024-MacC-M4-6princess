@@ -12,7 +12,7 @@ import Photos
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     @AppStorage("openFirstTime") var firstTime = false
-    //    @State var firstTime = false
+//        @State var firstTime = false
     
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false
@@ -89,10 +89,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //            }
     //        }
     //    }
-    
-    func startCamera() {
-        cameraManager.checkVideoAuthorizaion()
-    }
+
     
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
         print("카메라 셔터음 무음으로 변경됨")

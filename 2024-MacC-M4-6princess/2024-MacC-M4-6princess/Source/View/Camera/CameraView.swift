@@ -40,11 +40,65 @@ struct CameraView: View {
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end
-                //처음 실행했을 때
+                //처음 실행했을 때 - 온보딩 합침
                 if !viewModel.firstTime  {
-                    CameraOnboardingView(viewModel: viewModel)
-                        .ignoresSafeArea(.all, edges: .all)
-                        .zIndex(1)
+                    VStack {
+                        ZStack {
+                            Text("최애와 사진을 찍기 위해\n프레임 선택하기")
+                                .font(.system(size: 17))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.white)
+                            VStack(alignment: .leading){
+                                Spacer()
+                                
+                                HStack {
+                                    VStack {
+                                        Image("handPointer")
+                                            .resizable()
+                                            .frame(width: 114, height: 114)
+                                            .padding(.bottom, 20)
+                                            
+                                        
+                                        VStack {
+                                            ZStack {
+                                                Rectangle()
+                                                    .cornerRadius(5)
+                                                    .frame(width: 40, height: 40)
+                                                    .foregroundColor(.pointPink)
+                                                
+                                                Image("frameLoadWhite")
+                                                    .resizable()
+                                                    .frame(width: 40, height: 40)
+                                            }
+                                            .padding(.bottom, 4)
+                                            .padding(.leading, -8)
+                                            
+                                            Text("불러오기")
+                                                .font(.system(size: 13))
+                                                .multilineTextAlignment(.center)
+                                                .foregroundColor(.white)
+                                                .padding(.bottom, 35)
+                                                .padding(.leading, -8)
+                                            
+                                        }
+                                        .onTapGesture {
+                                            viewModel.firstTime = true
+                                            viewModel.isFrameSelect.toggle()
+                                        }
+                                    }
+                                    .padding(.leading, -10)
+                                    Spacer()
+                                }
+                            }
+                        }
+                        
+                        
+                    }
+                    .ignoresSafeArea(.all)
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                        .background(.black)
+                        .opacity(0.8)
+                      
                 }
                 if viewModel.delayTime != 0 && viewModel.isTakePic == true {
                     CameraTimerSecondsView(delayTime: $viewModel.delayTime, isTakePic: $viewModel.isTakePic)
@@ -58,13 +112,25 @@ struct CameraView: View {
             .onAppear(perform: {
                 viewModel.cameraManager.checkVideoAuthorizaion()
                 motionManager.startDeviceMotionUpdates()
+                viewModel.isFrameSelect = false
             })
             .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
-                CameraFrameSelectView(isFullScreenPop: $viewModel.isFullScreenPop, selectedFrame: $viewModel.selectedFrame, isFrameSelected: $viewModel.isFrameSelected)
+                CameraFrameSelectView(viewModel: viewModel)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 
             }
+//            .onChange(of: viewModel.isFrameSelect) { newValue in
+//                if !newValue {  // 프레임 선택 뷰가 닫힐 때
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // 약간의 지연을 주어 뷰 전환이 완료된 후 실행
+//                        viewModel.cameraManager.stopSession()  // 기존 세션을 중지
+//                        viewModel.cameraManager.setUp()        // 새로 설정
+//                        viewModel.cameraManager.startSession() // 세션 재시작
+//                    }
+//                } else {  // 프레임 선택 뷰가 열릴 때
+//                    viewModel.cameraManager.stopSession()  // 세션 중지
+//                }
+//            }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
@@ -89,6 +155,7 @@ struct CameraView: View {
 //                width: screenWidth,
 //                height: desiredHeight
 //            )
+            
         }
         
     }

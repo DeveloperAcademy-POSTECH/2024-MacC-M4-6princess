@@ -42,6 +42,7 @@ struct CameraBottomView: View {
                         self.viewModel.isTakePic = true
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                             viewModel.takePic()
+                            viewModel.cameraManager.stopSession()
                         }
                     } else {
                         viewModel.showAlert = true
