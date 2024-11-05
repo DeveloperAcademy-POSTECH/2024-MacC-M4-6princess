@@ -9,7 +9,6 @@ struct DFModifyFrame: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
     @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
-    @ObservedObject var cameraViewModel: CameraViewModel = CameraViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     
