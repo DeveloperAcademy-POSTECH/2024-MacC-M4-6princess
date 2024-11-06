@@ -22,12 +22,15 @@ struct CameraPreview: UIViewRepresentable {
                 viewModel.preview.videoGravity = .resizeAspectFill
                 view.layer.addSublayer(viewModel.preview)
             }
-        viewModel.cameraManager.startSession()
+        DispatchQueue.main.async {
+            viewModel.cameraManager.session.startRunning()
+                }
             
             return view
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-//        viewModel.preview.frame = uiView.bounds
+//        viewModel.cameraManager.stopSession()
+        viewModel.preview.frame = uiView.bounds
     }
 }

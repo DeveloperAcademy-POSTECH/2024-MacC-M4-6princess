@@ -56,13 +56,13 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     func checkVideoAuthorizaion() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            DispatchQueue.global(qos: .userInitiated).async {
+            DispatchQueue.main.async {
                 self.setUp()
             }
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 if granted {
-                    DispatchQueue.global(qos: .userInitiated).async {
+                    DispatchQueue.main.async {
                         self?.setUp()
                     }
                 }

@@ -23,6 +23,9 @@ struct CameraView: View {
                         CameraPreview(viewModel: viewModel)
                             .frame(width: viewModel.frameSize.width,height: viewModel.frameSize.height)
                             .ignoresSafeArea(.all, edges: .all)
+//                            .onAppear {
+//                                viewModel.cameraManager.startSession()
+//                            }
                         Group{
                             if let image = viewModel.frameImage {
                                 Image(uiImage: image)

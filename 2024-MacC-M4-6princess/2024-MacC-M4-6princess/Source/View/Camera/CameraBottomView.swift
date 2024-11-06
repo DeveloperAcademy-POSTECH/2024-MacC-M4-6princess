@@ -22,7 +22,7 @@ struct CameraBottomView: View {
                     print("프레임 버튼 눌림")
                 } label: {
                     VStack(alignment: .center, spacing: 4) {
-                        Image("frameLoad")
+                        Image(viewModel.firstTime ? "frameLoadPink" : "frameLoad")
                             .resizable()
                             .frame(width: 40, height: 40)
                             .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
