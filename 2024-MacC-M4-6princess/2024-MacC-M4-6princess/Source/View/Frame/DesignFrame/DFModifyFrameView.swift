@@ -169,7 +169,7 @@ private extension DFModifyFrame {
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-            print("\(scale)")
+//            print("\(scale)")
         }
         return scale
     }
@@ -214,11 +214,13 @@ private extension DFModifyFrame {
         viewModel.image = render.uiImage
         addImage(data: viewModel.image?.pngData())
         viewModel.btnOpacity = 1
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
-            viewModel.btnOpacity = 0
-        }
+//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+//            viewModel.btnOpacity = 0
+//        }
+        print("저장잘됨")
         viewModel.isShowCamera = true
     }
+    
     func checkScreenState(_ image: UIImage?) -> String {
         if image!.size.width > image!.size.height {
             return "horizon"
