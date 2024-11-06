@@ -5,9 +5,11 @@ struct ResultView: View {
     
     var body: some View {
         VStack {
-            Image(uiImage: image!)
-                .resizable()
-                .scaledToFit()
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+            }
         }
     }
 }
