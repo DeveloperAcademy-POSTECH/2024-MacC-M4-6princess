@@ -40,7 +40,7 @@ struct IEMainView: View {
             }
             
             VStack{
-                TopBar()
+                topBar()
                 Spacer()
             }
             VStack{
@@ -53,7 +53,7 @@ struct IEMainView: View {
                         ColorSlider(idx)
                     }
                 }
-                BottomBar()
+                bottomBar()
             }
             /// 원본 보기 클릭시 1초간 "원본" 표시가 남
             if viewModel.showRawAlert{

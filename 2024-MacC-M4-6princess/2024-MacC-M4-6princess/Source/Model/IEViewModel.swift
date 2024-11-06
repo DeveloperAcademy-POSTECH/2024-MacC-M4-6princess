@@ -51,6 +51,7 @@ class IEViewModel: ObservableObject {
     @Published var temp = History(size: .zero, loc: .zero, ang: .zero, sliderValues: [0.0, 1.0, 1.0]) // 원본보기 클릭시 데이터 저장용
     @Published var showRawAlert = false
     @Published var isRawImage = false
+    @Published var rawNoSave = false
     
     
     /// 핀치 제스처 (사용x)

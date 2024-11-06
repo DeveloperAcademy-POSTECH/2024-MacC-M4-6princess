@@ -204,7 +204,7 @@ extension IEMainView{
         }
     }
     
-    func BottomBar() -> some View {
+    func bottomBar() -> some View {
         return HStack() {
             Spacer()
             HStack(spacing: 45) { // 여기에 spacing: 45 추가
@@ -266,7 +266,7 @@ extension IEMainView{
         .frame(height: 80)
     }
     
-    func TopBar() -> some View {
+    func topBar() -> some View {
         return VStack{
             HStack {
                 Spacer()
@@ -307,7 +307,6 @@ extension IEMainView{
                 Spacer()
                     .frame(width: 20)
                 Button {
-                    
                     if !viewModel.redoHistory.isEmpty{
                         guard let lastHistory = viewModel.redoHistory.popLast() else { return }
                         viewModel.undoHistory.append(viewModel.recentPop)
@@ -327,12 +326,23 @@ extension IEMainView{
                     viewModel.saveRenderedView(content: canvasView)
                     viewModel.saveAnimate = true
                     // 5초 후에 isSave를 true로 변경하여 이미지로 전환
+                    if viewModel.isRawImage{
+                        
+                        let one = viewModel.temp
+                        viewModel.recentPop = one
+                        viewModel.frameIdolSize = one.size
+                        viewModel.location = one.loc
+                        viewModel.rotationAngle = one.ang
+                        viewModel.sliderValues = one.sliderValues
+                        viewModel.isRawImage = false
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         viewModel.savePhoto = true
                         //                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         //                            viewModel.saveAnimate = false
                         //                            self.presentationMode.wrappedValue.dismiss()
                         //                        }
+                        
                     }
                 } label: {
                     Text("저장")
@@ -342,7 +352,7 @@ extension IEMainView{
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10.49618)
                 }
-                .disabled(viewModel.isRawImage)
+//                .disabled(viewModel.isRawImage)
                 .padding(.horizontal)
                 
             }
@@ -362,7 +372,7 @@ extension UIImage {
         
         
         
-        let newWidth = originalHeight * targetAspectRatio
+//        let newWidth = originalHeight * targetAspectRatio
         
         cropRect = CGRect(x: 0, y: 0, width: size.width, height: size.width * targetAspectRatio)
         // 크롭 영역을 설정하여 CGImage로 변환
