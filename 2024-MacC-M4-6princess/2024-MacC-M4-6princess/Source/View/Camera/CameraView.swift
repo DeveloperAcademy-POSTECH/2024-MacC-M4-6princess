@@ -11,53 +11,30 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State var frameImage: UIImage?
-    @StateObject var camera = CameraModel()
+    @ObservedObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-    @State var delayTime: TimeInterval = 0.0
-    @State var isPushed = 0
-    @State var isTakePic = false
-    @State var isFrameSelect = false
-    @State var isFullScreenPop: Bool = false
-    @State var selectedFrame: UUID? = nil
-    @State var isFrameSelected: Bool = false
-    @State private var showAlert = false
-    //    @State var camera.frameSize = CGRect(origin: .zero, size: .zero)
+    //TODO: 바인딩 변수로 방금 만든 frame 불러오기
     
-    @State var idolImg = UIImage(named: "Felix")!
-    //    @State private var firstTime = false
-    //    @AppStorage("openFirstTime") private var firstTime = false
-    @State var firstTime = false
-    var defaultImg: UIImage = UIImage(named: "6princess")!
-    @State var frameRatio:CGFloat = 4/3
+    private var cameraPreview: some View  {
+        GeometryReader { geo in
+            CameraPreview(viewModel: viewModel)
+                .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                .onAppear {
+                    viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                }
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 VStack{
-                    HStack(alignment: .bottom) {
-                        Spacer()
-                        VStack {
-                            Spacer()
-                            Button {
-                                camera.changeCamera()
-                            } label: {
-                                Image("cameraReverseIcon")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                                    .animation(.easeInOut, value: motionManager.currentOrientation)
-                                
-                            }.padding(.trailing, 20)
-                        }
-                    }
-                    .frame(width: UIScreen.main.bounds.width, height: 82)
-                    .background(.white)
+                    CameraTopView(viewModel: viewModel)
                     ZStack{
-                        CameraPreview(camera: camera)
-                            .frame(width: camera.frameSize.width,height: camera.frameSize.height)
-                            .ignoresSafeArea(.all, edges: .all)
+                        cameraPreview
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
                         Group{
-                            if let image = frameImage {
+                            if let image = viewModel.frameImage {
                                 Image(uiImage: image)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
@@ -66,121 +43,137 @@ struct CameraView: View {
                         .onAppear {
                             loadSelectedFrame()
                         }
-                        .onChange(of: selectedFrame) {
+                        .onChange(of: viewModel.selectedFrame) {
                             loadSelectedFrame()
                         }
                     }
-                    VStack{
-                        HStack (alignment: .center){
-                            
-                            //프레임 불러오기 버튼
-                            Button {
-                                isFrameSelect = true
-                            } label: {
-                                VStack(alignment: .center, spacing: 4) {
-                                    Image("frameLoad")
-                                        .resizable()
-                                        .frame(width: 40, height: 40)
-                                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                                        .animation(.easeInOut, value: motionManager.currentOrientation)
-                                    Text("불러오기")
-                                        .font(Font.custom("SF Pro", size: 13))
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                                }
-                            }
-                            
-                            Spacer()
-                            
-                            //셔터 버튼
-                            Button {
-                                if isFrameSelected {
-                                    self.isTakePic = true
-                                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
-                                        camera.takePic()
-                                    }
-                                } else {
-                                    showAlert = true
-                                }
-                            } label: {
-                                Image("shutterImage")
-                                    .resizable()
-                                    .frame(width: 80, height: 80)
-                                    .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                                    .animation(.easeInOut, value: motionManager.currentOrientation)
-                            }
-                            .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $showAlert) {
-                                Button("닫기", role: .cancel) { }
-                            } message: {
-                                Text("")
-                            }
-                            
-                            Spacer()
-                            
-                            //타이머 설정 버튼
-                            CameraTimerView(delayTime: $delayTime, isPushed: $isPushed)
-                        }
-                        Spacer()
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    .frame(width: UIScreen.main.bounds.width, height: 132)
-                    .background(.white)
+                    CameraBottomView(viewModel: viewModel)
                 }
                 //v end
-                //처음 실행했을 때
-                if !firstTime  {
-                    CameraOnboardingView(firstTime: $firstTime)
-                        .ignoresSafeArea(.all, edges: .all)
-                        .zIndex(1)
+                //처음 실행했을 때 - 온보딩 합침
+                if !viewModel.firstTime  {
+                    VStack {
+                        ZStack {
+                            Text("최애와 사진을 찍기 위해\n프레임 선택하기")
+                                .font(.system(size: 17))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.white)
+                            VStack(alignment: .leading){
+                                Spacer()
+                                
+                                HStack {
+                                    VStack {
+                                        Image("handPointer")
+                                            .resizable()
+                                            .frame(width: 114, height: 114)
+                                            .padding(.bottom, 20)
+                                            
+                                        
+                                        VStack {
+                                            ZStack {
+                                                Rectangle()
+                                                    .cornerRadius(5)
+                                                    .frame(width: 40, height: 40)
+                                                    .foregroundColor(.pointPink)
+                                                
+                                                Image("frameLoadWhite")
+                                                    .resizable()
+                                                    .frame(width: 40, height: 40)
+                                            }
+                                            .padding(.bottom, 4)
+                                            .padding(.leading, -8)
+                                            
+                                            Text("불러오기")
+                                                .font(.system(size: 13))
+                                                .multilineTextAlignment(.center)
+                                                .foregroundColor(.white)
+                                                .padding(.bottom, 35)
+                                                .padding(.leading, -8)
+                                            
+                                        }
+                                        .onTapGesture {
+                                            viewModel.firstTime = true
+                                            viewModel.isFrameSelect.toggle()
+                                        }
+                                    }
+                                    .padding(.leading, -10)
+                                    Spacer()
+                                }
+                            }
+                        }
+                        
+                        
+                    }
+                    .ignoresSafeArea(.all)
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                        .background(.black)
+                        .opacity(0.8)
+                      
                 }
-                if delayTime != 0 && isTakePic == true {
-                    CameraTimerSecondsView(delayTime: $delayTime, isTakePic: $isTakePic)
+                if viewModel.delayTime != 0 && viewModel.isTakePic == true {
+                    CameraTimerSecondsView(delayTime: $viewModel.delayTime, isTakePic: $viewModel.isTakePic)
                         .ignoresSafeArea(.all, edges: .all)
                 }
                 
                 
                 
             }
-            //            .ignoresSafeArea(.all, edges: .all)
-            //home indicator 잠깐 숨겨봤는데.. 잘 모르겠네요
             .persistentSystemOverlays(.hidden)
-            .onAppear(perform: {
-                camera.checkVideoAuthorizaion()
+            .onAppear {
+                viewModel.cameraManager.startSession()
                 motionManager.startDeviceMotionUpdates()
-                //                    DispatchQueue.main.async {
-                //                        camera.session.startRunning()
-                //                    }
-            })
-            .fullScreenCover(isPresented: $isFrameSelect) {
-                CameraFrameSelectView(isFullScreenPop: $isFullScreenPop, selectedFrame: $selectedFrame, isFrameSelected: $isFrameSelected)
+//                viewModel.isFrameSelect = false
+            }
+            .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
+                CameraFrameSelectView(viewModel: viewModel)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 
             }
+//            .onChange(of: viewModel.isFrameSelect) { newValue in
+//                if !newValue {  // 프레임 선택 뷰가 닫힐 때
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // 약간의 지연을 주어 뷰 전환이 완료된 후 실행
+//                        viewModel.cameraManager.stopSession()  // 기존 세션을 중지
+//                        viewModel.cameraManager.setUp()        // 새로 설정
+//                        viewModel.cameraManager.startSession() // 세션 재시작
+//                    }
+//                } else {  // 프레임 선택 뷰가 열릴 때
+//                    viewModel.cameraManager.stopSession()  // 세션 중지
+//                }
+//            }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
-            .navigationDestination(isPresented: $camera.nextView) {
-                if let takenImg = camera.takenImg,let frameImg = frameImage{
+            .navigationDestination(isPresented: $viewModel.nextView) {
+                if let takenImg = viewModel.takenImg,let frameImg = viewModel.frameImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
                 else{
-                    IEIntroView(bg: defaultImg,idol: idolImg)
+                    IEIntroView(bg: viewModel.defaultImg,idol: viewModel.idolImg)
                     
                 }
             }
             
         }
-        //        .ignoresSafeArea(.all)
-        .onAppear{
-            camera.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+        .onAppear {
+            // 프레임 크기 설정
+            viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+            viewModel.cameraManager.checkVideoAuthorizaion()
+//            let screenWidth = UIScreen.main.bounds.width
+//            let desiredHeight = screenWidth * (4.0/3.0)
+//            viewModel.frameSize = CGRect(
+//                x: 0,
+//                y: (UIScreen.main.bounds.height - desiredHeight) / 2,
+//                width: screenWidth,
+//                height: desiredHeight
+//            )
+            
         }
         
     }
     //이미지 렌더링해서 불러오기
     private func loadSelectedFrame() {
-        guard let frameId = selectedFrame else {
-            frameImage = nil
+        guard let frameId = viewModel.selectedFrame else {
+            viewModel.frameImage = nil
             return
         }
         
@@ -191,13 +184,13 @@ struct CameraView: View {
         do {
             let results = try viewContext.fetch(fetchRequest)
             if let storedImage = results.first, let imageData = storedImage.image {
-                frameImage = UIImage(data: imageData)
+                viewModel.frameImage = UIImage(data: imageData)
             } else {
-                frameImage = nil
+                viewModel.frameImage = nil
             }
         } catch {
             print("Error fetching frame: \(error)")
-            frameImage = nil
+            viewModel.frameImage = nil
         }
     }
 }

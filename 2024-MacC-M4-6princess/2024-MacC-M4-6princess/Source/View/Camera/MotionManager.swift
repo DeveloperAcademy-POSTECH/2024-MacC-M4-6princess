@@ -9,8 +9,8 @@ import SwiftUI
 import CoreMotion
 
 class MotionManager: ObservableObject {
+    @Published var currentOrientation: UIDeviceOrientation = .portrait //이걸 model로 따로 빼야하는데
     private var motionManager = CMMotionManager()
-    @Published var currentOrientation: UIDeviceOrientation = .portrait
     private var lastUpdate: Date = Date()
 
     init() {
@@ -46,9 +46,9 @@ class MotionManager: ObservableObject {
     }
     
     private func updateOrientation(attitude: CMAttitude) {
-        if attitude.roll > .pi / 4 {
+        if attitude.roll > .pi / 2 { //예민한 roll 센서 수정함
             currentOrientation = .landscapeRight
-        } else if attitude.roll < -.pi / 4 {
+        } else if attitude.roll < -.pi / 2 {
             currentOrientation = .landscapeLeft
         } else {
             currentOrientation = .portrait
