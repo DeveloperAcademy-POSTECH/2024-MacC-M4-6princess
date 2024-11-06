@@ -134,13 +134,11 @@ class DFFrameEditViewModel: ObservableObject {
         }
         
         Task { @MainActor in
-            
             if let maskImage = maskImage {
                 
                 let outputImage = apply(mask: CIImage(image: maskImage)!, to: inputImage)
                 resultImage = convertToUIImage(ciImage: outputImage)
                 self.resultImage = resultImage
-                
             }
         }
     }
@@ -181,7 +179,6 @@ class DFFrameEditViewModel: ObservableObject {
     //    }
     
     private func createMask(from inputImage: CIImage) -> CIImage? {
-        
         let handler = VNImageRequestHandler(ciImage: inputImage)
         let request = VNGenerateForegroundInstanceMaskRequest()
         
@@ -192,7 +189,6 @@ class DFFrameEditViewModel: ObservableObject {
                 let mask = try result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler)
                 return CIImage(cvPixelBuffer: mask)
             }
-            
         } catch {
             print(error)
         }
@@ -218,7 +214,6 @@ class DFFrameEditViewModel: ObservableObject {
     }
     
     func appendMaskImage(_ inputImage: UIImage?) {
-        
         if let image = inputImage {
             if indexOfMask < maskImageList.count - 1 {
                 for _ in indexOfMask+1..<maskImageList.count {

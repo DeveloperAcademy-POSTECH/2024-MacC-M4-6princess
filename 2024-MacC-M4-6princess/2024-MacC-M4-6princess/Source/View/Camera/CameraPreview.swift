@@ -11,7 +11,8 @@ import AVFoundation
 ///카메라 화면 프리뷰
 struct CameraPreview: UIViewRepresentable{
     
-    @ObservedObject var camera: CameraModel
+    @ObservedObject var camera: CameraViewModel
+//    @ObservedObject var manager: CamaraManager
 //    let frame : CGRect // 프레임 크기
     func makeUIView(context: Context) -> UIView {
         
@@ -20,7 +21,7 @@ struct CameraPreview: UIViewRepresentable{
         // AVCaptureVideoPreviewLayer 생성
         
         DispatchQueue.main.async {
-            camera.preview = AVCaptureVideoPreviewLayer(session: camera.session)
+            camera.preview = AVCaptureVideoPreviewLayer(session: camera.cameraManager.session)
             camera.preview.frame = view.frame // 크기 수정
             //            camera.preview.frame = frame // 크기 수정
             camera.preview.videoGravity = .resizeAspectFill
@@ -30,23 +31,17 @@ struct CameraPreview: UIViewRepresentable{
         }
         
         //starting session
+        
         DispatchQueue.main.async {
-            camera.session.startRunning()
+            camera.cameraManager.startSession()
         }
-//        DispatchQueue.global(qos: .background).async {
-//            camera.session.startRunning()
-//        }
         
         return view
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-//        if camera.isTaken {
-//                    camera.session.stopRunning()
-//                }else {
-//                    DispatchQueue.global(qos: .background).async {
-//                        camera.session.startRunning()
-//                    }
+//        if camera.isTakenPhoto {
+//            camera.cameraManager.stopSession()
 //                }
     }
 }

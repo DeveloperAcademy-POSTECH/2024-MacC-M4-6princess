@@ -11,25 +11,23 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State var frameImage: UIImage?
-    @StateObject var camera = CameraModel()
+    @StateObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
+    @State var frameImage: UIImage?
     @State var delayTime: TimeInterval = 0.0
-    @State var isPushed = 0
+    @State var isPushedTimer = 0
     @State var isTakePic = false
     @State var isFrameSelect = false
     @State var isFullScreenPop: Bool = false
     @State var selectedFrame: UUID? = nil
     @State var isFrameSelected: Bool = false
     @State private var showAlert = false
-    //    @State var camera.frameSize = CGRect(origin: .zero, size: .zero)
-    
     @State var idolImg = UIImage(named: "Felix")!
-    //    @State private var firstTime = false
     //    @AppStorage("openFirstTime") private var firstTime = false
     @State var firstTime = false
     var defaultImg: UIImage = UIImage(named: "6princess")!
     @State var frameRatio:CGFloat = 4/3
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -39,7 +37,7 @@ struct CameraView: View {
                         VStack {
                             Spacer()
                             Button {
-                                camera.changeCamera()
+                                viewModel.changeCamera()
                             } label: {
                                 Image("cameraReverseIcon")
                                     .resizable()
@@ -53,8 +51,8 @@ struct CameraView: View {
                     .frame(width: UIScreen.main.bounds.width, height: 82)
                     .background(.white)
                     ZStack{
-                        CameraPreview(camera: camera)
-                            .frame(width: camera.frameSize.width,height: camera.frameSize.height)
+                        CameraPreview(camera: viewModel)
+                            .frame(width: viewModel.frameSize.width,height: viewModel.frameSize.height)
                             .ignoresSafeArea(.all, edges: .all)
                         Group{
                             if let image = frameImage {
@@ -84,7 +82,7 @@ struct CameraView: View {
                                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                         .animation(.easeInOut, value: motionManager.currentOrientation)
                                     Text("불러오기")
-                                        .font(Font.custom("SF Pro", size: 13))
+                                        .font(.system(size: 13))
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
                                 }
@@ -97,7 +95,7 @@ struct CameraView: View {
                                 if isFrameSelected {
                                     self.isTakePic = true
                                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayTime) {
-                                        camera.takePic()
+                                        viewModel.takePic()
                                     }
                                 } else {
                                     showAlert = true
@@ -118,7 +116,7 @@ struct CameraView: View {
                             Spacer()
                             
                             //타이머 설정 버튼
-                            CameraTimerView(delayTime: $delayTime, isPushed: $isPushed)
+                            CameraTimerView(delayTime: $delayTime, isPushed: $isPushedTimer)
                         }
                         Spacer()
                     }
@@ -142,11 +140,9 @@ struct CameraView: View {
                 
                 
             }
-            //            .ignoresSafeArea(.all, edges: .all)
-            //home indicator 잠깐 숨겨봤는데.. 잘 모르겠네요
             .persistentSystemOverlays(.hidden)
             .onAppear(perform: {
-                camera.checkVideoAuthorizaion()
+                viewModel.startCamera()
                 motionManager.startDeviceMotionUpdates()
                 //                    DispatchQueue.main.async {
                 //                        camera.session.startRunning()
@@ -160,8 +156,8 @@ struct CameraView: View {
             }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
-            .navigationDestination(isPresented: $camera.nextView) {
-                if let takenImg = camera.takenImg,let frameImg = frameImage{
+            .navigationDestination(isPresented: $viewModel.nextView) {
+                if let takenImg = viewModel.takenImg,let frameImg = frameImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
                 else{
@@ -171,9 +167,8 @@ struct CameraView: View {
             }
             
         }
-        //        .ignoresSafeArea(.all)
         .onAppear{
-            camera.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+            viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
         }
         
     }

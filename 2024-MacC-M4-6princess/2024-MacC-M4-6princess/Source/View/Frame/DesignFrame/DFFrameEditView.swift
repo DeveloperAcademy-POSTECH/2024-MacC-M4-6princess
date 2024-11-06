@@ -261,7 +261,6 @@ private extension DFFrameEditView {
             }
         }
     }
-    
     var toolBarButtons: some View {
         HStack {
             Button {
@@ -318,9 +317,7 @@ private extension DFFrameEditView {
         
         HStack(spacing: UIScreen.main.bounds.width / 2.4) {
             Button {
-                
                 toolSelect("brush")
-                
             } label: {
                 ZStack {
                     Circle()
@@ -337,7 +334,6 @@ private extension DFFrameEditView {
             }
             
             Button {
-                
                 toolSelect("erase")
                 
             } label: {
@@ -441,7 +437,6 @@ private extension DFFrameEditView {
                 selectionModeIndex = 1
             }
         }
-        
     }
     
     private func deleteAllLines() {

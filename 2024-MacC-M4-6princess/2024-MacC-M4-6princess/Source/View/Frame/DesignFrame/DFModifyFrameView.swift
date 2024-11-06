@@ -151,7 +151,7 @@ private extension DFModifyFrame {
 private extension DFModifyFrame {
     
     func makeHistory() {
-        
+
         if let image = resultImage {
             
             let render = ImageRenderer(content: self.imageView.frame(width: image.size.width / (scaleCompute(image) * 2), height: image.size.height / scaleCompute(image)))
@@ -218,8 +218,6 @@ private extension DFModifyFrame {
             viewModel.btnOpacity = 0
         }
         viewModel.isShowCamera = true
-        
-        
     }
     func checkScreenState(_ image: UIImage?) -> String {
         if image!.size.width > image!.size.height {
@@ -228,5 +226,4 @@ private extension DFModifyFrame {
             return "vertical"
         }
     }
-    
 }
