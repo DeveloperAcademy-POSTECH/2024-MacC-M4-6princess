@@ -13,10 +13,11 @@ struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-    @Binding var inputImage: UIImage?
+//    @Binding var inputImage: UIImage?
     //TODO: 바인딩 변수로 방금 만든 frame 불러오기
     
     private var cameraPreview: some View  {
+        
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)

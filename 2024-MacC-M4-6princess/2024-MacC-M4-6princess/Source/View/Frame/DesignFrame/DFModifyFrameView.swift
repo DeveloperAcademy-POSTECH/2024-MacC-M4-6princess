@@ -39,7 +39,7 @@ struct DFModifyFrame: View {
             toolBarButtons
         }
         .navigationDestination(isPresented: $viewModel.isShowCamera) {
-            CameraView(inputImage: $viewModel.image)
+            CameraView()
         }
         .onAppear {
             makeHistory()
@@ -86,7 +86,7 @@ private extension DFModifyFrame {
                 viewModel.setScaleVolume(value.magnification)
             }
             .onEnded { value in
-                viewModel.setScaleValue(minimum: 1.0, maximum: 3.0)
+                viewModel.setScaleValue(minimum: 0.5, maximum: 3.0)
             }
     }
     
