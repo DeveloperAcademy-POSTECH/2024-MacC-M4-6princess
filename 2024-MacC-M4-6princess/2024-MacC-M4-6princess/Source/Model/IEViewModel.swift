@@ -78,7 +78,7 @@ class IEViewModel: ObservableObject {
         self.screenSize = bounds
         
         // 배경이미지를 scaleToFit하게 만듬
-        self.frameBGSize = CGSize(width: screenSize.width, height: screenSize.width / 3 * 4 )
+        self.frameBGSize = CGSize(width: screenSize.width, height: screenSize.width * (bgImg.size.height/bgImg.size.width))
         
         self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)) // baseWidth를 100으로 지정,세로는 계산
         
@@ -120,8 +120,14 @@ class IEViewModel: ObservableObject {
     @MainActor
     func saveRenderedView<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
         // ImageRenderer를 이용해서 합성 이미지 생성
-        let renderedImage = ImageRenderer(content: content.frame(width: frameBGSize.width, height: frameBGSize.height))
-        
+        //        let renderedImage = ImageRenderer(content: content.frame(width: frameBGSize.width, height: frameBGSize.height))
+        //
+        //        let startPoint = CGPoint(x: 0, y: 82)
+        let renderedImage = ImageRenderer(
+            content: content
+                .frame(width: frameBGSize.width, height: frameBGSize.width * 1.54)
+            //                    .offset(x: startPoint.x, y: startPoint.y) // 원하는 시작 위치 설정
+        )
         // 해상도
         renderedImage.scale = 8.0
         

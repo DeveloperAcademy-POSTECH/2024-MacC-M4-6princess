@@ -19,19 +19,22 @@ struct IEMainView: View {
     var body: some View {
         ZStack{
             ZStack{
-                VStack{// 캔버스 뷰를 vetical center 정렬
+                //                 캔버스 뷰를 vetical center 정렬
+                VStack{
                     Spacer()
                     // 후보정 레이어 편집 뷰
                     canvasView
                         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     Spacer()
                 }
+                //                canvasView
+                //                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                 VStack{
                     Color.white
-                        .frame(width:viewModel.frameBGSize.width,height: (viewModel.screenSize.height - viewModel.frameBGSize.height)/2 )
+                        .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2+11)
                     Spacer()
                     Color.white
-                        .frame(width:viewModel.frameBGSize.width,height: (viewModel.screenSize.height - viewModel.frameBGSize.height)/2 )
+                        .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2)
                 }
                 .ignoresSafeArea(.all)
             }
