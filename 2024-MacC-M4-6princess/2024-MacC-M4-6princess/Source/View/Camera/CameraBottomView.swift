@@ -25,6 +25,7 @@ struct CameraBottomView: View {
                         Image(viewModel.firstTime ? "frameLoadPink" : "frameLoad")
                             .resizable()
                             .frame(width: 40, height: 40)
+                            .cornerRadius(5)
                             .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                             .animation(.easeInOut, value: motionManager.currentOrientation)
                         Text("불러오기")

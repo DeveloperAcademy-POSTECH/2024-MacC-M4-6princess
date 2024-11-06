@@ -25,7 +25,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     // 프레임 관련 상태
     @Published var frameImage: UIImage?
-//    @Published var frameRatio: CGFloat = 4/3
+    @Published var frameRatio: CGFloat = 1.54
     
     // 타이머 관련 상태
     @Published var delayTime: TimeInterval = 0.0
@@ -91,14 +91,14 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //    }
 
     
-    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-        print("카메라 셔터음 무음으로 변경됨")
-        AudioServicesDisposeSystemSoundID(1108)
-        
-    }
-    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-        AudioServicesDisposeSystemSoundID(1108)
-    }
+//    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//        print("카메라 셔터음 무음으로 변경됨")
+//        AudioServicesDisposeSystemSoundID(1108)
+//        
+//    }
+//    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//        AudioServicesDisposeSystemSoundID(1108)
+//    }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -122,24 +122,36 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
         
         // 이미지 크기를 frameSize로 조정
-        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
-        image = renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
-        }
+//        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+//        image = renderer.image { _ in
+//            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
+//        }
         
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
         
+        let croppedImage = cropToAspectRatio(image: image)
+        
         DispatchQueue.main.async {
             print("[Camera]: Silent sound activated")
             AudioServicesDisposeSystemSoundID(1108)
-            self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
-            self.takenImg = image
+            self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
+            self.takenImg = croppedImage
             self.nextView = true
             print("nextView:\(self.nextView)")
             print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
         }
+    }
+    
+    func cropToAspectRatio(image: UIImage) -> UIImage  {
+        let originalWidth = image.size.width
+        var cropRect: CGRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalWidth * frameRatio)
+        
+        guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
+            return image
+        }
+        return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
     }
     
     func takePic() {

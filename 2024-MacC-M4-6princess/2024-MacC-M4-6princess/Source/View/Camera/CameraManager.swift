@@ -81,9 +81,9 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         self.session.automaticallyConfiguresCaptureDeviceForWideColor = false
             
             // 이미 실행 중이면 중단
-            if self.session.isRunning {
-                return
-            }
+//            if self.session.isRunning {
+//                return
+//            }
             
             // 세션 구성 시작
             self.session.beginConfiguration()
@@ -114,9 +114,9 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 // 세션 구성 완료
                 self.session.commitConfiguration()
                 
-                // 메인 큐에서 세션 시작
+//                // 메인 큐에서 세션 시작
                 DispatchQueue.main.async {
-                    self.session.startRunning()
+                    self.startSession()
                 }
             } catch {
                 print("카메라 설정 오류: \(error)")

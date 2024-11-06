@@ -14,18 +14,24 @@ struct CameraView: View {
     @StateObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     
+    private var cameraPreview: some View  {
+        GeometryReader { geo in
+            CameraPreview(viewModel: viewModel)
+                .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                .onAppear {
+                    viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                }
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 VStack{
                     CameraTopView(viewModel: viewModel)
                     ZStack{
-                        CameraPreview(viewModel: viewModel)
-                            .frame(width: viewModel.frameSize.width,height: viewModel.frameSize.height)
-                            .ignoresSafeArea(.all, edges: .all)
-//                            .onAppear {
-//                                viewModel.cameraManager.startSession()
-//                            }
+                        cameraPreview
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
                         Group{
                             if let image = viewModel.frameImage {
                                 Image(uiImage: image)
@@ -112,11 +118,12 @@ struct CameraView: View {
                 
             }
             .persistentSystemOverlays(.hidden)
-            .onAppear(perform: {
+            .onAppear {
                 viewModel.cameraManager.checkVideoAuthorizaion()
+//                viewModel.cameraManager.startSession()
                 motionManager.startDeviceMotionUpdates()
-                viewModel.isFrameSelect = false
-            })
+//                viewModel.isFrameSelect = false
+            }
             .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
                 CameraFrameSelectView(viewModel: viewModel)
                     .presentationDetents([.large])
