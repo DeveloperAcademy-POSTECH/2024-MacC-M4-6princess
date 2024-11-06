@@ -47,10 +47,6 @@ struct CameraView: View {
                                     .aspectRatio(contentMode: .fit)
                             }
                         }
-                        //                        .onAppear {
-                        //                            loadSelectedFrame()
-                        //                        }
-                        
                     }
                     CameraBottomView(viewModel: viewModel)
                 }
@@ -92,7 +88,7 @@ struct CameraView: View {
                                                 .font(.system(size: 13))
                                                 .multilineTextAlignment(.center)
                                                 .foregroundColor(.white)
-                                                .padding(.bottom, 35)
+                                                .padding(.bottom, 50)
                                                 .padding(.leading, -8)
                                             
                                         }
