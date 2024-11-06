@@ -77,30 +77,16 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func setUp() {
-        
-        self.session.automaticallyConfiguresCaptureDeviceForWideColor = false
-            
-            // 이미 실행 중이면 중단
-//            if self.session.isRunning {
-//                return
-//            }
-            
-            // 세션 구성 시작
-            self.session.beginConfiguration()
-            
-            // 기존 입력/출력 모두 제거
-            self.session.inputs.forEach { self.session.removeInput($0) }
-            self.session.outputs.forEach { self.session.removeOutput($0) }
-            
             do {
+                
+                // 세션 구성 시작
+                self.session.beginConfiguration()
+                
                 // 카메라 디바이스 설정
-                guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else {
-                    print("카메라를 찾을 수 없습니다")
-                    return
-                }
+                let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
                 
                 // 새 입력 생성
-                let input = try AVCaptureDeviceInput(device: device)
+                let input = try AVCaptureDeviceInput(device: device!)
                 if self.session.canAddInput(input) {
                     self.session.addInput(input)
                     self.videoDeviceInput = input
@@ -114,10 +100,8 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 // 세션 구성 완료
                 self.session.commitConfiguration()
                 
-//                // 메인 큐에서 세션 시작
-                DispatchQueue.main.async {
-                    self.startSession()
-                }
+//              // 세션 시작
+                startSession()
             } catch {
                 print("카메라 설정 오류: \(error)")
             }
@@ -145,19 +129,33 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func startSession() {
-        DispatchQueue.main.async {
-            self.session.startRunning()
-        }
+        Task.detached { @MainActor in
+                    if !self.session.isRunning {
+                        self.session.startRunning()
+                    }
+                }
     }
     
     func stopSession() {
-        DispatchQueue.main.async {
-            self.session.stopRunning()
-        }
+        Task.detached { @MainActor in
+                    if !self.session.isRunning {
+                        self.session.stopRunning()
+                    }
+                }
     }
     
     func takePicture(delegate: AVCapturePhotoCaptureDelegate) {
-        let settings = AVCapturePhotoSettings()
-        output.capturePhoto(with: settings, delegate: delegate)
-    }
+            guard session.isRunning else {
+                print("세션이 실행중이지 않습니다")
+                return
+            }
+            
+            let settings = AVCapturePhotoSettings()
+            settings.flashMode = .off
+            
+            // 메인 스레드에서 실행
+            DispatchQueue.main.async {
+                self.output.capturePhoto(with: settings, delegate: delegate)
+            }
+        }
 }

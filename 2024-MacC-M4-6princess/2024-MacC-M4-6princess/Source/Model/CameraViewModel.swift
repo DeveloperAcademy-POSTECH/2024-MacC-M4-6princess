@@ -133,8 +133,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         let croppedImage = cropToAspectRatio(image: image)
         
         DispatchQueue.main.async {
-            print("[Camera]: Silent sound activated")
-            AudioServicesDisposeSystemSoundID(1108)
             self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
             self.takenImg = croppedImage
             self.nextView = true
@@ -146,7 +144,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func cropToAspectRatio(image: UIImage) -> UIImage  {
         let originalWidth = image.size.width
-        var cropRect: CGRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalWidth * frameRatio)
+        let cropRect: CGRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalWidth * frameRatio)
         
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image
@@ -155,9 +153,11 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     
     func takePic() {
-        cameraManager.takePicture(delegate: self)
-        
-        self.isTakenPhoto.toggle()
+        // 메인 큐에서 실행
+        DispatchQueue.main.async {
+            self.cameraManager.takePicture(delegate: self)
+            self.isTakenPhoto.toggle()
+        }
     }
     
     func changeCamera() {

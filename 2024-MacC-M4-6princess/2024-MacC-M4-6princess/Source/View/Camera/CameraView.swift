@@ -11,8 +11,9 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var viewModel = CameraViewModel()
+    @ObservedObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
+    //TODO: 바인딩 변수로 방금 만든 frame 불러오기
     
     private var cameraPreview: some View  {
         GeometryReader { geo in
@@ -119,8 +120,7 @@ struct CameraView: View {
             }
             .persistentSystemOverlays(.hidden)
             .onAppear {
-                viewModel.cameraManager.checkVideoAuthorizaion()
-//                viewModel.cameraManager.startSession()
+                viewModel.cameraManager.startSession()
                 motionManager.startDeviceMotionUpdates()
 //                viewModel.isFrameSelect = false
             }
@@ -157,6 +157,7 @@ struct CameraView: View {
         .onAppear {
             // 프레임 크기 설정
             viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+            viewModel.cameraManager.checkVideoAuthorizaion()
 //            let screenWidth = UIScreen.main.bounds.width
 //            let desiredHeight = screenWidth * (4.0/3.0)
 //            viewModel.frameSize = CGRect(
