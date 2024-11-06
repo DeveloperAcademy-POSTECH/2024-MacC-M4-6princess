@@ -39,6 +39,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var isFrameSelected: Bool = false
     @Published var showAlert = false
     @Published var isFrameLoading: Bool = false
+    @Published var inputImage: UIImage?
     
     // 이미지 관련
     @Published var idolImg: UIImage

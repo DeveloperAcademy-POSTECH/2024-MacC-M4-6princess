@@ -6,7 +6,7 @@ struct DFFrameEditView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @ObservedObject var viewModel: DFFrameEditViewModel = DFFrameEditViewModel()
-    @State private var selectionModeIndex: Int = 0
+    @State private var selectionModeIndex: Int = 3
     @State private var lines: [Line] = []
     @State private var thickness: Double = 10.0
     @Binding var pickedImage: UIImage?
@@ -19,6 +19,7 @@ struct DFFrameEditView: View {
                 ZStack {
                     
                     inputImageWithMask
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 210))
                     
                     if let image = viewModel.resultImage {
                         let scale = scaleCompute(image)
@@ -30,6 +31,7 @@ struct DFFrameEditView: View {
                             .background(Color(hex: "32322f").opacity(viewModel.showPreview ? 1 : 0))
                             .frame(width: image.size.width / scale, height: image.size.height / scale)
                             .padding(.bottom, 20)
+                    
                     }
                     
                     Circle()
@@ -42,8 +44,10 @@ struct DFFrameEditView: View {
                         HStack {
                             Spacer()
                             Button {
+                                
                                 viewModel.showPreview.toggle()
                                 viewModel.createResult()
+                                
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 4)
@@ -58,7 +62,7 @@ struct DFFrameEditView: View {
                         }
                         
                         thicknessControl
-
+                        
                     }
                 }
                 
@@ -75,6 +79,8 @@ struct DFFrameEditView: View {
         .toolbar {
             toolBarButtons
         }
+        .simultaneousGesture(moveImage)
+        .simultaneousGesture(magnification)
     }
     
 }
@@ -95,7 +101,7 @@ private extension DFFrameEditView {
             }
         }
     }
-
+    
     struct Line {
         var color: Color
         var points: [CGPoint]
@@ -107,6 +113,60 @@ private extension DFFrameEditView {
 
 ///
 private extension DFFrameEditView {
+    
+    var draw: some Gesture {
+        
+        DragGesture()
+            .onChanged{ dragValue in
+                if selectionModeIndex == 0 || selectionModeIndex == 1 {
+                    drawLines(startLocation: dragValue.startLocation, location: dragValue.location)
+                    print("\(dragValue.startLocation)")
+                    
+                }
+            }
+            .onEnded{ dragValue in
+                
+                if selectionModeIndex == 0 || selectionModeIndex == 1 {
+                    makeHistory()
+                }
+            }
+    }
+    
+    var moveImage: some Gesture {
+        
+        DragGesture()
+            .onChanged { value in
+                if selectionModeIndex == 3 && viewModel.magnifyScale > 1.0 {
+                    
+                    viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
+                    viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+                    
+                }
+            }
+            .onEnded { value in
+                
+                if selectionModeIndex == 3 && viewModel.magnifyScale > 1.0 {
+                    
+                    viewModel.accumulatedOffSet.width += value.translation.width
+                    viewModel.accumulatedOffSet.height += value.translation.height
+                    
+                }
+            }
+    }
+    
+    var magnification: some Gesture {
+        
+        MagnifyGesture()
+            .onChanged { value in
+                viewModel.setScaleVolume(value.magnification)
+            }
+            .onEnded { value in
+                
+                viewModel.setScaleValue(minimum: 1.0, maximum: 4.0)
+            }
+    }
+    
+    
     
     var inputImageWithMask: some View {
         
@@ -122,12 +182,18 @@ private extension DFFrameEditView {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: image.size.width / scale, height: image.size.height / scale)
                     .padding(.bottom, 20)
+                    .scaleEffect(viewModel.magnifyScale)
+                    .offset(viewModel.draggedOffSet)
+                
                 
                 canvas
                     .offset(y: -10)
                     .opacity(viewModel.showPreview ? 0 : 1)
                     .frame(width: image.size.width / scale, height: image.size.height / scale)
+                    .scaleEffect(viewModel.magnifyScale)
+                    .offset(viewModel.draggedOffSet)
             }
+            
         }
     }
     
@@ -173,10 +239,10 @@ private extension DFFrameEditView {
                 path.addLines(line.points)
                 if line.mode == .draw {
                     context.blendMode = .normal
-                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth))
+                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
                 } else {
                     context.blendMode = .clear
-                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth))
+                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
                 }
             }
         }
@@ -185,12 +251,7 @@ private extension DFFrameEditView {
         }
         .colorMultiply(viewModel.maskColor)
         .opacity(viewModel.opacity)
-        .gesture(DragGesture().onChanged({ dragValue in
-            drawLines(startLocation: dragValue.startLocation, location: dragValue.location)
-        }).onEnded({ dragValue in
-//            viewModel.makeHistory(view: canvas)
-            makeHistory()
-        }))
+        .gesture(draw)
     }
     
     var pickedImageRender: some View {
@@ -200,7 +261,6 @@ private extension DFFrameEditView {
             }
         }
     }
-    
     var toolBarButtons: some View {
         HStack {
             Button {
@@ -238,8 +298,9 @@ private extension DFFrameEditView {
             
             Spacer()
             Button {
+                
                 viewModel.createResult()
-                viewModel.isShowModifyFrame = true
+                viewModel.isShowModifyFrame.toggle()
                 
             } label: {
                 Text("확인")
@@ -256,7 +317,7 @@ private extension DFFrameEditView {
         
         HStack(spacing: UIScreen.main.bounds.width / 2.4) {
             Button {
-                toolSelectionModeToggle()
+                toolSelect("brush")
             } label: {
                 ZStack {
                     Circle()
@@ -273,7 +334,7 @@ private extension DFFrameEditView {
             }
             
             Button {
-                toolSelectionModeToggle()
+                toolSelect("erase")
                 
             } label: {
                 ZStack {
@@ -296,10 +357,6 @@ private extension DFFrameEditView {
 
 private extension DFFrameEditView {
     
-    func customView(viewOne: () -> some View) {
-        
-    }
-    
     private func showMaskImage() {
         
         let render = ImageRenderer(content: pickedImageRender)
@@ -317,10 +374,7 @@ private extension DFFrameEditView {
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-            print("\(scale)")
         }
-        print("\(image.size.width)  \(image.size.height)")
-        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
         return scale
     }
     
@@ -340,9 +394,9 @@ private extension DFFrameEditView {
     
     private func drawLines(startLocation: CGPoint, location: CGPoint) {
         if lines.isEmpty  {
-            lines = [Line(color: .white, points: [startLocation], mode: Mode(rawValue: selectionModeIndex)!, lineWidth: thickness)]
+            lines = [Line(color: .white, points: [startLocation], mode: Mode(rawValue: selectionModeIndex)!, lineWidth: thickness / viewModel.magnifyScale)]
         } else {
-            var newLine = Line(color: .white, points: [], mode:  Mode(rawValue: selectionModeIndex)!, lineWidth: thickness)
+            var newLine = Line(color: .white, points: [], mode:  Mode(rawValue: selectionModeIndex)!, lineWidth: thickness / viewModel.magnifyScale)
             if startLocation != lines[lines.count - 1].points.first {
                 newLine.points = [startLocation]
                 lines.append(newLine)
@@ -362,11 +416,26 @@ private extension DFFrameEditView {
         UISlider.appearance().setThumbImage(thumbImage, for: .normal)
     }
     
-    private func toolSelectionModeToggle() {
-        if selectionModeIndex == 0 {
-            selectionModeIndex = 1
+    private func toolSelect(_ selected: String) {
+        
+        if selectionModeIndex != 3 {
+            
+            if (selected == "brush" && selectionModeIndex == 0) || (selected == "erase" && selectionModeIndex == 1) {
+                selectionModeIndex = 3
+            } else if selected == "brush" && selectionModeIndex == 1 {
+                selectionModeIndex = 0
+            } else if selected == "erase" && selectionModeIndex == 0 {
+                selectionModeIndex = 1
+            }
+            
         } else {
-            selectionModeIndex = 0
+            
+            if selected == "brush" {
+                selectionModeIndex = 0
+                
+            } else {
+                selectionModeIndex = 1
+            }
         }
     }
     

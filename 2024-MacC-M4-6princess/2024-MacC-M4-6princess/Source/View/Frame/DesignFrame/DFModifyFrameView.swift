@@ -1,9 +1,5 @@
 import SwiftUI
 
-
-struct imageHistory {
-    
-}
 struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -12,31 +8,33 @@ struct DFModifyFrame: View {
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var shouldNavigate: Bool = false
+    @State private var frameImage: UIImage?
     
     var body: some View {
-
-            VStack {
-                ZStack {
-                    if isFirstLaunching == true {
-                        DFOnboardingView(isFirstLaunching: $isFirstLaunching)
-                            .zIndex(1)
-                    }
-                    
-                    if let image = resultImage {
-                        Color(hex: "32322f")
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
-                        imageView
-                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
-
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(Color.white)
-                            .opacity(viewModel.btnOpacity)
-                            .frame(width: 175, height: 38)
-                            .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                        
-                    }
+        VStack {
+            ZStack {
+                Color(hex: "32322f")
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+                
+                if isFirstLaunching == true {
+                    DFOnboardingView(isFirstLaunching: $isFirstLaunching)
+                        .zIndex(1)
                 }
-            
+                
+                //                    if let _ = viewModel.outputImage {
+                //                        imageView
+                //                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+                //                    }
+                imageView
+                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+                
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(Color.white)
+                    .opacity(viewModel.btnOpacity)
+                    .frame(width: 175, height: 38)
+                    .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                
+            }
         }
         .navigationBarBackButtonHidden()
         .toolbar {
@@ -54,7 +52,7 @@ struct DFModifyFrame: View {
                     }
                 }
                 .fullScreenCover(isPresented: $shouldNavigate) {
-                    CameraView()
+                    CameraView(frameImage: $frameImage)
                 }
         .onAppear {
             makeHistory()
@@ -62,19 +60,69 @@ struct DFModifyFrame: View {
     }
 }
 
-private extension CGSize {
-    static func + (lhs: Self, rhs: Self) -> Self {
-        CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
-    }
-}
-
 private extension DFModifyFrame {
+    
+    var rotate: some Gesture {
+        
+        RotateGesture()
+            .onChanged { value in
+                
+                viewModel.angle = value.rotation + viewModel.current
+                viewModel.anchor = value.startAnchor
+                
+            }
+            .onEnded { value in
+                viewModel.current += value.rotation
+            }
+    }
+    var moveImage: some Gesture {
+        
+        DragGesture()
+            .onChanged { value in
+//                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
+                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + (value.translation.width / viewModel.magnifyScale)
+                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + (value.translation.height / viewModel.magnifyScale)
+            }
+            .onEnded { value in
+                
+                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
+                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
+                
+            }
+        
+    }
+    
+    var magnification: some Gesture {
+        
+        MagnifyGesture()
+            .onChanged { value in
+                viewModel.setScaleVolume(value.magnification)
+            }
+            .onEnded { value in
+                viewModel.setScaleValue(minimum: 1.0, maximum: 3.0)
+            }
+    }
+    
     var imageView: some View {
-        Image(uiImage: resultImage ?? UIImage())
-            .resizable()
-            .scaledToFit()
-            .frame(width: resultImage!.size.width / scaleCompute(resultImage!), height: resultImage!.size.height / scaleCompute(resultImage!))
-            .padding(.bottom, 20)
+        
+        ZStack {
+            
+            if let image = resultImage {
+                
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: image.size.width / scaleCompute(resultImage!), height: image.size.height / scaleCompute(resultImage!))
+                    .padding(.bottom, 20)
+                    .rotationEffect(viewModel.angle)
+                    .offset(viewModel.draggedOffSet)
+                    .scaleEffect(viewModel.magnifyScale)
+                
+            }
+        }
+        .gesture(moveImage)
+        .simultaneousGesture(magnification)
+        .simultaneousGesture(rotate)
     }
     
     var toolBarButtons: some View {
@@ -104,7 +152,7 @@ private extension DFModifyFrame {
             } label: {
                 Text("저장")
                     .fontWeight(.semibold)
-                    .foregroundStyle(.pointPink)
+                    .foregroundStyle(isFirstLaunching ? .gray01 : .pointPink)
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
             .padding(.leading, 150)
@@ -116,16 +164,21 @@ private extension DFModifyFrame {
 private extension DFModifyFrame {
     
     func makeHistory() {
-        
-        let render = ImageRenderer(content: self.imageView.frame(width: resultImage!.size.width / (scaleCompute(resultImage!) * 2), height: resultImage!.size.height / scaleCompute(resultImage!)))
-        render.scale = scaleCompute(resultImage!)
-        viewModel.image = render.uiImage
-        viewModel.imageHistory.append(viewModel.image!)
+
+        if let image = resultImage {
+            
+            let render = ImageRenderer(content: self.imageView.frame(width: image.size.width / (scaleCompute(image) * 2), height: image.size.height / scaleCompute(image)))
+            render.scale = scaleCompute(image)
+            viewModel.image = render.uiImage
+            viewModel.imageHistory.append(viewModel.image!)
+        }
         
     }
     
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
+        
+//        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
@@ -172,6 +225,7 @@ private extension DFModifyFrame {
         let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
         render.scale = scaleCompute(resultImage!)
         viewModel.image = render.uiImage
+        frameImage = render.uiImage
         
         // 2. CoreData 저장
         addImage(data: viewModel.image?.pngData())

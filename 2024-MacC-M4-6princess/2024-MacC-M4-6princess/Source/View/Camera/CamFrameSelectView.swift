@@ -21,6 +21,7 @@ struct CameraFrameSelectView: View {
     @State private var isShowPhotosPicker: Bool = false
     @State private var isEditing: Bool = false
     @State private var selectedImageIds: Set<UUID> = []
+    @Binding var frameImage: UIImage?
     
     
     var body: some View {
@@ -61,6 +62,7 @@ struct CameraFrameSelectView: View {
                                             Button {
                                                 if !isEditing {
                                                     viewModel.isFrameSelected = true
+                                                    print("isFrameSelected 값 true로 변경됨")
                                                     viewModel.selectedFrame = imageInfo.id
                                                     viewModel.isFrameLoading = true
                                                     dismiss()
