@@ -11,6 +11,9 @@ import Photos
 
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
+    @AppStorage("openFirstTime") var firstTime = false
+//        @State var firstTime = false
+    
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false
     @Published var isSavedPhotoData = false
@@ -20,10 +23,33 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var frameSize = CGRect(origin: .zero, size: .zero)
     @Published var preview: AVCaptureVideoPreviewLayer!
     
+    // 프레임 관련 상태
+    @Published var frameImage: UIImage?
+    @Published var frameRatio: CGFloat = 1.54
+    
+    // 타이머 관련 상태
+    @Published var delayTime: TimeInterval = 0.0
+    @Published var isPushedTimer = 0
+    @Published var isTakePic = false
+    
+    // 프레임 선택 관련 상태
+    @Published var isFrameSelect = false
+    @Published var isFullScreenPop: Bool = false
+    @Published var selectedFrame: UUID? = nil
+    @Published var isFrameSelected: Bool = false
+    @Published var showAlert = false
+    
+    // 이미지 관련
+    @Published var idolImg: UIImage
+    let defaultImg: UIImage
+    
+    
     let cameraManager: CameraManager
     
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
+        self.idolImg = UIImage(named: "Felix") ?? UIImage()
+        self.defaultImg = UIImage(named: "6princess") ?? UIImage()
         super.init()
         setupPreviewLayer()
     }
@@ -63,19 +89,16 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //            }
     //        }
     //    }
+
     
-    func startCamera() {
-        cameraManager.checkVideoAuthorizaion()
-    }
-    
-    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-        print("카메라 셔터음 무음으로 변경됨")
-        AudioServicesDisposeSystemSoundID(1108)
-        
-    }
-    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-        AudioServicesDisposeSystemSoundID(1108)
-    }
+//    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//        print("카메라 셔터음 무음으로 변경됨")
+//        AudioServicesDisposeSystemSoundID(1108)
+//        
+//    }
+//    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//        AudioServicesDisposeSystemSoundID(1108)
+//    }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -99,19 +122,19 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
         
         // 이미지 크기를 frameSize로 조정
-        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
-        image = renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
-        }
+//        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+//        image = renderer.image { _ in
+//            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
+//        }
         
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
         
+        let croppedImage = cropToAspectRatio(image: image)
+        
         DispatchQueue.main.async {
-            print("[Camera]: Silent sound activated")
-            AudioServicesDisposeSystemSoundID(1108)
-            self.picData = image.jpegData(compressionQuality: 1.0) ?? Data()
-            self.takenImg = image
+            self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
+            self.takenImg = croppedImage
             self.nextView = true
             print("nextView:\(self.nextView)")
             print("이미지 사이즈: \(image.size)")
@@ -119,10 +142,22 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
     }
     
-    func takePic() {
-        cameraManager.takePicture(delegate: self)
+    func cropToAspectRatio(image: UIImage) -> UIImage  {
+        let originalWidth = image.size.width
+        let cropRect: CGRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalWidth * frameRatio)
         
-        self.isTakenPhoto.toggle()
+        guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
+            return image
+        }
+        return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
+    }
+    
+    func takePic() {
+        // 메인 큐에서 실행
+        DispatchQueue.main.async {
+            self.cameraManager.takePicture(delegate: self)
+            self.isTakenPhoto.toggle()
+        }
     }
     
     func changeCamera() {
@@ -145,18 +180,5 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         
         return normalizedImage
     }
-    
-    
-    func dataToUIImage() -> UIImage? {
-        guard let image = UIImage(data: self.picData) else{
-            print("이미지를 저장할 수 없습니다. picData가 유효하지 않습니다.")
-            return nil
-        }
-        print("이미지가 UIImage로 변환되었습니다.")
-        
-        return image
-    }
-    
-    
 }
 

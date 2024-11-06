@@ -13,7 +13,7 @@ struct DFModifyFrame: View {
     @Binding var resultImage: UIImage?
     
     var body: some View {
-        NavigationStack {
+
             VStack {
                 ZStack {
                     if isFirstLaunching == true {
@@ -35,7 +35,7 @@ struct DFModifyFrame: View {
                         
                     }
                 }
-            }
+            
         }
         .navigationBarBackButtonHidden()
         .toolbar {
