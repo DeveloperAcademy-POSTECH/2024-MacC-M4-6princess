@@ -39,7 +39,7 @@ struct DFModifyFrame: View {
             toolBarButtons
         }
         .navigationDestination(isPresented: $viewModel.isShowCamera) {
-            CameraView()
+            CameraView(inputImage: $viewModel.image)
         }
         .onAppear {
             makeHistory()

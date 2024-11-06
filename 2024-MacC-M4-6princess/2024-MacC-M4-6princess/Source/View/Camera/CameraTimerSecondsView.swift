@@ -12,10 +12,10 @@ struct CameraTimerSecondsView: View {
     
     var body: some View {
         ZStack {
-            Color.black
-                .opacity(backgroundOpacity)
-                .ignoresSafeArea()
-            
+//            Color.black
+//                .opacity(backgroundOpacity)
+//                .ignoresSafeArea()
+//            
             if remainingTime > 0 {
                 Text("\(Int(remainingTime))")
                     .font(.system(size: 200))
