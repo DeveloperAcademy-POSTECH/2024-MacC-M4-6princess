@@ -1,6 +1,7 @@
 import SwiftUI
 import Vision
 import CoreImage.CIFilterBuiltins
+import VisionKit
 
 class DFFrameEditViewModel: ObservableObject {
     
@@ -19,6 +20,52 @@ class DFFrameEditViewModel: ObservableObject {
     @Published var lastScale = 1.0
     @Published var draggedOffSet: CGSize = .zero
     @Published var accumulatedOffSet: CGSize = .zero
+    @Published var outputImage: UIImage?
+    @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
+    
+//    let analyzer = ImageAnalyzer()
+//    let interaction = ImageAnalysisInteraction()
+//    
+//    func analyzeImage(_ image: UIImage) async throws -> Set<ImageAnalysisInteraction.Subject> {
+//        
+//        let configuration = ImageAnalyzer.Configuration([.visualLookUp])
+//        let analysis = try await analyzer.analyze(image, configuration: configuration)
+//        interaction.analysis = analysis
+//        let detectedSubjects = await interaction.subjects
+//        return detectedSubjects
+//    }
+//    
+//    func detectSubject(inputImage: UIImage?) {
+//        
+//        Task { @MainActor in
+//            
+//            do {
+//                guard let inputImage = inputImage else { return }
+    //                detectedObjects = try await self.analyzeImage(inputImage)
+    //                print("탐지된 피사체: \(detectedObjects.count)")
+//
+//            } catch {
+//                print("none object detected")
+//            }
+//            
+//        }
+//    }
+//    
+//    func extractsubject() {
+//        
+//        for i in detectedObjects {
+//            
+//            Task { @MainActor in
+//                
+//                if let objectImage = try? await i.image {
+//                    outputImage = objectImage
+//                } else {
+//                    print("저장실패")
+//                }
+//            }
+//            
+//        }
+//    }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         
@@ -87,10 +134,13 @@ class DFFrameEditViewModel: ObservableObject {
         }
         
         Task { @MainActor in
+            
             if let maskImage = maskImage {
+                
                 let outputImage = apply(mask: CIImage(image: maskImage)!, to: inputImage)
                 resultImage = convertToUIImage(ciImage: outputImage)
                 self.resultImage = resultImage
+                
             }
         }
     }
@@ -121,6 +171,15 @@ class DFFrameEditViewModel: ObservableObject {
         }
     }
     
+    //    func detectSubjects(from inputImage: CIImage) -> CIImage? {
+    //
+    //        let handler = VNImageRequestHandler(ciImage: inputImage)
+    //        let detect = VNDetectHorizonRequest()
+    ////        let request = VNTrackObjectRequest(detectedObjectObservation: detect)
+    //
+    //
+    //    }
+    
     private func createMask(from inputImage: CIImage) -> CIImage? {
         
         let handler = VNImageRequestHandler(ciImage: inputImage)
@@ -133,6 +192,7 @@ class DFFrameEditViewModel: ObservableObject {
                 let mask = try result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler)
                 return CIImage(cvPixelBuffer: mask)
             }
+            
         } catch {
             print(error)
         }
@@ -158,6 +218,7 @@ class DFFrameEditViewModel: ObservableObject {
     }
     
     func appendMaskImage(_ inputImage: UIImage?) {
+        
         if let image = inputImage {
             if indexOfMask < maskImageList.count - 1 {
                 for _ in indexOfMask+1..<maskImageList.count {

@@ -1,9 +1,5 @@
 import SwiftUI
 
-
-struct imageHistory {
-    
-}
 struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -11,34 +7,31 @@ struct DFModifyFrame: View {
     @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
-    @State private var draggedOffSet: CGSize = .zero
-    @State private var accumulatedOffSet: CGSize = .zero
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                ZStack {
-                    Color(hex: "32322f")
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
-                    
-                    if isFirstLaunching == true {
-                        DFOnboardingView(isFirstLaunching: $isFirstLaunching)
-                            .zIndex(1)
-                    }
-                    
-                    if let _ = resultImage {
-                        
-                        imageView
-                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
-                        
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(Color.white)
-                            .opacity(viewModel.btnOpacity)
-                            .frame(width: 175, height: 38)
-                            .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                        
-                    }
+        VStack {
+            ZStack {
+                Color(hex: "32322f")
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+                
+                if isFirstLaunching == true {
+                    DFOnboardingView(isFirstLaunching: $isFirstLaunching)
+                        .zIndex(1)
                 }
+                
+                //                    if let _ = viewModel.outputImage {
+                //                        imageView
+                //                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+                //                    }
+                imageView
+                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+                
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(Color.white)
+                    .opacity(viewModel.btnOpacity)
+                    .frame(width: 175, height: 38)
+                    .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                
             }
         }
         .navigationBarBackButtonHidden()
@@ -56,25 +49,49 @@ struct DFModifyFrame: View {
 
 private extension DFModifyFrame {
     
-    
+    var rotate: some Gesture {
+        
+        RotateGesture()
+            .onChanged { value in
+                
+                viewModel.angle = value.rotation + viewModel.current
+                viewModel.anchor = value.startAnchor
+                
+            }
+            .onEnded { value in
+                viewModel.current += value.rotation
+            }
+    }
     var moveImage: some Gesture {
         
         DragGesture()
             .onChanged { value in
-                print("change")
-                draggedOffSet.width = accumulatedOffSet.width + value.translation.width
-                draggedOffSet.height = accumulatedOffSet.height + value.translation.height
-                print("\(value.startLocation)")
+//                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
+                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + (value.translation.width / viewModel.magnifyScale)
+                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + (value.translation.height / viewModel.magnifyScale)
             }
             .onEnded { value in
-                print("stop")
-                accumulatedOffSet.width += value.translation.width
-                accumulatedOffSet.height += value.translation.height
+                
+                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
+                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
+                
             }
         
     }
     
+    var magnification: some Gesture {
+        
+        MagnifyGesture()
+            .onChanged { value in
+                viewModel.setScaleVolume(value.magnification)
+            }
+            .onEnded { value in
+                viewModel.setScaleValue(minimum: 1.0, maximum: 3.0)
+            }
+    }
+    
     var imageView: some View {
+        
         ZStack {
             
             if let image = resultImage {
@@ -82,13 +99,17 @@ private extension DFModifyFrame {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: image.size.width / scaleCompute(image), height: image.size.height / scaleCompute(image))
+                    .frame(width: image.size.width / scaleCompute(resultImage!), height: image.size.height / scaleCompute(resultImage!))
                     .padding(.bottom, 20)
-                    .offset(draggedOffSet)
-                    .gesture(moveImage)
+                    .rotationEffect(viewModel.angle)
+                    .offset(viewModel.draggedOffSet)
+                    .scaleEffect(viewModel.magnifyScale)
                 
             }
         }
+        .gesture(moveImage)
+        .simultaneousGesture(magnification)
+        .simultaneousGesture(rotate)
     }
     
     var toolBarButtons: some View {
@@ -142,7 +163,9 @@ private extension DFModifyFrame {
     }
     
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
+        
+//        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
@@ -196,6 +219,7 @@ private extension DFModifyFrame {
         }
         viewModel.isShowCamera = true
         
+        
     }
     func checkScreenState(_ image: UIImage?) -> String {
         if image!.size.width > image!.size.height {
@@ -204,4 +228,5 @@ private extension DFModifyFrame {
             return "vertical"
         }
     }
+    
 }

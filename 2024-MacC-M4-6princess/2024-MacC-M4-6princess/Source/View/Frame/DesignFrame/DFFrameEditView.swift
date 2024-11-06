@@ -44,8 +44,10 @@ struct DFFrameEditView: View {
                         HStack {
                             Spacer()
                             Button {
+                                
                                 viewModel.showPreview.toggle()
                                 viewModel.createResult()
+                                
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 4)
@@ -123,6 +125,7 @@ private extension DFFrameEditView {
                 }
             }
             .onEnded{ dragValue in
+                
                 if selectionModeIndex == 0 || selectionModeIndex == 1 {
                     makeHistory()
                 }
@@ -155,7 +158,6 @@ private extension DFFrameEditView {
         
         MagnifyGesture()
             .onChanged { value in
-                
                 viewModel.setScaleVolume(value.magnification)
             }
             .onEnded { value in
@@ -297,8 +299,9 @@ private extension DFFrameEditView {
             
             Spacer()
             Button {
+                
                 viewModel.createResult()
-                viewModel.isShowModifyFrame = true
+                viewModel.isShowModifyFrame.toggle()
                 
             } label: {
                 Text("확인")
