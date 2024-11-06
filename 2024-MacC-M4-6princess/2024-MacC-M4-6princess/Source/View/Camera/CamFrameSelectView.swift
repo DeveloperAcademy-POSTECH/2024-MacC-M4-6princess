@@ -62,6 +62,7 @@ struct CameraFrameSelectView: View {
                                                 if !isEditing {
                                                     viewModel.isFrameSelected = true
                                                     viewModel.selectedFrame = imageInfo.id
+                                                    viewModel.isFrameLoading = true
                                                     dismiss()
                                                 }
                                             } label: {

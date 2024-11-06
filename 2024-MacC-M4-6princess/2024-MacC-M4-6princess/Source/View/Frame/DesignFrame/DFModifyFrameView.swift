@@ -11,6 +11,7 @@ struct DFModifyFrame: View {
     @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
+    @State private var shouldNavigate: Bool = false
     
     var body: some View {
 
@@ -41,9 +42,20 @@ struct DFModifyFrame: View {
         .toolbar {
             toolBarButtons
         }
-        .navigationDestination(isPresented: $viewModel.isShowCamera) {
-            CameraView()
-        }
+//        .navigationDestination(isPresented: $viewModel.isShowCamera) {
+//            CameraView()
+//        }
+        .onChange(of: viewModel.isShowCamera) { newValue in
+                    if newValue {
+                        // 1초 후에 화면 전환
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            shouldNavigate = true
+                        }
+                    }
+                }
+                .fullScreenCover(isPresented: $shouldNavigate) {
+                    CameraView()
+                }
         .onAppear {
             makeHistory()
         }
@@ -156,17 +168,28 @@ private extension DFModifyFrame {
     }
     
     func saveImage() {
-        
+        // 1. 이미지 렌더링
         let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
         render.scale = scaleCompute(resultImage!)
         viewModel.image = render.uiImage
-        addImage(data: viewModel.image?.pngData())
-        viewModel.btnOpacity = 1
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
-            viewModel.btnOpacity = 0
-        }
-        viewModel.isShowCamera = true
         
+        // 2. CoreData 저장
+        addImage(data: viewModel.image?.pngData())
+        
+        // 3. 저장 완료 메시지 표시
+        viewModel.btnOpacity = 1
+        
+        // 4. 지연 시간을 둬서 작업을 분산
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            // 저장 완료 메시지 숨기기
+            viewModel.btnOpacity = 0
+            
+            // 추가 지연 후 화면 전환
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                // 화면 전환
+                viewModel.isShowCamera = true
+            }
+        }
     }
     func checkScreenState(_ image: UIImage?) -> String {
         if image!.size.width > image!.size.height {

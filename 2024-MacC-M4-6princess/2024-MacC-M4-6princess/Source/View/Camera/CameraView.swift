@@ -40,12 +40,10 @@ struct CameraView: View {
                                     .aspectRatio(contentMode: .fit)
                             }
                         }
-                        .onAppear {
-                            loadSelectedFrame()
-                        }
-                        .onChange(of: viewModel.selectedFrame) {
-                            loadSelectedFrame()
-                        }
+//                        .onAppear {
+//                            loadSelectedFrame()
+//                        }
+                        
                     }
                     CameraBottomView(viewModel: viewModel)
                 }
@@ -118,6 +116,12 @@ struct CameraView: View {
                 
                 
             }
+            .onChange(of: viewModel.isFrameLoading) { newValue in
+                        if newValue {
+                            loadSelectedFrame()
+                            viewModel.isFrameLoading = false
+                        }
+                    }
             .persistentSystemOverlays(.hidden)
             .onAppear {
                 viewModel.cameraManager.startSession()
