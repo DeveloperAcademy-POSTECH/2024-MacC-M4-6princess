@@ -99,7 +99,7 @@ private extension DFModifyFrame {
                 viewModel.setScaleVolume(value.magnification)
             }
             .onEnded { value in
-                viewModel.setScaleValue(minimum: 1.0, maximum: 3.0)
+                viewModel.setScaleValue(minimum: 0.4, maximum: 4.0)
             }
     }
     
@@ -146,11 +146,7 @@ private extension DFModifyFrame {
             
             Spacer()
             Button {
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    viewModel.btnOpacity = 1
-                    viewModel.isPushedSaveBtn = false
-                }
+                viewModel.isPushedSaveBtn = true
                 saveImage()
                 
             } label: {
@@ -245,7 +241,9 @@ private extension DFModifyFrame {
             
             // 3. 저장 완료 메시지 표시
 //            let btnOpacityStart = Date()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0){
             viewModel.btnOpacity = 1
+        }
 //            let btnOpacityTime = Date().timeIntervalSince(btnOpacityStart) * 1000
 //            print("Button Opacity Set Time: \(btnOpacityTime) ms")
             
@@ -263,7 +261,9 @@ private extension DFModifyFrame {
 //            let showCameraStart = Date()
             
             // 화면 전환
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
             viewModel.isShowCamera = true
+        }
 //            let showCameraTime = Date().timeIntervalSince(showCameraStart) * 1000
 //            print("Show Camera Time: \(showCameraTime) ms")
 //            
