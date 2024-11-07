@@ -20,6 +20,7 @@ struct IEOutputImageView: View {
         
     }
 }
+
 struct SliderView: View {
     @Binding var value: Float// 슬라이더 값
     var range: ClosedRange<Float> // 슬라이더 범위
@@ -83,22 +84,24 @@ struct CustomSliderView: View {
             ), in: range, step: step, onEditingChanged: { editing in
                 // 사용자가 슬라이더 조작을 종료했을 때
                 if !editing {
-                    print("안녕")
                     viewModel.undoHistory.append(viewModel.recentPop)
                     viewModel.recentPop.sliderValues[idx] = value
-                    
                     if !viewModel.redoHistory.isEmpty{
                         viewModel.redoHistory = []
                     }
                 }
-            })
+            }
+            )
             .tint(Color.pointPink)
             .padding(.horizontal)
         }
-        .background(Color.black.opacity(0.5)) // 배경색
-        .onAppear {
-            // 중간값 사용 예시
-            print("중간값: \(midValue)")
-        }
+        .frame(width: viewModel.screenSize.width,height: 40)
+        //        .background(Color.black.opacity(0.5)) // 배경색
+    }
+}
+
+extension CGPoint {
+    func printPoint() {
+        print("x: \(self.x), y: \(self.y)")
     }
 }

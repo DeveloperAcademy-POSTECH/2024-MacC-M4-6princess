@@ -7,6 +7,8 @@ struct DFModifyFrame: View {
     @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
+    @State private var shouldNavigate: Bool = false
+    @State private var frameImage: UIImage?
     
     var body: some View {
         VStack {
@@ -38,9 +40,20 @@ struct DFModifyFrame: View {
         .toolbar {
             toolBarButtons
         }
-        .navigationDestination(isPresented: $viewModel.isShowCamera) {
-            CameraView()
-        }
+//        .navigationDestination(isPresented: $viewModel.isShowCamera) {
+//            CameraView()
+//        }
+        .onChange(of: viewModel.isShowCamera) { newValue in
+                    if newValue {
+                        // 1초 후에 화면 전환
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            shouldNavigate = true
+                        }
+                    }
+                }
+                .fullScreenCover(isPresented: $shouldNavigate) {
+                    CameraView(frameImage: $frameImage)
+                }
         .onAppear {
             makeHistory()
         }
@@ -67,13 +80,15 @@ private extension DFModifyFrame {
         DragGesture()
             .onChanged { value in
 //                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
-                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + (value.translation.width / viewModel.magnifyScale)
-                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + (value.translation.height / viewModel.magnifyScale)
+                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
+                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+                
             }
             .onEnded { value in
-                
-                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
-                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
+                viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
+                viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+//                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
+//                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
                 
             }
         
@@ -86,7 +101,7 @@ private extension DFModifyFrame {
                 viewModel.setScaleVolume(value.magnification)
             }
             .onEnded { value in
-                viewModel.setScaleValue(minimum: 0.5, maximum: 3.0)
+                viewModel.setScaleValue(minimum: 0.2, maximum: 10)
             }
     }
     
@@ -100,16 +115,14 @@ private extension DFModifyFrame {
                     .resizable()
                     .scaledToFit()
                     .frame(width: image.size.width / scaleCompute(resultImage!), height: image.size.height / scaleCompute(resultImage!))
-                    .padding(.bottom, 20)
+//                    .padding(.bottom, 20)
+                    .scaleEffect(viewModel.magnifyScale)
                     .rotationEffect(viewModel.angle)
                     .offset(viewModel.draggedOffSet)
-                    .scaleEffect(viewModel.magnifyScale)
+                    .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
                 
             }
         }
-        .gesture(moveImage)
-        .simultaneousGesture(magnification)
-        .simultaneousGesture(rotate)
     }
     
     var toolBarButtons: some View {
@@ -208,17 +221,29 @@ private extension DFModifyFrame {
     }
     
     func saveImage() {
-        
+        // 1. 이미지 렌더링
         let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
         render.scale = scaleCompute(resultImage!)
         viewModel.image = render.uiImage
+        frameImage = render.uiImage
+        
+        // 2. CoreData 저장
         addImage(data: viewModel.image?.pngData())
+        
+        // 3. 저장 완료 메시지 표시
         viewModel.btnOpacity = 1
-//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
-//            viewModel.btnOpacity = 0
-//        }
-        print("저장잘됨")
-        viewModel.isShowCamera = true
+        
+        // 4. 지연 시간을 둬서 작업을 분산
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            // 저장 완료 메시지 숨기기
+            viewModel.btnOpacity = 0
+            
+            // 추가 지연 후 화면 전환
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                // 화면 전환
+                viewModel.isShowCamera = true
+            }
+        }
     }
     
     func checkScreenState(_ image: UIImage?) -> String {

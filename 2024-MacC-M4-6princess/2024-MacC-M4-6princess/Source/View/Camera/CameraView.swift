@@ -13,8 +13,14 @@ struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-//    @Binding var inputImage: UIImage?
+    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
+    
+    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
+        _frameImage = frameImage
+    }
+    
     //TODO: 바인딩 변수로 방금 만든 frame 불러오기
+    
     
     private var cameraPreview: some View  {
         
@@ -42,12 +48,6 @@ struct CameraView: View {
                                     .aspectRatio(contentMode: .fit)
                             }
                         }
-                        .onAppear {
-                            loadSelectedFrame()
-                        }
-                        .onChange(of: viewModel.selectedFrame) {
-                            loadSelectedFrame()
-                        }
                     }
                     CameraBottomView(viewModel: viewModel)
                 }
@@ -69,7 +69,7 @@ struct CameraView: View {
                                             .resizable()
                                             .frame(width: 114, height: 114)
                                             .padding(.bottom, 20)
-                                            
+                                        
                                         
                                         VStack {
                                             ZStack {
@@ -89,7 +89,7 @@ struct CameraView: View {
                                                 .font(.system(size: 13))
                                                 .multilineTextAlignment(.center)
                                                 .foregroundColor(.white)
-                                                .padding(.bottom, 35)
+                                                .padding(.bottom, 50)
                                                 .padding(.leading, -8)
                                             
                                         }
@@ -107,10 +107,10 @@ struct CameraView: View {
                         
                     }
                     .ignoresSafeArea(.all)
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                        .background(.black)
-                        .opacity(0.8)
-                      
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    .background(.black)
+                    .opacity(0.8)
+                    
                 }
                 if viewModel.delayTime != 0 && viewModel.isTakePic == true {
                     CameraTimerSecondsView(delayTime: $viewModel.delayTime, isTakePic: $viewModel.isTakePic)
@@ -120,29 +120,39 @@ struct CameraView: View {
                 
                 
             }
+            .onChange(of: viewModel.isFrameLoading) { newValue in
+                if newValue {
+                    loadSelectedFrame()
+                    viewModel.isFrameLoading = false
+                }
+            }
             .persistentSystemOverlays(.hidden)
             .onAppear {
                 viewModel.cameraManager.startSession()
                 motionManager.startDeviceMotionUpdates()
-//                viewModel.isFrameSelect = false
+                viewModel.frameImage = frameImage
+                if frameImage != nil {
+                    viewModel.isFrameSelected = true
+                }
+                //                viewModel.isFrameSelect = false
             }
             .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
-                CameraFrameSelectView(viewModel: viewModel)
+                CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 
             }
-//            .onChange(of: viewModel.isFrameSelect) { newValue in
-//                if !newValue {  // 프레임 선택 뷰가 닫힐 때
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // 약간의 지연을 주어 뷰 전환이 완료된 후 실행
-//                        viewModel.cameraManager.stopSession()  // 기존 세션을 중지
-//                        viewModel.cameraManager.setUp()        // 새로 설정
-//                        viewModel.cameraManager.startSession() // 세션 재시작
-//                    }
-//                } else {  // 프레임 선택 뷰가 열릴 때
-//                    viewModel.cameraManager.stopSession()  // 세션 중지
-//                }
-//            }
+            //            .onChange(of: viewModel.isFrameSelect) { newValue in
+            //                if !newValue {  // 프레임 선택 뷰가 닫힐 때
+            //                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // 약간의 지연을 주어 뷰 전환이 완료된 후 실행
+            //                        viewModel.cameraManager.stopSession()  // 기존 세션을 중지
+            //                        viewModel.cameraManager.setUp()        // 새로 설정
+            //                        viewModel.cameraManager.startSession() // 세션 재시작
+            //                    }
+            //                } else {  // 프레임 선택 뷰가 열릴 때
+            //                    viewModel.cameraManager.stopSession()  // 세션 중지
+            //                }
+            //            }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
@@ -160,14 +170,14 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
             viewModel.cameraManager.checkVideoAuthorizaion()
-//            let screenWidth = UIScreen.main.bounds.width
-//            let desiredHeight = screenWidth * (4.0/3.0)
-//            viewModel.frameSize = CGRect(
-//                x: 0,
-//                y: (UIScreen.main.bounds.height - desiredHeight) / 2,
-//                width: screenWidth,
-//                height: desiredHeight
-//            )
+            //            let screenWidth = UIScreen.main.bounds.width
+            //            let desiredHeight = screenWidth * (4.0/3.0)
+            //            viewModel.frameSize = CGRect(
+            //                x: 0,
+            //                y: (UIScreen.main.bounds.height - desiredHeight) / 2,
+            //                width: screenWidth,
+            //                height: desiredHeight
+            //            )
             
         }
         
@@ -187,6 +197,7 @@ struct CameraView: View {
             let results = try viewContext.fetch(fetchRequest)
             if let storedImage = results.first, let imageData = storedImage.image {
                 viewModel.frameImage = UIImage(data: imageData)
+//                frameImage = UIImage(data: imageData)
             } else {
                 viewModel.frameImage = nil
             }

@@ -19,7 +19,7 @@ struct PhotosPickerView: View {
         .onChange(of: selectedItem) {
             
             Task {
-                if let data = try? await selectedItem[0].loadTransferable(type: Data.self) {
+                if let data = try await selectedItem[0].loadTransferable(type: Data.self) {
                     pickedImage = UIImage(data:data)
                     if pickedImage != nil {
                         isPresented = true

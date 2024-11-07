@@ -12,24 +12,51 @@ struct IEIntroView: View {
     var idol: UIImage
     var splash = UIImage(named: "imageEditSplash")!
     @State var isMain = false
-    
+    @StateObject var viewModel = IEViewModel()
     var body: some View {
         VStack {
             ZStack{
-                IEMainView(bg: bg, idol: idol)
-                if !isMain{
-                    Group{
-                        Color.black.opacity(0.7)
-                        Image(uiImage: splash)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 200)
-                            .aspectRatio(contentMode: .fill)
-                            .onTapGesture {
-                                isMain = true
+                if !viewModel.saveAnimate{
+                    IEMainView(bg: bg, idol: idol, viewModel: viewModel)
+                    
+                    if !isMain{ // 온보딩
+                        ZStack{
+                            Color.black.opacity(0.7)
+                            VisualEffectView(effect: UIBlurEffect(style: .dark), alpha: 0.6)
+                                .ignoresSafeArea()
+                            VStack{
+                                Image(uiImage: splash)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 200)
+                                    .aspectRatio(contentMode: .fill)
+                                
+                                Button(action: {
+                                    isMain = true
+                                }) {
+                                    Text("닫기")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal,40)
+                                        .padding(.vertical,8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 17)
+                                                .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+                                            
+                                        )
+                                    
+                                        .cornerRadius(17)
+                                }
+                                .padding(.vertical,30)
+                                
                             }
+                        }
+                        .ignoresSafeArea(.all)
+                        .navigationBarHidden(true)
                     }
-                    .ignoresSafeArea(.all)
+                }
+                else{ // 저장시 애니매이션 뷰
+                    IEProgressView(isSave: $viewModel.savePhoto, viewModel: viewModel)
                 }
             }
         }
@@ -37,3 +64,4 @@ struct IEIntroView: View {
     }
     
 }
+
