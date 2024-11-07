@@ -51,7 +51,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
         self.idolImg = UIImage(named: "Felix") ?? UIImage()
-        self.defaultImg = UIImage(named: "6princess") ?? UIImage()
+        self.defaultImg = UIImage(named: "whiteBG") ?? UIImage()
         super.init()
         setupPreviewLayer()
     }

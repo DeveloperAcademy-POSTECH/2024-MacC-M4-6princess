@@ -39,7 +39,7 @@ struct CameraBottomView: View {
                 
                 //셔터 버튼
                 Button {
-                    if viewModel.isFrameSelected {
+                    if viewModel.isFrameSelected && viewModel.frameImage != nil{
                         self.viewModel.isTakePic = true
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                             viewModel.takePic()
