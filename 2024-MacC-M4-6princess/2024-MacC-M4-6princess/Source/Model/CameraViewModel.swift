@@ -45,6 +45,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var idolImg: UIImage
     let defaultImg: UIImage
     
+    var ScreenSize:CGSize = UIScreen.main.bounds.size
     
     let cameraManager: CameraManager
     
@@ -146,7 +147,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func cropToAspectRatio(image: UIImage) -> UIImage  {
         let originalWidth = image.size.width
-        let cropRect: CGRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalWidth * frameRatio)
+        let cropRect: CGRect = CGRect(x: 0, y: 125, width: originalWidth, height: originalWidth * frameRatio)
         
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image

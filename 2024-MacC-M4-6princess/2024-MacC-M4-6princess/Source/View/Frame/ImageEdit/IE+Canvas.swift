@@ -330,6 +330,7 @@ extension IEMainView{
                         
                         let one = viewModel.temp
                         viewModel.recentPop = one
+                        
                         viewModel.frameIdolSize = one.size
                         viewModel.location = one.loc
                         viewModel.rotationAngle = one.ang

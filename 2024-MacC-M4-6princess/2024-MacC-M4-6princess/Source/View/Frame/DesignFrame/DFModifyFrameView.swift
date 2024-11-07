@@ -14,7 +14,7 @@ struct DFModifyFrame: View {
         VStack {
             ZStack {
                 Color(hex: "32322f")
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.54)
                 
                 if isFirstLaunching == true {
                     DFOnboardingView(isFirstLaunching: $isFirstLaunching)
@@ -26,7 +26,7 @@ struct DFModifyFrame: View {
                 //                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
                 //                    }
                 imageView
-                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.54))
                 
                 RoundedRectangle(cornerRadius: 30)
                     .fill(Color.white)
@@ -178,7 +178,9 @@ private extension DFModifyFrame {
     func scaleCompute(_ image: UIImage) -> CGFloat {
         
 //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+//        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 1.54)
+        
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
@@ -222,7 +224,7 @@ private extension DFModifyFrame {
     
     func saveImage() {
         // 1. 이미지 렌더링
-        let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+        let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.54))
         render.scale = scaleCompute(resultImage!)
         viewModel.image = render.uiImage
         frameImage = render.uiImage
