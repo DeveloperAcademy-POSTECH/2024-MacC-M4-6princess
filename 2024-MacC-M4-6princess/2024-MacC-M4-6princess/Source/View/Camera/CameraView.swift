@@ -11,7 +11,7 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @ObservedObject private var viewModel = CameraViewModel()
+    @StateObject private var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     
@@ -23,6 +23,7 @@ struct CameraView: View {
     
     
     private var cameraPreview: some View  {
+        
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
@@ -44,7 +45,7 @@ struct CameraView: View {
                             if let image = viewModel.frameImage {
                                 Image(uiImage: image)
                                     .resizable()
-                                    .aspectRatio(contentMode: .fit)
+                                    .aspectRatio(contentMode: .fill)
                             }
                         }
                     }
@@ -127,7 +128,6 @@ struct CameraView: View {
             }
             .persistentSystemOverlays(.hidden)
             .onAppear {
-                viewModel.cameraManager.startSession()
                 motionManager.startDeviceMotionUpdates()
                 viewModel.frameImage = frameImage
                 if frameImage != nil {
@@ -169,6 +169,7 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
             viewModel.cameraManager.checkVideoAuthorizaion()
+            viewModel.cameraManager.startSession()
             //            let screenWidth = UIScreen.main.bounds.width
             //            let desiredHeight = screenWidth * (4.0/3.0)
             //            viewModel.frameSize = CGRect(
