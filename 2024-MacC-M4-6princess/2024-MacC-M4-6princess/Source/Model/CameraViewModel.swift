@@ -45,16 +45,14 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var idolImg: UIImage
     let defaultImg: UIImage
     
-//    let path = Bundle.main.path(forResource: "whatIsThis", ofType: "mp3")
-//    var audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
-    
+    var ScreenSize:CGSize = UIScreen.main.bounds.size
     
     let cameraManager: CameraManager
     
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
         self.idolImg = UIImage(named: "Felix") ?? UIImage()
-        self.defaultImg = UIImage(named: "6princess") ?? UIImage()
+        self.defaultImg = UIImage(named: "whiteBG") ?? UIImage()
         super.init()
         setupPreviewLayer()
     }
@@ -149,7 +147,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func cropToAspectRatio(image: UIImage) -> UIImage  {
         let originalWidth = image.size.width
-        let cropRect: CGRect = CGRect(x: 0, y: 0, width: originalWidth, height: originalWidth * frameRatio)
+        let cropRect: CGRect = CGRect(x: 0, y: 125, width: originalWidth, height: originalWidth * frameRatio)
         
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image

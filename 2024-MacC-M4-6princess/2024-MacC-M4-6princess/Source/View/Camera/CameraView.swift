@@ -116,9 +116,6 @@ struct CameraView: View {
                     CameraTimerSecondsView(delayTime: $viewModel.delayTime, isTakePic: $viewModel.isTakePic)
                         .ignoresSafeArea(.all, edges: .all)
                 }
-                
-                
-                
             }
             .onChange(of: viewModel.isFrameLoading) { newValue in
                 if newValue {
@@ -133,7 +130,6 @@ struct CameraView: View {
                 if frameImage != nil {
                     viewModel.isFrameSelected = true
                 }
-                //                viewModel.isFrameSelect = false
             }
             .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
                 CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
@@ -141,43 +137,20 @@ struct CameraView: View {
                     .presentationDragIndicator(.visible)
                 
             }
-            //            .onChange(of: viewModel.isFrameSelect) { newValue in
-            //                if !newValue {  // 프레임 선택 뷰가 닫힐 때
-            //                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // 약간의 지연을 주어 뷰 전환이 완료된 후 실행
-            //                        viewModel.cameraManager.stopSession()  // 기존 세션을 중지
-            //                        viewModel.cameraManager.setUp()        // 새로 설정
-            //                        viewModel.cameraManager.startSession() // 세션 재시작
-            //                    }
-            //                } else {  // 프레임 선택 뷰가 열릴 때
-            //                    viewModel.cameraManager.stopSession()  // 세션 중지
-            //                }
-            //            }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
                 if let takenImg = viewModel.takenImg,let frameImg = viewModel.frameImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
-                else{
-                    IEIntroView(bg: viewModel.defaultImg,idol: viewModel.idolImg)
-                    
-                }
+                
             }
             
         }
         .onAppear {
             // 프레임 크기 설정
-            viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            //            let screenWidth = UIScreen.main.bounds.width
-            //            let desiredHeight = screenWidth * (4.0/3.0)
-            //            viewModel.frameSize = CGRect(
-            //                x: 0,
-            //                y: (UIScreen.main.bounds.height - desiredHeight) / 2,
-            //                width: screenWidth,
-            //                height: desiredHeight
-            //            )
             
         }
         

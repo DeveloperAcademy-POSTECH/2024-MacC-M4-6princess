@@ -29,7 +29,7 @@ struct IECanvasView: View {
             // 아이돌 이미지
             Image(uiImage: viewModel.idolImg)
                 .resizable()
-                .scaledToFit()
+                .aspectRatio(contentMode: .fill)
                 .rotationEffect(viewModel.rotationAngle)
                 .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
                 .scaleEffect(currentScale)
