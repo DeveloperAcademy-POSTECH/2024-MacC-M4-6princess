@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+//    @State private var inputImage: UIImage?
+    
     var body: some View {
         
                 CameraView()

@@ -80,13 +80,15 @@ private extension DFModifyFrame {
         DragGesture()
             .onChanged { value in
 //                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
-                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + (value.translation.width / viewModel.magnifyScale)
-                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + (value.translation.height / viewModel.magnifyScale)
+                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
+                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+                
             }
             .onEnded { value in
-                
-                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
-                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
+                viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
+                viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+//                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
+//                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
                 
             }
         
@@ -99,7 +101,7 @@ private extension DFModifyFrame {
                 viewModel.setScaleVolume(value.magnification)
             }
             .onEnded { value in
-                viewModel.setScaleValue(minimum: 1.0, maximum: 3.0)
+                viewModel.setScaleValue(minimum: 0.2, maximum: 10)
             }
     }
     
@@ -113,16 +115,14 @@ private extension DFModifyFrame {
                     .resizable()
                     .scaledToFit()
                     .frame(width: image.size.width / scaleCompute(resultImage!), height: image.size.height / scaleCompute(resultImage!))
-                    .padding(.bottom, 20)
+//                    .padding(.bottom, 20)
+                    .scaleEffect(viewModel.magnifyScale)
                     .rotationEffect(viewModel.angle)
                     .offset(viewModel.draggedOffSet)
-                    .scaleEffect(viewModel.magnifyScale)
+                    .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
                 
             }
         }
-        .gesture(moveImage)
-        .simultaneousGesture(magnification)
-        .simultaneousGesture(rotate)
     }
     
     var toolBarButtons: some View {
@@ -182,7 +182,7 @@ private extension DFModifyFrame {
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-            print("\(scale)")
+//            print("\(scale)")
         }
         return scale
     }
@@ -245,6 +245,7 @@ private extension DFModifyFrame {
             }
         }
     }
+    
     func checkScreenState(_ image: UIImage?) -> String {
         if image!.size.width > image!.size.height {
             return "horizon"
