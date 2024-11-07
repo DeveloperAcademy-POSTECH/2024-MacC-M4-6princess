@@ -45,6 +45,9 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var idolImg: UIImage
     let defaultImg: UIImage
     
+//    let path = Bundle.main.path(forResource: "whatIsThis", ofType: "mp3")
+//    var audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
+    
     
     let cameraManager: CameraManager
     
