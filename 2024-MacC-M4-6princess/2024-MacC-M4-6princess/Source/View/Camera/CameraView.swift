@@ -23,6 +23,7 @@ struct CameraView: View {
     
     
     private var cameraPreview: some View  {
+        
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)

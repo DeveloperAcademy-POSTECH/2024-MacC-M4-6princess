@@ -34,10 +34,7 @@ class DFModifyFrameViewModel: ObservableObject {
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         
         if magnifyScale < minimum {
-            
             magnifyScale = minimum
-            draggedOffSet = .zero
-            accumulatedOffSet = .zero
             
         } else if magnifyScale > maximum {
             magnifyScale = maximum
