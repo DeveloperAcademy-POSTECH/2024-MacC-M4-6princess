@@ -156,6 +156,7 @@ struct CameraView: View {
         
     }
     //이미지 렌더링해서 불러오기
+    // TODO: 뷰모델이나 extension으로 분리하기?
     private func loadSelectedFrame() {
         guard let frameId = viewModel.selectedFrame else {
             viewModel.frameImage = nil

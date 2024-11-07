@@ -24,11 +24,8 @@ struct IEMainView: View {
                     Spacer()
                     // 후보정 레이어 편집 뷰
                     canvasView
-//                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     Spacer()
                 }
-                //                canvasView
-                //                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                 VStack{
                     Color.white
                         .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2+11)

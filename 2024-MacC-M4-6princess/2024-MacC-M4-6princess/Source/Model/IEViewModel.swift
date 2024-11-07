@@ -60,7 +60,7 @@ class IEViewModel: ObservableObject {
     var bgRatio: CGFloat = .zero
     var idolRatio:CGFloat = .zero
     private var cancellables = Set<AnyCancellable>()
-    
+    let frameRatio = 1.54
     // 편집 옵션 배열
     let colorEditOptions: [IEEditingOption] = [
         IEEditingOption(name: "밝기", icon: "luminosity",range:-0.1...0.1,step: 0.001),
@@ -120,14 +120,9 @@ class IEViewModel: ObservableObject {
     /// 사진 저장 함수
     @MainActor
     func saveRenderedView<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
-        // ImageRenderer를 이용해서 합성 이미지 생성
-        //        let renderedImage = ImageRenderer(content: content.frame(width: frameBGSize.width, height: frameBGSize.height))
-        //
-        //        let startPoint = CGPoint(x: 0, y: 82)
         let renderedImage = ImageRenderer(
             content: content
-                .frame(width: frameBGSize.width, height: frameBGSize.width * 1.54)
-            //                    .offset(x: startPoint.x, y: startPoint.y) // 원하는 시작 위치 설정
+                .frame(width: frameBGSize.width, height: frameBGSize.width * frameRatio)
         )
         // 해상도
         renderedImage.scale = 8.0

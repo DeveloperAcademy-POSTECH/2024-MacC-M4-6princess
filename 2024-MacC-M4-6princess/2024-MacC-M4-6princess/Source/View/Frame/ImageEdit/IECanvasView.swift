@@ -18,7 +18,6 @@ struct IECanvasView: View {
         ZStack {
             // 배경 이미지
             if let originalImage = viewModel.applyColorFilter(originalImage: viewModel.bgImg)
-            //                ,let croppedImage = originalImage.cropToAspectRatio(8.5 / 5.5)
             {
                 Image(uiImage: originalImage)
                     .resizable()
