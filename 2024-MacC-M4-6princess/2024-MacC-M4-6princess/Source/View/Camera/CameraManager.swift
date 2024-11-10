@@ -77,6 +77,21 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func setUp() {
+        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else { return }
+                
+                // 지원되는 포맷 중에서 원하는 비율과 가장 근접한 것을 선택
+                let formats = device.formats
+                let desiredAspectRatio = 1.54
+                
+                if let format = formats.first(where: { format in
+                    let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+                    let aspectRatio = Float(dimensions.height) / Float(dimensions.width)
+                    return abs(Float(desiredAspectRatio) - aspectRatio) < 0.1
+                }) {
+                    try? device.lockForConfiguration()
+                    device.activeFormat = format
+                    device.unlockForConfiguration()
+                }
             do {
                 
                 // 세션 구성 시작

@@ -30,7 +30,8 @@ struct CameraTopView: View {
             }
         }
         .frame(width: UIScreen.main.bounds.width, height: 94)
-        .background(.white)
+//        .background(.white)
+        .background(.black)
     }
 }
 

@@ -14,22 +14,29 @@ struct CameraPreview: UIViewRepresentable {
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: UIScreen.main.bounds)
-            
-            
-            DispatchQueue.main.async {
-                viewModel.preview = AVCaptureVideoPreviewLayer(session: viewModel.cameraManager.session)
-                viewModel.preview.frame = viewModel.frameSize
-                viewModel.preview.videoGravity = .resizeAspectFill
-                view.layer.addSublayer(viewModel.preview)
-                
-//                viewModel.cameraManager.session.startRunning()
-            }
         
-            return view
+        DispatchQueue.main.async {
+            viewModel.preview = AVCaptureVideoPreviewLayer(session: viewModel.cameraManager.session)
+            
+            // 커스텀 비율 계산
+            let screenWidth = UIScreen.main.bounds.width
+            let height = screenWidth * 1.54
+            let previewFrame = CGRect(x: 0, y: 0, width: screenWidth, height: height)
+            
+            viewModel.preview.frame = previewFrame
+            viewModel.preview.videoGravity = .resizeAspect
+            view.layer.addSublayer(viewModel.preview)
+        }
+        
+        return view
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-//        viewModel.cameraManager.stopSession()
-//        viewModel.preview.frame = uiView.bounds
+        viewModel.preview.frame = CGRect(
+            x: 0,
+            y: 0,
+            width: uiView.frame.width,
+            height: uiView.frame.width * 1.54
+        )
     }
 }

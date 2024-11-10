@@ -133,11 +133,13 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
         
-        let croppedImage = cropToAspectRatio(image: image)
+//        let croppedImage = cropToAspectRatio(image: image)
         
         DispatchQueue.main.async {
-            self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
-            self.takenImg = croppedImage
+//            self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
+//            self.takenImg = croppedImage
+            self.picData = imageData
+            self.takenImg = image
             self.nextView = true
             print("nextView:\(self.nextView)")
             print("이미지 사이즈: \(image.size)")

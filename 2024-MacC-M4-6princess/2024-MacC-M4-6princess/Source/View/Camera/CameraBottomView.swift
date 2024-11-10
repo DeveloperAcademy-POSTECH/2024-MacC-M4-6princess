@@ -71,7 +71,8 @@ struct CameraBottomView: View {
         .padding(.horizontal, 20)
         
         .frame(width: UIScreen.main.bounds.width, height: 132)
-        .background(.white)
+//        .background(.white)
+        .background(.black)
     }
 }
 

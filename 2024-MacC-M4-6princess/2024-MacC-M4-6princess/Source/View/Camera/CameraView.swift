@@ -22,25 +22,26 @@ struct CameraView: View {
     //TODO: 바인딩 변수로 방금 만든 frame 불러오기
     
     
-    private var cameraPreview: some View  {
-        
-        GeometryReader { geo in
-            CameraPreview(viewModel: viewModel)
-                .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
-                .onAppear {
-                    viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
-                }
-        }
-    }
+//    private var cameraPreview: some View  {
+//
+//        GeometryReader { geo in
+//            CameraPreview(viewModel: viewModel)
+//                .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+//                .onAppear {
+//                    viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+//                }
+//        }
+//    }
     
     var body: some View {
         NavigationStack {
             ZStack {
                 VStack{
                     CameraTopView(viewModel: viewModel)
+                    Spacer()
                     ZStack{
-                        cameraPreview
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
+//                        cameraPreview
+                        CameraPreview(viewModel: viewModel)
                         Group{
                             if let image = viewModel.frameImage {
                                 Image(uiImage: image)
@@ -49,6 +50,7 @@ struct CameraView: View {
                             }
                         }
                     }
+                    Spacer()
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end
