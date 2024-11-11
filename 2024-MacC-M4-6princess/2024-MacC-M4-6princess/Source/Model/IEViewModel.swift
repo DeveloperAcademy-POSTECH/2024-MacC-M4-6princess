@@ -126,7 +126,7 @@ class IEViewModel: ObservableObject {
         //        let startPoint = CGPoint(x: 0, y: 82)
         let renderedImage = ImageRenderer(
             content: content
-                .frame(width: frameBGSize.width, height: frameBGSize.width * 1.54)
+                .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
             //                    .offset(x: startPoint.x, y: startPoint.y) // 원하는 시작 위치 설정
         )
         // 해상도

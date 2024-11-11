@@ -26,7 +26,7 @@ struct _024_MacC_M4_6princessApp: App {
 class EnvironmentModel: ObservableObject {
     var frameWidth: CGFloat = 300
     var frameHeight: CGFloat = 500
-    var frameRatio: CGFloat = 1.54
+    var frameRatio: CGFloat = 4/3
     
     // 초기화 메서드 (필요 시 사용 가능)
     init(width: CGFloat = 100, height: CGFloat = 100,frameRatio: CGFloat = 1) {
