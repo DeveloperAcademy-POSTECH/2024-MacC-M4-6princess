@@ -366,9 +366,9 @@ extension IEMainView{
 
 extension UIImage {
     func cropToAspectRatio(_ targetAspectRatio: CGFloat) -> UIImage? {
-        let originalWidth = size.width
-        let originalHeight = size.height
-        
+//        let originalWidth = size.width
+//        let originalHeight = size.height
+//        
         var cropRect: CGRect
         
         
