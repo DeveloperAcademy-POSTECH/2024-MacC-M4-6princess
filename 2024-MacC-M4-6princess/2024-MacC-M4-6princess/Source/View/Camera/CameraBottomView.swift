@@ -65,7 +65,9 @@ struct CameraBottomView: View {
                 
                 //타이머 설정 버튼
                 CameraTimerView(delayTime: $viewModel.delayTime, isPushed: $viewModel.isPushedTimer)
-            }
+            }.padding(.top, 12)
+                .padding(.bottom, 28)
+            
             Spacer()
         }
         .padding(.horizontal, 20)

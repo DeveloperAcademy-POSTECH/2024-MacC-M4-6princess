@@ -22,7 +22,7 @@ struct IECanvasView: View {
             {
                 Image(uiImage: originalImage)
                     .resizable()
-                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+//                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     .aspectRatio(contentMode: .fit)
             }
             
