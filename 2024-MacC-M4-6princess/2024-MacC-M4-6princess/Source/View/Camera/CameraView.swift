@@ -34,6 +34,7 @@ struct CameraView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
             ZStack {
                 VStack{
@@ -70,33 +71,63 @@ struct CameraView: View {
                                             .frame(width: 114, height: 114)
                                             .padding(.bottom, 20)
                                         
-                                        
-                                        VStack {
-                                            ZStack {
-                                                Rectangle()
-                                                    .cornerRadius(5)
-                                                    .frame(width: 40, height: 40)
-                                                    .foregroundColor(.pointPink)
-                                                
-                                                Image("frameLoadWhite")
-                                                    .resizable()
-                                                    .frame(width: 40, height: 40)
-                                            }
-                                            .padding(.bottom, 4)
-                                            .padding(.leading, -8)
-                                            
-                                            Text("불러오기")
-                                                .font(.system(size: 13))
-                                                .multilineTextAlignment(.center)
-                                                .foregroundColor(.white)
-                                                .padding(.bottom, 50)
+                                        if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                                            VStack {
+                                                ZStack {
+                                                    Rectangle()
+                                                        .cornerRadius(5)
+                                                        .frame(width: 40, height: 40)
+                                                        .foregroundColor(.pointPink)
+                                                    
+                                                    Image("frameLoadWhite")
+                                                        .resizable()
+                                                        .frame(width: 40, height: 40)
+                                                }
+                                                .padding(.bottom, 4)
                                                 .padding(.leading, -8)
-                                            
+                                                
+                                                Text("불러오기")
+                                                    .font(.system(size: 13))
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundColor(.white)
+                                                    .padding(.bottom, 60)
+                                                    .padding(.leading, -8)
+                                                
+                                            }
+                                            .onTapGesture {
+                                                viewModel.firstTime = true
+                                                viewModel.isFrameSelect.toggle()
+                                            }
                                         }
-                                        .onTapGesture {
-                                            viewModel.firstTime = true
-                                            viewModel.isFrameSelect.toggle()
+                                        else{
+                                            VStack {
+                                                ZStack {
+                                                    Rectangle()
+                                                        .cornerRadius(5)
+                                                        .frame(width: 40, height: 40)
+                                                        .foregroundColor(.pointPink)
+                                                    
+                                                    Image("frameLoadWhite")
+                                                        .resizable()
+                                                        .frame(width: 40, height: 40)
+                                                }
+                                                .padding(.bottom, 4)
+                                                .padding(.leading, -8)
+                                                
+                                                Text("불러오기")
+                                                    .font(.system(size: 13))
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundColor(.white)
+                                                    .padding(.bottom, 20)
+                                                    .padding(.leading, -8)
+                                                
+                                            }
+                                            .onTapGesture {
+                                                viewModel.firstTime = true
+                                                viewModel.isFrameSelect.toggle()
+                                            }
                                         }
+                                       
                                     }
                                     .padding(.leading, -10)
                                     Spacer()

@@ -53,7 +53,12 @@ struct IEMainView: View {
                         ColorSlider(idx)
                     }
                 }
-                bottomBar()
+                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                    bottomBar()
+                }
+                else{
+                    bottomBarIpad()
+                }
             }
             /// 원본 보기 클릭시 1초간 "원본" 표시가 남
             if viewModel.showRawAlert{
