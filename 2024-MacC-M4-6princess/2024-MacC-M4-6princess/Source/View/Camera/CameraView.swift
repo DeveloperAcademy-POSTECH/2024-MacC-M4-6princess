@@ -10,8 +10,8 @@ import AVFoundation
 import CoreData
 
 struct CameraView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var viewModel = CameraViewModel()
+    @Environment(\.managedObjectContext) var viewContext
+    @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     
@@ -155,28 +155,5 @@ struct CameraView: View {
         }
         
     }
-    //이미지 렌더링해서 불러오기
-    private func loadSelectedFrame() {
-        guard let frameId = viewModel.selectedFrame else {
-            viewModel.frameImage = nil
-            return
-        }
-        
-        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try viewContext.fetch(fetchRequest)
-            if let storedImage = results.first, let imageData = storedImage.image {
-                viewModel.frameImage = UIImage(data: imageData)
-//                frameImage = UIImage(data: imageData)
-            } else {
-                viewModel.frameImage = nil
-            }
-        } catch {
-            print("Error fetching frame: \(error)")
-            viewModel.frameImage = nil
-        }
-    }
+    
 }
