@@ -60,6 +60,13 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         self.defaultImg = UIImage(named: "whiteBG") ?? UIImage()
         super.init()
         setupPreviewLayer()
+        
+        if cameraManager.videoDeviceInput?.device.deviceType == .builtInUltraWideCamera {
+            currentZoomFactor = 2.0
+        }
+        else if cameraManager.videoDeviceInput?.device.deviceType == .builtInWideAngleCamera {
+            currentZoomFactor = 1.0
+        }
     }
     
     
@@ -170,6 +177,16 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         return normalizedImage
     }
     
+    // 줌 제스처를 위한 함수
+    func zoom(factor: CGFloat) {
+        let delta = factor / lastScale
+        lastScale = factor
+        
+        // 현재 줌 상태에서 변화량을 적용
+        setZoom(factor: currentZoomFactor * delta)
+    }
+
+    // 버튼이나 직접 줌 설정을 위한 함수
     func setZoom(factor: CGFloat) {
         guard let device = cameraManager.videoDeviceInput?.device else { return }
         let zoomRange = getZoomRange(for: device)
@@ -179,21 +196,21 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             try device.lockForConfiguration()
             device.videoZoomFactor = newScale
             device.unlockForConfiguration()
-            currentZoomFactor = newScale
+            currentZoomFactor = newScale  // 현재 줌 상태 업데이트
         } catch {
             print("줌 설정 오류: \(error)")
         }
     }
-    
+
     func zoomInitialize() {
-        lastScale = 1.0
+        lastScale = 1.0  // 제스처를 위한 scale만 초기화
         print("스케일 초기화됨")
     }
-    
+
     func getZoomRange(for device: AVCaptureDevice) -> ClosedRange<CGFloat> {
         switch device.deviceType {
         case .builtInUltraWideCamera:
-            return 1.0...3.0
+            return 2.0...4.0
         case .builtInWideAngleCamera:
             return 1.0...3.0
         default:

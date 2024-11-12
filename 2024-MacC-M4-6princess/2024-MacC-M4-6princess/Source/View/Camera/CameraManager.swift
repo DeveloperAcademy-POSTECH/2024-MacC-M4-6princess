@@ -149,7 +149,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func startSession() {
-        Task.detached { @MainActor in
+        Task.detached {
                     if !self.session.isRunning {
                         self.session.startRunning()
                     }
@@ -157,7 +157,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func stopSession() {
-        Task.detached { @MainActor in
+        Task.detached {
                     if !self.session.isRunning {
                         self.session.stopRunning()
                     }
@@ -178,19 +178,19 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 self.output.capturePhoto(with: settings, delegate: delegate)
             }
         }
-//    func zoom(_ zoom: CGFloat){
-//            let factor = zoom < 1 ? 1 : zoom
-//            let device = self.videoDeviceInput!.device
-//            
-//            do {
-//                try device.lockForConfiguration()
-//                device.videoZoomFactor = factor
-//                device.unlockForConfiguration()
-//            }
-//            catch {
-//                print(error.localizedDescription)
-//            }
-//        }
+    func zoom(_ zoom: CGFloat){
+            let factor = zoom < 1 ? 1 : zoom
+            let device = self.videoDeviceInput!.device
+            
+            do {
+                try device.lockForConfiguration()
+                device.videoZoomFactor = factor
+                device.unlockForConfiguration()
+            }
+            catch {
+                print(error.localizedDescription)
+            }
+        }
 }
 
 

@@ -39,7 +39,7 @@ struct CameraView: View {
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
                     .gesture(MagnificationGesture()
                         .onChanged { val in
-                            viewModel.setZoom(factor: val)
+                            viewModel.zoom(factor: val)
                         }
                         .onEnded { _ in
                             viewModel.zoomInitialize()
