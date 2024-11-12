@@ -12,7 +12,7 @@ import Photos
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     @AppStorage("openFirstTime") var firstTime = false
-//        @State var firstTime = false
+    //        @State var firstTime = false
     
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false
@@ -45,16 +45,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var currentZoomFactor: CGFloat = 1.0
     @Published var lastScale: CGFloat = 1.0
     
+    //카메라 화면전환 관련
+    @Published var cameraPosition: AVCaptureDevice.Position = .front
+    
     // 이미지 관련
     @Published var idolImg: UIImage
     let defaultImg: UIImage
-    
     var ScreenSize:CGSize = UIScreen.main.bounds.size
-    
     let cameraManager: CameraManager
-    
-    
-    
+
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
         self.idolImg = UIImage(named: "Felix") ?? UIImage()
@@ -62,9 +61,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         super.init()
         setupPreviewLayer()
     }
-    //    @Published var picData: [Data] = []
-    //    @Published var imageViews: [UIImage] = [] // UIImageView 배열
-
+    
+    
     
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
@@ -72,43 +70,14 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     
     
-    ///이후 찍는 횟수 기능에 쓰이는 사진 촬영 함수
-    //    func takeManyPic() {
-    //        DispatchQueue.global(qos: .background).async {
+    //    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+    //        print("카메라 셔터음 무음으로 변경됨")
+    //        AudioServicesDisposeSystemSoundID(1108)
     //
-    //            self.cameraManager.output.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
-    //
-    //        }
     //    }
-    
-    ///사진 재촬영 함수
-    //    func reTake() {
-    //
-    //        DispatchQueue.global(qos: .background).async {
-    //            self.cameraManager.startSession()
-    //
-    //            DispatchQueue.main.async {
-    //                withAnimation {
-    //                    self.isTakenPhoto = false
-    //                }
-    //                //변수 초기화
-    //                self.isSavedPhotoData = false
-    //                self.picData = Data(count: 0) //picData 초기화
-    //                //                self.imageViews = []
-    //                //                self.picData = [] // picData 초기화
-    //            }
-    //        }
+    //    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+    //        AudioServicesDisposeSystemSoundID(1108)
     //    }
-
-    
-//    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//        print("카메라 셔터음 무음으로 변경됨")
-//        AudioServicesDisposeSystemSoundID(1108)
-//        
-//    }
-//    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//        AudioServicesDisposeSystemSoundID(1108)
-//    }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -132,10 +101,10 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
         
         // 이미지 크기를 frameSize로 조정
-//        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
-//        image = renderer.image { _ in
-//            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
-//        }
+        //        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+        //        image = renderer.image { _ in
+        //            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
+        //        }
         
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
@@ -172,6 +141,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func changeCamera() {
         cameraManager.changeCamera()
+        if cameraManager.videoDeviceInput?.device.position == .front {
+            cameraPosition = .back
+            currentZoomFactor = 1.0
+        }
+        else {
+            cameraPosition = .front
+            currentZoomFactor = 0.8
+        }
+        
     }
     
     func fixOrientation(_ image: UIImage) -> UIImage {
@@ -191,19 +169,35 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         return normalizedImage
     }
     
-    func zoom(factor: CGFloat) {
-            let delta = factor / lastScale
-            lastScale = factor
-            
-            let newScale = min(max(currentZoomFactor * delta, 1), 5)
-            cameraManager.zoom(newScale)
-            currentZoomFactor = newScale
-        }
+    func setZoom(factor: CGFloat) {
+        guard let device = cameraManager.videoDeviceInput?.device else { return }
+        let zoomRange = getZoomRange(for: device)
+        let newScale = min(max(factor, zoomRange.lowerBound), zoomRange.upperBound)
         
-        func zoomInitialize() {
-            lastScale = 1.0
-            print("스케일 초기화됨")
+        do {
+            try device.lockForConfiguration()
+            device.videoZoomFactor = newScale
+            device.unlockForConfiguration()
+            currentZoomFactor = newScale
+        } catch {
+            print("줌 설정 오류: \(error)")
         }
+    }
     
+    func zoomInitialize() {
+        lastScale = 1.0
+        print("스케일 초기화됨")
+    }
+    
+    func getZoomRange(for device: AVCaptureDevice) -> ClosedRange<CGFloat> {
+        switch device.deviceType {
+        case .builtInUltraWideCamera:
+            return 1.0...3.0
+        case .builtInWideAngleCamera:
+            return 1.0...3.0
+        default:
+            return 1.0...device.maxAvailableVideoZoomFactor
+        }
+    }
 }
 

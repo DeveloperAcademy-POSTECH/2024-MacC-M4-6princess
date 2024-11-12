@@ -10,8 +10,8 @@ import AVFoundation
 import CoreData
 
 struct CameraView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var viewModel = CameraViewModel()
+    @Environment(\.managedObjectContext) var viewContext
+    @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     
@@ -34,16 +34,7 @@ struct CameraView: View {
         NavigationStack {
             ZStack{
                 //TODO: 줌 한 화면대로 처리되도록
-                cameraPreview
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                    .gesture(MagnificationGesture()
-                        .onChanged { val in
-                            viewModel.zoom(factor: val)
-                        }
-                        .onEnded { _ in
-                            viewModel.zoomInitialize()
-                        }
-                    )
+                
                 Group{
                     if let image = viewModel.frameImage {
                         Image(uiImage: image)
@@ -51,7 +42,7 @@ struct CameraView: View {
                             .aspectRatio(contentMode: .fill)
                     }
                 }
-                .allowsHitTesting(false)
+                
                 
                 VStack {
                     CameraTopView(viewModel: viewModel)

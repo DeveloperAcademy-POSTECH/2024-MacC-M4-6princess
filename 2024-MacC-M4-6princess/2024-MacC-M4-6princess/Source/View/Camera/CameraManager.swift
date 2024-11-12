@@ -77,35 +77,55 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func setUp() {
-            do {
-                
-                // 세션 구성 시작
-                self.session.beginConfiguration()
-                
-                // 카메라 디바이스 설정
-                let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
-                
-                // 새 입력 생성
-                let input = try AVCaptureDeviceInput(device: device!)
-                if self.session.canAddInput(input) {
-                    self.session.addInput(input)
-                    self.videoDeviceInput = input
-                }
-                
-                // 출력 설정
-                if self.session.canAddOutput(self.output) {
-                    self.session.addOutput(self.output)
-                }
-                
-                // 세션 구성 완료
-                self.session.commitConfiguration()
-                
-//              // 세션 시작
-                startSession()
-            } catch {
-                print("카메라 설정 오류: \(error)")
+        do {
+            self.session.beginConfiguration()
+            
+            // 사용 가능한 카메라 확인
+            let discoverySession = AVCaptureDevice.DiscoverySession(
+                deviceTypes: [
+                    .builtInUltraWideCamera,
+                    .builtInWideAngleCamera,
+                    .builtInDualCamera,
+                    .builtInTripleCamera
+                ],
+                mediaType: .video,
+                position: .back
+            )
+            
+            // 사용 가능한 카메라 중 최적의 카메라 선택
+            guard let device = getBestCamera(from: discoverySession.devices) else {
+                throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No available camera"])
             }
+            print("설정된 렌즈 : \(device.deviceType.rawValue)")
+            
+            let input = try AVCaptureDeviceInput(device: device)
+            if self.session.canAddInput(input) {
+                self.session.addInput(input)
+                self.videoDeviceInput = input
+            }
+            
+            if self.session.canAddOutput(self.output) {
+                self.session.addOutput(self.output)
+            }
+            
+            self.session.commitConfiguration()
+            startSession()
+        } catch {
+            print("카메라 설정 오류: \(error)")
         }
+    }
+
+    func getBestCamera(from devices: [AVCaptureDevice]) -> AVCaptureDevice? {
+        // 우선순위에 따라 카메라 선택
+        if let ultraWideCamera = devices.first(where: { $0.deviceType == .builtInUltraWideCamera }) {
+            return ultraWideCamera
+        }
+        if let wideAngleCamera = devices.first(where: { $0.deviceType == .builtInWideAngleCamera }) {
+            return wideAngleCamera
+        }
+        // 기본 카메라 반환
+        return devices.first
+    }
     
     func changeCamera() {
         guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else { return }
@@ -158,19 +178,19 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 self.output.capturePhoto(with: settings, delegate: delegate)
             }
         }
-    func zoom(_ zoom: CGFloat){
-            let factor = zoom < 1 ? 1 : zoom
-            let device = self.videoDeviceInput!.device
-            
-            do {
-                try device.lockForConfiguration()
-                device.videoZoomFactor = factor
-                device.unlockForConfiguration()
-            }
-            catch {
-                print(error.localizedDescription)
-            }
-        }
+//    func zoom(_ zoom: CGFloat){
+//            let factor = zoom < 1 ? 1 : zoom
+//            let device = self.videoDeviceInput!.device
+//            
+//            do {
+//                try device.lockForConfiguration()
+//                device.videoZoomFactor = factor
+//                device.unlockForConfiguration()
+//            }
+//            catch {
+//                print(error.localizedDescription)
+//            }
+//        }
 }
 
 
