@@ -32,7 +32,7 @@ struct DFModifyFrame: View {
                     .fill(Color.white)
                     .opacity(viewModel.btnOpacity)
                     .frame(width: 175, height: 38)
-                    .overlay(Text("프레임을 저장 중입니다...").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                    .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                 
             }
         }
@@ -40,20 +40,20 @@ struct DFModifyFrame: View {
         .toolbar {
             toolBarButtons
         }
-//        .navigationDestination(isPresented: $viewModel.isShowCamera) {
-//            CameraView()
-//        }
+        //        .navigationDestination(isPresented: $viewModel.isShowCamera) {
+        //            CameraView()
+        //        }
         .onChange(of: viewModel.isShowCamera) { newValue in
-                    if newValue {
-                        // 1초 후에 화면 전환
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            shouldNavigate = true
-                        }
-                    }
+            if newValue {
+                // 1초 후에 화면 전환
+                DispatchQueue.main.async() {
+                    shouldNavigate = true
                 }
-                .fullScreenCover(isPresented: $shouldNavigate) {
-                    CameraView(frameImage: $frameImage)
-                }
+            }
+        }
+        .fullScreenCover(isPresented: $shouldNavigate) {
+            CameraView(frameImage: $frameImage)
+        }
         .onAppear {
             makeHistory()
         }
@@ -79,7 +79,7 @@ private extension DFModifyFrame {
         
         DragGesture()
             .onChanged { value in
-//                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
+                //                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
                 viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
                 viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
                 
@@ -87,8 +87,8 @@ private extension DFModifyFrame {
             .onEnded { value in
                 viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
                 viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
-//                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
-//                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
+                //                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
+                //                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
                 
             }
         
@@ -115,7 +115,7 @@ private extension DFModifyFrame {
                     .resizable()
                     .scaledToFit()
                     .frame(width: image.size.width / scaleCompute(resultImage!), height: image.size.height / scaleCompute(resultImage!))
-//                    .padding(.bottom, 20)
+                //                    .padding(.bottom, 20)
                     .scaleEffect(viewModel.magnifyScale)
                     .rotationEffect(viewModel.angle)
                     .offset(viewModel.draggedOffSet)
@@ -147,7 +147,18 @@ private extension DFModifyFrame {
             Spacer()
             Button {
                 
-                saveImage()
+                if let image = resultImage {
+                    viewModel.saveStateText = "저장중 입니다..."
+                    viewModel.isPushedSaveBtn = true
+                    saveImage(inputImage: image)
+                } else {
+                    viewModel.saveStateText = "저장할 이미지가 없습니다."
+                    Task {
+                        viewModel.btnOpacity = 1
+                        try await Task.sleep(for: .seconds(1))
+                        viewModel.btnOpacity = 0
+                    }
+                }
                 
             } label: {
                 Text("저장")
@@ -156,6 +167,7 @@ private extension DFModifyFrame {
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
             .padding(.leading, 150)
+            .disabled(viewModel.isPushedSaveBtn)
             
         }
     }
@@ -164,7 +176,7 @@ private extension DFModifyFrame {
 private extension DFModifyFrame {
     
     func makeHistory() {
-
+        
         if let image = resultImage {
             
             let render = ImageRenderer(content: self.imageView.frame(width: image.size.width / (scaleCompute(image) * 2), height: image.size.height / scaleCompute(image)))
@@ -184,10 +196,11 @@ private extension DFModifyFrame {
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-//            print("\(scale)")
+            //            print("\(scale)")
         }
         return scale
     }
+    
     
     func saveContext() {
         do {
@@ -222,31 +235,26 @@ private extension DFModifyFrame {
         resultImage = viewModel.imageHistory[viewModel.indexOfHistory]
     }
     
-    func saveImage() {
-        // 1. 이미지 렌더링
-        let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-        render.scale = scaleCompute(resultImage!)
-        viewModel.image = render.uiImage
-        frameImage = render.uiImage
+    func saveImage(inputImage: UIImage) {
         
-        // 2. CoreData 저장
-        addImage(data: viewModel.image?.pngData())
-        
-        // 3. 저장 완료 메시지 표시
         viewModel.btnOpacity = 1
-        
+
         // 4. 지연 시간을 둬서 작업을 분산
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        Task {
             // 저장 완료 메시지 숨기기
-//            viewModel.btnOpacity = 0
-            
-            // 추가 지연 후 화면 전환
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                // 화면 전환
-                viewModel.isShowCamera = true
-            }
+            let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
+            render.scale = scaleCompute(inputImage)
+            viewModel.image = render.uiImage
+//            try await Task.sleep(nanoseconds: 1_000_000_000)
+            addImage(data: viewModel.image?.pngData())
+//            try await Task.sleep(nanoseconds: 200_000_000)
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            viewModel.btnOpacity = 0
+            viewModel.isShowCamera = true
         }
+
     }
+    
     
     func checkScreenState(_ image: UIImage?) -> String {
         if image!.size.width > image!.size.height {
