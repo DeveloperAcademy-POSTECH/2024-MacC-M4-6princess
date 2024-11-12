@@ -26,6 +26,8 @@ class DFModifyFrameViewModel: ObservableObject {
     @Published var angle: Angle = .degrees(0)
     @Published var current: Angle = .degrees(0)
     @Published var anchor: UnitPoint = .zero
+    @Published var isPushedSaveBtn: Bool = false
+    @Published var saveStateText: String = ""
     
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()

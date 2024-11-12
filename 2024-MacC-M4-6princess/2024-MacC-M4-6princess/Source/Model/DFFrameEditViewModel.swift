@@ -134,6 +134,7 @@ class DFFrameEditViewModel: ObservableObject {
         }
         
         Task { @MainActor in
+            
             if let maskImage = maskImage {
                 
                 let outputImage = apply(mask: CIImage(image: maskImage)!, to: inputImage)
