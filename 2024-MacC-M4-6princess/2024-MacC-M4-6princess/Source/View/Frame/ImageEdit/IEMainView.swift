@@ -31,7 +31,7 @@ struct IEMainView: View {
                 //                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                 VStack{
                     Color.white
-                        .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2+11)
+                        .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2+12)
                     Spacer()
                     Color.white
                         .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2)

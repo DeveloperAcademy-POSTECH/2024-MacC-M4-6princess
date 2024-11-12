@@ -32,7 +32,7 @@ struct DFModifyFrame: View {
                     .fill(Color.white)
                     .opacity(viewModel.btnOpacity)
                     .frame(width: 175, height: 38)
-                    .overlay(Text("프레임이 저장되었습니다.").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                    .overlay(Text("프레임을 저장 중입니다...").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                 
             }
         }
@@ -238,7 +238,7 @@ private extension DFModifyFrame {
         // 4. 지연 시간을 둬서 작업을 분산
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             // 저장 완료 메시지 숨기기
-            viewModel.btnOpacity = 0
+//            viewModel.btnOpacity = 0
             
             // 추가 지연 후 화면 전환
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
