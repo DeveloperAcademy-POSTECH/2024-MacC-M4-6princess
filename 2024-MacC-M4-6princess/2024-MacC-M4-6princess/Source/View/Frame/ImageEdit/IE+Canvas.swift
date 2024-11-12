@@ -415,7 +415,7 @@ extension IEMainView{
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10.49618)
                 }
-//                .disabled(viewModel.isRawImage)
+                //                .disabled(viewModel.isRawImage)
                 .padding(.horizontal)
                 
             }
@@ -428,14 +428,14 @@ extension IEMainView{
 
 extension UIImage {
     func cropToAspectRatio(_ targetAspectRatio: CGFloat) -> UIImage? {
-//        let originalWidth = size.width
-//        let originalHeight = size.height
-//        
+        //        let originalWidth = size.width
+        //        let originalHeight = size.height
+        //        
         var cropRect: CGRect
         
         
         
-//        let newWidth = originalHeight * targetAspectRatio
+        //        let newWidth = originalHeight * targetAspectRatio
         
         cropRect = CGRect(x: 0, y: 0, width: size.width, height: size.width * targetAspectRatio)
         // 크롭 영역을 설정하여 CGImage로 변환
