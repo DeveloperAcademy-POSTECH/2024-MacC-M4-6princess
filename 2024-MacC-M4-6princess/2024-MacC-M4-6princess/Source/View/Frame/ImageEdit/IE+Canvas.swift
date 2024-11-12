@@ -204,7 +204,7 @@ extension IEMainView{
         }
     }
     
-    func bottomBar() -> some View {
+    func bottomBarIphone() -> some View {
         return HStack() {
             Spacer()
             HStack(spacing: 45) { // 여기에 spacing: 45 추가

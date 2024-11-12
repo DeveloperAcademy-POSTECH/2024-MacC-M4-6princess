@@ -35,26 +35,9 @@ struct CameraTopView: View {
             .background(.white)
         }
         else{
-            HStack(alignment: .center) {
-                Spacer()
-                VStack {
-                    Spacer()
-                    Button {
-                        viewModel.changeCamera()
-                    } label: {
-                        Image("cameraReverseIcon")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                            .animation(.easeInOut, value: motionManager.currentOrientation)
-                        
-                    }.padding(.trailing, 20)
-//                    Spacer()
-                }
-            }
-            .frame(width: UIScreen.main.bounds.width, height: 94)
-            .background(.white)
+            cameraIPadBottomView
         }
     }
 }
+
 

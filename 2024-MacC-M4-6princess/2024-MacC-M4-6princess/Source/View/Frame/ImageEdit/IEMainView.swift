@@ -54,7 +54,7 @@ struct IEMainView: View {
                     }
                 }
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
-                    bottomBar()
+                    bottomBarIphone()
                 }
                 else{
                     bottomBarIpad()

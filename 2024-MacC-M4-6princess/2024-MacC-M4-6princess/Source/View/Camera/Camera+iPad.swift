@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 extension CameraBottomView {
     
-    
     // iPad 전용 뷰 변수
     var cameraIPadBottomView: some View {
         VStack{
@@ -71,4 +70,27 @@ extension CameraBottomView {
         .background(.white)
     }
     
+}
+extension CameraTopView{
+    var cameraIPadBottomView: some View {
+        HStack(alignment: .center) {
+            Spacer()
+            VStack {
+                Spacer()
+                Button {
+                    viewModel.changeCamera()
+                } label: {
+                    Image("cameraReverseIcon")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                        .animation(.easeInOut, value: motionManager.currentOrientation)
+                    
+                }.padding(.trailing, 20)
+                //                    Spacer()
+            }
+        }
+        .frame(width: UIScreen.main.bounds.width, height: 94)
+        .background(.white)
+    }
 }
