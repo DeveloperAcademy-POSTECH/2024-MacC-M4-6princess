@@ -41,6 +41,7 @@ struct CameraView: View {
                     ZStack{
                         cameraPreview
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                            
                         Group{
                             if let image = viewModel.frameImage {
                                 Image(uiImage: image)
