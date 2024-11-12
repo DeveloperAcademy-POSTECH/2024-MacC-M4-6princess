@@ -158,4 +158,19 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 self.output.capturePhoto(with: settings, delegate: delegate)
             }
         }
+    func zoom(_ zoom: CGFloat){
+            let factor = zoom < 1 ? 1 : zoom
+            let device = self.videoDeviceInput!.device
+            
+            do {
+                try device.lockForConfiguration()
+                device.videoZoomFactor = factor
+                device.unlockForConfiguration()
+            }
+            catch {
+                print(error.localizedDescription)
+            }
+        }
 }
+
+

@@ -41,7 +41,8 @@ struct CameraView: View {
                     ZStack{
                         cameraPreview
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                            
+                            .scaleEffect(viewModel.currentScale)
+                            .gesture(viewModel.magnificationGesture)
                         Group{
                             if let image = viewModel.frameImage {
                                 Image(uiImage: image)

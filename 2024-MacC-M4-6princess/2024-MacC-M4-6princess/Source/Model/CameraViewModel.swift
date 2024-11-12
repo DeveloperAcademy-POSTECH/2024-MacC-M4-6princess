@@ -41,6 +41,10 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var isFrameLoading: Bool = false
     @Published var inputImage: UIImage?
     
+    //줌 관련
+    @Published var currentScale: CGFloat = 1.0
+    @Published var lastScale: CGFloat = 1.0
+    
     // 이미지 관련
     @Published var idolImg: UIImage
     let defaultImg: UIImage
@@ -48,6 +52,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     var ScreenSize:CGSize = UIScreen.main.bounds.size
     
     let cameraManager: CameraManager
+    
+    
     
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
@@ -58,6 +64,23 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     //    @Published var picData: [Data] = []
     //    @Published var imageViews: [UIImage] = [] // UIImageView 배열
+    
+    var magnificationGesture: some Gesture {
+        MagnifyGesture()
+            .onChanged { value in
+                // 상대적 변화량 계산
+                let delta = value.magnification / self.lastScale
+                self.lastScale = value.magnification
+                
+                // 최소/최대 제한과 함께 새로운 스케일 계산
+                let newScale = min(max(self.currentScale * delta, 1.0), 5.0)
+                self.currentScale = newScale
+            }
+            .onEnded { _ in
+                // 제스처 종료 시 마지막 스케일 초기화
+                self.lastScale = 1.0
+            }
+    }
     
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
@@ -183,5 +206,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         
         return normalizedImage
     }
+    
 }
 
