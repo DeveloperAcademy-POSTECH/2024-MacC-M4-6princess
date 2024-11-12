@@ -147,7 +147,7 @@ struct CameraFrameSelectView: View {
                     }.padding(.bottom, 40)
                 }
             }
-        }.onChange(of: storedImages.count) { _ in
+        }.onChange(of: storedImages.count) { 
             // CoreData에 변화가 있을 때만 이미지 로드
             loadImages()
         }

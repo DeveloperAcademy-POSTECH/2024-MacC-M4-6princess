@@ -10,7 +10,7 @@ import AVFoundation
 
 ///카메라 화면 프리뷰
 struct CameraPreview: UIViewRepresentable {
-    @ObservedObject var viewModel: CameraViewModel
+    @StateObject var viewModel: CameraViewModel
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: UIScreen.main.bounds)

@@ -10,8 +10,8 @@ import AVFoundation
 import CoreData
 
 struct CameraView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var viewModel = CameraViewModel()
+    @Environment(\.managedObjectContext) var viewContext
+    @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     
@@ -34,6 +34,7 @@ struct CameraView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
             ZStack {
                 VStack{
@@ -70,33 +71,63 @@ struct CameraView: View {
                                             .frame(width: 114, height: 114)
                                             .padding(.bottom, 20)
                                         
-                                        
-                                        VStack {
-                                            ZStack {
-                                                Rectangle()
-                                                    .cornerRadius(5)
-                                                    .frame(width: 40, height: 40)
-                                                    .foregroundColor(.pointPink)
-                                                
-                                                Image("frameLoadWhite")
-                                                    .resizable()
-                                                    .frame(width: 40, height: 40)
-                                            }
-                                            .padding(.bottom, 4)
-                                            .padding(.leading, -8)
-                                            
-                                            Text("불러오기")
-                                                .font(.system(size: 13))
-                                                .multilineTextAlignment(.center)
-                                                .foregroundColor(.white)
-                                                .padding(.bottom, 50)
+                                        if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                                            VStack {
+                                                ZStack {
+                                                    Rectangle()
+                                                        .cornerRadius(5)
+                                                        .frame(width: 40, height: 40)
+                                                        .foregroundColor(.pointPink)
+                                                    
+                                                    Image("frameLoadWhite")
+                                                        .resizable()
+                                                        .frame(width: 40, height: 40)
+                                                }
+                                                .padding(.bottom, 4)
                                                 .padding(.leading, -8)
-                                            
+                                                
+                                                Text("불러오기")
+                                                    .font(.system(size: 13))
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundColor(.white)
+                                                    .padding(.bottom, 60)
+                                                    .padding(.leading, -8)
+                                                
+                                            }
+                                            .onTapGesture {
+                                                viewModel.firstTime = true
+                                                viewModel.isFrameSelect.toggle()
+                                            }
                                         }
-                                        .onTapGesture {
-                                            viewModel.firstTime = true
-                                            viewModel.isFrameSelect.toggle()
+                                        else{
+                                            VStack {
+                                                ZStack {
+                                                    Rectangle()
+                                                        .cornerRadius(5)
+                                                        .frame(width: 40, height: 40)
+                                                        .foregroundColor(.pointPink)
+                                                    
+                                                    Image("frameLoadWhite")
+                                                        .resizable()
+                                                        .frame(width: 40, height: 40)
+                                                }
+                                                .padding(.bottom, 4)
+                                                .padding(.leading, -8)
+                                                
+                                                Text("불러오기")
+                                                    .font(.system(size: 13))
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundColor(.white)
+                                                    .padding(.bottom, 20)
+                                                    .padding(.leading, -8)
+                                                
+                                            }
+                                            .onTapGesture {
+                                                viewModel.firstTime = true
+                                                viewModel.isFrameSelect.toggle()
+                                            }
                                         }
+                                       
                                     }
                                     .padding(.leading, -10)
                                     Spacer()
@@ -116,9 +147,6 @@ struct CameraView: View {
                     CameraTimerSecondsView(delayTime: $viewModel.delayTime, isTakePic: $viewModel.isTakePic)
                         .ignoresSafeArea(.all, edges: .all)
                 }
-                
-                
-                
             }
             .onChange(of: viewModel.isFrameLoading) { newValue in
                 if newValue {
@@ -133,7 +161,6 @@ struct CameraView: View {
                 if frameImage != nil {
                     viewModel.isFrameSelected = true
                 }
-                //                viewModel.isFrameSelect = false
             }
             .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
                 CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
@@ -141,69 +168,23 @@ struct CameraView: View {
                     .presentationDragIndicator(.visible)
                 
             }
-            //            .onChange(of: viewModel.isFrameSelect) { newValue in
-            //                if !newValue {  // 프레임 선택 뷰가 닫힐 때
-            //                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // 약간의 지연을 주어 뷰 전환이 완료된 후 실행
-            //                        viewModel.cameraManager.stopSession()  // 기존 세션을 중지
-            //                        viewModel.cameraManager.setUp()        // 새로 설정
-            //                        viewModel.cameraManager.startSession() // 세션 재시작
-            //                    }
-            //                } else {  // 프레임 선택 뷰가 열릴 때
-            //                    viewModel.cameraManager.stopSession()  // 세션 중지
-            //                }
-            //            }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
                 if let takenImg = viewModel.takenImg,let frameImg = viewModel.frameImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
-                else{
-                    IEIntroView(bg: viewModel.defaultImg,idol: viewModel.idolImg)
-                    
-                }
+                
             }
             
         }
         .onAppear {
             // 프레임 크기 설정
-            viewModel.frameSize.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229)
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            //            let screenWidth = UIScreen.main.bounds.width
-            //            let desiredHeight = screenWidth * (4.0/3.0)
-            //            viewModel.frameSize = CGRect(
-            //                x: 0,
-            //                y: (UIScreen.main.bounds.height - desiredHeight) / 2,
-            //                width: screenWidth,
-            //                height: desiredHeight
-            //            )
             
         }
         
     }
-    //이미지 렌더링해서 불러오기
-    private func loadSelectedFrame() {
-        guard let frameId = viewModel.selectedFrame else {
-            viewModel.frameImage = nil
-            return
-        }
-        
-        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try viewContext.fetch(fetchRequest)
-            if let storedImage = results.first, let imageData = storedImage.image {
-                viewModel.frameImage = UIImage(data: imageData)
-//                frameImage = UIImage(data: imageData)
-            } else {
-                viewModel.frameImage = nil
-            }
-        } catch {
-            print("Error fetching frame: \(error)")
-            viewModel.frameImage = nil
-        }
-    }
+    
 }

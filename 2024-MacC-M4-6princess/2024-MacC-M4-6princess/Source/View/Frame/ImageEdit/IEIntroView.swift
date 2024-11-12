@@ -22,8 +22,8 @@ struct IEIntroView: View {
                     if !isMain{ // 온보딩
                         ZStack{
                             Color.black.opacity(0.7)
-                            VisualEffectView(effect: UIBlurEffect(style: .dark), alpha: 0.6)
-                                .ignoresSafeArea()
+                            //                            VisualEffectView(effect: UIBlurEffect(style: .dark), alpha: 0.7)
+                            //                                .ignoresSafeArea()
                             VStack{
                                 Image(uiImage: splash)
                                     .resizable()

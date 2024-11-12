@@ -204,7 +204,7 @@ extension IEMainView{
         }
     }
     
-    func bottomBar() -> some View {
+    func bottomBarIphone() -> some View {
         return HStack() {
             Spacer()
             HStack(spacing: 45) { // 여기에 spacing: 45 추가
@@ -263,6 +263,68 @@ extension IEMainView{
             Spacer()
         }
         .padding(.horizontal,20)
+        .frame(height: 80)
+    }
+    func bottomBarIpad() -> some View {
+        return HStack() {
+            Spacer()
+            HStack(spacing: 45) { // 여기에 spacing: 45 추가
+                ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
+                    VStack(alignment: .center, spacing: 8) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(red: 0.85, green: 0.85, blue: 0.85).opacity(0.15))
+                                .frame(width: 40, height: 40) // height 추가
+                                .overlay(
+                                    Circle().stroke(Color.black.opacity(0.15), lineWidth: 0.5)
+                                    //shadow가 자꾸 적용이 안되서 최대한 비슷하게 맞춰놨습니다
+                                )
+                            
+                            VStack {
+                                if viewModel.selectedIndex == index {
+                                    Image("\(viewModel.colorEditOptions[index].icon).selected")
+                                        .foregroundColor(.pointPink)
+                                        .onTapGesture{
+                                            
+                                            viewModel.selectedIndex = nil // 다시 선택하면 슬라이더 내려감
+                                            
+                                        }
+                                } else {
+                                    Image("\(viewModel.colorEditOptions[index].icon).unselected")
+                                        .foregroundColor(.gray01)
+                                }
+                            }
+                        }
+                        .onTapGesture {
+                            if viewModel.selectedIndex == index{ // 이미 선택되어 있으면 슬라이더가 내려감
+                                viewModel.selectedIndex = nil
+                            }
+                            else{
+                                if viewModel.isRawImage{
+                                    
+                                    let one = viewModel.temp
+                                    viewModel.recentPop = one
+                                    viewModel.frameIdolSize = one.size
+                                    viewModel.location = one.loc
+                                    viewModel.rotationAngle = one.ang
+                                    viewModel.sliderValues = one.sliderValues
+                                    viewModel.isRawImage = false
+                                }
+                                viewModel.selectedIndex = index
+                            }
+                        }
+                        
+                        Text(viewModel.colorEditOptions[index].name)
+                            .foregroundColor(viewModel.selectedIndex == index ? .pointPink : .gray01)
+                    }
+                    .padding(.top,30)
+                }
+            }
+            .padding(.horizontal, 72)
+            Spacer()
+        }
+        .padding(.horizontal,20)
+        .padding(.bottom,30)
         .frame(height: 80)
     }
     
@@ -330,6 +392,7 @@ extension IEMainView{
                         
                         let one = viewModel.temp
                         viewModel.recentPop = one
+                        
                         viewModel.frameIdolSize = one.size
                         viewModel.location = one.loc
                         viewModel.rotationAngle = one.ang
@@ -352,7 +415,7 @@ extension IEMainView{
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10.49618)
                 }
-//                .disabled(viewModel.isRawImage)
+                //                .disabled(viewModel.isRawImage)
                 .padding(.horizontal)
                 
             }
@@ -365,14 +428,14 @@ extension IEMainView{
 
 extension UIImage {
     func cropToAspectRatio(_ targetAspectRatio: CGFloat) -> UIImage? {
-        let originalWidth = size.width
-        let originalHeight = size.height
-        
+        //        let originalWidth = size.width
+        //        let originalHeight = size.height
+        //        
         var cropRect: CGRect
         
         
         
-//        let newWidth = originalHeight * targetAspectRatio
+        //        let newWidth = originalHeight * targetAspectRatio
         
         cropRect = CGRect(x: 0, y: 0, width: size.width, height: size.width * targetAspectRatio)
         // 크롭 영역을 설정하여 CGImage로 변환
