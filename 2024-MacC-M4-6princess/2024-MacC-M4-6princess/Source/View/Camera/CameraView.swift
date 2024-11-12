@@ -19,9 +19,6 @@ struct CameraView: View {
         _frameImage = frameImage
     }
     
-    //TODO: 바인딩 변수로 방금 만든 frame 불러오기
-    
-    
     private var cameraPreview: some View  {
         
         GeometryReader { geo in
@@ -35,22 +32,30 @@ struct CameraView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                VStack{
-                    CameraTopView(viewModel: viewModel)
-                    ZStack{
-                        cameraPreview
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                            .scaleEffect(viewModel.currentScale)
-                            .gesture(viewModel.magnificationGesture)
-                        Group{
-                            if let image = viewModel.frameImage {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                            }
+            ZStack{
+                //TODO: 줌 한 화면대로 처리되도록
+                cameraPreview
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                    .gesture(MagnificationGesture()
+                        .onChanged { val in
+                            viewModel.zoom(factor: val)
                         }
+                        .onEnded { _ in
+                            viewModel.zoomInitialize()
+                        }
+                    )
+                Group{
+                    if let image = viewModel.frameImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
                     }
+                }
+                .allowsHitTesting(false)
+                
+                VStack {
+                    CameraTopView(viewModel: viewModel)
+                    Spacer()
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end
@@ -153,7 +158,6 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            
         }
         
     }
@@ -172,7 +176,7 @@ struct CameraView: View {
             let results = try viewContext.fetch(fetchRequest)
             if let storedImage = results.first, let imageData = storedImage.image {
                 viewModel.frameImage = UIImage(data: imageData)
-//                frameImage = UIImage(data: imageData)
+                //                frameImage = UIImage(data: imageData)
             } else {
                 viewModel.frameImage = nil
             }
