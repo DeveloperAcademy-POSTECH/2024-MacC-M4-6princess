@@ -13,24 +13,31 @@ struct CameraTopView: View {
     @StateObject var motionManager = MotionManager()
     
     var body: some View {
-        HStack(alignment: .bottom) {
-            Spacer()
-            VStack {
+        if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+            HStack(alignment: .center) {
                 Spacer()
-                Button {
-                    viewModel.changeCamera()
-                } label: {
-                    Image("cameraReverseIcon")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                        .animation(.easeInOut, value: motionManager.currentOrientation)
-                    
-                }.padding(.trailing, 20)
+                VStack {
+                    Spacer()
+                    Button {
+                        viewModel.changeCamera()
+                    } label: {
+                        Image("cameraReverseIcon")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                            .animation(.easeInOut, value: motionManager.currentOrientation)
+                        
+                    }.padding(.trailing, 20)
+                    Spacer()
+                }
             }
+            .frame(width: UIScreen.main.bounds.width, height: 94)
+            .background(.white)
         }
-        .frame(width: UIScreen.main.bounds.width, height: 94)
-        .background(.white)
+        else{
+            cameraIPadBottomView
+        }
     }
 }
+
 
