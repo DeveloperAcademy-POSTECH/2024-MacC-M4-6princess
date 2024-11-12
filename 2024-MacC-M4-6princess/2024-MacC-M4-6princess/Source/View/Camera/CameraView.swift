@@ -31,10 +31,20 @@ struct CameraView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
             ZStack{
                 //TODO: 줌 한 화면대로 처리되도록
-                
+                cameraPreview
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                    .gesture(MagnificationGesture()
+                        .onChanged { val in
+                            viewModel.setZoom(factor: val)
+                        }
+                        .onEnded { _ in
+                            viewModel.zoomInitialize()
+                        }
+                    )
                 Group{
                     if let image = viewModel.frameImage {
                         Image(uiImage: image)
@@ -42,6 +52,7 @@ struct CameraView: View {
                             .aspectRatio(contentMode: .fill)
                     }
                 }
+                .allowsHitTesting(false)
                 
                 
                 VStack {
@@ -68,33 +79,63 @@ struct CameraView: View {
                                             .frame(width: 114, height: 114)
                                             .padding(.bottom, 20)
                                         
-                                        
-                                        VStack {
-                                            ZStack {
-                                                Rectangle()
-                                                    .cornerRadius(5)
-                                                    .frame(width: 40, height: 40)
-                                                    .foregroundColor(.pointPink)
-                                                
-                                                Image("frameLoadWhite")
-                                                    .resizable()
-                                                    .frame(width: 40, height: 40)
-                                            }
-                                            .padding(.bottom, 4)
-                                            .padding(.leading, -8)
-                                            
-                                            Text("불러오기")
-                                                .font(.system(size: 13))
-                                                .multilineTextAlignment(.center)
-                                                .foregroundColor(.white)
-                                                .padding(.bottom, 50)
+                                        if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                                            VStack {
+                                                ZStack {
+                                                    Rectangle()
+                                                        .cornerRadius(5)
+                                                        .frame(width: 40, height: 40)
+                                                        .foregroundColor(.pointPink)
+                                                    
+                                                    Image("frameLoadWhite")
+                                                        .resizable()
+                                                        .frame(width: 40, height: 40)
+                                                }
+                                                .padding(.bottom, 4)
                                                 .padding(.leading, -8)
-                                            
+                                                
+                                                Text("불러오기")
+                                                    .font(.system(size: 13))
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundColor(.white)
+                                                    .padding(.bottom, 60)
+                                                    .padding(.leading, -8)
+                                                
+                                            }
+                                            .onTapGesture {
+                                                viewModel.firstTime = true
+                                                viewModel.isFrameSelect.toggle()
+                                            }
                                         }
-                                        .onTapGesture {
-                                            viewModel.firstTime = true
-                                            viewModel.isFrameSelect.toggle()
+                                        else{
+                                            VStack {
+                                                ZStack {
+                                                    Rectangle()
+                                                        .cornerRadius(5)
+                                                        .frame(width: 40, height: 40)
+                                                        .foregroundColor(.pointPink)
+                                                    
+                                                    Image("frameLoadWhite")
+                                                        .resizable()
+                                                        .frame(width: 40, height: 40)
+                                                }
+                                                .padding(.bottom, 4)
+                                                .padding(.leading, -8)
+                                                
+                                                Text("불러오기")
+                                                    .font(.system(size: 13))
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundColor(.white)
+                                                    .padding(.bottom, 20)
+                                                    .padding(.leading, -8)
+                                                
+                                            }
+                                            .onTapGesture {
+                                                viewModel.firstTime = true
+                                                viewModel.isFrameSelect.toggle()
+                                            }
                                         }
+                                        
                                     }
                                     .padding(.leading, -10)
                                     Spacer()
@@ -151,29 +192,5 @@ struct CameraView: View {
             viewModel.cameraManager.startSession()
         }
         
-    }
-    //이미지 렌더링해서 불러오기
-    private func loadSelectedFrame() {
-        guard let frameId = viewModel.selectedFrame else {
-            viewModel.frameImage = nil
-            return
-        }
-        
-        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try viewContext.fetch(fetchRequest)
-            if let storedImage = results.first, let imageData = storedImage.image {
-                viewModel.frameImage = UIImage(data: imageData)
-                //                frameImage = UIImage(data: imageData)
-            } else {
-                viewModel.frameImage = nil
-            }
-        } catch {
-            print("Error fetching frame: \(error)")
-            viewModel.frameImage = nil
-        }
     }
 }

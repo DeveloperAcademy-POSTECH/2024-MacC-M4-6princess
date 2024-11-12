@@ -25,7 +25,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     // 프레임 관련 상태
     @Published var frameImage: UIImage?
-    @Published var frameRatio: CGFloat = 1.54
+    @Published var frameRatio: CGFloat = 4/3
     
     // 타이머 관련 상태
     @Published var delayTime: TimeInterval = 0.0
@@ -67,6 +67,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
         preview.videoGravity = .resizeAspectFill
+//        preview.session?.sessionPreset = .photo
     }
     
     
@@ -123,7 +124,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func cropToAspectRatio(image: UIImage) -> UIImage  {
         let originalWidth = image.size.width
-        let cropRect: CGRect = CGRect(x: 0, y: 125, width: originalWidth, height: originalWidth * frameRatio)
+        let cropRect: CGRect = CGRect(x: 0, y: 120, width: originalWidth, height: originalWidth * frameRatio)
         
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image

@@ -126,7 +126,7 @@ class IEViewModel: ObservableObject {
         //        let startPoint = CGPoint(x: 0, y: 82)
         let renderedImage = ImageRenderer(
             content: content
-                .frame(width: frameBGSize.width, height: frameBGSize.width * 1.54)
+                .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
             //                    .offset(x: startPoint.x, y: startPoint.y) // 원하는 시작 위치 설정
         )
         // 해상도
@@ -134,21 +134,97 @@ class IEViewModel: ObservableObject {
         
         if let uiImage = renderedImage.uiImage {
             self.compositeImage = uiImage
-            
-            // 이미지 저장
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
-            }) { success, error in
-                DispatchQueue.main.async {
-                    if success {
-                        print("성공")
-                    } else {
-                        print("실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
-                    }
-                }
-            }
+            saveImageToAlbum(uiImage: uiImage)
+//            // 이미지 저장
+//            PHPhotoLibrary.shared().performChanges({
+//                PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
+//            }) { success, error in
+//                DispatchQueue.main.async {
+//                    if success {
+//                        print("성공")
+//                    } else {
+//                        print("실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+//                    }
+//                }
+//            }
         } else {
             print("렌더링 실패: 이미지 생성 실패")
         }
     }
+    
+
+    
+
+    
+
+    func saveImageToAlbum(uiImage: UIImage) {
+        // 앨범 이름 설정
+        let albumName = "Frameet"
+        
+        // 1. 앨범 가져오기 또는 생성하기
+        func getAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
+            // 앨범이 이미 존재하는지 확인
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
+            let fetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+            
+            if let album = fetchResult.firstObject {
+                // 앨범이 이미 존재하면 반환
+                completion(album)
+            } else {
+                // 앨범이 존재하지 않으면 생성
+                var albumPlaceholder: PHObjectPlaceholder?
+                PHPhotoLibrary.shared().performChanges({
+                    let createAlbumRequest = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumName)
+                    albumPlaceholder = createAlbumRequest.placeholderForCreatedAssetCollection
+                }) { success, error in
+                    if success, let placeholder = albumPlaceholder {
+                        let fetchResult = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [placeholder.localIdentifier], options: nil)
+                        completion(fetchResult.firstObject)
+                    } else {
+                        print("앨범 생성 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                        completion(nil)
+                    }
+                }
+            }
+        }
+        
+        // 2. 사진 저장 및 앨범에 추가
+        func saveImageToAlbum(album: PHAssetCollection?) {
+            guard let album = album else {
+                print("앨범을 찾을 수 없습니다.")
+                return
+            }
+            
+            PHPhotoLibrary.shared().performChanges({
+                // 이미지 저장
+                let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
+                
+                // 앨범에 추가하기 위한 요청
+                if let assetPlaceholder = creationRequest.placeholderForCreatedAsset,
+                   let albumChangeRequest = PHAssetCollectionChangeRequest(for: album) {
+                    let fastEnumeration = NSArray(array: [assetPlaceholder])
+                    albumChangeRequest.addAssets(fastEnumeration)
+                }
+            }) { success, error in
+                DispatchQueue.main.async {
+                    if success {
+                        print("사진이 앨범 '\(albumName)'에 성공적으로 저장되었습니다.")
+                    } else {
+                        print("사진 저장 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                    }
+                }
+            }
+        }
+        
+        // 앨범 가져오기 또는 생성 후 사진 저장
+        getAlbum { album in
+            saveImageToAlbum(album: album)
+        }
+    }
+
+
+
 }
+
+

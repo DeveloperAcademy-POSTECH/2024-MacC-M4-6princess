@@ -31,7 +31,7 @@ struct DFFrameEditView: View {
                             .background(Color(hex: "32322f").opacity(viewModel.showPreview ? 1 : 0))
                             .frame(width: image.size.width / scale, height: image.size.height / scale)
                             .padding(.bottom, 20)
-                    
+                        
                     }
                     
                     Circle()
@@ -65,8 +65,12 @@ struct DFFrameEditView: View {
                         
                     }
                 }
-                
-                brushToolSelector
+                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                    brushToolSelector
+                }
+                else{
+                    brushToolSelectorIpad
+                }
             }
         }
         .onAppear {
@@ -95,9 +99,9 @@ private extension DFFrameEditView {
         
         init?(rawValue: Int) {
             switch rawValue {
-            case 0: self = .draw
-            case 1: self = .eraser
-            default: return nil
+                case 0: self = .draw
+                case 1: self = .eraser
+                default: return nil
             }
         }
     }
@@ -351,6 +355,48 @@ private extension DFFrameEditView {
                 }
             }
         }
+        
+        
+    }
+    var brushToolSelectorIpad: some View {
+        
+        HStack(spacing: UIScreen.main.bounds.width / 2.4) {
+            Button {
+                toolSelect("brush")
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: "212121"))
+                        .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                    Image("brush")
+                        .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                        .colorMultiply(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                    Text("브러쉬")
+                        .foregroundStyle(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                        .font(.custom("Pretendard-medium", size: 13))
+                        .offset(y: 30)
+                }
+            }
+            
+            Button {
+                toolSelect("erase")
+                
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: "212121"))
+                        .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                    Image("erase")
+                        .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
+                        .colorMultiply(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                    Text("지우개")
+                        .foregroundStyle(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                        .font(.custom("Pretendard-medium", size: 13))
+                        .offset(y: 30)
+                }
+            }
+        }
+        .padding(.bottom,30)
     }
     
 }

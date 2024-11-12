@@ -96,7 +96,7 @@ struct CustomSliderView: View {
             .padding(.horizontal)
         }
         .frame(width: viewModel.screenSize.width,height: 40)
-        //        .background(Color.black.opacity(0.5)) // 배경색
+        .background(Color.black.opacity(0.5)) // 배경색
     }
 }
 

@@ -14,7 +14,7 @@ struct DFModifyFrame: View {
         VStack {
             ZStack {
                 Color(hex: "32322f")
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.54)
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                 
                 if isFirstLaunching == true {
                     DFOnboardingView(isFirstLaunching: $isFirstLaunching)
@@ -26,13 +26,13 @@ struct DFModifyFrame: View {
                 //                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
                 //                    }
                 imageView
-                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.54))
+                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                 
                 RoundedRectangle(cornerRadius: 30)
                     .fill(Color.white)
                     .opacity(viewModel.btnOpacity)
                     .frame(width: 175, height: 38)
-                    .overlay(Text("프레임 저장 중입니다...").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                    .overlay(Text("프레임을 저장 중입니다...").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                 
             }
         }
@@ -179,7 +179,7 @@ private extension DFModifyFrame {
         
 //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
 //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 1.54)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
         
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
@@ -224,7 +224,7 @@ private extension DFModifyFrame {
     
     func saveImage() {
         // 1. 이미지 렌더링
-        let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.54))
+        let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
         render.scale = scaleCompute(resultImage!)
         viewModel.image = render.uiImage
         frameImage = render.uiImage
