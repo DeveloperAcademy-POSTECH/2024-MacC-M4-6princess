@@ -148,7 +148,7 @@ private extension DFModifyFrame {
             Button {
                 
                 if let image = resultImage {
-                    viewModel.saveStateText = "저장중 입니다..."
+                    viewModel.saveStateText = "저장 중 입니다..."
                     viewModel.isPushedSaveBtn = true
                     saveImage(inputImage: image)
                 } else {
