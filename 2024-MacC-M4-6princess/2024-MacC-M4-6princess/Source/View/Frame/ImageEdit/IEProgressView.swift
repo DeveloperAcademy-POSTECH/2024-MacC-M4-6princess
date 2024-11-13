@@ -48,7 +48,7 @@ struct IEProgressView: View {
                         value: isAnimating
                     )
                     .padding()
-                Text("저장중..")
+                Text("저장 중..")
                     .foregroundColor(.pointPink)
                     .fontWeight(.bold)
             }
