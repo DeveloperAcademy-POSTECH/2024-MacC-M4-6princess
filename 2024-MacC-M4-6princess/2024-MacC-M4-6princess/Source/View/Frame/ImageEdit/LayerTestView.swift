@@ -7,9 +7,9 @@ struct LayerImage: Identifiable {
     var image: UIImage
     var order: Int
     var position: CGPoint // 이미지 위치
-       var scale: CGFloat = 1.0      // 이미지 크기
-       var rotation: Angle = .zero   // 이미지 회전 각도
-
+    var scale: CGFloat = 1.0      // 이미지 크기
+    var rotation: Angle = .zero   // 이미지 회전 각도
+    
 }
 
 
@@ -18,7 +18,8 @@ struct LayerTestView: View {
     @State private var layerImages: [LayerImage] = []
     @State private var isEditing: Bool = false
     @State private var showImagePicker: Bool = false
-    
+    //    @GestureState private var dragOffset: CGSize = .zero
+    @State private var dragStartPosition: CGPoint?
     var body: some View {
         VStack {
             // ZStack으로 레이어 순서대로 이미지 표시
@@ -27,17 +28,43 @@ struct LayerTestView: View {
                     Image(uiImage: layerImages[index].image)
                         .resizable()
                         .scaledToFit()
-//                        .frame(width: 300, height: 300)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .position(layerImages[index].position) // 위치 설정
-                                               .scaleEffect(layerImages[index].scale) // 크기 설정
-                                               .rotationEffect(layerImages[index].rotation) // 회전 각도 설정
+                        .scaleEffect(layerImages[index].scale) // 크기 설정
+                        .rotationEffect(layerImages[index].rotation) // 회전 각도 설정
                         .overlay(
                             Text("Image \(layerImages[index].order)")
                                 .foregroundColor(.white)
                                 .background(Color.black.opacity(0.5))
                                 .padding(5),
                             alignment: .bottom
+                        )
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    if dragStartPosition == nil {
+                                        dragStartPosition = layerImages[index].position
+                                    }
+                                    layerImages[index].position = CGPoint(
+                                        x: dragStartPosition!.x + value.translation.width,
+                                        y: dragStartPosition!.y + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    dragStartPosition = nil // 드래그 종료 후 초기화
+                                }
+                        )
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    layerImages[index].scale = value
+                                }
+                        )
+                        .gesture(
+                            RotationGesture()
+                                .onChanged { angle in
+                                    layerImages[index].rotation = angle
+                                }
                         )
                         .onAppear {
                             print("Image \(index + 1) Loaded")
