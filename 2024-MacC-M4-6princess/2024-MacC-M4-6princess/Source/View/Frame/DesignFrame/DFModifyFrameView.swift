@@ -208,13 +208,19 @@ private extension DFModifyFrame {
             print("Error saving managed object context: \(error)")
         }
     }
-    func addImage(data: Data?) {
+    func addImage(albumImageData: Data?, subjectImageData: Data?) {
         
         let newImage = StoreImages(context: managedContext)
         
-        newImage.image = data
+        newImage.image = albumImageData
+        newImage.subjectImage = subjectImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
+        newImage.angle = viewModel.angle.degrees
+        newImage.x = viewModel.draggedOffSet.width
+        newImage.y = viewModel.draggedOffSet.height
+        newImage.scale = viewModel.magnifyScale
+        
         saveContext()
     }
     
@@ -245,7 +251,7 @@ private extension DFModifyFrame {
             render.scale = scaleCompute(inputImage)
             viewModel.image = render.uiImage
 //            try await Task.sleep(nanoseconds: 1_000_000_000)
-            addImage(data: viewModel.image?.pngData())
+            addImage(albumImageData: viewModel.image?.pngData(), subjectImageData: viewModel.outputImage?.pngData())
 //            try await Task.sleep(nanoseconds: 200_000_000)
             try await Task.sleep(nanoseconds: 1_000_000_000)
             viewModel.btnOpacity = 0
