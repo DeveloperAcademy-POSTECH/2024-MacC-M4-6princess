@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+//    @State private var inputImage: UIImage?
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        
+                CameraView()
+//        IEDevelopView()
+        //        CMView()
+        //        IEProgressView()
     }
 }
 
