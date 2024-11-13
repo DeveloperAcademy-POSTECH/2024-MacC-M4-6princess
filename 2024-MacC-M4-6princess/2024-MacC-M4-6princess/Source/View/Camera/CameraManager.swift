@@ -96,6 +96,16 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             guard let device = getBestCamera(from: discoverySession.devices) else {
                 throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No available camera"])
             }
+//            if device.deviceType == .builtInUltraWideCamera {
+//                device.videoZoomFactor = 2.0
+//            }
+//            else if device.deviceType == .builtInWideAngleCamera {
+//                device.videoZoomFactor = 1.0
+//            }
+//            else {
+//                device.videoZoomFactor = 1.0
+//            }
+            
             print("설정된 렌즈 : \(device.deviceType.rawValue)")
             
             let input = try AVCaptureDeviceInput(device: device)
@@ -114,7 +124,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             print("카메라 설정 오류: \(error)")
         }
     }
-
+    
     func getBestCamera(from devices: [AVCaptureDevice]) -> AVCaptureDevice? {
         // 우선순위에 따라 카메라 선택
         if let ultraWideCamera = devices.first(where: { $0.deviceType == .builtInUltraWideCamera }) {
@@ -150,47 +160,60 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     
     func startSession() {
         Task.detached {
-                    if !self.session.isRunning {
-                        self.session.startRunning()
-                    }
-                }
+            if !self.session.isRunning {
+                self.session.startRunning()
+            }
+        }
     }
     
     func stopSession() {
         Task.detached {
-                    if !self.session.isRunning {
-                        self.session.stopRunning()
-                    }
-                }
+            if !self.session.isRunning {
+                self.session.stopRunning()
+            }
+        }
     }
     
     func takePicture(delegate: AVCapturePhotoCaptureDelegate) {
-            guard session.isRunning else {
-                print("세션이 실행중이지 않습니다")
-                return
-            }
-            
-            let settings = AVCapturePhotoSettings()
-            settings.flashMode = .off
-            
-            // 메인 스레드에서 실행
-            DispatchQueue.main.async {
-                self.output.capturePhoto(with: settings, delegate: delegate)
-            }
+        guard session.isRunning else {
+            print("세션이 실행중이지 않습니다")
+            return
         }
-    func zoom(_ zoom: CGFloat){
-            let factor = zoom < 1 ? 1 : zoom
-            let device = self.videoDeviceInput!.device
-            
-            do {
-                try device.lockForConfiguration()
-                device.videoZoomFactor = factor
-                device.unlockForConfiguration()
-            }
-            catch {
-                print(error.localizedDescription)
-            }
+        
+        let settings = AVCapturePhotoSettings()
+        settings.flashMode = .off
+        
+        // 메인 스레드에서 실행
+        DispatchQueue.main.async {
+            self.output.capturePhoto(with: settings, delegate: delegate)
         }
+    }
+    func zoom(_ zoom: CGFloat) {
+        let device = self.videoDeviceInput!.device
+        
+        // 초기 줌 팩터 설정
+        let startFactor: CGFloat = (device.deviceType == .builtInUltraWideCamera) ? 2.0 : 1.0
+        
+        // 새로운 줌 팩터 계산
+        let factor = zoom < startFactor ? startFactor : zoom
+        
+        do {
+            try device.lockForConfiguration()
+            
+            // 줌 범위 확인
+            let minZoom = device.minAvailableVideoZoomFactor
+            let maxZoom = device.maxAvailableVideoZoomFactor
+            let finalZoom = min(max(factor, minZoom), maxZoom)
+            
+            // 부드러운 줌 적용
+            device.ramp(toVideoZoomFactor: finalZoom, withRate: 1.0)
+            // 또는 즉시 적용하려면: device.videoZoomFactor = finalZoom
+            
+            device.unlockForConfiguration()
+        } catch {
+            print("줌 설정 오류: \(error.localizedDescription)")
+        }
+    }
 }
 
 

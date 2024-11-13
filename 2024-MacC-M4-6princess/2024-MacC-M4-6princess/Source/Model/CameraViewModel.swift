@@ -42,7 +42,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var inputImage: UIImage?
     
     //줌 관련
-    @Published var currentZoomFactor: CGFloat = 1.0
+    @Published var currentZoomFactor: CGFloat = 2.0
     @Published var lastScale: CGFloat = 1.0
     
     //카메라 화면전환 관련
@@ -60,13 +60,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         self.defaultImg = UIImage(named: "whiteBG") ?? UIImage()
         super.init()
         setupPreviewLayer()
-        
-        if cameraManager.videoDeviceInput?.device.deviceType == .builtInUltraWideCamera {
-            currentZoomFactor = 2.0
-        }
-        else if cameraManager.videoDeviceInput?.device.deviceType == .builtInWideAngleCamera {
-            currentZoomFactor = 1.0
-        }
     }
     
     
@@ -74,7 +67,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
         preview.videoGravity = .resizeAspectFill
-//        preview.session?.sessionPreset = .photo
     }
     
     
