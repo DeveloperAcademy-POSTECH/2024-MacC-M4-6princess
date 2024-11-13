@@ -1,25 +1,25 @@
 import SwiftUI
+import PhotosUI
 
 struct LayerTestView: View {
     // 이미지 파일명 배열
-    let images = ["frameTest1", "frameTest2", "frameTest3", "frameTest4", "frameTest5"]
-    
-    // 현재 레이어 순서
-    @State private var layerOrder: [Int] = [0, 1, 2, 3, 4]
+    @State private var images: [UIImage] = []
+    @State private var layerOrder: [Int] = []
     @State private var isEditing: Bool = false
+    @State private var showImagePicker: Bool = false
     
     var body: some View {
         VStack {
             // ZStack으로 레이어 순서대로 이미지 표시
             ZStack {
-                ForEach(layerOrder, id: \.self) { index in
-                    let imageName = images[index]
-                    Image(imageName)
+                ForEach(layerOrder.indices, id: \.self) { index in
+                    let imageIndex = layerOrder[index]
+                    Image(uiImage: images[imageIndex])
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)
                         .overlay(
-                            Text(imageName)
+                            Text("Image \(imageIndex + 1)")
                                 .foregroundColor(.white)
                                 .background(Color.black.opacity(0.5))
                                 .padding(5),
@@ -32,15 +32,26 @@ struct LayerTestView: View {
             .border(Color.black, width: 1)
             .padding()
             
-            // EditButton과 List를 사용한 순서 변경
+            // EditButton과 추가 버튼
             HStack {
                 EditButton()
+                Spacer()
+                Button(action: {
+                    showImagePicker = true
+                }) {
+                    Text("사진 추가")
+                        .padding(8)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
                 Spacer()
                 Text(isEditing ? "Editing" : "Not Editing")
                 Spacer()
             }
             .padding()
             
+            // 리스트를 사용한 순서 변경 기능
             List {
                 ForEach(layerOrder, id: \.self) { index in
                     HStack {
@@ -55,6 +66,57 @@ struct LayerTestView: View {
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))
             .onAppear {
                 self.isEditing = true
+            }
+        }
+        .sheet(isPresented: $showImagePicker) {
+            PhotoPicker(images: $images, layerOrder: $layerOrder)
+        }
+    }
+}
+
+// PHPickerViewController를 사용하는 SwiftUI Wrapper
+struct PhotoPicker: UIViewControllerRepresentable {
+    @Binding var images: [UIImage]
+    @Binding var layerOrder: [Int]
+    
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 0 // 여러 개의 사진을 선택 가능
+        config.filter = .images // 이미지 필터 설정
+        
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: PhotoPicker
+        
+        init(_ parent: PhotoPicker) {
+            self.parent = parent
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            
+            for result in results {
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+                        if let uiImage = image as? UIImage {
+                            DispatchQueue.main.async {
+                                // 이미지 추가 및 레이어 순서 갱신
+                                self.parent.images.append(uiImage)
+                                self.parent.layerOrder.append(self.parent.images.count - 1)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

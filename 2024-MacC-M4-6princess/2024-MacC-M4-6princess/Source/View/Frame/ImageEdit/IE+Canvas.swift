@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import PhotosUI
 extension IECanvasView{
     // TODO: Angle 변화 속도를 늦추기
     var rotationGesture: some Gesture{
