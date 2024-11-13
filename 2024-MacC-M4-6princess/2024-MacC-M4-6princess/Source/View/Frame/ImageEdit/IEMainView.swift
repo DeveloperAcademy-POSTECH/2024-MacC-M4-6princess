@@ -24,11 +24,8 @@ struct IEMainView: View {
                     Spacer()
                     // 후보정 레이어 편집 뷰
                     canvasView
-                    //                        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     Spacer()
                 }
-                //                canvasView
-                //                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                 VStack{
                     Color.white
                         .frame(width:viewModel.frameBGSize.width,height:(UIScreen.main.bounds.height-viewModel.frameBGSize.height)/2+12)
@@ -40,7 +37,7 @@ struct IEMainView: View {
             }
             
             VStack{
-                topBar()
+                topBar
                 Spacer()
             }
             VStack{
@@ -54,10 +51,10 @@ struct IEMainView: View {
                     }
                 }
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
-                    bottomBarIphone()
+                    bottomBarIphone
                 }
                 else{
-                    bottomBarIpad()
+                    bottomBarIpad
                 }
             }
             /// 원본 보기 클릭시 1초간 "원본" 표시가 남

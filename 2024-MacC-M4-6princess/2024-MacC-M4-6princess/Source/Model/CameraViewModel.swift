@@ -45,9 +45,19 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var idolImg: UIImage
     let defaultImg: UIImage
     
-    var ScreenSize:CGSize = UIScreen.main.bounds.size
+    var screenSize:CGSize = UIScreen.main.bounds.size
     
     let cameraManager: CameraManager
+    
+    var topHeight:CGFloat = 130
+    @Published var shouldCapture: Bool = false { // 트리거 변수
+            didSet {
+                if shouldCapture {
+                    capturePreviewImage()
+                    shouldCapture = false
+                }
+            }
+        }
     
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
@@ -95,14 +105,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //    }
 
     
-//    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//        print("카메라 셔터음 무음으로 변경됨")
-//        AudioServicesDisposeSystemSoundID(1108)
-//        
-//    }
-//    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//        AudioServicesDisposeSystemSoundID(1108)
-//    }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -125,12 +127,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             image = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
         }
         
-        // 이미지 크기를 frameSize로 조정
-//        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
-//        image = renderer.image { _ in
-//            image.draw(in: CGRect(origin: .zero, size: frameSize.size))
-//        }
-        
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
         
@@ -148,7 +144,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func cropToAspectRatio(image: UIImage) -> UIImage  {
         let originalWidth = image.size.width
-        let cropRect: CGRect = CGRect(x: 0, y: 120, width: originalWidth, height: originalWidth * frameRatio)
+        let cropRect: CGRect = CGRect(x: 0, y: (screenSize.height-(screenSize.width * frameRatio))/2+20, width: originalWidth, height: originalWidth * frameRatio)
         
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image
@@ -163,7 +159,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             self.isTakenPhoto.toggle()
         }
     }
-    
+     
     func changeCamera() {
         cameraManager.changeCamera()
     }
@@ -184,5 +180,19 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         
         return normalizedImage
     }
+    /// 카메라 프리뷰 이미지를 캡처하는 메서드
+       func capturePreviewImage() {
+           guard let previewLayer = preview else { return }
+           
+           // UIGraphicsImageRenderer로 캡처
+           let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+           let image = renderer.image { context in
+               previewLayer.render(in: context.cgContext)
+           }
+           
+           DispatchQueue.main.async {
+               self.takenImg = image
+           }
+       }
 }
 

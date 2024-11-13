@@ -204,8 +204,8 @@ extension IEMainView{
         }
     }
     
-    func bottomBarIphone() -> some View {
-        return HStack() {
+    var bottomBarIphone: some View {
+        HStack() {
             Spacer()
             HStack(spacing: 45) { // 여기에 spacing: 45 추가
                 ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
@@ -265,8 +265,8 @@ extension IEMainView{
         .padding(.horizontal,20)
         .frame(height: 80)
     }
-    func bottomBarIpad() -> some View {
-        return HStack() {
+    var bottomBarIpad: some View {
+        HStack() {
             Spacer()
             HStack(spacing: 45) { // 여기에 spacing: 45 추가
                 ForEach(0..<viewModel.colorEditOptions.count, id: \.self) { index in
@@ -328,8 +328,8 @@ extension IEMainView{
         .frame(height: 80)
     }
     
-    func topBar() -> some View {
-        return VStack{
+    var topBar: some View {
+        VStack{
             HStack {
                 Spacer()
                     .frame(width: 20)
@@ -430,7 +430,7 @@ extension UIImage {
     func cropToAspectRatio(_ targetAspectRatio: CGFloat) -> UIImage? {
         //        let originalWidth = size.width
         //        let originalHeight = size.height
-        //        
+        //
         var cropRect: CGRect
         
         

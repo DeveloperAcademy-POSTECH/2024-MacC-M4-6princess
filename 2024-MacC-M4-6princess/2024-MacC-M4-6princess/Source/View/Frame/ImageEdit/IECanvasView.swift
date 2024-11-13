@@ -42,6 +42,7 @@ struct IECanvasView: View {
         }
         .onAppear {
             viewModel.canvasOnAppear(bgImg: viewModel.bgImg, idolImg: viewModel.idolImg, bounds: UIScreen.main.bounds.size)
+            print("image: \(viewModel.bgImg.size.width) \(viewModel.bgImg.size.height)")
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
     }

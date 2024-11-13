@@ -77,35 +77,35 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func setUp() {
-            do {
-                
-                // 세션 구성 시작
-                self.session.beginConfiguration()
-                
-                // 카메라 디바이스 설정
-                let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
-                
-                // 새 입력 생성
-                let input = try AVCaptureDeviceInput(device: device!)
-                if self.session.canAddInput(input) {
-                    self.session.addInput(input)
-                    self.videoDeviceInput = input
-                }
-                
-                // 출력 설정
-                if self.session.canAddOutput(self.output) {
-                    self.session.addOutput(self.output)
-                }
-                
-                // 세션 구성 완료
-                self.session.commitConfiguration()
-                
-//              // 세션 시작
-                startSession()
-            } catch {
-                print("카메라 설정 오류: \(error)")
+        do {
+            
+            // 세션 구성 시작
+            self.session.beginConfiguration()
+            
+            // 카메라 디바이스 설정
+            let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
+            
+            // 새 입력 생성
+            let input = try AVCaptureDeviceInput(device: device!)
+            if self.session.canAddInput(input) {
+                self.session.addInput(input)
+                self.videoDeviceInput = input
             }
+            
+            // 출력 설정
+            if self.session.canAddOutput(self.output) {
+                self.session.addOutput(self.output)
+            }
+            
+            // 세션 구성 완료
+            self.session.commitConfiguration()
+            
+            //              // 세션 시작
+            startSession()
+        } catch {
+            print("카메라 설정 오류: \(error)")
         }
+    }
     
     func changeCamera() {
         guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else { return }
@@ -129,33 +129,33 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     func startSession() {
-        Task.detached { @MainActor in
-                    if !self.session.isRunning {
-                        self.session.startRunning()
-                    }
-                }
+        Task {
+            if !self.session.isRunning {
+                self.session.startRunning()
+            }
+        }
     }
     
     func stopSession() {
-        Task.detached { @MainActor in
-                    if !self.session.isRunning {
-                        self.session.stopRunning()
-                    }
-                }
+        Task {
+            if !self.session.isRunning {
+                self.session.stopRunning()
+            }
+        }
     }
     
     func takePicture(delegate: AVCapturePhotoCaptureDelegate) {
-            guard session.isRunning else {
-                print("세션이 실행중이지 않습니다")
-                return
-            }
-            
-            let settings = AVCapturePhotoSettings()
-            settings.flashMode = .off
-            
-            // 메인 스레드에서 실행
-            DispatchQueue.main.async {
-                self.output.capturePhoto(with: settings, delegate: delegate)
-            }
+        guard session.isRunning else {
+            print("세션이 실행중이지 않습니다")
+            return
         }
+        
+        let settings = AVCapturePhotoSettings()
+        settings.flashMode = .off
+        
+        // 메인 스레드에서 실행
+        DispatchQueue.main.async {
+            self.output.capturePhoto(with: settings, delegate: delegate)
+        }
+    }
 }
