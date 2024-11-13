@@ -445,3 +445,58 @@ extension UIImage {
         return UIImage(cgImage: cgImage)
     }
 }
+
+
+// PHPickerViewController를 사용하는 SwiftUI Wrapper
+struct PhotoPicker: UIViewControllerRepresentable {
+    @Binding var images: [UIImage]
+    @Binding var layerOrder: [Int]
+    
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 0 // 여러 개의 사진을 선택 가능
+        config.filter = .images // 이미지 필터 설정
+        
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: PhotoPicker
+        
+        init(_ parent: PhotoPicker) {
+            self.parent = parent
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            
+            for result in results {
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+                        if let uiImage = image as? UIImage {
+                            DispatchQueue.main.async {
+                                // 이미지 추가 및 레이어 순서 갱신
+                                self.parent.images.append(uiImage)
+                                self.parent.layerOrder.append(self.parent.images.count - 1)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct LayerTestView_Previews: PreviewProvider {
+    static var previews: some View {
+        LayerTestView()
+    }
+}
