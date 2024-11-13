@@ -11,9 +11,11 @@ struct IEProgressView: View {
     @State var isAnimating = false
     @Binding var isSave:Bool
     @StateObject var viewModel:IEViewModel
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     var body: some View {
         VStack{
+            topBar
             if let compositeImage = viewModel.compositeImage{
                 Image(uiImage: compositeImage)
                     .resizable()
@@ -52,7 +54,12 @@ struct IEProgressView: View {
                     .foregroundColor(.pointPink)
                     .fontWeight(.bold)
             }
+            Spacer()
         }
+        .navigationBarBackButtonHidden()
+//        .toolbar{
+//            topBar
+//        }
         .onAppear{
             isAnimating = true
             isSave = false
@@ -77,3 +84,37 @@ struct VisualEffectView: UIViewRepresentable {
     }
 }
 
+
+extension IEProgressView {
+    var topBar: some View {
+        VStack{
+            HStack {
+                Spacer()
+                    .frame(width: 10)
+                Button {
+                    // 뒤로가기 버튼
+                    self.presentationMode.wrappedValue.dismiss()
+                } label: {
+                    HStack(alignment: .center, spacing: 4) {
+                        Group{
+                            Image(systemName: "chevron.backward")
+                                .fontWeight(.semibold)
+                                .padding(.leading, 10)
+                            Text("다시 찍기")
+                                .font(.system(size: 16))
+                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                        }
+                        .foregroundColor(.gray01)
+                    }
+                }
+                
+                Spacer()
+                
+                
+                
+            }
+            Spacer()
+        }
+        .frame(height: 40)
+    }
+}
