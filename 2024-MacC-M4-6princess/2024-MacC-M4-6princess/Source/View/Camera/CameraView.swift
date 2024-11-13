@@ -29,6 +29,7 @@ struct CameraView: View {
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                    print("geo:\(geo.size.width) \(geo.size.height)")
                 }
         }
     }
@@ -182,7 +183,8 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            
+            viewModel.screenSize = UIScreen.main.bounds.size
+            print("UIScreen: \(UIScreen.main.bounds.size.width) \(UIScreen.main.bounds.size.height)")
         }
         
     }
