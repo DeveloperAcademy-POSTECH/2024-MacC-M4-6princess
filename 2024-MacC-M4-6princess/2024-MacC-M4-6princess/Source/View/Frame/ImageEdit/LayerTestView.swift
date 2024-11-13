@@ -8,6 +8,7 @@ struct LayerImage: Identifiable {
     var order: Int
 }
 
+
 struct LayerTestView: View {
     // LayerImage 배열로 이미지와 순서를 관리
     @State private var layerImages: [LayerImage] = []
@@ -18,18 +19,21 @@ struct LayerTestView: View {
         VStack {
             // ZStack으로 레이어 순서대로 이미지 표시
             ZStack {
-                ForEach(layerImages.sorted(by: { $0.order < $1.order })) { layerImage in
-                    Image(uiImage: layerImage.image)
+                ForEach(layerImages.indices, id: \.self) { index in
+                    Image(uiImage: layerImages[index].image)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)
                         .overlay(
-                            Text("Image \(layerImage.order + 1)")
+                            Text("Image \(layerImages[index].order)")
                                 .foregroundColor(.white)
                                 .background(Color.black.opacity(0.5))
                                 .padding(5),
                             alignment: .bottom
                         )
+                        .onAppear {
+                            print("Image \(index + 1) Loaded")
+                        }
                 }
             }
             .frame(width: 300, height: 300)
@@ -58,15 +62,13 @@ struct LayerTestView: View {
             
             // 리스트를 사용한 순서 변경 기능
             List {
-                ForEach(layerImages.sorted(by: { $0.order > $1.order })) { layerImage in
+                ForEach(layerImages.indices.reversed(), id: \.self) { index in
                     HStack {
-                        Text("Image \(layerImage.order + 1)")
+                        Text("Image \(layerImages[index].order)")
                         Spacer()
                     }
                 }
-                .onMove { indices, newOffset in
-                    moveLayerImages(indices: indices, newOffset: newOffset)
-                }
+                .onMove(perform: moveLayerImages)
             }
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))
             .onAppear {
@@ -80,17 +82,15 @@ struct LayerTestView: View {
     
     // 순서 변경 함수
     private func moveLayerImages(indices: IndexSet, newOffset: Int) {
-        var reversedImages = layerImages.sorted(by: { $0.order > $1.order })
-        reversedImages.move(fromOffsets: indices, toOffset: newOffset)
-        
-        // 정렬 후 순서 업데이트
-        for i in 0..<reversedImages.count {
-            reversedImages[i].order = reversedImages.count - 1 - i
+        layerImages.move(fromOffsets: indices, toOffset: newOffset)
+        print("New Layer Order:")
+        for (index, layer) in layerImages.enumerated() {
+            print("Image \(layer.order) : \(index + 1)")
         }
-        
-        layerImages = reversedImages
     }
 }
+
+
 
 // PHPickerViewController를 사용하는 SwiftUI Wrapper
 struct LayerPhotoPicker: UIViewControllerRepresentable {
@@ -107,7 +107,7 @@ struct LayerPhotoPicker: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -127,7 +127,7 @@ struct LayerPhotoPicker: UIViewControllerRepresentable {
                     result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
                         if let uiImage = image as? UIImage {
                             DispatchQueue.main.async {
-                                let newOrder = self.parent.layerImages.count
+                                let newOrder = self.parent.layerImages.count + 1
                                 let newLayerImage = LayerImage(image: uiImage, order: newOrder)
                                 self.parent.layerImages.append(newLayerImage)
                             }
@@ -136,11 +136,5 @@ struct LayerPhotoPicker: UIViewControllerRepresentable {
                 }
             }
         }
-    }
-}
-
-struct LayerTestView_Previews: PreviewProvider {
-    static var previews: some View {
-        LayerTestView()
     }
 }
