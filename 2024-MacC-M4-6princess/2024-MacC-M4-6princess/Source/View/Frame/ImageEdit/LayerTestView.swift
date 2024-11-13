@@ -6,6 +6,10 @@ struct LayerImage: Identifiable {
     let id = UUID()
     var image: UIImage
     var order: Int
+    var position: CGPoint // 이미지 위치
+       var scale: CGFloat = 1.0      // 이미지 크기
+       var rotation: Angle = .zero   // 이미지 회전 각도
+
 }
 
 
@@ -23,7 +27,11 @@ struct LayerTestView: View {
                     Image(uiImage: layerImages[index].image)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 300, height: 300)
+//                        .frame(width: 300, height: 300)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .position(layerImages[index].position) // 위치 설정
+                                               .scaleEffect(layerImages[index].scale) // 크기 설정
+                                               .rotationEffect(layerImages[index].rotation) // 회전 각도 설정
                         .overlay(
                             Text("Image \(layerImages[index].order)")
                                 .foregroundColor(.white)
@@ -37,8 +45,6 @@ struct LayerTestView: View {
                 }
             }
             .frame(width: 300, height: 300)
-            .background(Color.gray.opacity(0.2))
-            .border(Color.black, width: 1)
             .padding()
             
             // EditButton과 추가 버튼
@@ -76,7 +82,7 @@ struct LayerTestView: View {
             }
         }
         .sheet(isPresented: $showImagePicker) {
-            LayerPhotoPicker(layerImages: $layerImages)
+            LayerPhotoPicker(layerImages: $layerImages, screenSize: UIScreen.main.bounds.size)
         }
     }
     
@@ -95,7 +101,7 @@ struct LayerTestView: View {
 // PHPickerViewController를 사용하는 SwiftUI Wrapper
 struct LayerPhotoPicker: UIViewControllerRepresentable {
     @Binding var layerImages: [LayerImage]
-    
+    var screenSize: CGSize
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.selectionLimit = 0
@@ -128,7 +134,7 @@ struct LayerPhotoPicker: UIViewControllerRepresentable {
                         if let uiImage = image as? UIImage {
                             DispatchQueue.main.async {
                                 let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerImage(image: uiImage, order: newOrder)
+                                let newLayerImage = LayerImage(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
                                 self.parent.layerImages.append(newLayerImage)
                             }
                         }
