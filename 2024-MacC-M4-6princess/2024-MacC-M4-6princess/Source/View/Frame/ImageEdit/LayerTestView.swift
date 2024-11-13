@@ -53,20 +53,24 @@ struct LayerTestView: View {
             
             // 리스트를 사용한 순서 변경 기능
             List {
-                ForEach(layerOrder, id: \.self) { index in
+                ForEach(layerOrder.reversed(), id: \.self) { index in
                     HStack {
                         Text("Image \(index + 1)")
                         Spacer()
                     }
                 }
                 .onMove { indices, newOffset in
-                    layerOrder.move(fromOffsets: indices, toOffset: newOffset)
+                    // 역순일 경우, indices와 newOffset 값을 다시 변환해줌
+                    let reversedIndices = IndexSet(indices.map { layerOrder.count - 1 - $0 })
+                    let reversedNewOffset = layerOrder.count - newOffset
+                    layerOrder.move(fromOffsets: reversedIndices, toOffset: reversedNewOffset)
                 }
             }
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))
             .onAppear {
                 self.isEditing = true
             }
+
         }
         .sheet(isPresented: $showImagePicker) {
             PhotoPicker(images: $images, layerOrder: $layerOrder)
