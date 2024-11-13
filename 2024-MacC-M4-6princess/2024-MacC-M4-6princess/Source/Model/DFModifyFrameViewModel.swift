@@ -51,7 +51,7 @@ class DFModifyFrameViewModel: ObservableObject {
         lastScale = magnify
     }
     
-    func analyzeImage(_ image: UIImage) async throws -> Set<ImageAnalysisInteraction.Subject> {
+    private func analyzeImage(_ image: UIImage) async throws -> Set<ImageAnalysisInteraction.Subject> {
         
         let configuration = ImageAnalyzer.Configuration([.visualLookUp])
         let analysis = try await analyzer.analyze(image, configuration: configuration)
@@ -68,6 +68,11 @@ class DFModifyFrameViewModel: ObservableObject {
                 guard let inputImage = inputImage else { return }
                 detectedObjects = try await self.analyzeImage(inputImage)
                 print("탐지된 피사체: \(detectedObjects.count)")
+//                try await Task.sleep(for: .seconds(1))
+                for i in detectedObjects {
+                    interaction.highlightedSubjects.insert(i)
+                    try await generateImageForAllSelectedObjects()
+                }
                 
             } catch {
                 print("none object detected")
@@ -76,27 +81,9 @@ class DFModifyFrameViewModel: ObservableObject {
         }
     }
     
-    //    func generateImageForAllSelectedObjects() async throws {
-    //
-    //        let allSubjectsImage = try await self.interaction.image(for: self.interaction.highlightedSubjects)
-    //        outputImage = allSubjectsImage
-    //    }
-    
-    func extractsubject() {
-        
-        
-        for i in detectedObjects {
-            
-            Task { @MainActor in
-                
-                if let objectImage = try? await i.image {
-                    outputImage = objectImage
-                    print("저장완료")
-                } else {
-                    print("저장실패")
-                }
-            }
-            
-        }
+    private func generateImageForAllSelectedObjects() async throws {
+        let allSubjectsImage = try await interaction.image(for: interaction.highlightedSubjects)
+        outputImage = allSubjectsImage
     }
+
 }

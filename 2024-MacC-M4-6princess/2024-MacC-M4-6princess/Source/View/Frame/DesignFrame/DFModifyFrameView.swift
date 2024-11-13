@@ -4,11 +4,11 @@ struct DFModifyFrame: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
-    @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
+//    @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
+    @StateObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var shouldNavigate: Bool = false
-    @State private var frameImage: UIImage?
     
     var body: some View {
         VStack {
@@ -20,11 +20,6 @@ struct DFModifyFrame: View {
                     DFOnboardingView(isFirstLaunching: $isFirstLaunching)
                         .zIndex(1)
                 }
-                
-                //                    if let _ = viewModel.outputImage {
-                //                        imageView
-                //                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
-                //                    }
                 imageView
                     .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                 
@@ -52,10 +47,15 @@ struct DFModifyFrame: View {
             }
         }
         .fullScreenCover(isPresented: $shouldNavigate) {
-            CameraView(frameImage: $frameImage)
+            CameraView(frameImage: $resultImage)
         }
         .onAppear {
-            makeHistory()
+            
+            if let image = resultImage {
+                viewModel.detectSubject(inputImage: image)
+//                resultImage = viewModel.outputImage
+                makeHistory()
+            }
         }
     }
 }
@@ -109,7 +109,7 @@ private extension DFModifyFrame {
         
         ZStack {
             
-            if let image = resultImage {
+            if let image = viewModel.outputImage {
                 
                 Image(uiImage: image)
                     .resizable()
@@ -196,7 +196,6 @@ private extension DFModifyFrame {
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-            //            print("\(scale)")
         }
         return scale
     }
