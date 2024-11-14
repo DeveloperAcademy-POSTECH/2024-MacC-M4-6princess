@@ -19,6 +19,8 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     @Published var session: AVCaptureSession
     @Published var videoDeviceInput: AVCaptureDeviceInput?
     @Published var output: AVCapturePhotoOutput
+    @Published var startFactor: CGFloat = 2.0
+    @Published var device: AVCaptureDevice.DeviceType
     
     init(session: AVCaptureSession = AVCaptureSession(),
          videoDeviceInput: AVCaptureDeviceInput? = nil,
@@ -26,6 +28,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         self.session = session
         self.videoDeviceInput = videoDeviceInput
         self.output = output
+        self.device = .builtInWideAngleCamera
         super.init()
     }
     
@@ -52,7 +55,6 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         case notAuthorized
     }
     
-    // In CameraManager.swift, modify checkVideoAuthorizaion():
     func checkVideoAuthorizaion() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -97,6 +99,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             guard let device = getBestCamera(from: discoverySession.devices) else {
                 throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No available camera"])
             }
+            
 //            if device.deviceType == .builtInUltraWideCamera {
 //                device.videoZoomFactor = 2.0
 //            }
@@ -106,6 +109,8 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
 //            else {
 //                device.videoZoomFactor = 1.0
 //            }
+            // 초기 줌 팩터 설정
+            self.startFactor = (device.deviceType == .builtInUltraWideCamera) ? 2.0 : 1.0
             
             print("설정된 렌즈 : \(device.deviceType.rawValue)")
             
@@ -140,6 +145,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         if let wideAngleCamera = devices.first(where: { $0.deviceType == .builtInWideAngleCamera }) {
             return wideAngleCamera
         }
+        
         // 기본 카메라 반환
         return devices.first
     }
@@ -198,9 +204,6 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     func zoom(_ zoom: CGFloat) {
         let device = self.videoDeviceInput!.device
-        
-        // 초기 줌 팩터 설정
-        let startFactor: CGFloat = (device.deviceType == .builtInUltraWideCamera) ? 2.0 : 1.0
         
         // 새로운 줌 팩터 계산
         let factor = zoom < startFactor ? startFactor : zoom

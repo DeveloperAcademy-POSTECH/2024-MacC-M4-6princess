@@ -46,7 +46,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var lastScale: CGFloat = 1.0
     
     //카메라 화면전환 관련
-    @Published var cameraPosition: AVCaptureDevice.Position = .front
+    @Published var cameraPosition: AVCaptureDevice.Position = .back
     
     // 이미지 관련
     @Published var idolImg: UIImage

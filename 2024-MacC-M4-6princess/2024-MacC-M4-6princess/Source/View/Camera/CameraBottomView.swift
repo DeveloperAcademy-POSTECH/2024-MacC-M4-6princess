@@ -22,6 +22,7 @@ struct CameraBottomView: View {
                     //프레임 불러오기 버튼
                     Button {
                         viewModel.isFrameSelect.toggle()
+                        viewModel.cameraManager.stopSession()
                         print("프레임 버튼 눌림")
                     } label: {
                         VStack(alignment: .center, spacing: 4) {

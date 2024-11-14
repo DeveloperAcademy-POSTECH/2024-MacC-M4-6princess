@@ -58,6 +58,7 @@ struct CameraView: View {
                 VStack {
                     CameraTopView(viewModel: viewModel)
                     Spacer()
+                    CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end
