@@ -246,6 +246,7 @@ private extension DFModifyFrame {
             let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
             render.scale = scaleCompute(inputImage)
             viewModel.image = render.uiImage
+            frameImage = render.uiImage
 //            try await Task.sleep(nanoseconds: 1_000_000_000)
             addImage(data: viewModel.image?.pngData())
 //            try await Task.sleep(nanoseconds: 200_000_000)

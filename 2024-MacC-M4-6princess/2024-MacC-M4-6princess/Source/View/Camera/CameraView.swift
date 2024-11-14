@@ -50,6 +50,7 @@ struct CameraView: View {
                             }
                         }
                     }
+                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end
