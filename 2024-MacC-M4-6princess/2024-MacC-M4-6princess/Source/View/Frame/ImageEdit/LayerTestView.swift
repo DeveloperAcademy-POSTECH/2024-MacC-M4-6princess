@@ -1,83 +1,127 @@
 import SwiftUI
+
 import PhotosUI
 
-// 이미지와 순서를 관리하는 구조체
-struct LayerImage: Identifiable {
-    let id = UUID()
-    var image: UIImage
-    var order: Int
-    var position: CGPoint // 이미지 위치
-    var scale: CGFloat = 1.0      // 이미지 크기
-    var rotation: Angle = .zero   // 이미지 회전 각도
-    
-}
-
-
 struct LayerTestView: View {
-    // LayerImage 배열로 이미지와 순서를 관리
     @State private var layerImages: [LayerImage] = []
-    @State private var isEditing: Bool = false
     @State private var showImagePicker: Bool = false
-    //    @GestureState private var dragOffset: CGSize = .zero
     @State private var dragStartPosition: CGPoint?
-    var body: some View {
-        VStack {
-            // ZStack으로 레이어 순서대로 이미지 표시
-            ZStack {
-                ForEach(layerImages.indices, id: \.self) { index in
-                    Image(uiImage: layerImages[index].image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .position(layerImages[index].position) // 위치 설정
-                        .scaleEffect(layerImages[index].scale) // 크기 설정
-                        .rotationEffect(layerImages[index].rotation) // 회전 각도 설정
-                        .overlay(
-                            Text("Image \(layerImages[index].order)")
-                                .foregroundColor(.white)
-                                .background(Color.black.opacity(0.5))
-                                .padding(5),
-                            alignment: .bottom
-                        )
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    if dragStartPosition == nil {
-                                        dragStartPosition = layerImages[index].position
-                                    }
-                                    layerImages[index].position = CGPoint(
-                                        x: dragStartPosition!.x + value.translation.width,
-                                        y: dragStartPosition!.y + value.translation.height
-                                    )
-                                }
-                                .onEnded { _ in
-                                    dragStartPosition = nil // 드래그 종료 후 초기화
-                                }
-                        )
-                        .gesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    layerImages[index].scale = value
-                                }
-                        )
-                        .gesture(
-                            RotationGesture()
-                                .onChanged { angle in
-                                    layerImages[index].rotation = angle
-                                }
-                        )
-                        .onAppear {
-                            print("Image \(index + 1) Loaded")
+    @State private var isDragging: Bool = false
+    @State private var selectedLayerIndex: Int?
+//    @State var memoryIndex
+    var layerIndicator: some View {
+        VStack(spacing: 6) {
+                ForEach(Array(stride(from: layerImages.count - 1, to: -1, by: -1)), id: \.self) { index in
+                    if index == selectedLayerIndex {
+                        HStack{
+                            Rectangle()
+                                .fill(Color.gray)
+                                .frame(width: 20, height: 4)
+                                .cornerRadius(3)
+                            Spacer()
                         }
+                      
+//                        .frame(width: 20,height: 10)
+                    } else {
+                        HStack{
+                            Image("heart.union")
+                                .resizable()
+                                .foregroundStyle(Color.gray)
+                                .frame(width: 8, height: 6)
+                                .padding(.trailing)
+                            Spacer()
+                        }
+                        
+                    }
                 }
+
             }
-            .frame(width: 300, height: 300)
-            .padding()
-            
-            // EditButton과 추가 버튼
+        .frame(width: 38)
+//        .background(Color.gray.opacity(0.5))
+        .padding(20)
+        .background{
+            Rectangle()
+                .cornerRadius(4)
+                .foregroundStyle(Color.gray.opacity(0.5))
+        }
+        
+        }
+    var body: some View {
+        ZStack {
             HStack {
-                EditButton()
+                layerIndicator
+                // 막대 그래프 표시
+//                VStack {
+//                    ForEach(layerImages.indices, id: \.self) { index in
+//                        Rectangle()
+//                            .fill(index == selectedLayerIndex ? Color.blue : Color.gray.opacity(0.5))
+//                            .frame(width: 10, height: 30)
+//                    }
+//                }
+//                .padding(.trailing, 10)
+                
+                // ZStack으로 레이어 순서대로 이미지 표시
+                ZStack {
+                    ForEach(layerImages.indices, id: \.self) { index in
+                        let layer = layerImages[index]
+                        Image(uiImage: layer.image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .position(layer.position)
+                            .scaleEffect(layer.scale)
+                            .rotationEffect(layer.rotation)
+                            .overlay(
+                                Text("Image \(layer.order)")
+                                    .foregroundColor(.white)
+                                    .background(Color.black.opacity(0.5))
+                                    .padding(5),
+                                alignment: .bottom
+                            )
+                            .gesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        if !isDragging {
+                                            // 드래그 시작 시, 현재 레이어 위치 기억
+                                            selectedLayerIndex = index
+                                            dragStartPosition = layer.position
+                                            isDragging = true
+                                        }
+                                        
+                                        // 드래그의 Y축 이동 거리
+                                        let dragOffsetY = value.translation.height
+                                        let step = Int(dragOffsetY / 50) // 50픽셀당 한 단계 이동
+                                        
+                                        if step < 0, index - abs(step) >= 0 {
+                                            // 위로 드래그해서 여러 단계 앞으로 이동
+                                            moveLayerForward(at: index, steps: abs(step))
+                                            selectedLayerIndex = max(index - abs(step), 0)
+                                        } else if step > 0, index + step < layerImages.count {
+                                            // 아래로 드래그해서 여러 단계 뒤로 이동
+                                            moveLayerBackward(at: index, steps: step)
+                                            selectedLayerIndex = min(index + step, layerImages.count - 1)
+                                        }
+                                    }
+                                    .onEnded { _ in
+                                        // 드래그 종료 시 초기화
+                                        isDragging = false
+                                        dragStartPosition = nil
+                                        selectedLayerIndex = nil
+                                    }
+                            )
+                            .onAppear {
+                                print("Image \(index + 1) Loaded")
+                            }
+                    }
+                }
+                .frame(width: 300, height: 300)
+                .padding()
+            }
+            
+            // 추가 버튼
+            VStack {
                 Spacer()
+
                 Button(action: {
                     showImagePicker = true
                 }) {
@@ -87,87 +131,37 @@ struct LayerTestView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-                Spacer()
-                Text(isEditing ? "Editing" : "Not Editing")
-                Spacer()
             }
             .padding()
-            
-            // 리스트를 사용한 순서 변경 기능
-            List {
-                ForEach(layerImages.indices.reversed(), id: \.self) { index in
-                    HStack {
-                        Text("Image \(layerImages[index].order)")
-                        Spacer()
-                    }
-                }
-                .onMove(perform: moveLayerImages)
-            }
-            .environment(\.editMode, .constant(isEditing ? .active : .inactive))
-            .onAppear {
-                self.isEditing = true
-            }
         }
         .sheet(isPresented: $showImagePicker) {
             LayerPhotoPicker(layerImages: $layerImages, screenSize: UIScreen.main.bounds.size)
         }
     }
-    
-    // 순서 변경 함수
-    private func moveLayerImages(indices: IndexSet, newOffset: Int) {
-        layerImages.move(fromOffsets: indices, toOffset: newOffset)
-        print("New Layer Order:")
-        for (index, layer) in layerImages.enumerated() {
-            print("Image \(layer.order) : \(index + 1)")
-        }
-    }
-}
 
-
-
-// PHPickerViewController를 사용하는 SwiftUI Wrapper
-struct LayerPhotoPicker: UIViewControllerRepresentable {
-    @Binding var layerImages: [LayerImage]
-    var screenSize: CGSize
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 0
-        config.filter = .images
-        
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = context.coordinator
-        return picker
+    // 순서 앞으로 이동 함수 (여러 단계)
+    private func moveLayerForward(at index: Int, steps: Int) {
+        guard index - steps >= 0 else { return }
+        let newIndex = index - steps
+        let element = layerImages.remove(at: index)
+        layerImages.insert(element, at: newIndex)
+        updateOrder()
     }
     
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    // 순서 뒤로 이동 함수 (여러 단계)
+    private func moveLayerBackward(at index: Int, steps: Int) {
+        guard index + steps < layerImages.count else { return }
+        let newIndex = index + steps
+        let element = layerImages.remove(at: index)
+        layerImages.insert(element, at: newIndex)
+        updateOrder()
     }
     
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: LayerPhotoPicker
-        
-        init(_ parent: LayerPhotoPicker) {
-            self.parent = parent
+    // 레이어 순서 업데이트 함수
+    private func updateOrder() {
+        for i in 0..<layerImages.count {
+            layerImages[i].order = i + 1
         }
-        
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
-            
-            for result in results {
-                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
-                        if let uiImage = image as? UIImage {
-                            DispatchQueue.main.async {
-                                let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerImage(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
-                                self.parent.layerImages.append(newLayerImage)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
     }
 }

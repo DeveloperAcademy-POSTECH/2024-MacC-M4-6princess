@@ -45,7 +45,12 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var idolImg: UIImage
     let defaultImg: UIImage
     
+
     var screenSize:CGSize = UIScreen.main.bounds.size
+
+    @Published var isAnimating = false
+    
+
     
     let cameraManager: CameraManager
     

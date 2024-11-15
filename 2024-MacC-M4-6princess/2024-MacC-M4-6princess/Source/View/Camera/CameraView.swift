@@ -53,7 +53,22 @@ struct CameraView: View {
                     }
                     CameraBottomView(viewModel: viewModel)
                 }
-                //v end
+                
+//                VStack{
+//                    Spacer()
+//                    Circle()
+//                        .strokeBorder(style: StrokeStyle(lineWidth: 7, dash: [5]))
+//                        .frame(width: 20, height: 20)
+//                        .foregroundColor(.gray10)
+//                        .rotationEffect(Angle(degrees: viewModel.isAnimating ? 360 : 0))
+//                        .animation(
+//                            Animation.linear(duration: 2)
+//                                .repeatForever(autoreverses: false),
+//                            value: viewModel.isAnimating
+//                        )
+//                        .padding()
+//                    Spacer()
+//                }
                 //처음 실행했을 때 - 온보딩 합침
                 if !viewModel.firstTime  {
                     VStack {

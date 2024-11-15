@@ -12,9 +12,11 @@ struct ContentView: View {
 //    @State private var inputImage: UIImage?
     
     var body: some View {
-        
+
+        LayerTestView()
 //                CameraView()
-        IEDevelopView()
+//        IEDevelopView()
+
         //        CMView()
         //        IEProgressView()
     }
