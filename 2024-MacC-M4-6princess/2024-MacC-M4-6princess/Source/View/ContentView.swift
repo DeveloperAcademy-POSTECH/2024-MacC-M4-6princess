@@ -9,14 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     
-//    @State private var inputImage: UIImage?
+    //    @State private var inputImage: UIImage?
     
     var body: some View {
-
-        LayerTestView()
-//                CameraView()
-//        IEDevelopView()
-
+        
+        //        LayerTestView()
+        CameraView()
+        //        IEDevelopView()
+        
         //        CMView()
         //        IEProgressView()
     }

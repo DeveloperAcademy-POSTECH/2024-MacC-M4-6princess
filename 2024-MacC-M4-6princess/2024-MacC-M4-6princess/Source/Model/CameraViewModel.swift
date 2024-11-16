@@ -12,7 +12,7 @@ import Photos
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     @AppStorage("openFirstTime") var firstTime = false
-//        @State var firstTime = false
+    //        @State var firstTime = false
     
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false
@@ -45,24 +45,24 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var idolImg: UIImage
     let defaultImg: UIImage
     
-
+    
     var screenSize:CGSize = UIScreen.main.bounds.size
-
+    
     @Published var isAnimating = false
     
-
+    
     
     let cameraManager: CameraManager
     
     var topHeight:CGFloat = 130
     @Published var shouldCapture: Bool = false { // 트리거 변수
-            didSet {
-                if shouldCapture {
-                    capturePreviewImage()
-                    shouldCapture = false
-                }
+        didSet {
+            if shouldCapture {
+                capturePreviewImage()
+                shouldCapture = false
             }
         }
+    }
     
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
@@ -77,7 +77,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
         preview.videoGravity = .resizeAspectFill
-//        preview.session?.sessionPreset = .photo
+        //        preview.session?.sessionPreset = .photo
     }
     
     
@@ -108,7 +108,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //            }
     //        }
     //    }
-
+    
     
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
@@ -164,7 +164,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             self.isTakenPhoto.toggle()
         }
     }
-     
+    
     func changeCamera() {
         cameraManager.changeCamera()
     }
@@ -186,18 +186,18 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         return normalizedImage
     }
     /// 카메라 프리뷰 이미지를 캡처하는 메서드
-       func capturePreviewImage() {
-           guard let previewLayer = preview else { return }
-           
-           // UIGraphicsImageRenderer로 캡처
-           let renderer = UIGraphicsImageRenderer(size: frameSize.size)
-           let image = renderer.image { context in
-               previewLayer.render(in: context.cgContext)
-           }
-           
-           DispatchQueue.main.async {
-               self.takenImg = image
-           }
-       }
+    func capturePreviewImage() {
+        guard let previewLayer = preview else { return }
+        
+        // UIGraphicsImageRenderer로 캡처
+        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+        let image = renderer.image { context in
+            previewLayer.render(in: context.cgContext)
+        }
+        
+        DispatchQueue.main.async {
+            self.takenImg = image
+        }
+    }
 }
 
