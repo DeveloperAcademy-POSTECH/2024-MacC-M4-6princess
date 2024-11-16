@@ -23,6 +23,10 @@ struct LayerTestView: View {
     
     var body: some View {
         ZStack {
+            if isEditing{
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+            }
             ZStack {
                 ForEach(layerImages.indices, id: \.self) { index in
                     let layer = layerImages[index]
@@ -33,7 +37,6 @@ struct LayerTestView: View {
                         .position(layer.position)
                         .scaleEffect(layer.scale)
                         .rotationEffect(layer.rotation)
-                        .background(isEditing && selectedLayerIndex == index ? Color.gray.opacity(0.5) : Color.clear)
                         .overlay(
                             Text("Image \(layer.order)")
                                 .foregroundColor(.white)
@@ -124,44 +127,50 @@ struct LayerTestView: View {
             )
     }
 }
-
 // UIKit의 LongPressGestureRecognizer를 SwiftUI에 통합
 struct LongPressGestureRecognizerWrapper: UIViewRepresentable {
-    @Binding var isEditing: Bool
-    @Binding var selectedLayerIndex: Int?
-    var currentIndex: Int
+    @Binding var isEditing: Bool // 에디팅 모드 상태를 바인딩
+    @Binding var selectedLayerIndex: Int? // 현재 선택된 레이어 인덱스를 바인딩
+    var currentIndex: Int // 현재 레이어의 인덱스
     
+    // UIView 생성 및 UILongPressGestureRecognizer 추가
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         let gestureRecognizer = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleLongPress))
-        view.addGestureRecognizer(gestureRecognizer)
-        view.isUserInteractionEnabled = true
+        view.addGestureRecognizer(gestureRecognizer) // 뷰에 제스처 연결
+        view.isUserInteractionEnabled = true // 사용자 상호작용 활성화
         return view
     }
     
-    func updateUIView(_ uiView: UIView, context: Context) {}
+    func updateUIView(_ uiView: UIView, context: Context) {
+        // UIView 업데이트 로직 (필요하지 않아 비워둠)
+    }
     
+    // Coordinator 생성
     func makeCoordinator() -> Coordinator {
         Coordinator(isEditing: $isEditing, selectedLayerIndex: $selectedLayerIndex, currentIndex: currentIndex)
     }
     
+    // UILongPressGestureRecognizer 처리를 위한 Coordinator 클래스
     class Coordinator: NSObject {
-        @Binding var isEditing: Bool
-        @Binding var selectedLayerIndex: Int?
-        var currentIndex: Int
+        @Binding var isEditing: Bool // 에디팅 모드 상태를 바인딩
+        @Binding var selectedLayerIndex: Int? // 현재 선택된 레이어 인덱스를 바인딩
+        var currentIndex: Int // 현재 레이어의 인덱스
         
+        // 초기화
         init(isEditing: Binding<Bool>, selectedLayerIndex: Binding<Int?>, currentIndex: Int) {
             _isEditing = isEditing
             _selectedLayerIndex = selectedLayerIndex
             self.currentIndex = currentIndex
         }
         
+        // Long press 동작 처리 메서드
         @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
             if gestureRecognizer.state == .began {
-                isEditing = true
-                selectedLayerIndex = currentIndex
+                isEditing = true // 에디팅 모드 시작
+                selectedLayerIndex = currentIndex // 현재 레이어 선택
             } else if gestureRecognizer.state == .ended {
-                isEditing = false
+                isEditing = false // 에디팅 모드 종료
             }
         }
     }
