@@ -1,46 +1,26 @@
 import SwiftUI
 import PhotosUI
 
+struct LayerImage: Identifiable {
+    let id = UUID()
+    var image: UIImage
+    var order: Int
+    var position: CGPoint // 이미지 위치
+    var scale: CGFloat = 1.0      // 이미지 크기
+    var rotation: Angle = .zero   // 이미지 회전 각도
+}
+
 struct LayerTestView: View {
     @State var layerImages: [LayerImage] = []
     @State var showImagePicker: Bool = false
-    @State var dragStartPosition: CGPoint?
-    @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
-    @State var currentStep: Int = 0 // 현재 드래그 단계
-    var layerIndicator: some View {
-        VStack(spacing: 6) {
-            ForEach(Array(stride(from: layerImages.count - 1, to: -1, by: -1)), id: \.self) { index in
-                if index == selectedLayerIndex {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            RoundedRectangle(cornerRadius: 3)
-                                .frame(width: 24, height: 4)
-                                .foregroundColor(.white)
-                                .padding(.leading, 4)
-                            Spacer()
-                        }
-                        Spacer()
-                    }
-                    .frame(height: 6)
-                } else {
-                    HStack {
-                        Image("heart.union")
-                            .resizable()
-                            .frame(width: 8, height: 6)
-                        Spacer()
-                    }
-                }
-            }
-        }
-        .padding(6)
-        .frame(width: 40)
-        .background(Color.gray)
-        .cornerRadius(8)
-        .padding(.horizontal, 5)
-    }
-
+    
+    @State private var activeDragOffset: CGSize = .zero // 드래그 이동값
+    @State private var activeScale: CGFloat = 1.0       // 현재 확대/축소 값
+    @State private var activeRotation: Angle = .zero    // 현재 회전 값
+    
+    @State private var isEditing: Bool = false // 에디팅 모드 활성화 여부
+    
     var body: some View {
         ZStack {
             ZStack {
@@ -53,6 +33,7 @@ struct LayerTestView: View {
                         .position(layer.position)
                         .scaleEffect(layer.scale)
                         .rotationEffect(layer.rotation)
+                        .background(isEditing && selectedLayerIndex == index ? Color.gray.opacity(0.5) : Color.clear)
                         .overlay(
                             Text("Image \(layer.order)")
                                 .foregroundColor(.white)
@@ -60,23 +41,27 @@ struct LayerTestView: View {
                                 .padding(5),
                             alignment: .bottom
                         )
-                        .gesture(
-                            dragGesture(for: index)
-                        )
-                        .onAppear {
-                            print("Image \(index + 1) Loaded")
+                        .gesture(combinedGesture(for: index))
+                        .onTapGesture {
+                            selectedLayerIndex = index
                         }
+                        .overlay(
+                            LongPressGestureRecognizerWrapper(isEditing: $isEditing, selectedLayerIndex: $selectedLayerIndex, currentIndex: index)
+                        )
                 }
             }
             .frame(width: 300, height: 300)
             .padding()
             
-            HStack {
-                layerIndicator
-                Spacer()
-            }
-            
             VStack {
+                if isEditing {
+                    Text("레이어를 위아래로 끌어서 변경할 수 있어요")
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        .transition(.opacity)
+                }
                 Spacer()
                 Button(action: {
                     showImagePicker = true
@@ -94,19 +79,90 @@ struct LayerTestView: View {
             LayerPhotoPicker(layerImages: $layerImages, screenSize: UIScreen.main.bounds.size)
         }
     }
-
-    // 드래그 제스처 생성 함수
-    func dragGesture(for index: Int) -> some Gesture {
-        DragGesture(minimumDistance: 0)
+    
+    private func combinedGesture(for index: Int) -> some Gesture {
+        DragGesture()
             .onChanged { value in
-                withAnimation{
-                    dragOnChaged(value: value, index: index)
+                if selectedLayerIndex == index {
+                    activeDragOffset = value.translation
                 }
             }
-            .onEnded { _ in
-                dragOnEnded()
+            .onEnded { value in
+                if selectedLayerIndex == index {
+                    layerImages[index].position.x += activeDragOffset.width
+                    layerImages[index].position.y += activeDragOffset.height
+                    activeDragOffset = .zero
+                }
             }
+            .simultaneously(
+                with: MagnificationGesture()
+                    .onChanged { value in
+                        if selectedLayerIndex == index {
+                            activeScale = value
+                        }
+                    }
+                    .onEnded { value in
+                        if selectedLayerIndex == index {
+                            layerImages[index].scale *= activeScale
+                            activeScale = 1.0
+                        }
+                    }
+            )
+            .simultaneously(
+                with: RotationGesture()
+                    .onChanged { angle in
+                        if selectedLayerIndex == index {
+                            activeRotation = angle
+                        }
+                    }
+                    .onEnded { angle in
+                        if selectedLayerIndex == index {
+                            layerImages[index].rotation += activeRotation
+                            activeRotation = .zero
+                        }
+                    }
+            )
     }
+}
 
+// UIKit의 LongPressGestureRecognizer를 SwiftUI에 통합
+struct LongPressGestureRecognizerWrapper: UIViewRepresentable {
+    @Binding var isEditing: Bool
+    @Binding var selectedLayerIndex: Int?
+    var currentIndex: Int
     
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        let gestureRecognizer = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleLongPress))
+        view.addGestureRecognizer(gestureRecognizer)
+        view.isUserInteractionEnabled = true
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(isEditing: $isEditing, selectedLayerIndex: $selectedLayerIndex, currentIndex: currentIndex)
+    }
+    
+    class Coordinator: NSObject {
+        @Binding var isEditing: Bool
+        @Binding var selectedLayerIndex: Int?
+        var currentIndex: Int
+        
+        init(isEditing: Binding<Bool>, selectedLayerIndex: Binding<Int?>, currentIndex: Int) {
+            _isEditing = isEditing
+            _selectedLayerIndex = selectedLayerIndex
+            self.currentIndex = currentIndex
+        }
+        
+        @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+            if gestureRecognizer.state == .began {
+                isEditing = true
+                selectedLayerIndex = currentIndex
+            } else if gestureRecognizer.state == .ended {
+                isEditing = false
+            }
+        }
+    }
 }
