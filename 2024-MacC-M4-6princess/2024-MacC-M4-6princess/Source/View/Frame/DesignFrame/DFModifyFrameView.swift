@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct DFModifyFrame: View {
+struct DFModifyFrameView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
-    @ObservedObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
+    @StateObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var shouldNavigate: Bool = false
@@ -20,11 +20,6 @@ struct DFModifyFrame: View {
                     DFOnboardingView(isFirstLaunching: $isFirstLaunching)
                         .zIndex(1)
                 }
-                
-                //                    if let _ = viewModel.outputImage {
-                //                        imageView
-                //                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
-                //                    }
                 imageView
                     .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                 
@@ -56,24 +51,27 @@ struct DFModifyFrame: View {
 //            CameraView(frameImage: $resultImage)
         }
         .onAppear {
-            makeHistory()
+            
+            if let image = resultImage {
+                viewModel.detectSubject(inputImage: image)
+                //                resultImage = viewModel.outputImage
+                makeHistory()
+            }
         }
     }
 }
 
-private extension DFModifyFrame {
+private extension DFModifyFrameView {
     
     var rotate: some Gesture {
         
         RotateGesture()
             .onChanged { value in
-                
                 viewModel.angle = value.rotation + viewModel.current
-                viewModel.anchor = value.startAnchor
-                
             }
             .onEnded { value in
                 viewModel.current += value.rotation
+                makeHistory()
             }
     }
     var moveImage: some Gesture {
@@ -90,6 +88,8 @@ private extension DFModifyFrame {
                 viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
                 //                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
                 //                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
+                print(viewModel.draggedOffSet)
+                makeHistory()
                 
             }
         
@@ -103,14 +103,19 @@ private extension DFModifyFrame {
             }
             .onEnded { value in
                 viewModel.setScaleValue(minimum: 0.2, maximum: 10)
+                makeHistory()
             }
     }
+}
+
+private extension DFModifyFrameView {
+    
     
     var imageView: some View {
         
         ZStack {
             
-            if let image = resultImage {
+            if let image = viewModel.outputImage {
                 
                 Image(uiImage: image)
                     .resizable()
@@ -143,7 +148,25 @@ private extension DFModifyFrame {
             }
             .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
             
-            Spacer(minLength: UIScreen.main.bounds.width / 10)
+            Spacer(minLength: UIScreen.main.bounds.width / 20)
+            
+            Button {
+                viewModel.reDo()
+                print(viewModel.draggedOffSet)
+            } label: {
+                Image("back")
+                    .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
+            }
+            .padding(.trailing, 14)
+            
+            Button {
+                viewModel.unDo()
+                print(viewModel.draggedOffSet)
+            } label: {
+                Image("front")
+                    .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
+            }
+            .padding(.trailing, 60)
             
             Spacer()
             Button {
@@ -167,37 +190,41 @@ private extension DFModifyFrame {
                     .foregroundStyle(isFirstLaunching ? .gray01 : .pointPink)
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
-            .padding(.leading, 150)
+            .padding(.leading, 1)
             .disabled(viewModel.isPushedSaveBtn)
             
         }
     }
 }
 
-private extension DFModifyFrame {
+private extension DFModifyFrameView {
     
     func makeHistory() {
         
-        if let image = resultImage {
-            
-            let render = ImageRenderer(content: self.imageView.frame(width: image.size.width / (scaleCompute(image) * 2), height: image.size.height / scaleCompute(image)))
-            render.scale = scaleCompute(image)
-            viewModel.image = render.uiImage
-            viewModel.imageHistory.append(viewModel.image!)
+        var inputImage = subjectImage()
+        
+        inputImage.image = viewModel.outputImage
+        inputImage.angle = viewModel.angle
+        inputImage.scale = viewModel.magnifyScale
+        inputImage.offSet = viewModel.draggedOffSet
+
+        if viewModel.imageList.count > 0 {
+            viewModel.indexOfImageList += 1
         }
+        
+        viewModel.imageList.append(inputImage)
         
     }
     
     func scaleCompute(_ image: UIImage) -> CGFloat {
         
-//        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
-//        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
+        //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
         var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
         
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-            //            print("\(scale)")
         }
         return scale
     }
@@ -210,36 +237,43 @@ private extension DFModifyFrame {
             print("Error saving managed object context: \(error)")
         }
     }
-    func addImage(data: Data?) {
+    func addImage(albumImageData: Data?, subjectImageData: Data?) {
         
         let newImage = StoreImages(context: managedContext)
         
-        newImage.image = data
+        newImage.image = albumImageData
+        newImage.subjectImage = subjectImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
+        newImage.angle = viewModel.angle.degrees
+        newImage.x = viewModel.draggedOffSet.width
+        newImage.y = viewModel.draggedOffSet.height
+        newImage.scale = viewModel.magnifyScale
+        
         saveContext()
     }
     
     func makeImage() {
+        
         let render = ImageRenderer(content: self.imageView)
         render.scale = scaleCompute(resultImage!)
         if let rend = render.uiImage {
-            if viewModel.indexOfHistory < viewModel.imageHistory.count - 1 {
-                for _ in viewModel.indexOfHistory+1..<viewModel.imageHistory.count {
-                    viewModel.imageHistory.removeLast()
+            if viewModel.indexOfImageList < viewModel.imageList.count - 1 {
+                for _ in viewModel.indexOfImageList+1..<viewModel.imageList.count {
+                    viewModel.imageList.removeLast()
                 }
             }
-            viewModel.imageHistory.append(rend)
-            viewModel.indexOfHistory += 1
+            viewModel.imageList[viewModel.indexOfImageList].image = rend
+            viewModel.indexOfImageList += 1
             
         }
-        resultImage = viewModel.imageHistory[viewModel.indexOfHistory]
+        resultImage = viewModel.imageList[viewModel.indexOfImageList].image
     }
     
     func saveImage(inputImage: UIImage) {
         
         viewModel.btnOpacity = 1
-
+        
         // 4. 지연 시간을 둬서 작업을 분산
         Task {
             // 저장 완료 메시지 숨기기
@@ -247,14 +281,14 @@ private extension DFModifyFrame {
             render.scale = scaleCompute(inputImage)
             viewModel.image = render.uiImage
             frameImage = render.uiImage
-//            try await Task.sleep(nanoseconds: 1_000_000_000)
-            addImage(data: viewModel.image?.pngData())
-//            try await Task.sleep(nanoseconds: 200_000_000)
+            //            try await Task.sleep(nanoseconds: 1_000_000_000)
+            addImage(albumImageData: viewModel.image?.pngData(), subjectImageData: viewModel.outputImage?.pngData())
+            //            try await Task.sleep(nanoseconds: 200_000_000)
             try await Task.sleep(nanoseconds: 1_000_000_000)
             viewModel.btnOpacity = 0
             viewModel.isShowCamera = true
         }
-
+        
     }
     
     

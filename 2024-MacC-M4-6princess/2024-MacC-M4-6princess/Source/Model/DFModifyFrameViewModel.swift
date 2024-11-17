@@ -6,13 +6,6 @@ import VisionKit
 class DFModifyFrameViewModel: ObservableObject {
     
     @Published var btnOpacity: Double = 0.0
-    @Published var imageHistory: [UIImage?] = []
-    @Published var indexOfHistory: Int = 0
-    @Published var currentSize = 0.0
-    @Published var finalSize = 1.0
-    @Published var currentAngle = Angle.zero
-    @Published var finalAngle = Angle.zero
-    @Published var draggedOffset = CGSize.zero
     @Published var accumulatedOffset = CGSize.zero
     @Published var image: UIImage?
     @Published var isShowCamera: Bool = false
@@ -25,12 +18,36 @@ class DFModifyFrameViewModel: ObservableObject {
     @Published var location: CGPoint = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
     @Published var angle: Angle = .degrees(0)
     @Published var current: Angle = .degrees(0)
-    @Published var anchor: UnitPoint = .zero
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
+    @Published var indexOfImageList: Int = 0
+    @Published var imageList: [subjectImage] = []
     
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
+    
+    
+    func reDo() {
+        
+        if indexOfImageList > 0 {
+            indexOfImageList -= 1
+            angle = imageList[indexOfImageList].angle
+            current = imageList[indexOfImageList].angle
+            magnifyScale = imageList[indexOfImageList].scale
+            draggedOffSet = imageList[indexOfImageList].offSet
+        }
+    }
+    
+    func unDo() {
+        
+        if imageList.count - 1 > indexOfImageList {
+            indexOfImageList += 1
+            angle = imageList[indexOfImageList].angle
+            current = imageList[indexOfImageList].angle
+            magnifyScale = imageList[indexOfImageList].scale
+            draggedOffSet = imageList[indexOfImageList].offSet
+        }
+    }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         
@@ -51,7 +68,7 @@ class DFModifyFrameViewModel: ObservableObject {
         lastScale = magnify
     }
     
-    func analyzeImage(_ image: UIImage) async throws -> Set<ImageAnalysisInteraction.Subject> {
+    private func analyzeImage(_ image: UIImage) async throws -> Set<ImageAnalysisInteraction.Subject> {
         
         let configuration = ImageAnalyzer.Configuration([.visualLookUp])
         let analysis = try await analyzer.analyze(image, configuration: configuration)
@@ -68,6 +85,11 @@ class DFModifyFrameViewModel: ObservableObject {
                 guard let inputImage = inputImage else { return }
                 detectedObjects = try await self.analyzeImage(inputImage)
                 print("탐지된 피사체: \(detectedObjects.count)")
+//                try await Task.sleep(for: .seconds(1))
+                for i in detectedObjects {
+                    interaction.highlightedSubjects.insert(i)
+                    try await generateImageForAllSelectedObjects()
+                }
                 
             } catch {
                 print("none object detected")
@@ -76,27 +98,9 @@ class DFModifyFrameViewModel: ObservableObject {
         }
     }
     
-    //    func generateImageForAllSelectedObjects() async throws {
-    //
-    //        let allSubjectsImage = try await self.interaction.image(for: self.interaction.highlightedSubjects)
-    //        outputImage = allSubjectsImage
-    //    }
-    
-    func extractsubject() {
-        
-        
-        for i in detectedObjects {
-            
-            Task { @MainActor in
-                
-                if let objectImage = try? await i.image {
-                    outputImage = objectImage
-                    print("저장완료")
-                } else {
-                    print("저장실패")
-                }
-            }
-            
-        }
+    private func generateImageForAllSelectedObjects() async throws {
+        let allSubjectsImage = try await interaction.image(for: interaction.highlightedSubjects)
+        outputImage = allSubjectsImage
     }
+
 }
