@@ -6,13 +6,6 @@ import VisionKit
 class DFModifyFrameViewModel: ObservableObject {
     
     @Published var btnOpacity: Double = 0.0
-    @Published var imageHistory: [UIImage?] = []
-    @Published var indexOfHistory: Int = 0
-    @Published var currentSize = 0.0
-    @Published var finalSize = 1.0
-    @Published var currentAngle = Angle.zero
-    @Published var finalAngle = Angle.zero
-    @Published var draggedOffset = CGSize.zero
     @Published var accumulatedOffset = CGSize.zero
     @Published var image: UIImage?
     @Published var isShowCamera: Bool = false
@@ -25,12 +18,36 @@ class DFModifyFrameViewModel: ObservableObject {
     @Published var location: CGPoint = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
     @Published var angle: Angle = .degrees(0)
     @Published var current: Angle = .degrees(0)
-    @Published var anchor: UnitPoint = .zero
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
+    @Published var indexOfImageList: Int = 0
+    @Published var imageList: [subjectImage] = []
     
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
+    
+    
+    func reDo() {
+        
+        if indexOfImageList > 0 {
+            indexOfImageList -= 1
+            angle = imageList[indexOfImageList].angle
+            current = imageList[indexOfImageList].angle
+            magnifyScale = imageList[indexOfImageList].scale
+            draggedOffSet = imageList[indexOfImageList].offSet
+        }
+    }
+    
+    func unDo() {
+        
+        if imageList.count - 1 > indexOfImageList {
+            indexOfImageList += 1
+            angle = imageList[indexOfImageList].angle
+            current = imageList[indexOfImageList].angle
+            magnifyScale = imageList[indexOfImageList].scale
+            draggedOffSet = imageList[indexOfImageList].offSet
+        }
+    }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         

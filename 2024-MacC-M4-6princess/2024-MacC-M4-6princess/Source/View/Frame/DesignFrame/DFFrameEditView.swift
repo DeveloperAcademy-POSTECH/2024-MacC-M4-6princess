@@ -77,7 +77,7 @@ struct DFFrameEditView: View {
             showMaskImage()
         }
         .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
-            DFModifyFrame(resultImage: $viewModel.resultImage)
+            DFModifyFrameView(resultImage: $viewModel.resultImage)
         })
         .navigationBarBackButtonHidden()
         .toolbar {
