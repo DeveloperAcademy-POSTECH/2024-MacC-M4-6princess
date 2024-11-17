@@ -11,24 +11,30 @@ struct DFModifyFrameView: View {
     @State private var frameImage: UIImage?
     
     var body: some View {
-        VStack {
-            ZStack {
-                Color(hex: "32322f")
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
-                
-                if isFirstLaunching == true {
-                    DFOnboardingView(isFirstLaunching: $isFirstLaunching)
-                        .zIndex(1)
+        
+        ZStack {
+            if isFirstLaunching == true {
+                DFOnboardingView(isFirstLaunching: $isFirstLaunching)
+                    .zIndex(1)
+            }
+            
+            VStack {
+                ZStack {
+                    Color(hex: "32322f")
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
+                    
+                    imageView
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                    
+                    RoundedRectangle(cornerRadius: 30)
+                        .fill(Color.white)
+                        .opacity(viewModel.btnOpacity)
+                        .frame(width: 175, height: 38)
+                        .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                    
                 }
-                imageView
-                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-                
-                RoundedRectangle(cornerRadius: 30)
-                    .fill(Color.white)
-                    .opacity(viewModel.btnOpacity)
-                    .frame(width: 175, height: 38)
-                    .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                
+                DFDecoImageView()
+                    .padding(.top, 58)
             }
         }
         .navigationBarBackButtonHidden()
@@ -110,7 +116,6 @@ private extension DFModifyFrameView {
 
 private extension DFModifyFrameView {
     
-    
     var imageView: some View {
         
         ZStack {
@@ -141,7 +146,7 @@ private extension DFModifyFrameView {
                         .fontWeight(.semibold)
                         .foregroundStyle(.gray01)
                     
-                    Text("배경 수정")
+                    Text("프레임선택")
                         .fontWeight(.regular)
                         .foregroundStyle(.gray01)
                 }
