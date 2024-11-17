@@ -14,9 +14,9 @@ struct CameraFrameSelectView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var viewModel: CameraViewModel
     @FetchRequest(
-            sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)],
-            animation: .default
-        ) private var storedImages: FetchedResults<StoreImages>
+        sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)],
+        animation: .default
+    ) private var storedImages: FetchedResults<StoreImages>
     @State var imageDataArray: [(id: UUID, data: Data)] = []
     @State private var isShowPhotosPicker: Bool = false
     @State private var isEditing: Bool = false
@@ -30,103 +30,69 @@ struct CameraFrameSelectView: View {
                 VStack(spacing: 0) {
                     SheetTitleView(isEditing: $isEditing, imageDataArray: $imageDataArray)
                     
-//                    if !imageDataArray.isEmpty {
-                        ScrollView {
-                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-                                    NavigationLink {
-                                        PhotosPickerView()
+                    //                    if !imageDataArray.isEmpty {
+                    ScrollView {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
+                            NavigationLink {
+                                PhotosPickerView()
+                            } label: {
+                                VStack(alignment: .center, spacing: 4) {
+                                    Spacer()
+                                    Image("plusIcon")
+                                        .resizable()
+                                        .frame(width: 30, height: 30, alignment: .center)
+                                    Text("새로운\n프레임 만들기")
+                                        .font(.system(size: 13))
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                                    Spacer()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(minHeight: 200)
+                                .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+                            }.onTapGesture {
+                                viewModel.isFullScreenPop.toggle()
+                                viewModel.isFrameSelect = true
+                                dismiss()
+                            }
+                            .disabled(isEditing)
+                            
+                            ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
+                                ZStack(alignment: .topTrailing) {
+                                    Button {
+                                        if isEditing {
+                                            toggleSelection(for: imageInfo.id)
+                                        } else {
+                                            viewModel.isFrameSelected = true
+                                            print("isFrameSelected 값 true로 변경됨")
+                                            viewModel.selectedFrame = imageInfo.id
+                                            viewModel.isFrameLoading = true
+                                            dismiss()
+                                        }
                                     } label: {
-                                        VStack(alignment: .center, spacing: 4) {
-                                            Spacer()
-                                            Image("plusIcon")
+                                        if let uiImage = UIImage(data: imageInfo.data) {
+                                            Image(uiImage: uiImage)
                                                 .resizable()
-                                                .frame(width: 30, height: 30, alignment: .center)
-                                            Text("새로운\n프레임 만들기")
-                                                .font(.system(size: 13))
-                                                .multilineTextAlignment(.center)
-                                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                                            Spacer()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: UIScreen.main.bounds.width / 3, height: (UIScreen.main.bounds.width / 3) * (598 / 375))
+                                                .clipped()
                                         }
-                                        .frame(maxWidth: .infinity)
-                                        .frame(minHeight: 200)
-                                        .background(Color(red: 0.83, green: 0.83, blue: 0.83))
-                                    }.onTapGesture {
-                                        viewModel.isFullScreenPop.toggle()
-                                        viewModel.isFrameSelect = true
-                                        dismiss()
                                     }
-                                    .disabled(isEditing)
+                                    .frame(width: UIScreen.main.bounds.width / 3, height: (UIScreen.main.bounds.width / 3) * (598 / 375))
                                     
-                                    ForEach(imageDataArray.reversed(), id: \.id) { imageInfo in
-                                        ZStack(alignment: .topTrailing) {
-                                            Button {
-                                                if !isEditing {
-                                                    viewModel.isFrameSelected = true
-                                                    print("isFrameSelected 값 true로 변경됨")
-                                                    viewModel.selectedFrame = imageInfo.id
-                                                    viewModel.isFrameLoading = true
-                                                    dismiss()
-                                                }
-                                            } label: {
-                                                if let uiImage = UIImage(data: imageInfo.data) {
-                                                    Image(uiImage: uiImage)
-                                                        .resizable()
-                                                        .aspectRatio(contentMode: .fill)
-                                                        .frame(width: UIScreen.main.bounds.width / 3,
-                                                               height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                                        .clipped()
-                                                    //                                                    .border(Color.black, width: 1)
-                                                }
-                                            }.frame(width: UIScreen.main.bounds.width / 3,
-                                                    height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                            
-                                            if isEditing {
-                                                Button {
-                                                    toggleSelection(for: imageInfo.id)
-                                                } label: {
-                                                    Image(selectedImageIds.contains(imageInfo.id) ? "frameCheckIcon" : "")
-                                                        .resizable()
-                                                        .frame(width: 24, height: 24)
-                                                        .background(Circle().fill(Color.gray03))
-                                                        .padding(.trailing, 10)
-                                                        .padding(.top, 10)
-                                                }
-                                            }
-                                        }
+                                    if isEditing {
+                                        Image(selectedImageIds.contains(imageInfo.id) ? "frameCheckIcon" : "")
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                            .background(Circle().fill(Color.gray03))
+                                            .padding(.trailing, 10)
+                                            .padding(.top, 10)
                                     }
                                 }
-                            }
-                        
-//                    } else {
-//                        ZStack {
-//                            Rectangle()
-//                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                                .ignoresSafeArea(.all)
-//                                .foregroundColor(Color.white)
-//                            Spacer()
-//                            VStack(alignment: .center, spacing: 30) {
-//                                Image("noFrameIcon")
-//                                    .resizable()
-//                                    .frame(width: 106, height: 79, alignment: .center)
-//                                Text("앗! 내가 만든 프레임이 없어요!\n화면을 클릭해서 새로운 프레임을 만들어주세요!")
-//                                    .font(.system(size: 17))
-//                                    .multilineTextAlignment(.center)
-//                                    .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-//                            }
-//                            Spacer()
-//                            
-//                        }
-//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                        .navigationDestination(isPresented: $isGotoPhotosPicker) {
-//                            PhotosPickerView()
-//                        }
-//                        .onTapGesture {
-//                            isGotoPhotosPicker.toggle()
-//                            isFullScreenPop.toggle()
-////                            dismiss()
-//                            
-//                        }
-//                    }
+                            }  
+                        }
+                    }
+                    
                 }
                 if isEditing {
                     Button {
@@ -134,29 +100,29 @@ struct CameraFrameSelectView: View {
                     } label: {
                         ZStack {
                             Rectangle()
-                              .foregroundColor(.clear)
-                              .frame(width: 240, height: 60)
-                              .background(.pointPink)
-                              .cornerRadius(10)
-                              .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 0)
+                                .foregroundColor(.clear)
+                                .frame(width: 240, height: 60)
+                                .background(.pointPink)
+                                .cornerRadius(10)
+                                .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 0)
                             Text("\(selectedImageIds.count)장의 프레임 삭제")
                                 .font(.system(size: 17))
-                              .foregroundColor(.white)
+                                .foregroundColor(.white)
                         }
-                          
+                        
                     }.padding(.bottom, 40)
                 }
             }
-        }.onChange(of: storedImages.count) { 
+        }.onChange(of: storedImages.count) {
             // CoreData에 변화가 있을 때만 이미지 로드
             loadImages()
         }
         .onAppear {
-                    // 처음 한 번만 로드
-                    if imageDataArray.isEmpty {
-                        loadImages()
-                    }
-                }
+            // 처음 한 번만 로드
+            if imageDataArray.isEmpty {
+                loadImages()
+            }
+        }
         .fullScreenCover(isPresented: $isShowPhotosPicker) {
             PhotosPickerView().onAppear {
                 viewModel.isFullScreenPop.toggle()
@@ -175,7 +141,7 @@ struct CameraFrameSelectView: View {
             return (id: id, data: downsampledImage.jpegData(compressionQuality: 0.5) ?? imageData)
         }
     }
-
+    
     private func downsampleImage(_ image: UIImage, to pointSize: CGSize) -> UIImage? {
         let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
         guard let data = image.jpegData(compressionQuality: 1.0),
@@ -197,9 +163,9 @@ struct CameraFrameSelectView: View {
         
         return UIImage(cgImage: downsampledImage)
     }
-
-
-
+    
+    
+    
     
     private func toggleSelection(for id: UUID) {
         if selectedImageIds.contains(id) {

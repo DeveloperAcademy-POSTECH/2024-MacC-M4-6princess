@@ -17,6 +17,7 @@ protocol CameraManagerDelegate: AnyObject {
 class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     weak var delegate: CameraManagerDelegate?
     @Published var session: AVCaptureSession
+    @Published var preset: AVCaptureSession.Preset
     @Published var videoDeviceInput: AVCaptureDeviceInput?
     @Published var output: AVCapturePhotoOutput
     @Published var startFactor: CGFloat = 2.0
@@ -26,6 +27,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
          videoDeviceInput: AVCaptureDeviceInput? = nil,
          output: AVCapturePhotoOutput = AVCapturePhotoOutput()) {
         self.session = session
+        self.preset = .photo
         self.videoDeviceInput = videoDeviceInput
         self.output = output
         self.device = .builtInWideAngleCamera

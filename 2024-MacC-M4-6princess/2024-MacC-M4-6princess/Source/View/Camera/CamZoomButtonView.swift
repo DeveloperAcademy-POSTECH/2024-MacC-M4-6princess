@@ -14,7 +14,7 @@ struct CamZoomButtonView: View {
     // 후면 카메라 줌 팩터 배열
     let backCameraFactors: [Double] = [0.5, 1, 2, 3]
     // 전면 카메라 줌 팩터 배열
-    let frontCameraFactors: [Double] = [0.5, 0.8]
+    let frontCameraFactors: [Double] = [0.5, 0.8, 1, 2, 3]
     
     var body: some View {
         HStack(spacing: 15) {

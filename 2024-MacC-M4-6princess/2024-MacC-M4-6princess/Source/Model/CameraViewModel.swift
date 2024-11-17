@@ -181,6 +181,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     // 버튼이나 직접 줌 설정을 위한 함수
     func setZoom(factor: CGFloat) {
         guard let device = cameraManager.videoDeviceInput?.device else { return }
+        print("\(cameraManager.videoDeviceInput!.device.position)")
         let zoomRange = getZoomRange(for: device)
         let newScale = min(max(factor, zoomRange.lowerBound), zoomRange.upperBound)
         
