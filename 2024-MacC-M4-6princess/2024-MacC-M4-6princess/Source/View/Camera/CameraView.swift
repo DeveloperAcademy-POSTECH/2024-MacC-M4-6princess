@@ -29,6 +29,7 @@ struct CameraView: View {
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                    print("geo:\(geo.size.width) \(geo.size.height)")
                 }
         }
     }
@@ -53,7 +54,22 @@ struct CameraView: View {
                     .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
                 }
-                //v end
+                
+//                VStack{
+//                    Spacer()
+//                    Circle()
+//                        .strokeBorder(style: StrokeStyle(lineWidth: 7, dash: [5]))
+//                        .frame(width: 20, height: 20)
+//                        .foregroundColor(.gray10)
+//                        .rotationEffect(Angle(degrees: viewModel.isAnimating ? 360 : 0))
+//                        .animation(
+//                            Animation.linear(duration: 2)
+//                                .repeatForever(autoreverses: false),
+//                            value: viewModel.isAnimating
+//                        )
+//                        .padding()
+//                    Spacer()
+//                }
                 //처음 실행했을 때 - 온보딩 합침
                 if !viewModel.firstTime  {
                     VStack {
@@ -183,7 +199,8 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            
+            viewModel.screenSize = UIScreen.main.bounds.size
+            print("UIScreen: \(UIScreen.main.bounds.size.width) \(UIScreen.main.bounds.size.height)")
         }
         
     }
