@@ -8,40 +8,47 @@ struct LayerTestView: View {
     @State private var dragStartPosition: CGPoint?
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
-//    @State var memoryIndex
+
     var layerIndicator: some View {
-            VStack(spacing: 4) {
-                ForEach(0..<layerImages.count, id: \.self) { index in
-                    if index==selectedLayerIndex {
-                        Rectangle()
-                            .fill(Color.gray)
-                            .frame(width: 20, height: 3)
-                    }
-                    else{
-                        HStack{
-                            Image(systemName: "heart.fill")
-                                .foregroundStyle(Color.gray)
-                                .frame(width: 3, height: 3)
+            VStack(spacing: 6) {
+                ForEach(Array(stride(from: layerImages.count - 1, to: -1, by: -1)), id: \.self) { index in
+                    if index == selectedLayerIndex {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                RoundedRectangle(cornerRadius: 3)
+                                    .frame(width: 24, height: 4)
+                                    .foregroundColor(.white)
+                                    .padding(.leading,4)
+                                Spacer()
+                            }
+                            Spacer()
+                        }
+                        .frame(height: 6)
+                        
+                    } else {
+                        HStack {
+                            Image("heart.union")
+                                .resizable()
+                                .frame(width: 8, height: 6)
+                            Spacer()
                         }
                     }
                 }
             }
-        }
+            .padding(6) // 내부 패딩
+            .frame(width: 40)
+            .background(Color.gray)
+            .cornerRadius(8)
+            .padding(.horizontal,5)
+        
+    }
+
+
+
+
     var body: some View {
         ZStack {
-            HStack {
-                layerIndicator
-                // 막대 그래프 표시
-//                VStack {
-//                    ForEach(layerImages.indices, id: \.self) { index in
-//                        Rectangle()
-//                            .fill(index == selectedLayerIndex ? Color.blue : Color.gray.opacity(0.5))
-//                            .frame(width: 10, height: 30)
-//                    }
-//                }
-//                .padding(.trailing, 10)
-                
-                // ZStack으로 레이어 순서대로 이미지 표시
                 ZStack {
                     ForEach(layerImages.indices, id: \.self) { index in
                         let layer = layerImages[index]
@@ -97,6 +104,9 @@ struct LayerTestView: View {
                 }
                 .frame(width: 300, height: 300)
                 .padding()
+            HStack{
+                layerIndicator
+                Spacer()
             }
             
             // 추가 버튼

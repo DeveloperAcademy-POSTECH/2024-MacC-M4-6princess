@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+
 // 이미지와 순서를 관리하는 구조체
 struct LayerImage: Identifiable {
     let id = UUID()
@@ -17,6 +18,7 @@ struct LayerImage: Identifiable {
     var rotation: Angle = .zero   // 이미지 회전 각도
     
 }
+
 // PHPickerViewController를 사용하는 SwiftUI Wrapper
 struct LayerPhotoPicker: UIViewControllerRepresentable {
     @Binding var layerImages: [LayerImage]
