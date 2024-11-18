@@ -15,20 +15,20 @@ struct IEDevelopView: View {
     @State private var edit = false
     @StateObject var viewModel = IEViewModel()
     var body: some View {
-        
-        NavigationStack {
-            VStack {
-                Button(action:{
-                    edit = true
-                }
-                ){
-                    Text("test")
-                }
-            }
-            .navigationDestination(isPresented: $edit){
-                IEIntroView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
-                //                IEMainView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
-            }
-        }
+        LayerTestView()
+//        NavigationStack {
+//            VStack {
+//                Button(action:{
+//                    edit = true
+//                }
+//                ){
+//                    Text("test")
+//                }
+//            }
+//            .navigationDestination(isPresented: $edit){
+//                IEIntroView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
+//                //                IEMainView(bg: UIImage(named:"Felix")!, idol: UIImage(named:"Posil")!, viewModel: viewModel)
+//            }
+//        }
     }
 }
