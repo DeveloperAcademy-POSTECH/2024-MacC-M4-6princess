@@ -1,13 +1,22 @@
 import SwiftUI
 import PhotosUI
 
+struct LayerImage: Identifiable {
+    let id = UUID()
+    var image: UIImage
+    var order: Int
+    var position: CGPoint = .zero
+    var scale: CGFloat = 1.0
+    var rotation: Angle = .zero
+}
+
 struct LayerTestView: View {
     @State private var layerImages: [LayerImage] = []
     @State private var showImagePicker: Bool = false
     @State private var dragStartPosition: CGPoint?
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
-    @State private var currentStep: Int = 0 // 현재 단계 추적
+    @State private var previousStep: Int = 0 // 이전 단계
 
     var layerIndicator: some View {
         VStack(spacing: 6) {
@@ -35,7 +44,7 @@ struct LayerTestView: View {
                 }
             }
         }
-        .padding(6) // 내부 패딩
+        .padding(6)
         .frame(width: 40)
         .background(Color.gray)
         .cornerRadius(8)
@@ -64,37 +73,10 @@ struct LayerTestView: View {
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
-                                    if !isDragging {
-                                        // 드래그 시작 시, 현재 레이어 위치 기억
-                                        selectedLayerIndex = index
-                                        dragStartPosition = layer.position
-                                        isDragging = true
-                                        currentStep = 0 // 초기 단계 설정
-                                    }
-
-                                    // 드래그의 Y축 이동 거리
-                                    let dragOffsetY = value.translation.height
-                                    let step = Int(dragOffsetY / 50) // 50픽셀당 한 단계 이동
-
-                                    if step != currentStep { // 단계가 변경되었을 때만 처리
-                                        if step < 0, index - abs(step) >= 0 {
-                                            // 위로 드래그해서 여러 단계 앞으로 이동
-                                            moveLayerForward(at: index, steps: abs(step - currentStep))
-                                            selectedLayerIndex = max(index - abs(step), 0)
-                                        } else if step > 0, index + step < layerImages.count {
-                                            // 아래로 드래그해서 여러 단계 뒤로 이동
-                                            moveLayerBackward(at: index, steps: step - currentStep)
-                                            selectedLayerIndex = min(index + step, layerImages.count - 1)
-                                        }
-                                        currentStep = step // 현재 단계 업데이트
-                                    }
+                                    dragOnChanged(value: value, index: index)
                                 }
                                 .onEnded { _ in
-                                    // 드래그 종료 시 초기화
-                                    isDragging = false
-                                    dragStartPosition = nil
-                                    selectedLayerIndex = nil
-                                    currentStep = 0 // 단계 초기화
+                                    dragOnEnded()
                                 }
                         )
                         .onAppear {
@@ -104,15 +86,14 @@ struct LayerTestView: View {
             }
             .frame(width: 300, height: 300)
             .padding()
+            
             HStack {
                 layerIndicator
                 Spacer()
             }
 
-            // 추가 버튼
             VStack {
                 Spacer()
-
                 Button(action: {
                     showImagePicker = true
                 }) {
@@ -130,24 +111,61 @@ struct LayerTestView: View {
         }
     }
 
+    // 드래그 변경 시 동작 처리 함수
+    func dragOnChanged(value: DragGesture.Value, index: Int) {
+        if !isDragging {
+            selectedLayerIndex = index
+            dragStartPosition = layerImages[index].position
+            isDragging = true
+            previousStep = 0 // 초기화
+        }
+        
+        let dragOffsetY = value.translation.height
+        let step = Int(dragOffsetY / 50)
+        
+        // 단계가 이전 단계와 달라야만 레이어 이동
+        if step != previousStep {
+            if step < 0, index + abs(step) < layerImages.count {
+                moveLayerBackward(at: index, steps: abs(step - previousStep))
+                selectedLayerIndex = min(index + abs(step), layerImages.count - 1)
+            } else if step > 0, index - step >= 0 {
+                moveLayerForward(at: index, steps: step - previousStep)
+                selectedLayerIndex = max(index - step, 0)
+            }
+            previousStep = step // 이전 단계를 업데이트
+        }
+    }
+
+    // 드래그 종료 시 동작 처리 함수
+    func dragOnEnded() {
+        isDragging = false
+        dragStartPosition = nil
+        selectedLayerIndex = nil
+        previousStep = 0 // 초기화
+    }
+
     // 순서 앞으로 이동 함수 (여러 단계)
     private func moveLayerForward(at index: Int, steps: Int) {
-        guard index - steps >= 0 else { return }
-        let newIndex = index - steps
-        let element = layerImages.remove(at: index)
-        layerImages.insert(element, at: newIndex)
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex > 0 else { return }
+            layerImages.swapAt(currentIndex, currentIndex - 1)
+            currentIndex -= 1
+        }
         updateOrder()
     }
-
+    
     // 순서 뒤로 이동 함수 (여러 단계)
     private func moveLayerBackward(at index: Int, steps: Int) {
-        guard index + steps < layerImages.count else { return }
-        let newIndex = index + steps
-        let element = layerImages.remove(at: index)
-        layerImages.insert(element, at: newIndex)
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex < layerImages.count - 1 else { return }
+            layerImages.swapAt(currentIndex, currentIndex + 1)
+            currentIndex += 1
+        }
         updateOrder()
     }
-
+    
     // 레이어 순서 업데이트 함수
     private func updateOrder() {
         for i in 0..<layerImages.count {

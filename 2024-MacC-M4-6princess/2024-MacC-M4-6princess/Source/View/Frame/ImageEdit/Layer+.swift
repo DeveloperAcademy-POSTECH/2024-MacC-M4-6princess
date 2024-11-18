@@ -8,16 +8,6 @@
 import SwiftUI
 import PhotosUI
 
-// 이미지와 순서를 관리하는 구조체
-struct LayerImage: Identifiable {
-    let id = UUID()
-    var image: UIImage
-    var order: Int
-    var position: CGPoint // 이미지 위치
-    var scale: CGFloat = 1.0      // 이미지 크기
-    var rotation: Angle = .zero   // 이미지 회전 각도
-    
-}
 
 // PHPickerViewController를 사용하는 SwiftUI Wrapper
 struct LayerPhotoPicker: UIViewControllerRepresentable {
