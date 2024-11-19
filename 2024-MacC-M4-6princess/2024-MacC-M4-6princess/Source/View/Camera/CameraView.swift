@@ -59,6 +59,7 @@ struct CameraView: View {
                     CameraTopView(viewModel: viewModel)
                     Spacer()
                     CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end

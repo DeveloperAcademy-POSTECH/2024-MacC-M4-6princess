@@ -120,9 +120,16 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     
     func cropToAspectRatio(image: UIImage) -> UIImage  {
-        let originalWidth = image.size.width
-        let cropRect: CGRect = CGRect(x: 0, y: 120, width: originalWidth, height: originalWidth * frameRatio)
+        let cgImage = image.cgImage!
+        let width = CGFloat(cgImage.width)
+        let height = CGFloat(cgImage.height)
         
+        
+        let cropRect: CGRect = CGRect(x: 0, y: (height - (width * 4/3))/2 - 3
+//                                        (screenSize.height-(screenSize.width * frameRatio))/2+60
+                                      , width: width, height: width * frameRatio)
+        
+        print("높이는 \((height - (width * 4/3))/2 - 3)")
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image
         }

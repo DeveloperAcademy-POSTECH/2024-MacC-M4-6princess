@@ -53,6 +53,7 @@ struct DFModifyFrame: View {
         }
         .fullScreenCover(isPresented: $shouldNavigate) {
             CameraView(frameImage: $frameImage)
+//            CameraView(frameImage: $resultImage)
         }
         .onAppear {
             makeHistory()
@@ -148,7 +149,7 @@ private extension DFModifyFrame {
             Button {
                 
                 if let image = resultImage {
-                    viewModel.saveStateText = "저장 중 입니다..."
+                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     saveImage(inputImage: image)
                 } else {
@@ -244,6 +245,7 @@ private extension DFModifyFrame {
             let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
             render.scale = scaleCompute(inputImage)
             viewModel.image = render.uiImage
+            frameImage = render.uiImage
 //            try await Task.sleep(nanoseconds: 1_000_000_000)
             addImage(data: viewModel.image?.pngData())
 //            try await Task.sleep(nanoseconds: 200_000_000)
