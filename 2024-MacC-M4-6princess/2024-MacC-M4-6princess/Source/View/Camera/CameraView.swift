@@ -170,9 +170,10 @@ struct CameraView: View {
             }
             .fullScreenCover(isPresented: $viewModel.isShowMFView) {
                 //TODO: 수정에정
-                MFView(viewModel: MFViewModel())
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
+                MFView(context: viewContext)
+                        .environment(\.managedObjectContext, viewContext)
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
                 
             }
             .statusBar(hidden: true)

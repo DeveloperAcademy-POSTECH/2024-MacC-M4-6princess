@@ -12,7 +12,13 @@ import CoreData
 struct MFView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
-    @ObservedObject var viewModel: MFViewModel
+    @StateObject var viewModel: MFViewModel
+    @ObservedObject var cameraViewModel: CameraViewModel
+    
+    init(context: NSManagedObjectContext) {
+            _viewModel = StateObject(wrappedValue: MFViewModel(context: context))
+        _cameraViewModel = ObservedObject(wrappedValue: CameraViewModel())
+        }
     
     var body: some View {
         NavigationStack {
@@ -53,8 +59,8 @@ struct MFView: View {
                                         } else {
                                             
                                             //TODO: 아래 부분 뷰모델 간 데이터 전송 수정 예정
-                                            CameraViewModel().selectedFrame = imageInfo.id
-                                            CameraViewModel().isFrameLoading = true
+                                            cameraViewModel.selectedFrame = imageInfo.id
+                                            cameraViewModel.isFrameLoading = true
                                             
                                             dismiss()
                                         }
@@ -140,7 +146,7 @@ struct MFView: View {
                 }
             }
         }
-        .onChange(of: viewModel.storedImages.count) {
+        .onChange(of: viewModel.selectedImageIds.count) {
             // CoreData에 변화가 있을 때만 이미지 로드
             viewModel.loadImages()
         }
