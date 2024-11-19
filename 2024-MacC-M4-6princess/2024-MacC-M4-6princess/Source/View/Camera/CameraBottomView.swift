@@ -23,7 +23,8 @@ struct CameraBottomView: View {
                     
                     //프레임 불러오기 버튼
                     Button {
-                        viewModel.isShowMFView.toggle()
+//                        viewModel.isShowMFView.toggle()
+                        frameManager.showMFView = true
                         viewModel.cameraManager.stopSession()
                         print("프레임 버튼 눌림")
                     } label: {

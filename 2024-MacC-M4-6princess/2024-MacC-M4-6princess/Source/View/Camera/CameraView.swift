@@ -116,7 +116,8 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isShowMFView.toggle()
+//                                                viewModel.isShowMFView.toggle()
+                                                frameManager.showMFView = true
                                             }
                                         }
                                         else{
@@ -144,7 +145,8 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isShowMFView.toggle()
+//                                                viewModel.isShowMFView.toggle()
+                                                frameManager.showMFView = true
                                             }
                                         }
                                         
@@ -179,7 +181,7 @@ struct CameraView: View {
                 motionManager.startDeviceMotionUpdates()
                 //                viewModel.frameImage = frameImage
             }
-            .fullScreenCover(isPresented: $viewModel.isShowMFView) {
+            .fullScreenCover(isPresented: $frameManager.showMFView) {
                 //TODO: 수정에정
                 MFView(context: viewContext)
                     .environment(\.managedObjectContext, viewContext)

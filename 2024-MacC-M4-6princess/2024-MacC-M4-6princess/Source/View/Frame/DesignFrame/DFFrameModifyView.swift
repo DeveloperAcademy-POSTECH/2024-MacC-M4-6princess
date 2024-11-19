@@ -52,8 +52,9 @@ struct DFFrameModifyView: View {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
                     //                    shouldNavigate = true
+//                    frameManager.isFrameSelect = false
                     naviManager.popToRoot()
-                    frameManager.isFrameSelect = false
+                    frameManager.showMFView = false
                 }
             }
         }
