@@ -86,7 +86,8 @@ extension CameraTopView{
                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     
-                }.padding(.trailing, 20)
+                }
+                .padding(.trailing, 20)
                 //                    Spacer()
             }
         }

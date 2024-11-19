@@ -50,7 +50,8 @@ struct CameraFrameSelectView: View {
                                 .frame(maxWidth: .infinity)
                                 .frame(minHeight: 200)
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
-                            }.onTapGesture {
+                            }
+                            .onTapGesture {
                                 viewModel.isFullScreenPop.toggle()
                                 viewModel.isFrameSelect = true
                                 dismiss()
@@ -150,7 +151,8 @@ struct CameraFrameSelectView: View {
                     }
                 }
             }
-        }.onChange(of: storedImages.count) {
+        }
+        .onChange(of: storedImages.count) {
             // CoreData에 변화가 있을 때만 이미지 로드
             loadImages()
         }
