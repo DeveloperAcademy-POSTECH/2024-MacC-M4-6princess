@@ -12,6 +12,8 @@ struct CameraBottomView: View {
     @ObservedObject var viewModel: CameraViewModel
     @StateObject var motionManager = MotionManager()
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @EnvironmentObject var naviManager:NavigationManager
+    @EnvironmentObject var frameManager:FrameManager
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             //        if horizontalSizeClass == .regular{
@@ -21,7 +23,8 @@ struct CameraBottomView: View {
                     
                     //프레임 불러오기 버튼
                     Button {
-                        viewModel.isShowMFView.toggle()
+//                        viewModel.isShowMFView.toggle()
+                        frameManager.showMFView = true
                         viewModel.cameraManager.stopSession()
                         print("프레임 버튼 눌림")
                     } label: {
@@ -43,7 +46,7 @@ struct CameraBottomView: View {
                     
                     //셔터 버튼
                     Button {
-                        if viewModel.frameImage != nil{
+                        if frameManager.resultImage != nil{
                             self.viewModel.isTakePic = true
                             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                                 viewModel.takePic()

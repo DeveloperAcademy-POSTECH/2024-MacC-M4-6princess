@@ -15,7 +15,8 @@ extension CameraBottomView {
             HStack (){
                 //프레임 불러오기 버튼
                 Button {
-                    viewModel.isShowMFView.toggle()
+//                    viewModel.isShowMFView.toggle()
+                    frameManager.showMFView = true
                     print("프레임 버튼 눌림")
                 } label: {
                     VStack(alignment: .center, spacing: 4) {
@@ -36,7 +37,7 @@ extension CameraBottomView {
                 
                 //셔터 버튼
                 Button {
-                    if viewModel.frameImage != nil{
+                    if frameManager.resultImage != nil{
                         self.viewModel.isTakePic = true
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                             viewModel.takePic()

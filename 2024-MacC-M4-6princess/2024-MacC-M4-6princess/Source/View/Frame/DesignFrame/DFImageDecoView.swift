@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct DFImageDecoView: View {
-    @Binding var isShowImagePickerView: Bool
-    
+//    @Binding var isShowImagePickerView: Bool
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     var body: some View {
             
         HStack(spacing: 40){
@@ -22,7 +23,8 @@ extension DFImageDecoView {
         VStack {
             Button  {
                 
-                isShowImagePickerView.toggle()
+//                isShowImagePickerView.toggle()
+                naviManager.push(screen: Screen.photoPicker)
                 
             } label: {
                 ZStack {
@@ -87,7 +89,7 @@ extension DFImageDecoView {
         }
     }
 }
-
-#Preview {
-    DFImageDecoView(isShowImagePickerView: .constant(false))
-}
+//
+//#Preview {
+//    DFImageDecoView(isShowImagePickerView: .constant(false))
+//}

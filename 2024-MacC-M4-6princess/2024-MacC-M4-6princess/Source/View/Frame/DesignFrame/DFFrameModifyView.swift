@@ -8,8 +8,10 @@ struct DFFrameModifyView: View {
     @Environment(\.managedObjectContext) var managedContext: NSManagedObjectContext
     @StateObject var viewModel: DFFrameModifyViewModel = DFFrameModifyViewModel()
     @State private var isFirstLaunching: Bool = true
-    @Binding var resultImage: UIImage?
-    @State private var shouldNavigate: Bool = false
+    //    @Binding var resultImage: UIImage?
+    //    @State private var shouldNavigate: Bool = false
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     
     var body: some View {
         
@@ -34,13 +36,13 @@ struct DFFrameModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
-                DFImageDecoView(isShowImagePickerView: $viewModel.isShowImagePickerView)
+                DFImageDecoView()
                     .padding(.top, 58)
             }
         }
-        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
-            PhotosPickerView()
-        })
+        //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
+        //            PhotosPickerView()
+        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             toolBarButtons
@@ -49,18 +51,20 @@ struct DFFrameModifyView: View {
             if newValue {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
-                    shouldNavigate = true
+                    //                    shouldNavigate = true
+//                    frameManager.isFrameSelect = false
+                    naviManager.popToRoot()
+                    frameManager.showMFView = false
                 }
             }
         }
-        .fullScreenCover(isPresented: $shouldNavigate) {
-            CameraView(frameImage: $viewModel.frameImage)
-//            CameraView(frameImage: $resultImage)
-        }
+        //        .fullScreenCover(isPresented: $shouldNavigate) {
+        //            CameraView(frameImage: $viewModel.frameImage)
+        //            //            CameraView(frameImage: $resultImage)
+        //        }
         .onAppear {
             Task {
-                
-                if let image = resultImage {
+                if let image = frameManager.resultImage {
                     viewModel.detectSubject(inputImage: image)
                     try await Task.sleep(for: .seconds(1))
                     try await viewModel.makeImageList()
@@ -115,25 +119,25 @@ private extension DFFrameModifyView {
 private extension DFFrameModifyView {
     
     var imageView: some View {
+        
+        ZStack {
             
-            ZStack {
+            ForEach(viewModel.imageHistory, id: \.self) { subject in
                 
-                ForEach(viewModel.imageHistory, id: \.self) { subject in
+                if let image = subject.image, let realImage = frameManager.resultImage {
                     
-                    if let image = subject.image, let realImage = resultImage {
-                        
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
-                            .scaleEffect(viewModel.magnifyScale)
-                            .rotationEffect(viewModel.angle)
-                            .offset(viewModel.draggedOffSet)
-                            .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
-                        
-                    }
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                        .scaleEffect(viewModel.magnifyScale)
+                        .rotationEffect(viewModel.angle)
+                        .offset(viewModel.draggedOffSet)
+                        .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
+                    
                 }
             }
+        }
     }
     
     var toolBarButtons: some View {
@@ -176,7 +180,7 @@ private extension DFFrameModifyView {
             Spacer()
             Button {
                 
-                if let image = resultImage {
+                if let image = frameManager.resultImage {
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext)

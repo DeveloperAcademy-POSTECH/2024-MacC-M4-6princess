@@ -9,7 +9,9 @@ struct DFFrameEditView: View {
     @State private var selectionModeIndex: Int = 3
     @State private var lines: [Line] = []
     @State private var thickness: Double = 10.0
-    @Binding var pickedImage: UIImage?
+    //    @Binding var pickedImage: UIImage?
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     
     var body: some View {
         ZStack {
@@ -44,7 +46,6 @@ struct DFFrameEditView: View {
                         HStack {
                             Spacer()
                             Button {
-                                
                                 viewModel.showPreview.toggle()
                                 viewModel.createResult()
                                 
@@ -76,9 +77,12 @@ struct DFFrameEditView: View {
         .onAppear {
             showMaskImage()
         }
-        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
-            DFFrameModifyView(resultImage: $viewModel.resultImage)
-        })
+        .onDisappear{ // ✅
+            frameManager.resultImage = viewModel.resultImage
+        }
+        //        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
+        //            DFFrameModifyView()
+        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             toolBarButtons
@@ -260,7 +264,7 @@ private extension DFFrameEditView {
     
     var pickedImageRender: some View {
         VStack {
-            if let image = pickedImage {
+            if let image = frameManager.pickedImage {
                 Image(uiImage: image)
             }
         }
@@ -304,7 +308,8 @@ private extension DFFrameEditView {
             Button {
                 
                 viewModel.createResult()
-                viewModel.isShowModifyFrame.toggle()
+                //                viewModel.isShowModifyFrame.toggle()
+                naviManager.push(screen: Screen.modifyFrame) //✅
                 
             } label: {
                 Text("확인")
