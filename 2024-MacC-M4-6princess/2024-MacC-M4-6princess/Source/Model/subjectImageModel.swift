@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct subjectImage {
+struct subjectImage: Hashable {
     
     var image: UIImage?
     var angle: Angle = .degrees(0)

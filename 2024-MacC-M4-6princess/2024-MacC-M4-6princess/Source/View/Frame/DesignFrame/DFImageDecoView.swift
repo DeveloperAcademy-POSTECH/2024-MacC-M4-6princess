@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct DFDecoImageView: View {
+struct DFImageDecoView: View {
+    @Binding var isShowImagePickerView: Bool
     
     var body: some View {
             
@@ -14,13 +15,14 @@ struct DFDecoImageView: View {
     }
 }
 
-extension DFDecoImageView {
+extension DFImageDecoView {
     
     var appendImageView: some View {
         
         VStack {
-            
             Button  {
+                
+                isShowImagePickerView.toggle()
                 
             } label: {
                 ZStack {
@@ -87,5 +89,5 @@ extension DFDecoImageView {
 }
 
 #Preview {
-    DFDecoImageView()
+    DFImageDecoView(isShowImagePickerView: .constant(false))
 }

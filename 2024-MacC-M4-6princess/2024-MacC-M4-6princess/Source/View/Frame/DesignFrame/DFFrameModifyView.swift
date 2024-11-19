@@ -1,14 +1,15 @@
 import SwiftUI
+import Foundation
+import CoreData
 
-struct DFModifyFrameView: View {
+struct DFFrameModifyView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @Environment(\.managedObjectContext) var managedContext
-    @StateObject var viewModel: DFModifyFrameViewModel = DFModifyFrameViewModel()
+    @Environment(\.managedObjectContext) var managedContext: NSManagedObjectContext
+    @StateObject var viewModel: DFFrameModifyViewModel = DFFrameModifyViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var shouldNavigate: Bool = false
-    @State private var frameImage: UIImage?
     
     var body: some View {
         
@@ -33,17 +34,17 @@ struct DFModifyFrameView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
-                DFDecoImageView()
+                DFImageDecoView(isShowImagePickerView: $viewModel.isShowImagePickerView)
                     .padding(.top, 58)
             }
         }
+        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
+            PhotosPickerView()
+        })
         .navigationBarBackButtonHidden()
         .toolbar {
             toolBarButtons
         }
-        //        .navigationDestination(isPresented: $viewModel.isShowCamera) {
-        //            CameraView()
-        //        }
         .onChange(of: viewModel.isShowCamera) { newValue in
             if newValue {
                 // 1초 후에 화면 전환
@@ -53,21 +54,24 @@ struct DFModifyFrameView: View {
             }
         }
         .fullScreenCover(isPresented: $shouldNavigate) {
-            CameraView(frameImage: $frameImage)
+            CameraView(frameImage: $viewModel.frameImage)
 //            CameraView(frameImage: $resultImage)
         }
         .onAppear {
-            
-            if let image = resultImage {
-                viewModel.detectSubject(inputImage: image)
-                //                resultImage = viewModel.outputImage
-                makeHistory()
+            Task {
+                
+                if let image = resultImage {
+                    viewModel.detectSubject(inputImage: image)
+                    try await Task.sleep(for: .seconds(1))
+                    try await viewModel.makeImageList()
+                    //                resultImage = viewModel.outputImage
+                }
             }
         }
     }
 }
 
-private extension DFModifyFrameView {
+private extension DFFrameModifyView {
     
     var rotate: some Gesture {
         
@@ -77,14 +81,13 @@ private extension DFModifyFrameView {
             }
             .onEnded { value in
                 viewModel.current += value.rotation
-                makeHistory()
+                viewModel.makeHistory()
             }
     }
     var moveImage: some Gesture {
         
         DragGesture()
             .onChanged { value in
-                //                viewModel.updateLocation(translation: value.translation, startLocation: value.startLocation)
                 viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
                 viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
                 
@@ -92,10 +95,8 @@ private extension DFModifyFrameView {
             .onEnded { value in
                 viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
                 viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
-                //                viewModel.accumulatedOffSet.width += (value.translation.width / viewModel.magnifyScale)
-                //                viewModel.accumulatedOffSet.height += (value.translation.height / viewModel.magnifyScale)
                 print(viewModel.draggedOffSet)
-                makeHistory()
+//                makeHistory()
                 
             }
         
@@ -109,31 +110,33 @@ private extension DFModifyFrameView {
             }
             .onEnded { value in
                 viewModel.setScaleValue(minimum: 0.2, maximum: 10)
-                makeHistory()
+//                makeHistory()
             }
     }
 }
 
-private extension DFModifyFrameView {
+private extension DFFrameModifyView {
     
     var imageView: some View {
-        
-        ZStack {
             
-            if let image = viewModel.outputImage {
+            ZStack {
                 
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: image.size.width / scaleCompute(resultImage!), height: image.size.height / scaleCompute(resultImage!))
-                //                    .padding(.bottom, 20)
-                    .scaleEffect(viewModel.magnifyScale)
-                    .rotationEffect(viewModel.angle)
-                    .offset(viewModel.draggedOffSet)
-                    .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
-                
+                ForEach(viewModel.imageHistory, id: \.self) { subject in
+                    
+                    if let image = subject.image, let realImage = resultImage {
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                            .scaleEffect(viewModel.magnifyScale)
+                            .rotationEffect(viewModel.angle)
+                            .offset(viewModel.draggedOffSet)
+                            .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
+                        
+                    }
+                }
             }
-        }
     }
     
     var toolBarButtons: some View {
@@ -179,7 +182,8 @@ private extension DFModifyFrameView {
                 if let image = resultImage {
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
-                    saveImage(inputImage: image)
+                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext)
+                    
                 } else {
                     viewModel.saveStateText = "저장할 이미지가 없습니다."
                     Task {
@@ -198,110 +202,6 @@ private extension DFModifyFrameView {
             .padding(.leading, 1)
             .disabled(viewModel.isPushedSaveBtn)
             
-        }
-    }
-}
-
-private extension DFModifyFrameView {
-    
-    func makeHistory() {
-        
-        var inputImage = subjectImage()
-        
-        inputImage.image = viewModel.outputImage
-        inputImage.angle = viewModel.angle
-        inputImage.scale = viewModel.magnifyScale
-        inputImage.offSet = viewModel.draggedOffSet
-
-        if viewModel.imageList.count > 0 {
-            viewModel.indexOfImageList += 1
-        }
-        
-        viewModel.imageList.append(inputImage)
-        
-    }
-    
-    func scaleCompute(_ image: UIImage) -> CGFloat {
-        
-        //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height - 229)
-        //        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
-        
-        
-        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
-            scale = image.size.width / UIScreen.main.bounds.width
-        }
-        return scale
-    }
-    
-    
-    func saveContext() {
-        do {
-            try managedContext.save()
-        } catch {
-            print("Error saving managed object context: \(error)")
-        }
-    }
-    func addImage(albumImageData: Data?, subjectImageData: Data?) {
-        
-        let newImage = StoreImages(context: managedContext)
-        
-        newImage.image = albumImageData
-        newImage.subjectImage = subjectImageData
-        newImage.uuid = UUID()
-        newImage.isSelected = false
-        newImage.angle = viewModel.angle.degrees
-        newImage.x = viewModel.draggedOffSet.width
-        newImage.y = viewModel.draggedOffSet.height
-        newImage.scale = viewModel.magnifyScale
-        
-        saveContext()
-    }
-    
-    func makeImage() {
-        
-        let render = ImageRenderer(content: self.imageView)
-        render.scale = scaleCompute(resultImage!)
-        if let rend = render.uiImage {
-            if viewModel.indexOfImageList < viewModel.imageList.count - 1 {
-                for _ in viewModel.indexOfImageList+1..<viewModel.imageList.count {
-                    viewModel.imageList.removeLast()
-                }
-            }
-            viewModel.imageList[viewModel.indexOfImageList].image = rend
-            viewModel.indexOfImageList += 1
-            
-        }
-        resultImage = viewModel.imageList[viewModel.indexOfImageList].image
-    }
-    
-    func saveImage(inputImage: UIImage) {
-        
-        viewModel.btnOpacity = 1
-        
-        // 4. 지연 시간을 둬서 작업을 분산
-        Task {
-            // 저장 완료 메시지 숨기기
-            let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
-            render.scale = scaleCompute(inputImage)
-            viewModel.image = render.uiImage
-            frameImage = render.uiImage
-            //            try await Task.sleep(nanoseconds: 1_000_000_000)
-            addImage(albumImageData: viewModel.image?.pngData(), subjectImageData: viewModel.outputImage?.pngData())
-            //            try await Task.sleep(nanoseconds: 200_000_000)
-            try await Task.sleep(nanoseconds: 1_000_000_000)
-            viewModel.btnOpacity = 0
-            viewModel.isShowCamera = true
-        }
-        
-    }
-    
-    
-    func checkScreenState(_ image: UIImage?) -> String {
-        if image!.size.width > image!.size.height {
-            return "horizon"
-        } else {
-            return "vertical"
         }
     }
 }

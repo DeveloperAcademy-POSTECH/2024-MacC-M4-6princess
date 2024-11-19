@@ -1,9 +1,10 @@
 import SwiftUI
 import Vision
 import VisionKit
+import CoreData
 
 @MainActor
-class DFModifyFrameViewModel: ObservableObject {
+class DFFrameModifyViewModel: ObservableObject {
     
     @Published var btnOpacity: Double = 0.0
     @Published var accumulatedOffset = CGSize.zero
@@ -22,9 +23,116 @@ class DFModifyFrameViewModel: ObservableObject {
     @Published var saveStateText: String = ""
     @Published var indexOfImageList: Int = 0
     @Published var imageList: [subjectImage] = []
-    
+    @Published var isShowImagePickerView: Bool = false
+    @Published var imageHistory: [subjectImage] = []
+    @Published var frameImage: UIImage?
+
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
+    
+    
+    func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext) {
+        
+        btnOpacity = 1
+        
+        Task {
+            // 저장 완료 메시지 숨기기
+            let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+            render.scale = scaleCompute(inputImage)
+            frameImage = render.uiImage
+            addImage(albumImageData: frameImage?.pngData(), subjectImageData: outputImage?.pngData(), context: context)
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            btnOpacity = 0
+            isShowCamera = true
+        }
+        
+    }
+    
+    
+    func makeImage(view: some View, image: UIImage) -> UIImage? {
+        
+        let resultImage: UIImage?
+        let render = ImageRenderer(content: view)
+        render.scale = scaleCompute(image)
+        if let rend = render.uiImage {
+            if indexOfImageList < imageList.count - 1 {
+                for _ in indexOfImageList+1..<imageList.count {
+                    imageList.removeLast()
+                }
+            }
+            imageList[indexOfImageList].image = rend
+            indexOfImageList += 1
+            
+        }
+        resultImage = imageList[indexOfImageList].image
+        return resultImage
+    }
+    
+    func saveContext(context: NSManagedObjectContext) {
+        do {
+            try context.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
+        }
+    }
+    
+    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
+        
+        let newImage = StoreImages(context: context)
+        
+        newImage.image = albumImageData
+        newImage.subjectImage = subjectImageData
+        newImage.uuid = UUID()
+        newImage.isSelected = false
+        newImage.angle = angle.degrees
+        newImage.x = draggedOffSet.width
+        newImage.y = draggedOffSet.height
+        newImage.scale = magnifyScale
+        
+        saveContext(context: context)
+    }
+    
+    
+    
+    func scaleCompute(_ image: UIImage) -> CGFloat {
+        
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
+        
+        
+        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
+            scale = image.size.width / UIScreen.main.bounds.width
+        }
+        return scale
+    }
+    
+    func makeImageList() async throws -> Void {
+        
+        var inputImage = subjectImage()
+        
+        inputImage.image = outputImage
+        
+        imageHistory.append(inputImage)
+        
+    }
+
+    
+    
+    func makeHistory() {
+        
+        var inputImage = subjectImage()
+        
+        inputImage.image = outputImage
+        inputImage.angle = angle
+        inputImage.scale = magnifyScale
+        inputImage.offSet = draggedOffSet
+
+        if imageList.count > 0 {
+            indexOfImageList += 1
+        }
+        
+        imageList.append(inputImage)
+        
+    }
     
     
     func reDo() {
@@ -85,7 +193,6 @@ class DFModifyFrameViewModel: ObservableObject {
                 guard let inputImage = inputImage else { return }
                 detectedObjects = try await self.analyzeImage(inputImage)
                 print("탐지된 피사체: \(detectedObjects.count)")
-//                try await Task.sleep(for: .seconds(1))
                 for i in detectedObjects {
                     interaction.highlightedSubjects.insert(i)
                     try await generateImageForAllSelectedObjects()

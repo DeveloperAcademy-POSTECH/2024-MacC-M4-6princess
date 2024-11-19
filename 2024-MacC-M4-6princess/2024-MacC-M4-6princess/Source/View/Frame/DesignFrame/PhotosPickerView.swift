@@ -2,6 +2,17 @@ import SwiftUI
 import PhotosUI
 
 struct PhotosPickerView: View {
+//    enum PickerType {
+//        case base
+//        case new
+//    }
+//    
+//    let pickerType: PickerType
+//    
+//    init(_ pickerType: PickerType) {
+//        self.pickerType = pickerType
+//    }
+//    
     @State private var selectedItem: [PhotosPickerItem] = []
     @State private var item: PhotosPickerItem? = nil
     @State private var pickedImage: UIImage? = nil
