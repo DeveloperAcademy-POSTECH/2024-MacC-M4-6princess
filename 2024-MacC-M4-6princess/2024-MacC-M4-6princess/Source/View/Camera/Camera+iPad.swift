@@ -36,7 +36,7 @@ extension CameraBottomView {
                 
                 //셔터 버튼
                 Button {
-                    if viewModel.frameImage != nil{
+                    if frameManager.resultImage != nil{
                         self.viewModel.isTakePic = true
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                             viewModel.takePic()

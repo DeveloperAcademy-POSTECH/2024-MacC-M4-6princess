@@ -116,8 +116,7 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-//                                                viewModel.isShowMFView.toggle()
-//                                                frameManager.isFrameSelect
+                                                viewModel.isShowMFView.toggle()
                                             }
                                         }
                                         else{

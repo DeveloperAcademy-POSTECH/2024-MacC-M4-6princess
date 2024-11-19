@@ -24,7 +24,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var preview: AVCaptureVideoPreviewLayer!
     
     // 프레임 관련 상태
-    @Published var frameImage: UIImage?
+//    @Published var frameImage: UIImage?
     @Published var frameRatio: CGFloat = 4/3
     
     // 타이머 관련 상태
