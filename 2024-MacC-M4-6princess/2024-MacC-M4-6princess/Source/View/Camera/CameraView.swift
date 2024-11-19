@@ -169,7 +169,8 @@ struct CameraView: View {
                 viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $viewModel.isShowMFView) {
-                CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
+                //TODO: 수정에정
+                MFView(viewModel: MFViewModel())
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 
