@@ -20,9 +20,6 @@ struct CameraView: View {
         _frameImage = frameImage
     }
     
-    //TODO: 바인딩 변수로 방금 만든 frame 불러오기
-    
-    
     private var cameraPreview: some View  {
         
         GeometryReader { geo in
@@ -36,22 +33,34 @@ struct CameraView: View {
     
     var body: some View {
         
-        NavigationStack(path: $path) {
-            ZStack {
-                VStack{
-                    CameraTopView(viewModel: viewModel)
-                    ZStack{
-                        cameraPreview
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                        Group{
-                            if let image = viewModel.frameImage {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                            }
+        NavigationStack {
+            ZStack{
+                //TODO: 줌 한 화면대로 처리되도록
+                cameraPreview
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                    .gesture(MagnificationGesture()
+                        .onChanged { val in
+                            viewModel.zoom(factor: val)
                         }
+                        .onEnded { _ in
+                            viewModel.zoomInitialize()
+                        }
+                    )
+                Group{
+                    if let image = viewModel.frameImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
                     }
-                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                }
+                .allowsHitTesting(false)
+                
+                
+                VStack {
+                    CameraTopView(viewModel: viewModel)
+                    Spacer()
+                    CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
                 }
                 //v end
@@ -98,7 +107,7 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isFrameSelect.toggle()
+                                                viewModel.isShowMFView.toggle()
                                             }
                                         }
                                         else{
@@ -126,10 +135,10 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isFrameSelect.toggle()
+                                                viewModel.isShowMFView.toggle()
                                             }
                                         }
-                                       
+                                        
                                     }
                                     .padding(.leading, -10)
                                     Spacer()
@@ -160,14 +169,13 @@ struct CameraView: View {
             .onAppear {
                 motionManager.startDeviceMotionUpdates()
                 viewModel.frameImage = frameImage
-                if frameImage != nil {
-                    viewModel.isFrameSelected = true
-                }
             }
-            .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
-                CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
+            .fullScreenCover(isPresented: $viewModel.isShowMFView) {
+                //TODO: 수정에정
+                MFView(context: viewContext)
+                        .environment(\.managedObjectContext, viewContext)
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
                 
             }
             .statusBar(hidden: true)
@@ -184,9 +192,7 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            
         }
         
     }
-    
 }

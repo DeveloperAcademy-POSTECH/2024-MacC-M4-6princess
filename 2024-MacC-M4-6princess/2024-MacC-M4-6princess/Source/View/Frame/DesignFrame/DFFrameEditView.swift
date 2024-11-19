@@ -19,7 +19,7 @@ struct DFFrameEditView: View {
                 ZStack {
                     
                     inputImageWithMask
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 210))
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 4/3))
                     
                     if let image = viewModel.resultImage {
                         let scale = scaleCompute(image)

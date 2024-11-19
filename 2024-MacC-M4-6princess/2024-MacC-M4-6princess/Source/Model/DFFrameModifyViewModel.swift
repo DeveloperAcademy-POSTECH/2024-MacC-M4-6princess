@@ -40,7 +40,7 @@ class DFFrameModifyViewModel: ObservableObject {
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
             render.scale = scaleCompute(inputImage)
             frameImage = render.uiImage
-            addImage(albumImageData: frameImage?.pngData(), subjectImageData: outputImage?.pngData(), context: context)
+            addImage(albumImageData: frameImage?.pngData(), context: context)
             try await Task.sleep(nanoseconds: 1_000_000_000)
             btnOpacity = 0
             isShowCamera = true
@@ -75,22 +75,32 @@ class DFFrameModifyViewModel: ObservableObject {
             print("Error saving managed object context: \(error)")
         }
     }
-    
-    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
+    func addImage(albumImageData: Data?, context: NSManagedObjectContext) {
         
         let newImage = StoreImages(context: context)
         
         newImage.image = albumImageData
-        newImage.subjectImage = subjectImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
-        newImage.angle = angle.degrees
-        newImage.x = draggedOffSet.width
-        newImage.y = draggedOffSet.height
-        newImage.scale = magnifyScale
         
         saveContext(context: context)
     }
+    
+//    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
+//        
+//        let newImage = StoreImages(context: context)
+//        
+//        newImage.image = albumImageData
+//        newImage.subjectImage = subjectImageData
+//        newImage.uuid = UUID()
+//        newImage.isSelected = false
+//        newImage.angle = angle.degrees
+//        newImage.x = draggedOffSet.width
+//        newImage.y = draggedOffSet.height
+//        newImage.scale = magnifyScale
+//        
+//        saveContext(context: context)
+//    }
     
     
     

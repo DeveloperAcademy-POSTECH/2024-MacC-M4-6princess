@@ -64,7 +64,6 @@ struct DFFrameModifyView: View {
                     viewModel.detectSubject(inputImage: image)
                     try await Task.sleep(for: .seconds(1))
                     try await viewModel.makeImageList()
-                    //                resultImage = viewModel.outputImage
                 }
             }
         }
@@ -96,7 +95,6 @@ private extension DFFrameModifyView {
                 viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
                 viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
                 print(viewModel.draggedOffSet)
-//                makeHistory()
                 
             }
         
@@ -110,7 +108,6 @@ private extension DFFrameModifyView {
             }
             .onEnded { value in
                 viewModel.setScaleValue(minimum: 0.2, maximum: 10)
-//                makeHistory()
             }
     }
 }

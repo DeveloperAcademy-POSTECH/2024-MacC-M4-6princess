@@ -37,7 +37,8 @@ struct CameraTimerView: View {
                             .font(.system(size: 17))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                    }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                    }
+                    .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     .onAppear {
                         self.delayTime = 3
@@ -52,7 +53,8 @@ struct CameraTimerView: View {
                             .font(.system(size: 17))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                    }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                    }
+                    .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     .onAppear {
                         self.delayTime = 5
@@ -67,7 +69,8 @@ struct CameraTimerView: View {
                             .font(.system(size: 17))
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                    }.rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                    }
+                    .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     .onAppear {
                         self.delayTime = 7
