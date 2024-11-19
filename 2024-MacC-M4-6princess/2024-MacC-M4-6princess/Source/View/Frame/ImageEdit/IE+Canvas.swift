@@ -401,11 +401,6 @@ extension IEMainView{
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         viewModel.savePhoto = true
-                        //                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        //                            viewModel.saveAnimate = false
-                        //                            self.presentationMode.wrappedValue.dismiss()
-                        //                        }
-                        
                     }
                 } label: {
                     Text("저장")
@@ -415,7 +410,6 @@ extension IEMainView{
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10.49618)
                 }
-                //                .disabled(viewModel.isRawImage)
                 .padding(.horizontal)
                 
             }
@@ -428,16 +422,10 @@ extension IEMainView{
 
 extension UIImage {
     func cropToAspectRatio(_ targetAspectRatio: CGFloat) -> UIImage? {
-        //        let originalWidth = size.width
-        //        let originalHeight = size.height
-        //
+
         var cropRect: CGRect
-        
-        
-        
-        //        let newWidth = originalHeight * targetAspectRatio
-        
         cropRect = CGRect(x: 0, y: 0, width: size.width, height: size.width * targetAspectRatio)
+        
         // 크롭 영역을 설정하여 CGImage로 변환
         guard let cgImage = self.cgImage?.cropping(to: cropRect) else { return nil }
         

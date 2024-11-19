@@ -19,7 +19,6 @@ struct IEProgressView: View {
             if let compositeImage = viewModel.compositeImage{
                 Image(uiImage: compositeImage)
                     .resizable()
-                //                    .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.width * 0.8 * (viewModel.frameBGSize.height / viewModel.frameBGSize.width))
                     .aspectRatio(contentMode: .fit)
                     .padding()
             }
@@ -57,9 +56,6 @@ struct IEProgressView: View {
             Spacer()
         }
         .navigationBarBackButtonHidden()
-//        .toolbar{
-//            topBar
-//        }
         .onAppear{
             isAnimating = true
             isSave = false
