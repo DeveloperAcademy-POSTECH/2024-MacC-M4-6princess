@@ -52,8 +52,8 @@ struct CameraFrameSelectView: View {
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
                             }
                             .onTapGesture {
-                                viewModel.isFullScreenPop.toggle()
-                                viewModel.isFrameSelect = true
+//                                viewModel.isFullScreenPop.toggle()
+                                viewModel.isShowMFView.toggle()
                                 dismiss()
                             }
                             .disabled(isEditing)
@@ -64,8 +64,6 @@ struct CameraFrameSelectView: View {
                                         if isEditing {
                                             toggleSelection(for: imageInfo.id)
                                         } else {
-                                            viewModel.isFrameSelected = true
-                                            print("isFrameSelected 값 true로 변경됨")
                                             viewModel.selectedFrame = imageInfo.id
                                             viewModel.isFrameLoading = true
                                             dismiss()
@@ -164,7 +162,8 @@ struct CameraFrameSelectView: View {
         }
         .fullScreenCover(isPresented: $isShowPhotosPicker) {
             PhotosPickerView().onAppear {
-                viewModel.isFullScreenPop.toggle()
+                viewModel.isShowMFView.toggle()
+//                viewModel.isFullScreenPop.toggle()
             }
         }
     }
@@ -269,3 +268,5 @@ struct SheetTitleView: View {
         
     }
 }
+
+

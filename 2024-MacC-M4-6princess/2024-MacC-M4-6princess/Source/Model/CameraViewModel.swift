@@ -33,11 +33,9 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var isTakePic = false
     
     // 프레임 선택 관련 상태
-    @Published var isFrameSelect = false
-    @Published var isFullScreenPop: Bool = false
-    @Published var selectedFrame: UUID? = nil
-    @Published var isFrameSelected: Bool = false
-    @Published var showAlert = false
+    @Published var isShowMFView = false
+    @Published var selectedFrame: UUID? = nil //CoreData에서 선택한 프레임 id 받아옴
+    @Published var isShowAlert = false //프레임 없을 때 alert
     @Published var isFrameLoading: Bool = false
     @Published var inputImage: UIImage?
     

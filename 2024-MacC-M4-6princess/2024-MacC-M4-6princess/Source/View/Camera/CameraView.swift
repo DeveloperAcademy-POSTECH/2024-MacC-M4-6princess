@@ -105,7 +105,7 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isFrameSelect.toggle()
+                                                viewModel.isShowMFView.toggle()
                                             }
                                         }
                                         else{
@@ -133,7 +133,7 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isFrameSelect.toggle()
+                                                viewModel.isShowMFView.toggle()
                                             }
                                         }
                                         
@@ -167,11 +167,8 @@ struct CameraView: View {
             .onAppear {
                 motionManager.startDeviceMotionUpdates()
                 viewModel.frameImage = frameImage
-                if frameImage != nil {
-                    viewModel.isFrameSelected = true
-                }
             }
-            .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
+            .fullScreenCover(isPresented: $viewModel.isShowMFView) {
                 CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
