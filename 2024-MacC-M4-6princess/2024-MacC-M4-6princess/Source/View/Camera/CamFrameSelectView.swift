@@ -89,28 +89,65 @@ struct CameraFrameSelectView: View {
                                             .padding(.top, 10)
                                     }
                                 }
-                            }  
+                            }
                         }
                     }
                     
                 }
                 if isEditing {
-                    Button {
-                        deleteSelectedImages()
-                    } label: {
-                        ZStack {
-                            Rectangle()
-                                .foregroundColor(.clear)
-                                .frame(width: 240, height: 60)
-                                .background(.pointPink)
-                                .cornerRadius(10)
-                                .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 0)
-                            Text("\(selectedImageIds.count)장의 프레임 삭제")
-                                .font(.system(size: 17))
-                                .foregroundColor(.white)
+                    HStack(spacing: 10) {
+                        Button {
+                            //프레임 수정 뷰로 향하도록 수정
+                        } label: {
+                            ZStack {
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                                    .frame(width: 164, height: 60)
+                                    .background(selectedImageIds.count > 1 ? .gray03 : .pointPink)
+                                    .cornerRadius(10)
+                                Text("수정하기")
+                                    .font(.system(size: 17))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        Button {
+                            deleteSelectedImages()
+                        } label: {
+                            ZStack {
+                                Rectangle()
+                                    .foregroundColor(.white)
+                                    .frame(width: 164, height: 60)
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .inset(by: 1)
+                                            .stroke(.pointPink, lineWidth: 2)
+                                    )
+                                Text("삭제하기")
+                                    .font(.system(size: 17))
+                                    .foregroundColor(.pointPink)
+                                    .fontWeight(.bold)
+                            }
                         }
                         
-                    }.padding(.bottom, 40)
+                    }
+                    .background {
+                            Rectangle()
+                              .foregroundColor(.clear)
+                              .frame(width: UIScreen.main.bounds.width, height: 130)
+                              .background(
+                                LinearGradient(
+                                  stops: [
+                                    Gradient.Stop(color: .white.opacity(0), location: 0.00),
+                                    Gradient.Stop(color: .white, location: 0.30),
+                                    Gradient.Stop(color: .white, location: 1.00),
+                                  ],
+                                  startPoint: UnitPoint(x: 0.5, y: 0),
+                                  endPoint: UnitPoint(x: 0.5, y: 1)
+                                )
+                              )
+                    }
                 }
             }
         }.onChange(of: storedImages.count) {
@@ -164,9 +201,6 @@ struct CameraFrameSelectView: View {
         return UIImage(cgImage: downsampledImage)
     }
     
-    
-    
-    
     private func toggleSelection(for id: UUID) {
         if selectedImageIds.contains(id) {
             selectedImageIds.remove(id)
@@ -197,30 +231,39 @@ struct SheetTitleView: View {
     
     
     var body: some View {
-        HStack {
-            Button {
-                dismiss()
-            } label: {
-                Image("xIcon")
-                    .resizable()
-                    .frame(width: 26, height: 26)
-                    .padding(.leading, 8)
+        ZStack {
+            HStack(alignment: .center) {
+                Spacer()
+                Text("프레임")
+                    .font(.system(size: 17))
+                    .fontWeight(.bold)
+                Spacer()
             }
-            
-            Spacer()
-            
-            if !imageDataArray.isEmpty {
+            HStack(alignment: .center) {
                 Button {
-                    isEditing.toggle()
+                    dismiss()
                 } label: {
-                    Text(isEditing ? "취소" : "편집")
-                        .font(.system(size: 17))
-                        .fontWeight(.semibold)
-                        .foregroundColor(.gray01)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10.49618)
+                    Image("xIcon")
+                        .resizable()
+                        .frame(width: 26, height: 26)
+                        .padding(.leading, 8)
+                }
+                Spacer()
+                if !imageDataArray.isEmpty {
+                    Button {
+                        isEditing.toggle()
+                    } label: {
+                        Text(isEditing ? "취소" : "편집")
+                            .font(.system(size: 17))
+                            .fontWeight(.bold)
+                            .foregroundColor(.gray01)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10.49618)
+                    }
                 }
             }
+            .padding(.vertical, 20)
         }
+        
     }
 }

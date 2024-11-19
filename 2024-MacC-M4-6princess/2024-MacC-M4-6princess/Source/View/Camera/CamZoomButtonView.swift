@@ -48,7 +48,7 @@ struct CamZoomButtonView: View {
     
     // 사용 가능한 줌 팩터 배열 반환
     private func getAvailableZoomFactors() -> [Double] {
-        if viewModel.cameraManager.device == .builtInUltraWideCamera {
+        if viewModel.cameraManager.deviceType == .builtInUltraWideCamera {
             return backCameraFactors
         } else {
             return Array(backCameraFactors.dropFirst()) // 0.5x 제외

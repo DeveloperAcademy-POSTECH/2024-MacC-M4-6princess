@@ -21,7 +21,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     @Published var videoDeviceInput: AVCaptureDeviceInput?
     @Published var output: AVCapturePhotoOutput
     @Published var startFactor: CGFloat = 2.0
-    @Published var device: AVCaptureDevice.DeviceType
+    @Published var deviceType: AVCaptureDevice.DeviceType
     
     init(session: AVCaptureSession = AVCaptureSession(),
          videoDeviceInput: AVCaptureDeviceInput? = nil,
@@ -30,7 +30,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         self.preset = .photo
         self.videoDeviceInput = videoDeviceInput
         self.output = output
-        self.device = .builtInWideAngleCamera
+        self.deviceType = .builtInWideAngleCamera
         super.init()
     }
     
@@ -101,6 +101,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             guard let device = getBestCamera(from: discoverySession.devices) else {
                 throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No available camera"])
             }
+//            device.activeDepthDataFormat?.zoomFactorsOutsideOfVideoZoomRangesForDepthDeliverySupported = true
             
 //            if device.deviceType == .builtInUltraWideCamera {
 //                device.videoZoomFactor = 2.0
