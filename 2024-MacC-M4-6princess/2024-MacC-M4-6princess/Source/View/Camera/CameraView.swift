@@ -14,7 +14,8 @@ struct CameraView: View {
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @Binding var frameImage: UIImage?  // 옵셔널 바인딩
-    
+    @StateObject var naviManager = NavigationManager()
+    @StateObject var frameManager = FrameManager()
     init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
         _frameImage = frameImage
     }
@@ -61,6 +62,8 @@ struct CameraView: View {
                     CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
+                        .environmentObject(naviManager)
+                        .environmentObject(frameManager)
                 }
                 //v end
                 //처음 실행했을 때 - 온보딩 합침
@@ -172,9 +175,11 @@ struct CameraView: View {
             .fullScreenCover(isPresented: $viewModel.isShowMFView) {
                 //TODO: 수정에정
                 MFView(context: viewContext)
-                        .environment(\.managedObjectContext, viewContext)
-                        .presentationDetents([.large])
-                        .presentationDragIndicator(.visible)
+                    .environment(\.managedObjectContext, viewContext)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+                    .environmentObject(naviManager)
+                    .environmentObject(frameManager)
                 
             }
             .statusBar(hidden: true)

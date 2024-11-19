@@ -14,14 +14,15 @@ struct MFView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject var viewModel: MFViewModel
     @ObservedObject var cameraViewModel: CameraViewModel
+    @EnvironmentObject var naviManager: NavigationManager
     
     init(context: NSManagedObjectContext) {
-            _viewModel = StateObject(wrappedValue: MFViewModel(context: context))
+        _viewModel = StateObject(wrappedValue: MFViewModel(context: context))
         _cameraViewModel = ObservedObject(wrappedValue: CameraViewModel())
-        }
+    }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $naviManager.route) {
             ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     SheetTitleView(viewModel: viewModel)
@@ -89,10 +90,14 @@ struct MFView: View {
                     }
                     
                 }
+                .navigationDestination(for: Screen.self) { type in
+                    FeatureView(type: type)
+                }
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
                             //프레임 수정 뷰로 향하도록 수정
+//                            naviManager.push(screen: Screen.photoPicker)
                         } label: {
                             ZStack {
                                 Rectangle()
@@ -158,9 +163,9 @@ struct MFView: View {
         }
         .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
             PhotosPickerView()
-//                .onAppear {
-//                    viewModel.isShowMFView.toggle()
-//                }
+            //                .onAppear {
+            //                    viewModel.isShowMFView.toggle()
+            //                }
         }
     }
 }
