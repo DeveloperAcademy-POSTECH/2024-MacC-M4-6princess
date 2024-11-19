@@ -15,6 +15,7 @@ struct MFView: View {
     @StateObject var viewModel: MFViewModel
     @ObservedObject var cameraViewModel: CameraViewModel
     @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     
     init(context: NSManagedObjectContext) {
         _viewModel = StateObject(wrappedValue: MFViewModel(context: context))
@@ -28,8 +29,8 @@ struct MFView: View {
                     SheetTitleView(viewModel: viewModel)
                     ScrollView {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-                            NavigationLink {
-                                PhotosPickerView()
+                            Button {
+                                naviManager.push(screen: Screen.photoPicker)
                             } label: {
                                 VStack(alignment: .center, spacing: 4) {
                                     Spacer()
@@ -46,10 +47,10 @@ struct MFView: View {
                                 .frame(minHeight: 200)
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
                             }
-                            .onTapGesture {
-                                //                                viewModel.isShowMFView.toggle()
-                                dismiss()
-                            }
+                            //                            .onTapGesture {
+                            //                                //                                viewModel.isShowMFView.toggle()
+                            //                                dismiss()
+                            //                            }
                             .disabled(viewModel.isEditing)
                             
                             ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
@@ -90,14 +91,14 @@ struct MFView: View {
                     }
                     
                 }
-                .navigationDestination(for: Screen.self) { type in
+                .navigationDestination(for: Screen.self) { type in // ✅
                     FeatureView(type: type)
                 }
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
                             //프레임 수정 뷰로 향하도록 수정
-//                            naviManager.push(screen: Screen.photoPicker)
+                            //                            naviManager.push(screen: Screen.photoPicker)
                         } label: {
                             ZStack {
                                 Rectangle()

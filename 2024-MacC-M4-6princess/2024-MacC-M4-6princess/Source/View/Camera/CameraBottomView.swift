@@ -12,6 +12,8 @@ struct CameraBottomView: View {
     @ObservedObject var viewModel: CameraViewModel
     @StateObject var motionManager = MotionManager()
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @EnvironmentObject var naviManager:NavigationManager
+    @EnvironmentObject var frameManager:FrameManager
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             //        if horizontalSizeClass == .regular{

@@ -58,9 +58,9 @@ public final class NavigationManager: ObservableObject {
 // 네비게이션에서 이동할 화면을 정의
 // Hashable을 준수하여 NavigationPath에서 식별 가능
 public enum Screen: Hashable {
-//    case photoPicker // PhotosPickerView 화면
-//    case frameEdit   // DFFrameEditView 화면
-//    case modifyFrame // DFModifyFrame 화면
+    case photoPicker // PhotosPickerView 화면
+    case frameEdit   // DFFrameEditView 화면
+    case modifyFrame // DFModifyFrame 화면
     case testFrame
 }
 
@@ -72,12 +72,12 @@ struct FeatureView: View {
     var body: some View {
         // Screen 타입에 따라 다른 뷰를 렌더링
         switch type {
-//            case .photoPicker:
-//                PhotosPickerView() // PhotosPickerView로 이동
-//            case .frameEdit:
-//                DFFrameEditView() // DFFrameEditView로 이동
-//            case .modifyFrame:
-//                DFModifyFrame() // DFModifyFrame로 이동
+            case .photoPicker:
+                PhotosPickerView()
+            case .frameEdit:
+                DFFrameEditView()
+            case .modifyFrame:
+                DFFrameModifyView()
             case .testFrame:
                 DFTestFrameView()
                 

@@ -23,10 +23,10 @@ class DFFrameModifyViewModel: ObservableObject {
     @Published var saveStateText: String = ""
     @Published var indexOfImageList: Int = 0
     @Published var imageList: [subjectImage] = []
-    @Published var isShowImagePickerView: Bool = false
+    //    @Published var isShowImagePickerView: Bool = false
     @Published var imageHistory: [subjectImage] = []
     @Published var frameImage: UIImage?
-
+    
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
     
@@ -86,21 +86,21 @@ class DFFrameModifyViewModel: ObservableObject {
         saveContext(context: context)
     }
     
-//    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
-//        
-//        let newImage = StoreImages(context: context)
-//        
-//        newImage.image = albumImageData
-//        newImage.subjectImage = subjectImageData
-//        newImage.uuid = UUID()
-//        newImage.isSelected = false
-//        newImage.angle = angle.degrees
-//        newImage.x = draggedOffSet.width
-//        newImage.y = draggedOffSet.height
-//        newImage.scale = magnifyScale
-//        
-//        saveContext(context: context)
-//    }
+    //    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
+    //        
+    //        let newImage = StoreImages(context: context)
+    //        
+    //        newImage.image = albumImageData
+    //        newImage.subjectImage = subjectImageData
+    //        newImage.uuid = UUID()
+    //        newImage.isSelected = false
+    //        newImage.angle = angle.degrees
+    //        newImage.x = draggedOffSet.width
+    //        newImage.y = draggedOffSet.height
+    //        newImage.scale = magnifyScale
+    //        
+    //        saveContext(context: context)
+    //    }
     
     
     
@@ -124,7 +124,7 @@ class DFFrameModifyViewModel: ObservableObject {
         imageHistory.append(inputImage)
         
     }
-
+    
     
     
     func makeHistory() {
@@ -135,7 +135,7 @@ class DFFrameModifyViewModel: ObservableObject {
         inputImage.angle = angle
         inputImage.scale = magnifyScale
         inputImage.offSet = draggedOffSet
-
+        
         if imageList.count > 0 {
             indexOfImageList += 1
         }
@@ -219,5 +219,5 @@ class DFFrameModifyViewModel: ObservableObject {
         let allSubjectsImage = try await interaction.image(for: interaction.highlightedSubjects)
         outputImage = allSubjectsImage
     }
-
+    
 }

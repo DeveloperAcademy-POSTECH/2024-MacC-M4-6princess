@@ -14,12 +14,12 @@ struct CameraView: View {
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @State private var path: NavigationPath = NavigationPath()
-    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
+    //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
     @StateObject var frameManager = FrameManager()
-    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
-        _frameImage = frameImage
-    }
+    //    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
+    //        _frameImage = frameImage
+    //    }
     
     private var cameraPreview: some View  {
         
@@ -48,11 +48,17 @@ struct CameraView: View {
                         }
                     )
                 Group{
-                    if let image = viewModel.frameImage {
+                    // ✅
+                    if let image = frameManager.resultImage {
                         Image(uiImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                     }
+                    //                    if let image = viewModel.frameImage {
+                    //                        Image(uiImage: image)
+                    //                            .resizable()
+                    //                            .aspectRatio(contentMode: .fill)
+                    //                    }
                 }
                 .allowsHitTesting(false)
                 
@@ -110,7 +116,8 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isShowMFView.toggle()
+//                                                viewModel.isShowMFView.toggle()
+//                                                frameManager.isFrameSelect
                                             }
                                         }
                                         else{
@@ -171,7 +178,7 @@ struct CameraView: View {
             .persistentSystemOverlays(.hidden)
             .onAppear {
                 motionManager.startDeviceMotionUpdates()
-                viewModel.frameImage = frameImage
+                //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $viewModel.isShowMFView) {
                 //TODO: 수정에정
@@ -179,14 +186,14 @@ struct CameraView: View {
                     .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
-                    .environmentObject(naviManager)
-                    .environmentObject(frameManager)
+                    .environmentObject(naviManager) // ✅
+                    .environmentObject(frameManager) // ✅
                 
             }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
-                if let takenImg = viewModel.takenImg,let frameImg = viewModel.frameImage{
+                if let takenImg = viewModel.takenImg,let frameImg = frameManager.resultImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
                 
