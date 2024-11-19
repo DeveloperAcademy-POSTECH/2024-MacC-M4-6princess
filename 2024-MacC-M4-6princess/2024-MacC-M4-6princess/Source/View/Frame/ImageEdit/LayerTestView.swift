@@ -17,7 +17,7 @@ struct LayerTestView: View {
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
     @State private var previousStep: Int = 0 // 이전 단계
-
+    
     var layerIndicator: some View {
         VStack(spacing: 6) {
             ForEach(Array(stride(from: layerImages.count - 1, to: -1, by: -1)), id: \.self) { index in
@@ -50,7 +50,7 @@ struct LayerTestView: View {
         .cornerRadius(8)
         .padding(.horizontal, 5)
     }
-
+    
     var body: some View {
         ZStack {
             ZStack {
@@ -91,7 +91,7 @@ struct LayerTestView: View {
                 layerIndicator
                 Spacer()
             }
-
+            
             VStack {
                 Spacer()
                 Button(action: {
@@ -110,7 +110,7 @@ struct LayerTestView: View {
             LayerPhotoPicker(layerImages: $layerImages, screenSize: UIScreen.main.bounds.size)
         }
     }
-
+    
     // 드래그 변경 시 동작 처리 함수
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
@@ -135,7 +135,7 @@ struct LayerTestView: View {
             previousStep = step // 이전 단계를 업데이트
         }
     }
-
+    
     // 드래그 종료 시 동작 처리 함수
     func dragOnEnded() {
         isDragging = false
@@ -143,7 +143,7 @@ struct LayerTestView: View {
         selectedLayerIndex = nil
         previousStep = 0 // 초기화
     }
-
+    
     // 순서 앞으로 이동 함수 (여러 단계)
     private func moveLayerForward(at index: Int, steps: Int) {
         var currentIndex = index
