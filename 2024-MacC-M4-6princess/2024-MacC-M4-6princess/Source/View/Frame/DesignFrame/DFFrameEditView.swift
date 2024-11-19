@@ -19,7 +19,7 @@ struct DFFrameEditView: View {
                 ZStack {
                     
                     inputImageWithMask
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 210))
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 4/3))
                     
                     if let image = viewModel.resultImage {
                         let scale = scaleCompute(image)
@@ -77,7 +77,7 @@ struct DFFrameEditView: View {
             showMaskImage()
         }
         .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
-            DFModifyFrame(resultImage: $viewModel.resultImage)
+            DFFrameModifyView(resultImage: $viewModel.resultImage)
         })
         .navigationBarBackButtonHidden()
         .toolbar {
@@ -416,7 +416,7 @@ private extension DFFrameEditView {
     }
     
     private func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width

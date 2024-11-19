@@ -13,6 +13,7 @@ struct CameraView: View {
     @Environment(\.managedObjectContext) var viewContext
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
+    @State private var path: NavigationPath = NavigationPath()
     @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
     @StateObject var frameManager = FrameManager()

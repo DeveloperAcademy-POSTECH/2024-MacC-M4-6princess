@@ -10,10 +10,11 @@ import SwiftUI
 struct ContentView: View {
     
 //    @State private var inputImage: UIImage?
+//    @StateObject var vm: DFFrameModifyViewModel = DFFrameModifyViewModel()
     
     var body: some View {
         
-                CameraView()
+        CameraView()
 //        IEDevelopView()
         //        CMView()
         //        IEProgressView()
