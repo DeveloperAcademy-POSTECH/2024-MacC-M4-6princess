@@ -240,7 +240,6 @@ private extension DFModifyFrame {
         
         viewModel.btnOpacity = 1
 
-        // 4. 지연 시간을 둬서 작업을 분산
         Task {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: self.imageView.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 229))
