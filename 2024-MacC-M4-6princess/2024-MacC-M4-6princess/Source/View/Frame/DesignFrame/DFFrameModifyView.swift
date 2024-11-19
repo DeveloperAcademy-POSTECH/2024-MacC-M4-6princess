@@ -5,7 +5,7 @@ import CoreData
 struct DFFrameModifyView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @Environment(\.managedObjectContext) var managedContext: NSManagedObjectContext
+    @Environment(\.managedObjectContext) var managedContext
     @StateObject var viewModel: DFFrameModifyViewModel = DFFrameModifyViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
@@ -58,13 +58,11 @@ struct DFFrameModifyView: View {
 //            CameraView(frameImage: $resultImage)
         }
         .onAppear {
-            Task {
+            
+            if let image = resultImage {
                 
-                if let image = resultImage {
-                    viewModel.detectSubject(inputImage: image)
-                    try await Task.sleep(for: .seconds(1))
-                    try await viewModel.makeImageList()
-                }
+                viewModel.onAppearTask(image: image)
+                
             }
         }
     }

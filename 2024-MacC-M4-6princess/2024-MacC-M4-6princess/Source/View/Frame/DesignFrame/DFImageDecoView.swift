@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct DFImageDecoView: View {
+    
     @Binding var isShowImagePickerView: Bool
     
     var body: some View {
             
         HStack(spacing: 40){
+            
             appendImageView
             
             stickerView
@@ -76,7 +78,7 @@ extension DFImageDecoView {
                         .fill(Color(hex: "d9d9d9"))
                         .frame(width: 40, height: 40)
                         .opacity(0.15)
-                    Image("textIcon")
+                    Image("TextIcon")
                 }
             }
             .padding(.bottom, 5)

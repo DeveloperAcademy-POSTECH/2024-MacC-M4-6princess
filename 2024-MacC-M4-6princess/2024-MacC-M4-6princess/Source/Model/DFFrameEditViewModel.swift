@@ -12,15 +12,20 @@ class DFFrameEditViewModel: ObservableObject {
     @Published var indexOfMask: Int = 0
     @Published var maskColor: Color = .pink
     @Published var opacity: CGFloat = 0.4
+    
     @Published var deleteLines: Bool = false
     @Published var isShowThick: Bool = false
     @Published var showPreview: Bool = false
+    
     @Published var isShowModifyFrame: Bool = false
+    
     @Published var magnifyScale = 1.0
     @Published var lastScale = 1.0
     @Published var draggedOffSet: CGSize = .zero
     @Published var accumulatedOffSet: CGSize = .zero
+    
     @Published var outputImage: UIImage?
+    
     @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {

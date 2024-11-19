@@ -31,6 +31,13 @@ class DFFrameModifyViewModel: ObservableObject {
     let interaction = ImageAnalysisInteraction()
     
     
+    func onAppearTask(image: UIImage) {
+        
+        detectSubject(inputImage: image)
+        makeImageList()
+        
+    }
+    
     func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext) {
         
         btnOpacity = 1
@@ -115,14 +122,16 @@ class DFFrameModifyViewModel: ObservableObject {
         return scale
     }
     
-    func makeImageList() async throws -> Void {
+    func makeImageList() {
         
-        var inputImage = subjectImage()
-        
-        inputImage.image = outputImage
-        
-        imageHistory.append(inputImage)
-        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            
+            var inputImage = subjectImage()
+            
+            inputImage.image = self.outputImage
+            
+            self.imageHistory.append(inputImage)
+        }
     }
 
     
@@ -195,7 +204,7 @@ class DFFrameModifyViewModel: ObservableObject {
         return detectedSubjects
     }
     
-    func detectSubject(inputImage: UIImage?) {
+    private func detectSubject(inputImage: UIImage?) {
         
         Task { @MainActor in
             
