@@ -3,6 +3,7 @@ import Vision
 import CoreImage.CIFilterBuiltins
 import VisionKit
 
+@MainActor
 class DFEditViewModel: ObservableObject {
     
     @Published var maskImage: UIImage?
@@ -27,6 +28,47 @@ class DFEditViewModel: ObservableObject {
     @Published var outputImage: UIImage?
     
     @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
+    
+    let analyzer = ImageAnalyzer()
+    let interaction = ImageAnalysisInteraction()
+    
+    private func generateImageForAllSelectedObjects() async throws {
+        let allSubjectsImage = try await interaction.image(for: interaction.highlightedSubjects)
+        outputImage = allSubjectsImage
+    }
+    
+    private func analyzeImage(_ image: UIImage) async throws -> Set<ImageAnalysisInteraction.Subject> {
+        
+        let configuration = ImageAnalyzer.Configuration([.visualLookUp])
+        let analysis = try await analyzer.analyze(image, configuration: configuration)
+        interaction.analysis = analysis
+        let detectedSubjects = await interaction.subjects
+        return detectedSubjects
+    }
+    
+    func detectSubject(inputImage: UIImage?, completionHandler: @escaping () -> Void) {
+        
+        Task { @MainActor in
+            
+            do {
+                guard let inputImage = inputImage else { return }
+                detectedObjects = try await self.analyzeImage(inputImage)
+                print("탐지된 피사체: \(detectedObjects.count)")
+                for i in detectedObjects {
+                    interaction.highlightedSubjects.insert(i)
+                    try await generateImageForAllSelectedObjects()
+                }
+                
+            } catch {
+                print("none object detected")
+            }
+            
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            
+            completionHandler()
+        }
+    }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         
@@ -85,7 +127,7 @@ class DFEditViewModel: ObservableObject {
             deleteLines = true
         }
     }
-    func createResult() {
+    func createResult(completionHandler: @escaping () -> Void) {
         
         var resultImage: UIImage?
         
@@ -103,6 +145,8 @@ class DFEditViewModel: ObservableObject {
                 self.resultImage = resultImage
             }
         }
+        
+        completionHandler()
     }
     
     func removeBackground() {

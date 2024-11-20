@@ -9,6 +9,8 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
+    @Binding var realImage: UIImage?
+    @Binding var imageList: [UIImage?]
     @State private var shouldNavigate: Bool = false
     
     var body: some View {
@@ -61,7 +63,8 @@ struct DFModifyView: View {
             
             if let image = resultImage {
                 
-                viewModel.onAppearTask(image: image)
+//                viewModel.onAppearTask(image: image)
+                viewModel.makeImageList()
                 
             }
         }
@@ -115,11 +118,9 @@ private extension DFModifyView {
     var imageView: some View {
             
             ZStack {
-                
-                ForEach(viewModel.imageHistory, id: \.self) { subject in
+                ForEach(imageList, id:\.self) { images in
                     
-                    if let image = subject.image, let realImage = resultImage {
-                        
+                    if let image = images, let realImage = realImage {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
@@ -128,9 +129,36 @@ private extension DFModifyView {
                             .rotationEffect(viewModel.angle)
                             .offset(viewModel.draggedOffSet)
                             .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
-                        
                     }
+                    
                 }
+//                if let image = resultImage, let realImage = realImage {
+//                    Image(uiImage: image)
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+//                        .scaleEffect(viewModel.magnifyScale)
+//                        .rotationEffect(viewModel.angle)
+//                        .offset(viewModel.draggedOffSet)
+//                        .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
+//                }
+                
+//                ForEach(viewModel.imageHistory, id: \.self) { subject in
+//
+//                    if let image = subject.image, let realImage = resultImage {
+//                        
+//                        Image(uiImage: image)
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+//                            .scaleEffect(viewModel.magnifyScale)
+//                            .rotationEffect(viewModel.angle)
+//                            .offset(viewModel.draggedOffSet)
+//                            .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
+//                        
+//                    }
+//                }
+                
             }
     }
     

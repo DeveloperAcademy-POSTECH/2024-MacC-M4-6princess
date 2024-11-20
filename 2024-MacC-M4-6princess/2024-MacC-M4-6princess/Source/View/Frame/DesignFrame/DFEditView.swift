@@ -5,6 +5,7 @@ import CoreImage.CIFilterBuiltins
 struct DFEditView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @EnvironmentObject var imageList: ImageHistoryModel
     @ObservedObject var viewModel: DFEditViewModel = DFEditViewModel()
     @State private var selectionModeIndex: Int = 3
     @State private var lines: [Line] = []
@@ -46,7 +47,9 @@ struct DFEditView: View {
                             Button {
                                 
                                 viewModel.showPreview.toggle()
-                                viewModel.createResult()
+                                viewModel.createResult{
+                                    
+                                }
                                 
                             } label: {
                                 ZStack {
@@ -77,7 +80,7 @@ struct DFEditView: View {
             showMaskImage()
         }
         .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
-            DFModifyView(resultImage: $viewModel.resultImage)
+            DFModifyView(resultImage: $viewModel.outputImage, realImage: $pickedImage, imageList: $imageList.image)
         })
         .navigationBarBackButtonHidden()
         .toolbar {
@@ -303,7 +306,15 @@ private extension DFEditView {
             Spacer()
             Button {
                 
-                viewModel.createResult()
+                viewModel.createResult {
+                    viewModel.detectSubject(inputImage: viewModel.resultImage) {
+                        
+                        if let image = viewModel.outputImage {
+                            imageList.image.append(image)
+                            print("\(imageList.image.count) 길이")
+                        }
+                    }
+                }
                 viewModel.isShowModifyFrame.toggle()
                 
             } label: {
