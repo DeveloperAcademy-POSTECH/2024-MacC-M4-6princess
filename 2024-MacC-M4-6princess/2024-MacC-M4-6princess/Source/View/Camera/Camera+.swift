@@ -13,7 +13,7 @@ import CoreData
 extension CameraView {
     //이미지 렌더링해서 불러오기
     func loadSelectedFrame() {
-        guard let frameId = viewModel.selectedFrame else {
+        guard let frameId = frameManager.selectedFrame else {
 //            viewModel.frameImage = nil
             frameManager.resultImage = nil
             return

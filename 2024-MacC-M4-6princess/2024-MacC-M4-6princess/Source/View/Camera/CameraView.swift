@@ -29,6 +29,7 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
+            
         }
     }
     
@@ -170,10 +171,10 @@ struct CameraView: View {
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }
-            .onChange(of: viewModel.isFrameLoading) { newValue in
+            .onChange(of: frameManager.isFrameLoading) { newValue in
                 if newValue {
                     loadSelectedFrame()
-                    viewModel.isFrameLoading = false
+                    frameManager.isFrameLoading = false
                 }
             }
             .persistentSystemOverlays(.hidden)
@@ -182,7 +183,6 @@ struct CameraView: View {
                 //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
-                //TODO: 수정에정
                 MFView(context: viewContext)
                     .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
