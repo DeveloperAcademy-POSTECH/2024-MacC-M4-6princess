@@ -29,6 +29,15 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
+            Group{
+                // ✅
+                if let image = frameManager.resultImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+            }
+            .allowsHitTesting(false)
             
         }
     }
@@ -48,20 +57,15 @@ struct CameraView: View {
                             viewModel.zoomInitialize()
                         }
                     )
-                Group{
-                    // ✅
-                    if let image = frameManager.resultImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                    //                    if let image = viewModel.frameImage {
-                    //                        Image(uiImage: image)
-                    //                            .resizable()
-                    //                            .aspectRatio(contentMode: .fill)
-                    //                    }
-                }
-                .allowsHitTesting(false)
+//                Group{
+//                    // ✅
+//                    if let image = frameManager.resultImage {
+//                        Image(uiImage: image)
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fill)
+//                    }
+//                }
+//                .allowsHitTesting(false)
                 
                 
                 VStack {
