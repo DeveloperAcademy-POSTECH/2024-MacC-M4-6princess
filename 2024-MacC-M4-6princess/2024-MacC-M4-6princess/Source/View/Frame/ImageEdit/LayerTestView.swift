@@ -16,11 +16,11 @@ struct LayerTestView: View {
     @State private var dragStartPosition: CGPoint?
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
-    @State private var previousStep: Int = 0 // 이전 단계
+    @State private var previousStep: Int = 0
     
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(Array(stride(from: layerImages.count - 1, to: -1, by: -1)), id: \.self) { index in
+            ForEach(layerImages.indices, id: \.self) { index in // 최상단 레이어는 index가 0
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -43,6 +43,7 @@ struct LayerTestView: View {
                     }
                 }
             }
+
         }
         .padding(6)
         .frame(width: 40)
@@ -54,7 +55,7 @@ struct LayerTestView: View {
     var body: some View {
         ZStack {
             ZStack {
-                ForEach(layerImages.indices, id: \.self) { index in
+                ForEach(layerImages.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
                     let layer = layerImages[index]
                     Image(uiImage: layer.image)
                         .resizable()
@@ -114,30 +115,48 @@ struct LayerTestView: View {
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         // 드래그가 시작되지 않았다면 초기 설정
         if !isDragging {
-            print("value:\(value)") // 현재 드래그 값 디버깅 출력
+//            print("value:\(value)") // 현재 드래그 값 디버깅 출력
             selectedLayerIndex = index // 현재 드래그 중인 레이어의 인덱스를 저장
+            print("selectedLayerIndex:\(selectedLayerIndex)")
             dragStartPosition = layerImages[index].position // 드래그 시작 시 레이어의 초기 위치 저장
             isDragging = true // 드래그 상태를 활성화
             previousStep = 0 // 이전 단계 초기화
         }
         
         let dragOffsetY = value.translation.height // 드래그 이동 거리의 Y축 값
-        let step = Int(dragOffsetY / 50) // Y축 이동 거리를 50으로 나눠 이동 단계(step)를 계산
+        var step = Int(dragOffsetY / 50) // Y축 이동 거리를 50으로 나눠 이동 단계(step)를 계산
         
         // 현재 단계가 이전 단계와 다를 때만 레이어를 이동
         if step != previousStep {
-            if step < 0, index + abs(step) < layerImages.count {
+            if step < 0
+                // index - step : 다음 index
+//                index + abs(step) < layerImages.count
+            {
+//                if previousStep - step < 0 { // 인덱스가 최대 범위를 벗어나면 스템 최댓값을 0으로 맞춤
+//                    step = previousStep
+//                }
                 // 위로 드래그 (step이 음수)
-                // 현재 레이어를 step 단계만큼 뒤로 이동
-                moveLayerBackward(at: index, steps: abs(step - previousStep))
-                // 드래그로 이동한 후 선택된 레이어 인덱스를 업데이트
-                selectedLayerIndex = min(index + abs(step), layerImages.count - 1)
-            } else if step > 0, index - step >= 0 {
-                // 아래로 드래그 (step이 양수)
                 // 현재 레이어를 step 단계만큼 앞으로 이동
-                moveLayerForward(at: index, steps: step - previousStep)
+                // 레이어를 앞으로 옮김(index 크기를 줄임)
+                moveLayerForward(at: previousStep, steps: step - previousStep)
                 // 드래그로 이동한 후 선택된 레이어 인덱스를 업데이트
-                selectedLayerIndex = max(index - step, 0)
+//                selectedLayerIndex = max(index - step, 0)
+                selectedLayerIndex = index - step
+            } else if step > 0
+//                      index - step >= 0
+            
+            {
+//                if index + step < layerImages.count {
+//                    step = layerImages.count
+//                }
+                // 아래로 드래그 (step이 양수) => 레이어가 아래로 이동 , 인덱스 값이 증가
+               
+                // 현재 레이어를 step 단계만큼 뒤로 이동
+//                moveLayerBackward(at: index, steps: abs(step - previousStep))
+                moveLayerForward(at: previousStep, steps: abs(step - previousStep))
+                // 드래그로 이동한 후 선택된 레이어 인덱스를 업데이트
+//                selectedLayerIndex = min(index + abs(step), layerImages.count - 1)
+                selectedLayerIndex = index + abs(step)
             }
             // 이전 단계를 현재 단계로 업데이트
             previousStep = step
@@ -161,7 +180,7 @@ struct LayerTestView: View {
             layerImages.swapAt(currentIndex, currentIndex - 1) // 현재 인덱스와 바로 앞 인덱스의 레이어를 교환
             currentIndex -= 1 // 현재 인덱스를 앞으로 한 단계 이동
         }
-        updateOrder() // 순서 업데이트
+//        updateOrder() // 순서 업데이트
     }
 
     // 순서 뒤로 이동 함수 (여러 단계)
@@ -173,7 +192,7 @@ struct LayerTestView: View {
             layerImages.swapAt(currentIndex, currentIndex + 1) // 현재 인덱스와 바로 뒤 인덱스의 레이어를 교환
             currentIndex += 1 // 현재 인덱스를 뒤로 한 단계 이동
         }
-        updateOrder() // 순서 업데이트
+//        updateOrder() // 순서 업데이트
     }
 
     // 레이어 순서 업데이트 함수
