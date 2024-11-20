@@ -29,6 +29,16 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
+            Group{
+                // ✅
+                if let image = frameManager.resultImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+            }
+            .allowsHitTesting(false)
+            
         }
     }
     
@@ -47,20 +57,15 @@ struct CameraView: View {
                             viewModel.zoomInitialize()
                         }
                     )
-                Group{
-                    // ✅
-                    if let image = frameManager.resultImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                    //                    if let image = viewModel.frameImage {
-                    //                        Image(uiImage: image)
-                    //                            .resizable()
-                    //                            .aspectRatio(contentMode: .fill)
-                    //                    }
-                }
-                .allowsHitTesting(false)
+//                Group{
+//                    // ✅
+//                    if let image = frameManager.resultImage {
+//                        Image(uiImage: image)
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fill)
+//                    }
+//                }
+//                .allowsHitTesting(false)
                 
                 
                 VStack {
@@ -170,10 +175,10 @@ struct CameraView: View {
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }
-            .onChange(of: viewModel.isFrameLoading) { newValue in
+            .onChange(of: frameManager.isFrameLoading) { newValue in
                 if newValue {
                     loadSelectedFrame()
-                    viewModel.isFrameLoading = false
+                    frameManager.isFrameLoading = false
                 }
             }
             .persistentSystemOverlays(.hidden)
@@ -182,7 +187,6 @@ struct CameraView: View {
                 //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
-                //TODO: 수정에정
                 MFView(context: viewContext)
                     .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
