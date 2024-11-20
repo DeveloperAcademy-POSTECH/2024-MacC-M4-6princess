@@ -4,7 +4,7 @@ import VisionKit
 import CoreData
 
 @MainActor
-class DFFrameModifyViewModel: ObservableObject {
+class DFModifyViewModel: ObservableObject {
     
     @Published var btnOpacity: Double = 0.0
     @Published var accumulatedOffset = CGSize.zero

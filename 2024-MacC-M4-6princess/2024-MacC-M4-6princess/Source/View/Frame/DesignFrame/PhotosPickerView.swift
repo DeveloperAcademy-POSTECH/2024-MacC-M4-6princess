@@ -40,7 +40,7 @@ struct PhotosPickerView: View {
             }
         }
         .navigationDestination(isPresented: $isPresented) {
-            DFFrameEditView(pickedImage: $pickedImage)
+            DFEditView(pickedImage: $pickedImage)
         }
     }
 }

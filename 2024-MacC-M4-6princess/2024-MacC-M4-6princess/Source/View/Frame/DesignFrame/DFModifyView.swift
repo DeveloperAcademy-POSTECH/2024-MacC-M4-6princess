@@ -2,11 +2,11 @@ import SwiftUI
 import Foundation
 import CoreData
 
-struct DFFrameModifyView: View {
+struct DFModifyView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
-    @StateObject var viewModel: DFFrameModifyViewModel = DFFrameModifyViewModel()
+    @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @State private var shouldNavigate: Bool = false
@@ -68,7 +68,7 @@ struct DFFrameModifyView: View {
     }
 }
 
-private extension DFFrameModifyView {
+private extension DFModifyView {
     
     var rotate: some Gesture {
         
@@ -110,7 +110,7 @@ private extension DFFrameModifyView {
     }
 }
 
-private extension DFFrameModifyView {
+private extension DFModifyView {
     
     var imageView: some View {
             

@@ -3,7 +3,7 @@ import Vision
 import CoreImage.CIFilterBuiltins
 import VisionKit
 
-class DFFrameEditViewModel: ObservableObject {
+class DFEditViewModel: ObservableObject {
     
     @Published var maskImage: UIImage?
     @Published var resultImage: UIImage?
