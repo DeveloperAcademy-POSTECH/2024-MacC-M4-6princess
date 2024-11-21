@@ -17,9 +17,6 @@ struct CameraView: View {
     //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
     @StateObject var frameManager = FrameManager()
-    //    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
-    //        _frameImage = frameImage
-    //    }
     
     private var cameraPreview: some View  {
         

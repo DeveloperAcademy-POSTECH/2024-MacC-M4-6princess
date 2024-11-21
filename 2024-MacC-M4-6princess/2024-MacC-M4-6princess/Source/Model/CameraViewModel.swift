@@ -146,15 +146,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func changeCamera() {
         cameraManager.changeCamera()
-        if cameraManager.videoDeviceInput?.device.position == .front {
-            cameraPosition = .back
-            currentZoomFactor = 1.0
-        }
-        else {
-            cameraPosition = .front
-            currentZoomFactor = 0.8
-        }
-        
+                cameraPosition = cameraManager.videoDeviceInput?.device.position ?? .back
+                currentZoomFactor = 2.0  // 줌 상태 초기화
     }
     
     func fixOrientation(_ image: UIImage) -> UIImage {
@@ -186,18 +179,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     // 버튼이나 직접 줌 설정을 위한 함수
     func setZoom(factor: CGFloat) {
         guard let device = cameraManager.videoDeviceInput?.device else { return }
-        print("\(cameraManager.videoDeviceInput!.device.position)")
-        let zoomRange = getZoomRange(for: device)
-        let newScale = min(max(factor, zoomRange.lowerBound), zoomRange.upperBound)
         
-        do {
-            try device.lockForConfiguration()
-            device.videoZoomFactor = newScale
-            device.unlockForConfiguration()
-            currentZoomFactor = newScale  // 현재 줌 상태 업데이트
-        } catch {
-            print("줌 설정 오류: \(error)")
+        // UltraWide 카메라일 때와 WideAngle 카메라일 때 줌 팩터 처리를 다르게 함
+        if cameraManager.deviceType == .builtInUltraWideCamera {
+            cameraManager.zoom(factor)
+        } else {
+            // WideAngle 카메라의 경우 줌 팩터를 2배로 조정
+            cameraManager.zoom(factor * 2)
         }
+        currentZoomFactor = factor
     }
 
     func zoomInitialize() {
