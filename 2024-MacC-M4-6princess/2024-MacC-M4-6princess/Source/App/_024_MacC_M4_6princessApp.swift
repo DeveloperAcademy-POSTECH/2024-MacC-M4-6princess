@@ -10,6 +10,12 @@ import SwiftUI
 @main
 struct _024_MacC_M4_6princessApp: App {
     @StateObject private var environmentModel = EnvironmentModel()
+    init() {
+        Font.registerFonts(fontName: "Hakgyoansim")
+        Font.registerFonts(fontName: "Hakgyoansim Geurimilgi OTF R")
+        Font.registerFonts(fontName: "Pretendard-Bold")
+        Font.registerFonts(fontName: "Pretendard-Regular")
+    }
     let persistenceController = PersistenceController.shared
     
     var body: some Scene {

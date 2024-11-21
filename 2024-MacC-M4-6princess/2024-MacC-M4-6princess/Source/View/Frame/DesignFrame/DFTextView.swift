@@ -19,12 +19,12 @@ struct DFTextView: View {
     @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorArr: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
-    
+
     var body: some View {
         NavigationView {
             VStack {
                 Spacer()
-                
+
                 TextEditor(text: $fullText)
                     .focused($isKeyboardVisible) // 키보드 활성화 상태와 연결
                     .multilineTextAlignment(textAlignment) // 동적 텍스트 정렬
@@ -49,9 +49,9 @@ struct DFTextView: View {
                                 }
                             }
                     )
-                
+
                 Spacer()
-                
+
                 if tab == 0 {
                     // 폰트 선택 ScrollView
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -96,7 +96,7 @@ struct DFTextView: View {
                 } else {
                     // tab == 2일 때 동작 추가 가능
                 }
-                
+
                 ZStack {
                     Rectangle()
                         .foregroundColor(.clear)
@@ -104,7 +104,7 @@ struct DFTextView: View {
                         .background(.white)
                         .cornerRadius(10)
                         .opacity(0.5)
-                    
+
                     HStack(spacing: 0) {
                         Text("Aa")
                             .font(.system(size: 16))
@@ -118,7 +118,7 @@ struct DFTextView: View {
                                 tab = 0
                             }
                             .frame(width: 105, height: 30)
-                        
+
                         Group {
                             Image("df.colorChip")
                                 .resizable()
@@ -132,7 +132,7 @@ struct DFTextView: View {
                                 }
                         }
                         .frame(width: 105, height: 30)
-                        
+
                         Group {
                             Image("df.alignment")
                                 .resizable()
@@ -172,22 +172,22 @@ struct DFTextView: View {
             }
         }
     }
-    
+
     // 정렬 방향 정의
     enum SwipeDirection {
         case left, right
     }
-    
+
     // 정렬 상태 변경 함수
     private func nextAlignment(for current: TextAlignment, direction: SwipeDirection) -> TextAlignment {
         switch (current, direction) {
-            case (.center, .left): return .leading
-            case (.center, .right): return .trailing
-            case (.leading, .right): return .center
-            case (.trailing, .left): return .center
-            case (.leading, .left): return .leading // 유지
-            case (.trailing, .right): return .trailing // 유지
-            default: return .center
+        case (.center, .left): return .leading
+        case (.center, .right): return .trailing
+        case (.leading, .right): return .center
+        case (.trailing, .left): return .center
+        case (.leading, .left): return .leading // 유지
+        case (.trailing, .right): return .trailing // 유지
+        default: return .center
         }
     }
 }
@@ -208,7 +208,7 @@ struct DFTextView: View {
 //        NavigationView {
 //            VStack {
 //                Spacer()
-//
+//                
 //                TextEditor(text: $fullText)
 //                    .focused($isKeyboardVisible) // 키보드 활성화 상태와 연결
 //                    .multilineTextAlignment(.center)
@@ -218,9 +218,9 @@ struct DFTextView: View {
 //                    .padding()
 //                    .background(Color.clear) // 배경을 투명하게 설정
 //                    .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
-//
+//                
 //                Spacer()
-//
+//                
 //                if tab == 0{
 //                    // 폰트 선택 ScrollView
 //                    ScrollView(.horizontal, showsIndicators: false) {
@@ -265,9 +265,9 @@ struct DFTextView: View {
 //                    .padding(.horizontal)
 //                }
 //                else{
-//
+//                   
 //                }
-//
+//                
 //                ZStack {
 //                    Rectangle()
 //                      .foregroundColor(.clear)
@@ -275,7 +275,7 @@ struct DFTextView: View {
 //                      .background(.white)
 //                      .cornerRadius(10)
 //                      .opacity(0.5)
-//
+//                    
 //                    HStack(spacing:0){
 //                        Text("Aa")
 //                            .font(.system(size: 16))
@@ -293,7 +293,7 @@ struct DFTextView: View {
 //                            Image("df.colorChip")
 //                                .resizable()
 //                                .frame(width: 27, height: 27) // 텍스트 크기에 맞춘 프레임
-//
+//                            
 //                                .background(
 //                                    RoundedRectangle(cornerRadius: 10)
 //                                    //                                    .frame(width: 105, height: 30)
@@ -316,16 +316,16 @@ struct DFTextView: View {
 //                                .onTapGesture {
 //                                    tab = 2
 //                                }
-//
+//                                
 //                        }
 //                        .frame(width:105, height: 30)
-//
+//                        
 //                    }
 //                    .padding(.vertical)
 //                }
 //                .frame(width: UIScreen.main.bounds.width - 40, height: 40)
 //                .padding()
-//
+//                    
 //            }
 //            .frame(maxWidth: .infinity, maxHeight: .infinity)
 //            .background(
@@ -341,13 +341,13 @@ struct DFTextView: View {
 //            }
 //            .onAppear {
 //                // 뷰가 나타날 때 키보드 자동 활성화
-//
+//                
 //                    isKeyboardVisible = true
-//
+//                
 //            }
 //        }
 //    }
-//
+//    
 //}
 
 extension DFTextView{
@@ -357,7 +357,7 @@ extension DFTextView{
             content: RenderView(
                 text: text,
                 selectedFont: selectedFont,
-                color: self.fontColor, textAlignment: textAlignment
+                color: self.fontColor
             )
         )
         
@@ -371,14 +371,11 @@ struct RenderView: View {
     let text: String
     let selectedFont: FontStyle
     let color: Color
-    let textAlignment: TextAlignment
-    
+
     var body: some View {
         Text(text)
-        //            .font(Font.custom(fontType,  size: 200))
+//            .font(Font.custom(fontType,  size: 200))
             .font(selectedFont.swiftUIFont(size: 20))
             .foregroundColor(color)
-            .multilineTextAlignment(textAlignment)
-            .lineSpacing(5)
     }
 }

@@ -47,10 +47,6 @@ struct MFView: View {
                                 .frame(minHeight: 200)
                                 .background(Color(red: 0.83, green: 0.83, blue: 0.83))
                             }
-                            //                            .onTapGesture {
-                            //                                //                                viewModel.isShowMFView.toggle()
-                            //                                dismiss()
-                            //                            }
                             .disabled(viewModel.isEditing)
                             
                             ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
@@ -61,8 +57,8 @@ struct MFView: View {
                                         } else {
                                             
                                             //TODO: 아래 부분 뷰모델 간 데이터 전송 수정 예정
-                                            cameraViewModel.selectedFrame = imageInfo.id
-                                            cameraViewModel.isFrameLoading = true
+                                            frameManager.selectedFrame = imageInfo.id
+                                            frameManager.isFrameLoading = true
                                             
                                             dismiss()
                                         }
@@ -97,8 +93,8 @@ struct MFView: View {
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
-                            //프레임 수정 뷰로 향하도록 수정
-                            //                            naviManager.push(screen: Screen.photoPicker)
+                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
+                            naviManager.push(screen: Screen.frameEdit)
                         } label: {
                             ZStack {
                                 Rectangle()

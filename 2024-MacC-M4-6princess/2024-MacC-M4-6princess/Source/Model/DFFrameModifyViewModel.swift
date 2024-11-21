@@ -27,6 +27,9 @@ class DFFrameModifyViewModel: ObservableObject {
     @Published var imageHistory: [subjectImage] = []
     @Published var frameImage: UIImage?
     
+    
+    @Published var showTextView = false
+    
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
     

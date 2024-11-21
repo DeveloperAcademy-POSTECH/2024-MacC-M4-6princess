@@ -36,8 +36,12 @@ struct DFFrameModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
-                DFImageDecoView()
+                DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
+            }
+            
+            if viewModel.showTextView {
+                DFTextView(viewModel: viewModel)
             }
         }
         //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
