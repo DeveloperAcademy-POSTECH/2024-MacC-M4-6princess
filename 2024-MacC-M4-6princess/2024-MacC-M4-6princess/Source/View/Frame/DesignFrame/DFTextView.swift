@@ -4,92 +4,156 @@
 //
 //  Created by ram on 11/21/24.
 //
-
 import SwiftUI
-enum FontStyle: String {
-    case modern = "HelveticaNeue"
-    case handwriting = "SnellRoundhand"
-    case bold = "Bold" // 시스템 기본 볼드체
-    
-    var displayName: String {
-        switch self {
-            case .modern:
-                return "모던체"
-            case .handwriting:
-                return "손글씨체"
-            case .bold:
-                return "볼드체"
-        }
-    }
-}
-
-extension FontStyle: CaseIterable {
-    func swiftUIFont(size: CGFloat) -> Font {
-        switch self {
-        case .modern:
-            return .system(size: size, weight: .regular) // 시스템 폰트
-        case .handwriting:
-            return .custom("Helvetica", size: size) // 헬베티카 폰트
-        case .bold:
-            return .system(size: size, weight: .bold) // 시스템 기본 볼드체
-        }
-    }
-}
-
 
 struct DFTextView: View {
-    @ObservedObject var viewModel:DFFrameModifyViewModel
+    @ObservedObject var viewModel: DFFrameModifyViewModel
+    @State var fullText = ""
     @State var selectedFont: FontStyle = .modern
-    @State var fontSize:Double = 20
+    @State var fontSize: Double = 20
     @State var fontColor: Color = .black
-    @State var renderedImage:UIImage?
+    @State var renderedImage: UIImage?
+    @FocusState private var isKeyboardVisible: Bool // 키보드 상태 관리
+    @State var tab = 0
+    @State var colorNum = 0
+    let colorArr:[Color] = ColorPreset.colorPallete
     var body: some View {
-        VStack{
-            HStack{
+        NavigationView {
+            VStack {
                 Spacer()
-                Button(action: {
-                    viewModel.showTextView = false
-                }) {
-                    Text("완료")
-                }
                 
-            }
-            Spacer()
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 20) {
-                    ForEach(FontStyle.allCases, id: \.self) { fontStyle in
-                        Text(fontStyle.displayName) // 한글 이름 표시
-                            .font(fontStyle.swiftUIFont(size: 20)) // 매칭된 영문 폰트 적용
-                            .padding(6)
-                            .background(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color.white, lineWidth: 1) // 흰색 테두리
-                                        )
-                                )
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 10)
-//                                    .stroke(Color.white, lineWidth: 1) // 흰색 테두리
-//                            )
-//                            .background(selectedFont == fontStyle ? Color.white : .clear)
-                            .onTapGesture {
-                                selectedFont = fontStyle
+                TextEditor(text: $fullText)
+                    .focused($isKeyboardVisible) // 키보드 활성화 상태와 연결
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(fontColor)
+                    .font(selectedFont.swiftUIFont(size: fontSize))
+                    .lineSpacing(5)
+                    .padding()
+                    .background(Color.clear) // 배경을 투명하게 설정
+                    .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
+                
+                Spacer()
+                
+                if tab == 0{
+                    // 폰트 선택 ScrollView
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 20) {
+                            ForEach(FontStyle.allCases, id: \.self) { fontStyle in
+                                Text(fontStyle.displayName) // 한글 이름 표시
+                                    .font(fontStyle.swiftUIFont(size: 20)) // 매칭된 영문 폰트 적용
+                                    .padding(6)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+                                            )
+                                    )
+                                    .onTapGesture {
+                                        selectedFont = fontStyle
+                                    }
                             }
+                        }
                     }
+                    .padding()
+                }
+                else if tab == 1{
+                    /// fontColor 선택
+                    ScrollView(.horizontal,showsIndicators: false) {
+                        HStack {
+                            ForEach(0..<colorArr.count, id: \.self) { colorIndex in
+                                Circle()
+                                    .frame(width: colorNum == colorIndex ? 40 : 30)
+                                    .foregroundColor(colorArr[colorIndex])
+                                    .onTapGesture {
+                                        fontColor = colorArr[colorIndex]
+                                        withAnimation(.easeInOut(duration: 0.36)) {
+                                            colorNum = colorIndex
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                else{
+                   
                 }
                 
-            }
-            .padding()
-                
+                ZStack {
+                    Rectangle()
+                      .foregroundColor(.clear)
+                      .frame(width: 335, height: 40)
+                      .background(.white)
+                      .cornerRadius(10)
+                      .opacity(0.5)
+                    
+                    HStack(spacing:0){
+                        Text("Aa")
+                            .font(.system(size: 16))
+                            .foregroundColor(tab == 0 ? .black : .gray)
+                            .frame(width: 105, height: 30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(tab == 0 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                            )
+                            .onTapGesture {
+                                tab = 0
+                            }
+                            .frame(width:105, height: 30)
+                        Image("df.colorChip")
+                            .resizable()
+                            .frame(width: 27, height: 27) // 텍스트 크기에 맞춘 프레임
+                            
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+//                                    .frame(width: 105, height: 30)
+                                    .fill(tab == 1 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                            )
+                            .onTapGesture {
+                                tab = 1
+                            }
+                            .frame(width:105, height: 30)
+
+                        Image("df.alignment")
+                            .resizable()
+                            .frame(width: 27, height: 27) // 텍스트 크기에 맞춘 프레임
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+//                                    .frame(width: 105, height: 30)
+                                    .fill(tab == 2 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                            )
+                            .onTapGesture {
+                                tab = 2
+                            }
+                            .frame(width:105, height: 30)
+
+                        
+                    }
+                    .padding(.vertical)
+                }
+                .frame(width: UIScreen.main.bounds.width - 40, height: 40)
+                .padding()
+                    
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 Color.black.opacity(0.5) // 반투명 검정색
             )
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("완료") {
+                        viewModel.showTextView = false
+                    }
+                }
+            }
+            .onAppear {
+                // 뷰가 나타날 때 키보드 자동 활성화
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isKeyboardVisible = true
+                }
+            }
         }
     }
-    
-
-   
+}
