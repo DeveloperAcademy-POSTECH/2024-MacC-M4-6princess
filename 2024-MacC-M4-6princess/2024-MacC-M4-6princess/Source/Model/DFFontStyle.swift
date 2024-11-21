@@ -8,9 +8,9 @@
 import SwiftUI
 
 enum FontStyle: String {
-    case modern = "HelveticaNeue"
-    case handwriting = "SnellRoundhand"
-    case bold = "Bold" // 시스템 기본 볼드체
+    case modern = "Pretendard-Regular"
+    case handwriting = "Hakgyoansim Geurimilgi OTF R"
+    case bold = "Pretendard-Bold" // 시스템 기본 볼드체
     
     var displayName: String {
         switch self {
@@ -28,11 +28,11 @@ extension FontStyle: CaseIterable {
     func swiftUIFont(size: CGFloat) -> Font {
         switch self {
         case .modern:
-            return .system(size: size, weight: .regular) // 시스템 폰트
+            return .custom("Pretendard-Regular",size: size) // 시스템 폰트
         case .handwriting:
-            return .custom("Helvetica", size: size) // 헬베티카 폰트
+            return .custom("Hakgyoansim Geurimilgi OTF R", size: size) // 헬베티카 폰트
         case .bold:
-            return .system(size: size, weight: .bold) // 시스템 기본 볼드체
+                return .custom("Pretendard-Bold",size: size) // 시스템 기본 볼드체
         }
     }
 }
@@ -111,4 +111,22 @@ extension Color {
     
     
     
+}
+
+extension Font {
+    public static func registerFonts(fontName: String) {
+        registerFont(bundle: Bundle.main , fontName: fontName, fontExtension: ".otf") //change according to your ext.
+    }
+    fileprivate static func registerFont(bundle: Bundle, fontName: String, fontExtension: String) {
+
+        guard let fontURL = bundle.url(forResource: fontName, withExtension: fontExtension),
+              let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
+              let font = CGFont(fontDataProvider) else {
+            fatalError("Couldn't create font from data")
+        }
+
+        var error: Unmanaged<CFError>?
+
+        CTFontManagerRegisterGraphicsFont(font, &error)
+    }
 }
