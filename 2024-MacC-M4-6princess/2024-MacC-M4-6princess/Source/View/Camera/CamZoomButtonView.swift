@@ -6,47 +6,47 @@ struct CamZoomButtonView: View {
     @StateObject var motionManager = MotionManager()
     
     enum ZoomOption: Double {
-            case ultraWide = 1.0
-            case wide = 2.0
-            case telephoto = 3.0
-            case maxZoom = 4.0
-            
-            func displayText(for position: AVCaptureDevice.Position) -> String {
-                if position == .back {
-                    switch self {
-                    case .ultraWide: return "0.5x"
-                    case .wide: return "1x"
-                    case .telephoto: return "2x"
-                    case .maxZoom: return "3x"
-                    }
-                } else {
-                    switch self {
-                    case .ultraWide: return "1x"
-                    case .wide: return "2x"
-                    case .telephoto: return "3x"
-                    case .maxZoom: return "3x"
-                    }
+        case ultraWide = 1.0  // 실제 줌 팩터값은 1.0으로 유지
+        case wide = 2.0
+        case telephoto = 3.0
+        case maxZoom = 4.0
+        
+        func displayText(for position: AVCaptureDevice.Position) -> String {
+            if position == .back {
+                switch self {
+                case .ultraWide: return ".5x"  // 표시만 0.5x
+                case .wide: return "1x"
+                case .telephoto: return "2x"
+                case .maxZoom: return "3x"
                 }
-            }
-            
-            func zoomFactor(for position: AVCaptureDevice.Position) -> Double {
-                if position == .back {
-                    switch self {
-                    case .ultraWide: return 0.5  // 0.5x
-                    case .wide: return 1.0       // 1x
-                    case .telephoto: return 2.0   // 2x
-                    case .maxZoom: return 3.0     // 3x
-                    }
-                } else {
-                    switch self {
-                    case .ultraWide: return 1.0   // 1x
-                    case .wide: return 2.0        // 2x
-                    case .telephoto: return 3.0    // 3x
-                    case .maxZoom: return 3.0      // 3x
-                    }
+            } else {
+                switch self {
+                case .ultraWide: return "1x"
+                case .wide: return "2x"
+                case .telephoto: return "3x"
+                case .maxZoom: return "3x"
                 }
             }
         }
+        
+        func zoomFactor(for position: AVCaptureDevice.Position) -> Double {
+            if position == .back {
+                switch self {
+                case .ultraWide: return 1.0  // 실제 줌 팩터는 1.0 유지
+                case .wide: return 2.0
+                case .telephoto: return 3.0
+                case .maxZoom: return 4.0
+                }
+            } else {
+                switch self {
+                case .ultraWide: return 1.0
+                case .wide: return 2.0
+                case .telephoto: return 3.0
+                case .maxZoom: return 3.0
+                }
+            }
+        }
+    }
     
     var body: some View {
         HStack(spacing: 15) {
@@ -60,7 +60,11 @@ struct CamZoomButtonView: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(.black.opacity(0.2))
+        .cornerRadius(19)
+        .padding(.bottom, 20)
     }
     
     private var availableZoomOptions: [ZoomOption] {
@@ -69,8 +73,8 @@ struct CamZoomButtonView: View {
         
         if isBackCamera {
             return isUltraWide ?
-                [.ultraWide, .wide, .telephoto, .maxZoom] :
-                [.wide, .telephoto, .maxZoom]
+            [.ultraWide, .wide, .telephoto, .maxZoom] :
+            [.wide, .telephoto, .maxZoom]
         } else {
             return [.ultraWide, .wide, .telephoto]
         }
@@ -91,7 +95,7 @@ struct ZoomButton: View {
         .background {
             Circle()
                 .fill(Color.black.opacity(0.5))
-                .frame(width: 30, height: 30)
+                .frame(width: isSelected ? 30 : 24, height: isSelected ? 30 : 24)
         }
     }
 }

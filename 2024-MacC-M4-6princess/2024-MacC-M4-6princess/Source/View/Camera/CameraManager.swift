@@ -80,6 +80,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         }
     }
     
+    // CameraManager.swift
     func setUp() {
         do {
             self.session.beginConfiguration()
@@ -94,41 +95,43 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             )
             
             guard let device = getBestCamera(from: discoverySession.devices) else {
-                throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No available camera"])
+                session.commitConfiguration()
+                print("사용 가능한 카메라를 찾을 수 없습니다")
+                return
             }
             
-            // deviceType 업데이트
             self.deviceType = device.deviceType
-            
-            // 디바이스 타입에 따라 초기 줌 팩터 설정
-            if device.deviceType == .builtInUltraWideCamera {
-                self.startFactor = 2.0
-            } else {
-                self.startFactor = 1.0
-            }
-            
-            let input = try AVCaptureDeviceInput(device: device)
-            if self.session.canAddInput(input) {
-                self.session.addInput(input)
-                self.videoDeviceInput = input
-                
-                do {
-                    try device.lockForConfiguration()
-                    device.videoZoomFactor = self.startFactor
-                    device.unlockForConfiguration()
-                } catch {
-                    print("초기 줌 설정 오류: \(error)")
+            self.startFactor = 1.0
+
+            do {
+                let input = try AVCaptureDeviceInput(device: device)
+                if self.session.canAddInput(input) {
+                    self.session.addInput(input)
+                    self.videoDeviceInput = input
+                    
+                    do {
+                        try device.lockForConfiguration()
+                        if device.deviceType == .builtInUltraWideCamera {
+                            device.videoZoomFactor = 2.0
+                        } else {
+                            device.videoZoomFactor = 1.0
+                        }
+                        device.unlockForConfiguration()
+                    } catch {
+                        print("초기 줌 설정 오류: \(error)")
+                    }
                 }
+                
+                if self.session.canAddOutput(self.output) {
+                    self.session.addOutput(self.output)
+                }
+                
+                self.session.commitConfiguration()
+                startSession()
+            } catch {
+                session.commitConfiguration()
+                print("카메라 입력 설정 오류: \(error)")
             }
-            
-            if self.session.canAddOutput(self.output) {
-                self.session.addOutput(self.output)
-            }
-            
-            self.session.commitConfiguration()
-            startSession()
-        } catch {
-            print("카메라 설정 오류: \(error)")
         }
     }
 

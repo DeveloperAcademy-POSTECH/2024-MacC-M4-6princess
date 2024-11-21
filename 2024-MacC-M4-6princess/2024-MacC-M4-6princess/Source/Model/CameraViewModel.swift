@@ -136,8 +136,20 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func changeCamera() {
         cameraManager.changeCamera()
-                cameraPosition = cameraManager.videoDeviceInput?.device.position ?? .back
-                currentZoomFactor = 1.0  // 줌 상태 초기화
+        cameraPosition = cameraManager.videoDeviceInput?.device.position ?? .back
+        
+        // 카메라 전환 시 적절한 초기 줌 팩터 설정
+        if cameraPosition == .back {
+            if cameraManager.deviceType == .builtInUltraWideCamera {
+                currentZoomFactor = 1.0  // 0.5x로 표시됨
+            } else {
+                currentZoomFactor = 1.0
+            }
+        } else {
+            currentZoomFactor = 1.0
+        }
+        
+        lastScale = 1.0
     }
     
     func fixOrientation(_ image: UIImage) -> UIImage {
@@ -157,37 +169,52 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         return normalizedImage
     }
     
-    // 줌 제스처를 위한 함수
     func zoom(factor: CGFloat) {
         let delta = factor / lastScale
         lastScale = factor
         
         // 현재 줌 상태에서 변화량을 적용
-        setZoom(factor: currentZoomFactor * delta)
+        let newZoomFactor = currentZoomFactor * delta
+        
+        // 제스처로 인한 줌 팩터를 가장 가까운 줌 옵션으로 매핑
+        let mappedZoomFactor = mapToNearestZoomFactor(newZoomFactor)
+        setZoom(factor: mappedZoomFactor)
     }
 
-    // 버튼이나 직접 줌 설정을 위한 함수
+    // 새로운 함수 추가
+    private func mapToNearestZoomFactor(_ factor: CGFloat) -> CGFloat {
+        let zoomFactors: [CGFloat] = cameraPosition == .back ?
+            [0.5, 1.0, 2.0, 3.0] : [1.0, 2.0, 3.0]
+        
+        return zoomFactors.min(by: { abs($0 - factor) < abs($1 - factor) }) ?? factor
+    }
+
     func setZoom(factor: CGFloat) {
         guard let device = cameraManager.videoDeviceInput?.device else { return }
         
-        if device.position == .back {
-            // 후면 카메라
-            if cameraManager.deviceType == .builtInUltraWideCamera {
-                cameraManager.zoom(factor)
+        do {
+            try device.lockForConfiguration()
+            let actualZoomFactor = if device.position == .back {
+                if cameraManager.deviceType == .builtInUltraWideCamera {
+                    factor
+                } else {
+                    factor * 2
+                }
             } else {
-                // WideAngle 카메라의 경우 줌 팩터를 2배로 조정
-                cameraManager.zoom(factor * 2)
+                factor
             }
-        } else {
-            // 전면 카메라는 factor 그대로 적용
-            cameraManager.zoom(factor)
+            
+            device.videoZoomFactor = actualZoomFactor
+            device.unlockForConfiguration()
+            currentZoomFactor = factor // 실제 줌 팩터 저장
+        } catch {
+            print("줌 설정 오류: \(error.localizedDescription)")
         }
-        currentZoomFactor = factor
     }
 
     func zoomInitialize() {
         lastScale = 1.0  // 제스처를 위한 scale만 초기화
-        print("스케일 초기화됨")
+        print("lastScale 초기화됨")
     }
 
     func getZoomRange(for device: AVCaptureDevice) -> ClosedRange<CGFloat> {
