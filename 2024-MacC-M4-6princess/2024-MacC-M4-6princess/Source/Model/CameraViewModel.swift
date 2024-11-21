@@ -178,7 +178,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
 
     // 버튼이나 직접 줌 설정을 위한 함수
     func setZoom(factor: CGFloat) {
-        guard let device = cameraManager.videoDeviceInput?.device else { return }
+        guard (cameraManager.videoDeviceInput?.device) != nil else { return }
         
         // UltraWide 카메라일 때와 WideAngle 카메라일 때 줌 팩터 처리를 다르게 함
         if cameraManager.deviceType == .builtInUltraWideCamera {
