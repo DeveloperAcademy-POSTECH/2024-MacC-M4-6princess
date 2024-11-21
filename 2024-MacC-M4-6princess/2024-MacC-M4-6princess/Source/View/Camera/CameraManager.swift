@@ -256,29 +256,6 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             print("줌 설정 오류: \(error.localizedDescription)")
         }
     }
-//    func zoom(_ zoom: CGFloat) {
-//        let device = self.videoDeviceInput!.device
-//        
-//        // 새로운 줌 팩터 계산
-//        let factor = zoom < startFactor ? startFactor : zoom
-//        
-//        do {
-//            try device.lockForConfiguration()
-//            
-//            // 줌 범위 확인
-//            let minZoom = device.minAvailableVideoZoomFactor
-//            let maxZoom = device.maxAvailableVideoZoomFactor
-//            let finalZoom = min(max(factor, minZoom), maxZoom)
-//            
-//            // 부드러운 줌 적용
-//            device.ramp(toVideoZoomFactor: finalZoom, withRate: 1.0)
-//            // 또는 즉시 적용하려면: device.videoZoomFactor = finalZoom
-//            
-//            device.unlockForConfiguration()
-//        } catch {
-//            print("줌 설정 오류: \(error.localizedDescription)")
-//        }
-//    }
 }
 
 
