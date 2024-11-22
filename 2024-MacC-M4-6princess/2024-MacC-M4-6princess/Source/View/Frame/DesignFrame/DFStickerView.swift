@@ -12,44 +12,58 @@ struct DFStickerView: View {
     
     var body: some View {
         VStack {
+            Text("스티커")
+                .font(.system(size: 17, weight: .bold))
+                .frame(maxWidth: .infinity) // 부모 뷰의 가로 폭을 채우기
+                .multilineTextAlignment(.center) // 텍스트 중앙 정렬
+                .padding(.top)
+            Divider()
             // 탭 선택 버튼
             HStack(spacing: 20) {
                 ForEach(StickerTab.allCases, id: \.self) { tab in
                     Text(tab.displayName)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(selectedTab == tab ? .black : .gray)
-                        .padding(8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(selectedTab == tab ? Color.white : Color.clear)
-                        )
+                        .font(.system(size: 13, weight: selectedTab == tab ? .bold : .medium))
+                        .foregroundColor(selectedTab == tab ? .pointPink : .gray02)
+//                        .padding(8)
+//                        .background(
+//                            RoundedRectangle(cornerRadius: 10)
+//                                .fill(selectedTab == tab ? Color.white : Color.clear)
+//                        )
                         .onTapGesture {
-                            withAnimation {
+//                            withAnimation {
                                 selectedTab = tab
-                            }
+//                            }
                         }
                 }
+                Spacer()
             }
-            .padding(.vertical, 10)
-            
+            .padding(.horizontal)
+            .padding(.vertical, 6)
+            Divider()
             // 이미지 스크롤 뷰
             ScrollView {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 15) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
                     ForEach(images[selectedTab] ?? [], id: \.self) { imageName in
-                        Image(imageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 80, height: 80)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
+                        VStack {
+                            Image(imageName)
+                                .resizable()
+                                .scaledToFit()
+                                .padding(10) // 이미지 바깥에 10 정도의 패딩
+                                .frame(width: 80, height: 80)
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10) // 정사각형 박스의 코너 라디우스
+                        }
+                        .frame(width: 80, height: 80) // 정사각형 박스 크기
                     }
                 }
-                .padding(.horizontal)
+//                .padding(.horizontal)
             }
-            .background(Color.black.opacity(0.05))
+            .padding(.horizontal)
+
+
+
         }
-        .padding()
-        .background(Color.black.opacity(0.1))
+//        .padding()
     }
 }
 
@@ -59,10 +73,10 @@ enum StickerTab: String, CaseIterable {
     
     var displayName: String {
         switch self {
-        case .bubble: return "Bubble"
-        case .humor: return "Humor"
-        case .character: return "Character"
-        case .full: return "Full"
+            case .bubble: return "말풍선"
+            case .humor: return "유머"
+            case .character: return "캐릭터"
+            case .full: return "프레임"
         }
     }
 }
