@@ -36,16 +36,28 @@ struct DFFrameModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
-                DFImageDecoView()
+                DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
             }
+            
+            if viewModel.showTextView {
+                DFTextView(viewModel: viewModel)
+            }
         }
+        .sheet(isPresented: $viewModel.showStickerSheet) {
+                    DFStickerView()
+                        .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
+                        .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
+                }
         //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
         //            PhotosPickerView()
         //        })
         .navigationBarBackButtonHidden()
         .toolbar {
-            toolBarButtons
+            if !viewModel.showTextView {
+                toolBarButtons
+            }
+            
         }
         .onChange(of: viewModel.isShowCamera) { newValue in
             if newValue {
