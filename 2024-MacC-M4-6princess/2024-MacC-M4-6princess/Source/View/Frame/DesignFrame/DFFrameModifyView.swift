@@ -54,7 +54,10 @@ struct DFFrameModifyView: View {
         //        })
         .navigationBarBackButtonHidden()
         .toolbar {
-            toolBarButtons
+            if !viewModel.showTextView {
+                toolBarButtons
+            }
+            
         }
         .onChange(of: viewModel.isShowCamera) { newValue in
             if newValue {

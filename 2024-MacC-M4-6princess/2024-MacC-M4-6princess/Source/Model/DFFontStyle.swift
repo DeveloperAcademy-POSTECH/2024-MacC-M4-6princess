@@ -25,7 +25,7 @@ enum FontStyle: String {
 }
 
 extension FontStyle: CaseIterable {
-    func swiftUIFont(size: CGFloat) -> Font {
+    func applyFont(size: CGFloat) -> Font {
         switch self {
         case .modern:
             return .custom("Pretendard-Regular",size: size) // 시스템 폰트
@@ -39,8 +39,8 @@ extension FontStyle: CaseIterable {
 
 struct ColorPreset {
     static let colorPallete: [Color] = [
-        Color.black,
         Color.white,
+        Color.black,
         Color.redStrong,
         Color.redLight,
         Color.orangeStrong,
