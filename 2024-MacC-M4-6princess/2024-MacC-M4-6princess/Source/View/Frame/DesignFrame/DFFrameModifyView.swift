@@ -44,6 +44,11 @@ struct DFFrameModifyView: View {
                 DFTextView(viewModel: viewModel)
             }
         }
+        .sheet(isPresented: $viewModel.showStickerSheet) {
+                    DFStickerView()
+                        .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
+                        .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
+                }
         //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
         //            PhotosPickerView()
         //        })

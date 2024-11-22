@@ -29,6 +29,7 @@ class DFFrameModifyViewModel: ObservableObject {
     
     
     @Published var showTextView = false
+    @Published var showStickerSheet = false
     
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()

@@ -49,7 +49,7 @@ extension DFImageDecoView {
         VStack {
             
             Button  {
-                
+                viewModel.showStickerSheet = true
             } label: {
                 ZStack {
                     Circle()
