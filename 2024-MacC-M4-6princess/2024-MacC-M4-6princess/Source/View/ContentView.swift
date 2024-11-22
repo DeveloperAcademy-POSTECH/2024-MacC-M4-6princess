@@ -11,12 +11,12 @@ struct ContentView: View {
     
 //    @State private var inputImage: UIImage?
 //    @StateObject var vm: DFFrameModifyViewModel = DFFrameModifyViewModel()
-    @StateObject var imageList: ImageHistoryModel = ImageHistoryModel()
+    @StateObject var imageModel: ImageListModel = ImageListModel()
     
     var body: some View {
         
         CameraView()
-            .environmentObject(imageList)
+            .environmentObject(imageModel)
 //        IEDevelopView()
         //        CMView()
         //        IEProgressView()

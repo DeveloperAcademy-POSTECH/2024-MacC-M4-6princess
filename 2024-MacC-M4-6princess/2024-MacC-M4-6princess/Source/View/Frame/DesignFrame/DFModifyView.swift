@@ -6,11 +6,13 @@ struct DFModifyView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
+    @EnvironmentObject var imageModel: ImageListModel
+    
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
+    
     @State private var isFirstLaunching: Bool = true
     @Binding var resultImage: UIImage?
     @Binding var realImage: UIImage?
-    @Binding var imageList: [UIImage?]
     @State private var shouldNavigate: Bool = false
     
     var body: some View {
@@ -23,7 +25,7 @@ struct DFModifyView: View {
             
             VStack {
                 ZStack {
-                    Color(hex: "32322f")
+                    Color(Color.background)
                         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     
                     imageView
@@ -36,18 +38,18 @@ struct DFModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
-                DFImageDecoView(isShowImagePickerView: $viewModel.isShowImagePickerView)
+                DFImageDecoView(showImagePickerView: $viewModel.showImagePickerView)
                     .padding(.top, 58)
             }
         }
-        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
+        .navigationDestination(isPresented: $viewModel.showImagePickerView, destination: {
             PhotosPickerView()
         })
         .navigationBarBackButtonHidden()
         .toolbar {
             toolBarButtons
         }
-        .onChange(of: viewModel.isShowCamera) { newValue in
+        .onChange(of: viewModel.showCamera) { newValue in
             if newValue {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
@@ -57,13 +59,11 @@ struct DFModifyView: View {
         }
         .fullScreenCover(isPresented: $shouldNavigate) {
             CameraView(frameImage: $viewModel.frameImage)
-//            CameraView(frameImage: $resultImage)
         }
         .onAppear {
             
             if let image = resultImage {
                 
-//                viewModel.onAppearTask(image: image)
                 viewModel.makeImageList()
                 
             }
@@ -73,98 +73,22 @@ struct DFModifyView: View {
 
 private extension DFModifyView {
     
-    var rotate: some Gesture {
-        
-        RotateGesture()
-            .onChanged { value in
-                viewModel.angle = value.rotation + viewModel.current
-            }
-            .onEnded { value in
-                viewModel.current += value.rotation
-                viewModel.makeHistory()
-            }
-    }
-    var moveImage: some Gesture {
-        
-        DragGesture()
-            .onChanged { value in
-                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
-                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
-                
-            }
-            .onEnded { value in
-                viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
-                viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
-                print(viewModel.draggedOffSet)
-                
-            }
-        
-    }
-    
-    var magnification: some Gesture {
-        
-        MagnifyGesture()
-            .onChanged { value in
-                viewModel.setScaleVolume(value.magnification)
-            }
-            .onEnded { value in
-                viewModel.setScaleValue(minimum: 0.2, maximum: 10)
-            }
-    }
-}
-
-private extension DFModifyView {
-    
     var imageView: some View {
-            
-            ZStack {
-                ForEach(imageList, id:\.self) { images in
-                    
-                    if let image = images, let realImage = realImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
-                            .scaleEffect(viewModel.magnifyScale)
-                            .rotationEffect(viewModel.angle)
-                            .offset(viewModel.draggedOffSet)
-                            .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
-                    }
-                    
-                }
-//                if let image = resultImage, let realImage = realImage {
-//                    Image(uiImage: image)
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
-//                        .scaleEffect(viewModel.magnifyScale)
-//                        .rotationEffect(viewModel.angle)
-//                        .offset(viewModel.draggedOffSet)
-//                        .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
-//                }
+        
+        ZStack {
+            ForEach(imageModel.imageList, id: \.self) { subject in
                 
-//                ForEach(viewModel.imageHistory, id: \.self) { subject in
-//
-//                    if let image = subject.image, let realImage = resultImage {
-//                        
-//                        Image(uiImage: image)
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
-//                            .scaleEffect(viewModel.magnifyScale)
-//                            .rotationEffect(viewModel.angle)
-//                            .offset(viewModel.draggedOffSet)
-//                            .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate))
-//                        
-//                    }
-//                }
+                DFImageView(subjectModel: subject)
                 
             }
+            
+        }
     }
     
     var toolBarButtons: some View {
         HStack {
             Button {
+                imageModel.imageList.removeAll()
                 self.presentationMode.wrappedValue.dismiss()
             } label: {
                 HStack {
@@ -182,8 +106,7 @@ private extension DFModifyView {
             Spacer(minLength: UIScreen.main.bounds.width / 20)
             
             Button {
-                viewModel.reDo()
-                print(viewModel.draggedOffSet)
+                //                viewModel.reDo()
             } label: {
                 Image("back")
                     .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
@@ -191,8 +114,7 @@ private extension DFModifyView {
             .padding(.trailing, 14)
             
             Button {
-                viewModel.unDo()
-                print(viewModel.draggedOffSet)
+                //                viewModel.unDo()
             } label: {
                 Image("front")
                     .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
@@ -205,7 +127,14 @@ private extension DFModifyView {
                 if let image = resultImage {
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
-                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext)
+                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
+                        
+                        viewModel.btnOpacity = 0
+                        viewModel.showCamera = true
+                        imageModel.imageList.removeAll()
+                        
+                    }
+                    
                     
                 } else {
                     viewModel.saveStateText = "저장할 이미지가 없습니다."

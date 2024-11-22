@@ -32,6 +32,7 @@ class DFEditViewModel: ObservableObject {
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
     
+    
     private func generateImageForAllSelectedObjects() async throws {
         let allSubjectsImage = try await interaction.image(for: interaction.highlightedSubjects)
         outputImage = allSubjectsImage

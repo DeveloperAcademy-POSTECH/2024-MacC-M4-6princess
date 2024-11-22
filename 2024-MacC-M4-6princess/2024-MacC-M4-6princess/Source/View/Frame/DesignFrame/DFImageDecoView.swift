@@ -2,7 +2,7 @@ import SwiftUI
 
 struct DFImageDecoView: View {
     
-    @Binding var isShowImagePickerView: Bool
+    @Binding var showImagePickerView: Bool
     
     var body: some View {
             
@@ -24,7 +24,7 @@ extension DFImageDecoView {
         VStack {
             Button  {
                 
-                isShowImagePickerView.toggle()
+                showImagePickerView.toggle()
                 
             } label: {
                 ZStack {
@@ -91,5 +91,5 @@ extension DFImageDecoView {
 }
 
 #Preview {
-    DFImageDecoView(isShowImagePickerView: .constant(false))
+    DFImageDecoView(showImagePickerView: .constant(false))
 }

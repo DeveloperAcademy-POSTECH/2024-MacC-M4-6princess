@@ -7,27 +7,21 @@ import CoreData
 class DFModifyViewModel: ObservableObject {
     
     @Published var btnOpacity: Double = 0.0
-    @Published var accumulatedOffset = CGSize.zero
-    @Published var image: UIImage?
-    @Published var isShowCamera: Bool = false
-    @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
-    @Published var outputImage: UIImage?
-    @Published var magnifyScale = 1.0
-    @Published var lastScale = 1.0
-    @Published var draggedOffSet: CGSize = .zero
-    @Published var accumulatedOffSet: CGSize = .zero
-    @Published var location: CGPoint = CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-    @Published var angle: Angle = .degrees(0)
-    @Published var current: Angle = .degrees(0)
+    
+    @Published var showCamera: Bool = false
+    @Published var showImagePickerView: Bool = false
+
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
+    
+    @Published var outputImage: UIImage?
     @Published var indexOfImageList: Int = 0
     @Published var imageList: [SubjectImage] = []
-    @Published var isShowImagePickerView: Bool = false
     @Published var imageHistory: [SubjectImage] = []
+    
     @Published var frameImage: UIImage?
     
-    func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext) {
+    func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
         
         btnOpacity = 1
         
@@ -37,31 +31,12 @@ class DFModifyViewModel: ObservableObject {
             render.scale = scaleCompute(inputImage)
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context)
-            try await Task.sleep(nanoseconds: 1_000_000_000)
-            btnOpacity = 0
-            isShowCamera = true
         }
         
-    }
-    
-    
-    func makeImage(view: some View, image: UIImage) -> UIImage? {
-        
-        let resultImage: UIImage?
-        let render = ImageRenderer(content: view)
-        render.scale = scaleCompute(image)
-        if let rend = render.uiImage {
-            if indexOfImageList < imageList.count - 1 {
-                for _ in indexOfImageList+1..<imageList.count {
-                    imageList.removeLast()
-                }
-            }
-            imageList[indexOfImageList].image = rend
-            indexOfImageList += 1
-            
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            completionHandler()
         }
-        resultImage = imageList[indexOfImageList].image
-        return resultImage
+        
     }
     
     func saveContext(context: NSManagedObjectContext) {
@@ -81,24 +56,6 @@ class DFModifyViewModel: ObservableObject {
         
         saveContext(context: context)
     }
-    
-//    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
-//        
-//        let newImage = StoreImages(context: context)
-//        
-//        newImage.image = albumImageData
-//        newImage.subjectImage = subjectImageData
-//        newImage.uuid = UUID()
-//        newImage.isSelected = false
-//        newImage.angle = angle.degrees
-//        newImage.x = draggedOffSet.width
-//        newImage.y = draggedOffSet.height
-//        newImage.scale = magnifyScale
-//        
-//        saveContext(context: context)
-//    }
-    
-    
     
     func scaleCompute(_ image: UIImage) -> CGFloat {
         
@@ -122,66 +79,63 @@ class DFModifyViewModel: ObservableObject {
             self.imageHistory.append(inputImage)
         }
     }
-
     
-    
-    func makeHistory() {
+    func makeImage(view: some View, image: UIImage) -> UIImage? {
         
-        var inputImage = SubjectImage()
-        
-        inputImage.image = outputImage
-        inputImage.angle = angle
-        inputImage.scale = magnifyScale
-        inputImage.offSet = draggedOffSet
-
-        if imageList.count > 0 {
+        let resultImage: UIImage?
+        let render = ImageRenderer(content: view)
+        render.scale = scaleCompute(image)
+        if let rend = render.uiImage {
+            if indexOfImageList < imageList.count - 1 {
+                for _ in indexOfImageList+1..<imageList.count {
+                    imageList.removeLast()
+                }
+            }
+            imageList[indexOfImageList].image = rend
             indexOfImageList += 1
-        }
-        
-        imageList.append(inputImage)
-        
-    }
-    
-    
-    func reDo() {
-        
-        if indexOfImageList > 0 {
-            indexOfImageList -= 1
-            angle = imageList[indexOfImageList].angle
-            current = imageList[indexOfImageList].angle
-            magnifyScale = imageList[indexOfImageList].scale
-            draggedOffSet = imageList[indexOfImageList].offSet
-        }
-    }
-    
-    func unDo() {
-        
-        if imageList.count - 1 > indexOfImageList {
-            indexOfImageList += 1
-            angle = imageList[indexOfImageList].angle
-            current = imageList[indexOfImageList].angle
-            magnifyScale = imageList[indexOfImageList].scale
-            draggedOffSet = imageList[indexOfImageList].offSet
-        }
-    }
-    
-    func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
-        
-        if magnifyScale < minimum {
-            magnifyScale = minimum
             
-        } else if magnifyScale > maximum {
-            magnifyScale = maximum
         }
-        lastScale = 1.0
-        
+        resultImage = imageList[indexOfImageList].image
+        return resultImage
     }
     
-    func setScaleVolume(_ magnify: CGFloat) {
-        
-        let scaleVolume = magnify / lastScale
-        magnifyScale *= scaleVolume
-        lastScale = magnify
-    }
+//    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
+//        
+//        let newImage = StoreImages(context: context)
+//        
+//        newImage.image = albumImageData
+//        newImage.subjectImage = subjectImageData
+//        newImage.uuid = UUID()
+//        newImage.isSelected = false
+//        newImage.angle = angle.degrees
+//        newImage.x = draggedOffSet.width
+//        newImage.y = draggedOffSet.height
+//        newImage.scale = magnifyScale
+//        
+//        saveContext(context: context)
+//    }
+    
+    
+//    func reDo() {
+//        
+//        if indexOfImageList > 0 {
+//            indexOfImageList -= 1
+//            angle = imageList[indexOfImageList].angle
+//            current = imageList[indexOfImageList].angle
+//            magnifyScale = imageList[indexOfImageList].scale
+//            draggedOffSet = imageList[indexOfImageList].offSet
+//        }
+//    }
+//    
+//    func unDo() {
+//        
+//        if imageList.count - 1 > indexOfImageList {
+//            indexOfImageList += 1
+//            angle = imageList[indexOfImageList].angle
+//            current = imageList[indexOfImageList].angle
+//            magnifyScale = imageList[indexOfImageList].scale
+//            draggedOffSet = imageList[indexOfImageList].offSet
+//        }
+//    }
 
 }
