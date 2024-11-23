@@ -2,10 +2,11 @@ import SwiftUI
 import Vision
 import CoreImage.CIFilterBuiltins
 
-struct DFFrameEditView: View {
+struct DFEditView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @ObservedObject var viewModel: DFFrameEditViewModel = DFFrameEditViewModel()
+    @EnvironmentObject var imageModel: ImageListModel
+    @ObservedObject var viewModel: DFEditViewModel = DFEditViewModel()
     @State private var selectionModeIndex: Int = 3
     @State private var lines: [Line] = []
     @State private var thickness: Double = 10.0
@@ -47,7 +48,9 @@ struct DFFrameEditView: View {
                             Spacer()
                             Button {
                                 viewModel.showPreview.toggle()
-                                viewModel.createResult()
+                                viewModel.createResult{
+                                    
+                                }
                                 
                             } label: {
                                 ZStack {
@@ -95,7 +98,7 @@ struct DFFrameEditView: View {
 
 
 ///
-private extension DFFrameEditView {
+private extension DFEditView {
     
     enum Mode {
         case draw
@@ -120,7 +123,7 @@ private extension DFFrameEditView {
 }
 
 ///
-private extension DFFrameEditView {
+private extension DFEditView {
     
     var draw: some Gesture {
         
@@ -307,7 +310,20 @@ private extension DFFrameEditView {
             Spacer()
             Button {
                 
-                viewModel.createResult()
+                viewModel.createResult {
+                    viewModel.detectSubject(inputImage: viewModel.resultImage) {
+                        
+                        if let image = viewModel.outputImage {
+//                            imageList.image.append(image)
+                            var newImage = SubjectImage()
+                            newImage.image = image
+                            newImage.originalImage = frameManager.pickedImage
+                            imageModel.imageList.append(newImage)
+                            print("\(imageModel.imageList.count) 길이")
+                        }
+                    }
+                }
+                viewModel.isShowModifyFrame.toggle()
                 //                viewModel.isShowModifyFrame.toggle()
                 naviManager.push(screen: Screen.modifyFrame) //✅
                 
@@ -406,7 +422,7 @@ private extension DFFrameEditView {
     
 }
 
-private extension DFFrameEditView {
+private extension DFEditView {
     
     private func showMaskImage() {
         
@@ -498,5 +514,5 @@ private extension DFFrameEditView {
     }
 }
 //#Preview {
-//    DFFrameEditView()
+//    DFEditView()
 //}

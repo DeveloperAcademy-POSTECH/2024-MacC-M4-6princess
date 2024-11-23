@@ -75,9 +75,9 @@ struct FeatureView: View {
             case .photoPicker:
                 PhotosPickerView()
             case .frameEdit:
-                DFFrameEditView()
+                DFEditView()
             case .modifyFrame:
-                DFFrameModifyView()
+                DFModifyView()
             case .testFrame:
                 DFTestFrameView()
                 
