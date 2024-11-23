@@ -44,7 +44,7 @@ struct DFModifyView: View {
             }
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
-                    .ignoresSafeArea(.all)
+                    
             }
         }
         //        .fullScreenCover(isPresented: $viewModel.showTextView

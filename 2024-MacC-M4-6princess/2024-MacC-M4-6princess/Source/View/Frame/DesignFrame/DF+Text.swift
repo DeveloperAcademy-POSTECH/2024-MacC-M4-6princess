@@ -10,7 +10,7 @@ import SwiftUI
 
 extension DFTextView{
     @MainActor
-    func renderImage(text: String = ""){
+    func renderImage(text: String){
         let renderer = ImageRenderer(
             content: RenderView(
                 text: text,
@@ -23,7 +23,12 @@ extension DFTextView{
         renderer.scale = displayScale
         if let uiImage = renderer.uiImage {
             renderedImage = uiImage
+            
         }
+        else{
+            print("render 실패")
+        }
+        
     }
     // 정렬 방향 정의
     enum SwipeDirection {
@@ -39,7 +44,7 @@ extension DFTextView{
             case (.trailing, .left): return .center
             case (.leading, .left): return .leading // 유지
             case (.trailing, .right): return .trailing // 유지
-//            default: return .center
+            default: return .center
         }
     }
     var swipeGesture: some Gesture {
