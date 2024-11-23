@@ -13,7 +13,7 @@ struct DFImageDecoView: View {
             
             stickerView
             
-            TextView
+            textView
         }
     }
 }
@@ -68,7 +68,7 @@ extension DFImageDecoView {
         }
     }
     
-    var TextView: some View {
+    var textView: some View {
         
         VStack {
             
