@@ -20,6 +20,7 @@ struct DFTextView: View {
     @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorArr: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
+    @EnvironmentObject var imageModel: ImageListModel
     
     var body: some View {
         NavigationStack{

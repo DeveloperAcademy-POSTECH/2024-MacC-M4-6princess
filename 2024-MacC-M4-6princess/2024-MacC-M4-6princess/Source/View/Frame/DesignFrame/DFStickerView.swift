@@ -7,9 +7,10 @@
 import SwiftUI
 
 struct DFStickerView: View {
-    @StateObject var viewModel:DFFrameModifyViewModel
+    @StateObject var viewModel:DFModifyViewModel
     @State private var selectedTab: StickerTab = .bubble // 기본 탭 선택
     private let stickers = StickerImages.getStickerImages() // 스티커 이미지 리스트
+    @EnvironmentObject var imageModel: ImageListModel
     
     var body: some View {
         VStack {
@@ -39,6 +40,7 @@ struct DFStickerView: View {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
                     ForEach(stickers[selectedTab] ?? [], id: \.self) { imageName in
                         VStack {
+                            
                             Image(imageName)
                                 .resizable()
                                 .scaledToFit()
@@ -48,8 +50,18 @@ struct DFStickerView: View {
                                 .cornerRadius(10)
                         }
                         .onTapGesture {
+                            var newImage = SubjectImage()
+                            if let image = UIImage(named: imageName) {
+                                newImage.image = image
+                                newImage.originalImage = image
+//                                newImage.scale = 0.5
+                                imageModel.imageList.append(newImage)
+                            } else {
+                                //TODO: 에러 처리 해야함
+                                print("Image not found")
+                            }
+                            
                             viewModel.showStickerSheet = false
-//                            print("Selected Sticker: \(imageName)")
                             
                         }
 

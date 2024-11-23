@@ -10,3 +10,4 @@ struct SubjectImage: Identifiable, Hashable {
     var scale: CGFloat = 1.0
     
 }
+
