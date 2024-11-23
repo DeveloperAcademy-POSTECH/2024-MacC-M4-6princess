@@ -50,7 +50,7 @@ struct CamZoomButtonView: View {
                         // UltraWide 카메라일 때의 표시 로직
                         switch currentZoom {
                         case 1.0..<1.9:  // 실시간 줌 팩터 표시
-                            return String(format: "%.1f", currentZoom/2)
+                            return ".5"
                         case 1.9..<2.9:  // 1x 표시 구간
                             return "1"
                         case 2.9..<3.9:  // 2x 표시 구간
