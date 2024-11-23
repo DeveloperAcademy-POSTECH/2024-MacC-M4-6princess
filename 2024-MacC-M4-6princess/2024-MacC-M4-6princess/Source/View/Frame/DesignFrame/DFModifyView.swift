@@ -42,16 +42,21 @@ struct DFModifyView: View {
                 DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
             }
-            
             if viewModel.showTextView {
-                DFTextView(viewModel: viewModel)
+                DFTextView(viewModel:viewModel)
+                    
             }
         }
+        //        .fullScreenCover(isPresented: $viewModel.showTextView
+        ////                         , onDismiss: stateNone
+        //        ) {
+        //            DFTextView(viewModel: viewModel)
+        //        }
         .sheet(isPresented: $viewModel.showStickerSheet) {
-                    DFStickerView()
-                        .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
-                        .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
-                }
+            DFStickerView(viewModel: viewModel)
+                .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
+                .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
+        }
         //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
         //            PhotosPickerView()
         //        })
@@ -67,7 +72,7 @@ struct DFModifyView: View {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
                     //                    shouldNavigate = true
-//                    frameManager.isFrameSelect = false
+                    //                    frameManager.isFrameSelect = false
                     naviManager.popToRoot()
                     frameManager.showMFView = false
                 }

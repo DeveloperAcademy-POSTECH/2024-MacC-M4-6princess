@@ -7,6 +7,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hakgyoansim Geurimilgi OTF R.otf</string>
+		<string>Hakgyoansim Geurimilgi TTF R.ttf</string>
 		<string>Pretendard-Bold.otf</string>
 		<string>Pretendard-Regular.otf</string>
 	</array>
