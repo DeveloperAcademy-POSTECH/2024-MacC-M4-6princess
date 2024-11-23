@@ -42,6 +42,21 @@ extension DFTextView{
             default: return .center
         }
     }
+    var swipeGesture: some Gesture {
+        DragGesture()
+            .onEnded { value in
+                // 스와이프 감지
+                if value.translation.width < 0 { // 왼쪽 스와이프
+                    withAnimation {
+                        textAlignment = nextAlignment(for: textAlignment, direction: .left)
+                    }
+                } else if value.translation.width > 0 { // 오른쪽 스와이프
+                    withAnimation {
+                        textAlignment = nextAlignment(for: textAlignment, direction: .right)
+                    }
+                }
+            }
+    }
 }
 struct RenderView: View {
     let text: String

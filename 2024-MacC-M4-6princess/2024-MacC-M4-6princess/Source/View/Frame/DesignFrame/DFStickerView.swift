@@ -7,8 +7,9 @@
 import SwiftUI
 
 struct DFStickerView: View {
+    @StateObject var viewModel:DFFrameModifyViewModel
     @State private var selectedTab: StickerTab = .bubble // 기본 탭 선택
-    private let images = StickerImages.getStickerImages() // 스티커 이미지 리스트
+    private let stickers = StickerImages.getStickerImages() // 스티커 이미지 리스트
     
     var body: some View {
         VStack {
@@ -24,15 +25,8 @@ struct DFStickerView: View {
                     Text(tab.displayName)
                         .font(.system(size: 13, weight: selectedTab == tab ? .bold : .medium))
                         .foregroundColor(selectedTab == tab ? .pointPink : .gray02)
-//                        .padding(8)
-//                        .background(
-//                            RoundedRectangle(cornerRadius: 10)
-//                                .fill(selectedTab == tab ? Color.white : Color.clear)
-//                        )
                         .onTapGesture {
-//                            withAnimation {
-                                selectedTab = tab
-//                            }
+                            selectedTab = tab
                         }
                 }
                 Spacer()
@@ -43,31 +37,31 @@ struct DFStickerView: View {
             // 이미지 스크롤 뷰
             ScrollView {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
-                    ForEach(images[selectedTab] ?? [], id: \.self) { imageName in
+                    ForEach(stickers[selectedTab] ?? [], id: \.self) { imageName in
                         VStack {
                             Image(imageName)
                                 .resizable()
                                 .scaledToFit()
-                                .padding(10) // 이미지 바깥에 10 정도의 패딩
+                                .padding(10)
                                 .frame(width: 80, height: 80)
                                 .background(Color.gray.opacity(0.2))
-                                .cornerRadius(10) // 정사각형 박스의 코너 라디우스
+                                .cornerRadius(10)
                         }
+                        .onTapGesture {
+                            viewModel.showStickerSheet = false
+//                            print("Selected Sticker: \(imageName)")
+                            
+                        }
+
                         .frame(width: 80, height: 80) // 정사각형 박스 크기
                     }
                 }
-//                .padding(.horizontal)
             }
             .padding(.horizontal)
-
-
-
         }
-//        .padding()
     }
 }
 
-// Enum for Tabs
 enum StickerTab: String, CaseIterable {
     case bubble, humor, character, full
     

@@ -39,13 +39,15 @@ struct DFFrameModifyView: View {
                 DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
             }
-            
-            if viewModel.showTextView {
-                DFTextView(viewModel: viewModel)
-            }
+           
+        }
+        .fullScreenCover(isPresented: $viewModel.showTextView
+//                         , onDismiss: stateNone
+        ) {
+            DFTextView(viewModel: viewModel)
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
-                    DFStickerView()
+            DFStickerView(viewModel: viewModel)
                         .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
                         .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
                 }
