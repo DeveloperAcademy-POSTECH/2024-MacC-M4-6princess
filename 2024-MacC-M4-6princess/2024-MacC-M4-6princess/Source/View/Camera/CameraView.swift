@@ -172,12 +172,11 @@ struct CameraView: View {
                 //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
-                MFView(context: viewContext)
-                    .environment(\.managedObjectContext, viewContext)
+                MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
+//                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
-                    .environmentObject(naviManager)
-                    .environmentObject(frameManager)
+                    
                 
             }
             .statusBar(hidden: true)

@@ -16,11 +16,6 @@ struct MFView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     
-    init(context: NSManagedObjectContext) {
-        _viewModel = StateObject(wrappedValue: MFViewModel(context: context))
-
-    }
-    
     var body: some View {
         NavigationStack(path: $naviManager.route) {
             ZStack(alignment: .bottom) {
@@ -155,7 +150,7 @@ struct SheetTitleView: View {
 struct FrameGridItem: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject var viewModel: MFViewModel
+    @ObservedObject var viewModel: MFViewModel
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     
@@ -197,6 +192,8 @@ struct GridItemView: View {
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
     let isSelected: Bool
     @ObservedObject var viewModel: MFViewModel
+    @EnvironmentObject var frameManager: FrameManager
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -219,9 +216,8 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-            if viewModel.isEditing {
-                viewModel.toggleSelection(for: imageInfo.id)
-            }
+            viewModel.toggleSelection(for: imageInfo.id)
+            dismiss()
         }
     }
 }

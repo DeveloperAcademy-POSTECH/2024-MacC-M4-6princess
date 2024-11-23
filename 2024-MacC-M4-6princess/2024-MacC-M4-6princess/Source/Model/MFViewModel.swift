@@ -16,9 +16,11 @@ class MFViewModel: ObservableObject {
     
     private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
+    private var frameManager: FrameManager
     
-    init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext, frameManager: FrameManager) {
         self.viewContext = context
+        self.frameManager = frameManager
     }
     
     
@@ -114,13 +116,29 @@ class MFViewModel: ObservableObject {
     
     ///이미지 선택 토글 함수
     func toggleSelection(for id: UUID) {
-        DispatchQueue.main.async {
-            if self.selectedImageIds.contains(id) {
-                self.selectedImageIds.remove(id)
-            } else {
-                self.selectedImageIds.insert(id)
+        if isEditing {
+            DispatchQueue.main.async {
+                if self.selectedImageIds.contains(id) {
+                    self.selectedImageIds.remove(id)
+                } else {
+                    self.selectedImageIds.insert(id)
+                }
             }
         }
+        else {
+            selectFrame(id: id)
+        }
     }
+    
+    func selectFrame(id: UUID) {
+            if let imageData = loadImageData(for: id),
+               let uiImage = UIImage(data: imageData) {
+                DispatchQueue.main.async {
+                    self.frameManager.selectedFrame = id
+                    self.frameManager.pickedImage = uiImage
+                    self.frameManager.isFrameLoading = true
+                }
+            }
+        }
     
 }
