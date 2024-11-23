@@ -1,12 +1,14 @@
 import SwiftUI
 
 struct DFImageDecoView: View {
-//    @Binding var isShowImagePickerView: Bool
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
+    @ObservedObject var viewModel : DFModifyViewModel
+    
     var body: some View {
             
         HStack(spacing: 40){
+            
             appendImageView
             
             stickerView
@@ -48,7 +50,7 @@ extension DFImageDecoView {
         VStack {
             
             Button  {
-                
+//                viewModel.showStickerSheet = true
             } label: {
                 ZStack {
                     Circle()
@@ -71,14 +73,14 @@ extension DFImageDecoView {
         VStack {
             
             Button  {
-                
+//                viewModel.showTextView = true // zstack 최상단에 텍스트뷰가 보임
             } label: {
                 ZStack {
                     Circle()
                         .fill(Color(hex: "d9d9d9"))
                         .frame(width: 40, height: 40)
                         .opacity(0.15)
-                    Image("textIcon")
+                    Image("TextIcon")
                 }
             }
             .padding(.bottom, 5)
@@ -89,7 +91,3 @@ extension DFImageDecoView {
         }
     }
 }
-//
-//#Preview {
-//    DFImageDecoView(isShowImagePickerView: .constant(false))
-//}
