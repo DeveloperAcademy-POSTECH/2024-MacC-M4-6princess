@@ -9,60 +9,27 @@ import Foundation
 import SwiftUI
 
 extension DFTextView{
-    @MainActor
-    func renderImage(text: String){
-        let renderer = ImageRenderer(
-            content: RenderView(
-                text: text,
-                selectedFont: selectedFont,
-                color: fontColor,
-                textAlignment: textAlignment
-            )
-        )
-        
-        renderer.scale = displayScale
-        if let uiImage = renderer.uiImage {
-            renderedImage = uiImage
-            
-        }
-        else{
-            print("render 실패")
-        }
-        
-    }
     // 정렬 방향 정의
     enum SwipeDirection {
         case left, right
     }
     
-    // 정렬 상태 변경 함수
-    func nextAlignment(for current: TextAlignment, direction: SwipeDirection) -> TextAlignment {
-        switch (current, direction) {
-            case (.center, .left): return .leading
-            case (.center, .right): return .trailing
-            case (.leading, .right): return .center
-            case (.trailing, .left): return .center
-            case (.leading, .left): return .leading // 유지
-            case (.trailing, .right): return .trailing // 유지
-            default: return .center
-        }
-    }
-    var swipeGesture: some Gesture {
+    var swipeAlignmentGesture: some Gesture {
         DragGesture()
             .onEnded { value in
                 // 스와이프 감지
                 if value.translation.width < 0 { // 왼쪽 스와이프
                     withAnimation {
-                        textAlignment = nextAlignment(for: textAlignment, direction: .left)
+                        textAlignment = computeNextAlignment(for: textAlignment, direction: .left)
                     }
                 } else if value.translation.width > 0 { // 오른쪽 스와이프
                     withAnimation {
-                        textAlignment = nextAlignment(for: textAlignment, direction: .right)
+                        textAlignment = computeNextAlignment(for: textAlignment, direction: .right)
                     }
                 }
             }
     }
-    var fontSelection: some View {
+    var fontSelector: some View {
         // 폰트 선택 ScrollView
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
@@ -86,16 +53,16 @@ extension DFTextView{
             .padding(.horizontal)
         }
     }
-    var colorSelection: some View {
+    var colorSelector: some View {
         // fontColor 선택
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(0..<colorArr.count, id: \.self) { colorIndex in
+                ForEach(0..<colorChip.count, id: \.self) { colorIndex in
                     Circle()
                         .frame(width: colorNum == colorIndex ? 40 : 30)
-                        .foregroundColor(colorArr[colorIndex])
+                        .foregroundColor(colorChip[colorIndex])
                         .onTapGesture {
-                            fontColor = colorArr[colorIndex]
+                            fontColor = colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
                                 colorNum = colorIndex
                             }
@@ -106,7 +73,6 @@ extension DFTextView{
         .padding(.horizontal)
     }
     var textTabBar: some View {
-        
         ZStack {
             Rectangle()
                 .foregroundColor(.clear)
@@ -167,18 +133,19 @@ extension DFTextView{
         .padding()
     }
 }
-struct RenderView: View {
+
+struct TextRenderView: View {
     let text: String
     let selectedFont: FontStyle
-    let color: Color
-    let textAlignment: TextAlignment
+    let selectedColor: Color
+    let selectedAlignment: TextAlignment
     
     var body: some View {
         Text(text)
-        //            .font(Font.custom(fontType,  size: 200))
             .font(selectedFont.applyFont(size: 20))
-            .foregroundColor(color)
-            .multilineTextAlignment(textAlignment)
+            .foregroundColor(selectedColor)
+            .multilineTextAlignment(selectedAlignment)
+            .lineSpacing(5)
         
     }
 }

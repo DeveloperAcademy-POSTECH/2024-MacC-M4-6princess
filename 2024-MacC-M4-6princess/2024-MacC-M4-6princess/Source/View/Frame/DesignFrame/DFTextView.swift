@@ -2,23 +2,23 @@ import SwiftUI
 
 struct DFTextView: View {
     @ObservedObject var viewModel: DFModifyViewModel
-    @State var fullText = ""
+    @State var txt = ""
     @State var selectedFont: FontStyle = .modern
     @State var fontSize: Double = 20
     @State var fontColor: Color = .white
     @State var renderedImage: UIImage?
-    @FocusState private var isKeyboardVisible: Bool // 키보드 상태 관리
+    @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
     @State var tab = 0
     @State var colorNum = 0
     @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
-    let colorArr: [Color] = ColorPreset.colorPallete
+    let colorChip: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
     
     
     var body: some View {
         VStack {
-            TextEditor(text: $fullText)
+            TextEditor(text: $txt)
                 .frame(
                     maxWidth: .infinity,
                     maxHeight: .infinity
@@ -28,19 +28,17 @@ struct DFTextView: View {
                 .foregroundColor(fontColor)
                 .font(selectedFont.applyFont(size: fontSize))
                 .lineSpacing(5)
-            
                 .background(Color.clear) // 배경을 투명하게 설정
                 .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
-                .gesture(tab == 2 ? swipeGesture : nil)
+                .gesture(tab == 2 ? swipeAlignmentGesture : nil)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("완료") {
-                            renderImage(text: fullText)
+                            renderTextImage(text: txt)
                             var newImage = SubjectImage()
                             if let image = renderedImage {
                                 newImage.image = image
                                 newImage.originalImage = image
-//                                newImage.scale = 0.5
                                 imageModel.imageList.append(newImage)
                             } else {
                                 //TODO: 에러 처리 해야함
@@ -55,10 +53,10 @@ struct DFTextView: View {
                 }
             
             if tab == 0 {
-                fontSelection
+                fontSelector
                 
             } else if tab == 1 {
-                colorSelection
+                colorSelector
             }
             textTabBar
         }
