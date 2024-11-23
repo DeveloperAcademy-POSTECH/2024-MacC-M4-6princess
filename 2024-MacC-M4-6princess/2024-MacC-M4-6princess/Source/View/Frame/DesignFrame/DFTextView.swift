@@ -7,7 +7,8 @@
 import SwiftUI
 
 struct DFTextView: View {
-    @ObservedObject var viewModel: DFFrameModifyViewModel
+    
+    @ObservedObject var viewModel: DFModifyViewModel
     @State var fullText = ""
     @State var selectedFont: FontStyle = .modern
     @State var fontSize: Double = 20
