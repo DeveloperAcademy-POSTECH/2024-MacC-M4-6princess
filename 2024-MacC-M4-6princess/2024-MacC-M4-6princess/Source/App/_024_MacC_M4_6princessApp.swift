@@ -10,6 +10,8 @@ import SwiftUI
 @main
 struct _024_MacC_M4_6princessApp: App {
     @StateObject private var environmentModel = EnvironmentModel()
+    @StateObject private var frameManager = FrameManager()
+    @StateObject private var naviManager = NavigationManager()
     let persistenceController = PersistenceController.shared
     
     var body: some Scene {
@@ -18,6 +20,8 @@ struct _024_MacC_M4_6princessApp: App {
                 .environment(\.managedObjectContext,
                               persistenceController.container.viewContext)
                 .environmentObject(environmentModel)
+                .environmentObject(naviManager)
+                .environmentObject(frameManager)
         }
     }
 }

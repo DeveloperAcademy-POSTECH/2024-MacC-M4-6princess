@@ -12,6 +12,8 @@ struct CameraBottomView: View {
     @ObservedObject var viewModel: CameraViewModel
     @StateObject var motionManager = MotionManager()
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @EnvironmentObject var naviManager:NavigationManager
+    @EnvironmentObject var frameManager:FrameManager
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             //        if horizontalSizeClass == .regular{
@@ -21,7 +23,9 @@ struct CameraBottomView: View {
                     
                     //프레임 불러오기 버튼
                     Button {
-                        viewModel.isFrameSelect.toggle()
+//                        viewModel.isShowMFView.toggle()
+                        frameManager.showMFView = true
+                        viewModel.cameraManager.stopSession()
                         print("프레임 버튼 눌림")
                     } label: {
                         VStack(alignment: .center, spacing: 4) {
@@ -42,16 +46,14 @@ struct CameraBottomView: View {
                     
                     //셔터 버튼
                     Button {
-                        viewModel.isAnimating = true
-                        if viewModel.isFrameSelected && viewModel.frameImage != nil{
+                        if frameManager.resultImage != nil{
                             self.viewModel.isTakePic = true
                             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                                 viewModel.takePic()
                                 viewModel.cameraManager.stopSession()
-                                viewModel.isAnimating = false
                             }
                         } else {
-                            viewModel.showAlert = true
+                            viewModel.isShowAlert = true
                         }
                     } label: {
                         Image("shutterImage")
@@ -60,7 +62,7 @@ struct CameraBottomView: View {
                             .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                             .animation(.easeInOut, value: motionManager.currentOrientation)
                     }
-                    .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.showAlert) {
+                    .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
                         Button("닫기", role: .cancel) { }
                     } message: {
                         Text("")

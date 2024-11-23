@@ -13,63 +13,60 @@ struct CameraView: View {
     @Environment(\.managedObjectContext) var viewContext
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
-    
-    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
-        _frameImage = frameImage
-    }
-    
-    //TODO: 바인딩 변수로 방금 만든 frame 불러오기
-    
+    @State private var path: NavigationPath = NavigationPath()
+    //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
+    @StateObject var naviManager = NavigationManager()
+    @StateObject var frameManager = FrameManager()
     
     private var cameraPreview: some View  {
-        
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
-                    print("geo:\(geo.size.width) \(geo.size.height)")
                 }
+            Group{
+                if let image = frameManager.resultImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+            }
+            .allowsHitTesting(false)
         }
     }
     
     var body: some View {
         
         NavigationStack {
-            ZStack {
-                VStack{
-                    CameraTopView(viewModel: viewModel)
-                    ZStack{
-                        cameraPreview
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                        Group{
-                            if let image = viewModel.frameImage {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
+            ZStack{
+                VStack(spacing: 0) {
+                                Color.clear
+                                    .frame(height: 94) // TopView 높이만큼 여백 확보
+                                
+                                cameraPreview
+                                    .frame(width: UIScreen.main.bounds.width,
+                                           height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                                    .gesture(MagnificationGesture()
+                                        .onChanged { val in
+                                            viewModel.zoom(factor: val)
+                                        }
+                                        .onEnded { _ in
+                                            viewModel.zoomInitialize()
+                                        })
+                                
+                                Spacer()
                             }
-                        }
-                    }
-                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                VStack {
+                    CameraTopView(viewModel: viewModel)
+                    Spacer()
+                    CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
+                        .environmentObject(naviManager)
+                        .environmentObject(frameManager)
                 }
-                
-//                VStack{
-//                    Spacer()
-//                    Circle()
-//                        .strokeBorder(style: StrokeStyle(lineWidth: 7, dash: [5]))
-//                        .frame(width: 20, height: 20)
-//                        .foregroundColor(.gray10)
-//                        .rotationEffect(Angle(degrees: viewModel.isAnimating ? 360 : 0))
-//                        .animation(
-//                            Animation.linear(duration: 2)
-//                                .repeatForever(autoreverses: false),
-//                            value: viewModel.isAnimating
-//                        )
-//                        .padding()
-//                    Spacer()
-//                }
+                //v end
                 //처음 실행했을 때 - 온보딩 합침
                 if !viewModel.firstTime  {
                     VStack {
@@ -113,7 +110,8 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isFrameSelect.toggle()
+//                                                viewModel.isShowMFView.toggle()
+                                                frameManager.showMFView = true
                                             }
                                         }
                                         else{
@@ -141,10 +139,11 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isFrameSelect.toggle()
+//                                                viewModel.isShowMFView.toggle()
+                                                frameManager.showMFView = true
                                             }
                                         }
-                                       
+                                        
                                     }
                                     .padding(.leading, -10)
                                     Spacer()
@@ -165,30 +164,29 @@ struct CameraView: View {
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }
-            .onChange(of: viewModel.isFrameLoading) { newValue in
+            .onChange(of: frameManager.isFrameLoading) { newValue in
                 if newValue {
                     loadSelectedFrame()
-                    viewModel.isFrameLoading = false
+                    frameManager.isFrameLoading = false
                 }
             }
             .persistentSystemOverlays(.hidden)
             .onAppear {
                 motionManager.startDeviceMotionUpdates()
-                viewModel.frameImage = frameImage
-                if frameImage != nil {
-                    viewModel.isFrameSelected = true
-                }
+                //                viewModel.frameImage = frameImage
             }
-            .fullScreenCover(isPresented: $viewModel.isFrameSelect) {
-                CameraFrameSelectView(viewModel: viewModel, frameImage: $frameImage)
+            .fullScreenCover(isPresented: $frameManager.showMFView) {
+                MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
+//                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
+                    
                 
             }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
-                if let takenImg = viewModel.takenImg,let frameImg = viewModel.frameImage{
+                if let takenImg = viewModel.takenImg,let frameImg = frameManager.resultImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
                 
@@ -199,10 +197,7 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
-            viewModel.screenSize = UIScreen.main.bounds.size
-            print("UIScreen: \(UIScreen.main.bounds.size.width) \(UIScreen.main.bounds.size.height)")
         }
         
     }
-    
 }

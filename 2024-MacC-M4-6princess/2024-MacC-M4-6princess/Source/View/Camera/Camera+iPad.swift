@@ -15,7 +15,8 @@ extension CameraBottomView {
             HStack (){
                 //프레임 불러오기 버튼
                 Button {
-                    viewModel.isFrameSelect.toggle()
+//                    viewModel.isShowMFView.toggle()
+                    frameManager.showMFView = true
                     print("프레임 버튼 눌림")
                 } label: {
                     VStack(alignment: .center, spacing: 4) {
@@ -36,14 +37,14 @@ extension CameraBottomView {
                 
                 //셔터 버튼
                 Button {
-                    if viewModel.isFrameSelected && viewModel.frameImage != nil{
+                    if frameManager.resultImage != nil{
                         self.viewModel.isTakePic = true
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                             viewModel.takePic()
                             viewModel.cameraManager.stopSession()
                         }
                     } else {
-                        viewModel.showAlert = true
+                        viewModel.isShowAlert = true
                     }
                 } label: {
                     Image("shutterImage")
@@ -52,7 +53,7 @@ extension CameraBottomView {
                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                 }
-                .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.showAlert) {
+                .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
                     Button("닫기", role: .cancel) { }
                 } message: {
                     Text("")
@@ -86,7 +87,8 @@ extension CameraTopView{
                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     
-                }.padding(.trailing, 20)
+                }
+                .padding(.trailing, 20)
                 //                    Spacer()
             }
         }
