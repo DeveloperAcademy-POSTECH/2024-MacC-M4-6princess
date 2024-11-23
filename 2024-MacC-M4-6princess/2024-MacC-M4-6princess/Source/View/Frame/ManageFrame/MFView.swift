@@ -31,7 +31,7 @@ struct MFView: View {
                     }
                     
                 }
-                .navigationDestination(for: Screen.self) { type in // ✅
+                .navigationDestination(for: Screen.self) { type in
                     FeatureView(type: type)
                 }
                 if viewModel.isEditing {
@@ -149,6 +149,8 @@ struct SheetTitleView: View {
     }
 }
 
+
+// MARK: - 그리드 분리
 struct FrameGridItem: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
@@ -179,7 +181,6 @@ struct FrameGridItem: View {
             .disabled(viewModel.isEditing)
             
             ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
-                //////////
                 GridItemView(imageInfo: imageInfo, isSelected: viewModel.selectedImageIds.contains(imageInfo.id), viewModel: viewModel)
                     .id(imageInfo.id)
             }
@@ -187,6 +188,8 @@ struct FrameGridItem: View {
     }
     
 }
+
+// MARK: - 그리드 각각 분리
 
 struct GridItemView: View {
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)

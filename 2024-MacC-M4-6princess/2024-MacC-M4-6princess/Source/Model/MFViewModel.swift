@@ -21,6 +21,8 @@ class MFViewModel: ObservableObject {
         self.viewContext = context
     }
     
+    
+    ///코어데이터에서 이미지 id를 가져옴
     func loadImages() {
             let request = StoreImages.fetchRequest()
             request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
@@ -36,6 +38,7 @@ class MFViewModel: ObservableObject {
             }
         }
     
+    ///특정 이미지가 필요할 때 로드(해당 Id가 없을 때만 로드)
     func loadImageIfNeeded(for id: UUID) -> Data? {
             if let cached = imageCache[id] {
                 return cached
@@ -48,6 +51,7 @@ class MFViewModel: ObservableObject {
             return nil
         }
     
+    ///특정 이미지 데이터를 가져옴
     func loadImageData(for id: UUID) -> Data? {
         let request = StoreImages.fetchRequest()
         request.predicate = NSPredicate(format: "uuid == %@", id as CVarArg)
@@ -66,6 +70,7 @@ class MFViewModel: ObservableObject {
         }
     }
     
+    ///선택된 이미지들을 코어데이터에서 삭제
     func deleteSelectedImages() {
         let request = StoreImages.fetchRequest()
         request.predicate = NSPredicate(format: "uuid IN %@", selectedImageIds)
@@ -84,6 +89,7 @@ class MFViewModel: ObservableObject {
         }
     }
     
+    ///원본 이미지를 다운샘플링(메모리 줄이기)
     func downsampleImage(_ image: UIImage, to pointSize: CGSize) -> UIImage? {
         let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
         guard let data = image.jpegData(compressionQuality: 1.0),
@@ -106,6 +112,7 @@ class MFViewModel: ObservableObject {
         return UIImage(cgImage: downsampledImage)
     }
     
+    ///이미지 선택 토글 함수
     func toggleSelection(for id: UUID) {
         DispatchQueue.main.async {
             if self.selectedImageIds.contains(id) {
