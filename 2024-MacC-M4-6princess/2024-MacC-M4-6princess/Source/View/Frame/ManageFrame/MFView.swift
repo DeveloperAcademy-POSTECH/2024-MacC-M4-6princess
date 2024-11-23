@@ -164,19 +164,20 @@ struct FrameGridItem: View {
                 naviManager.push(screen: Screen.photoPicker)
             } label: {
                 VStack(alignment: .center, spacing: 4) {
-                    Spacer()
-                    Image("plusIcon")
+                    Image("newFrameCreateLogo")
                         .resizable()
-                        .frame(width: 30, height: 30, alignment: .center)
+                        .frame(width: 80, height: 92)
+                        .padding(.top, 20)
+                        .padding(.bottom, 3)
                     Text("새로운\n프레임 만들기")
-                        .font(.system(size: 13))
+                        .font(.system(size: 13, weight: .bold))
                         .multilineTextAlignment(.center)
-                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                        .foregroundColor(.white)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
-                .frame(minHeight: 200)
-                .background(Color(red: 0.83, green: 0.83, blue: 0.83))
+                .frame(minHeight: 163)
+                .background(.pointPink)
             }
             .disabled(viewModel.isEditing)
             
