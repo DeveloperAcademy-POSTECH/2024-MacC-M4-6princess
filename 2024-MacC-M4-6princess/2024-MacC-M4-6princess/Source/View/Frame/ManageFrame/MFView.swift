@@ -118,6 +118,7 @@ struct SheetTitleView: View {
                 Text("프레임")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
+                    .foregroundColor(.gray01)
                 Spacer()
             }
             HStack(alignment: .center) {
