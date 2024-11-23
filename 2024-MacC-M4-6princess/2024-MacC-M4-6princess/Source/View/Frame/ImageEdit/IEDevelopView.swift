@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct IEDevelopView: View {
-    @State private var showMagnifyGestureTestView = false
-    @State private var showRatioChangeView = false
-    @State private var showWidthFixView = false
-    @State private var imageResizeView = false
-    @State private var edit = false
-    @StateObject var viewModel = IEViewModel()
+//    @State private var showMagnifyGestureTestView = false
+//    @State private var showRatioChangeView = false
+//    @State private var showWidthFixView = false
+//    @State private var imageResizeView = false
+//    @State private var edit = false
+//    @StateObject var viewModel = IEViewModel()
     var body: some View {
         LayerTestView()
 //        NavigationStack {

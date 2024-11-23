@@ -113,95 +113,65 @@ struct LayerTestView: View {
     }
     // 드래그 변경 시 동작 처리 함수
     func dragOnChanged(value: DragGesture.Value, index: Int) {
-        // 드래그가 시작되지 않았다면 초기 설정
         if !isDragging {
-//            print("value:\(value)") // 현재 드래그 값 디버깅 출력
-            selectedLayerIndex = index // 현재 드래그 중인 레이어의 인덱스를 저장
-            print("selectedLayerIndex:\(selectedLayerIndex)")
-            dragStartPosition = layerImages[index].position // 드래그 시작 시 레이어의 초기 위치 저장
-            isDragging = true // 드래그 상태를 활성화
-            previousStep = 0 // 이전 단계 초기화
+            selectedLayerIndex = index
+            dragStartPosition = layerImages[index].position
+            isDragging = true
+            previousStep = 0
+            print("Drag 시작: index = \(index), position = \(dragStartPosition ?? .zero)")
         }
-        
-        let dragOffsetY = value.translation.height // 드래그 이동 거리의 Y축 값
-        var step = Int(dragOffsetY / 50) // Y축 이동 거리를 50으로 나눠 이동 단계(step)를 계산
-        
-        // 현재 단계가 이전 단계와 다를 때만 레이어를 이동
-        if step != previousStep {
-            if step < 0
-                // index - step : 다음 index
-//                index + abs(step) < layerImages.count
-            {
-//                if previousStep - step < 0 { // 인덱스가 최대 범위를 벗어나면 스템 최댓값을 0으로 맞춤
-//                    step = previousStep
-//                }
-                // 위로 드래그 (step이 음수)
-                // 현재 레이어를 step 단계만큼 앞으로 이동
-                // 레이어를 앞으로 옮김(index 크기를 줄임)
-                moveLayerForward(at: previousStep, steps: step - previousStep)
-                // 드래그로 이동한 후 선택된 레이어 인덱스를 업데이트
-//                selectedLayerIndex = max(index - step, 0)
-                selectedLayerIndex = index - step
-            } else if step > 0
-//                      index - step >= 0
-            
-            {
-//                if index + step < layerImages.count {
-//                    step = layerImages.count
-//                }
-                // 아래로 드래그 (step이 양수) => 레이어가 아래로 이동 , 인덱스 값이 증가
-               
-                // 현재 레이어를 step 단계만큼 뒤로 이동
-//                moveLayerBackward(at: index, steps: abs(step - previousStep))
-                moveLayerForward(at: previousStep, steps: abs(step - previousStep))
-                // 드래그로 이동한 후 선택된 레이어 인덱스를 업데이트
-//                selectedLayerIndex = min(index + abs(step), layerImages.count - 1)
-                selectedLayerIndex = index + abs(step)
+
+        let dragOffsetY = value.translation.height
+        let currentStep = Int(dragOffsetY / 50)
+        print("Drag 진행 중: dragOffsetY = \(dragOffsetY), currentStep = \(currentStep), previousStep = \(previousStep)")
+
+        if currentStep != previousStep {
+            if currentStep < previousStep {
+                let steps = abs(currentStep - previousStep)
+                print("위로 이동: steps = \(steps)")
+                moveLayerForward(at: index, steps: steps)
+                selectedLayerIndex = max(index - steps, 0)
+            } else if currentStep > previousStep {
+                let steps = abs(currentStep - previousStep)
+                print("아래로 이동: steps = \(steps)")
+                moveLayerBackward(at: index, steps: steps)
+                selectedLayerIndex = min(index + steps, layerImages.count - 1)
             }
-            // 이전 단계를 현재 단계로 업데이트
-            previousStep = step
+            previousStep = currentStep
+            print("레이어 상태 업데이트 후: \(layerImages.map { $0.order })")
         }
     }
 
-    // 드래그 종료 시 동작 처리 함수
     func dragOnEnded() {
-        isDragging = false // 드래그 상태 종료
-        dragStartPosition = nil // 드래그 시작 위치 초기화
-        selectedLayerIndex = nil // 선택된 레이어 초기화
-        previousStep = 0 // 이전 단계 초기화
+        print("Drag 종료: selectedLayerIndex = \(selectedLayerIndex ?? -1), previousStep = \(previousStep)")
+        isDragging = false
+        dragStartPosition = nil
+        selectedLayerIndex = nil
+        previousStep = 0
+        print("최종 레이어 상태: \(layerImages.map { $0.order })")
     }
 
-    // 순서 앞으로 이동 함수 (여러 단계)
     private func moveLayerForward(at index: Int, steps: Int) {
-        guard steps > 0 else { return } // steps가 0 이하인 경우 함수 종료
-        var currentIndex = index // 현재 레이어의 인덱스를 추적
-        for _ in 0..<steps { // steps 단계만큼 반복
-            guard currentIndex > 0 else { return } // 배열의 시작 범위를 벗어나지 않도록 제한
-            layerImages.swapAt(currentIndex, currentIndex - 1) // 현재 인덱스와 바로 앞 인덱스의 레이어를 교환
-            currentIndex -= 1 // 현재 인덱스를 앞으로 한 단계 이동
+        guard steps > 0 else { return }
+        print("moveLayerForward 호출: index = \(index), steps = \(steps)")
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex > 0 else { return }
+            layerImages.swapAt(currentIndex, currentIndex - 1)
+            currentIndex -= 1
         }
-//        updateOrder() // 순서 업데이트
     }
 
-    // 순서 뒤로 이동 함수 (여러 단계)
     private func moveLayerBackward(at index: Int, steps: Int) {
-        guard steps > 0 else { return } // steps가 0 이하인 경우 함수 종료
-        var currentIndex = index // 현재 레이어의 인덱스를 추적
-        for _ in 0..<steps { // steps 단계만큼 반복
-            guard currentIndex < layerImages.count - 1 else { return } // 배열의 끝 범위를 벗어나지 않도록 제한
-            layerImages.swapAt(currentIndex, currentIndex + 1) // 현재 인덱스와 바로 뒤 인덱스의 레이어를 교환
-            currentIndex += 1 // 현재 인덱스를 뒤로 한 단계 이동
-        }
-//        updateOrder() // 순서 업데이트
-    }
-
-    // 레이어 순서 업데이트 함수
-    private func updateOrder() {
-        // 모든 레이어의 순서를 인덱스 기반으로 재설정
-        for i in 0..<layerImages.count {
-            layerImages[i].order = i + 1 // 배열의 현재 순서에 맞게 order를 업데이트
+        guard steps > 0 else { return }
+        print("moveLayerBackward 호출: index = \(index), steps = \(steps)")
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex < layerImages.count - 1 else { return }
+            layerImages.swapAt(currentIndex, currentIndex + 1)
+            currentIndex += 1
         }
     }
 
-   
+
 }
