@@ -80,7 +80,6 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         }
     }
     
-    // CameraManager.swift
     func setUp() {
         do {
             self.session.beginConfiguration()

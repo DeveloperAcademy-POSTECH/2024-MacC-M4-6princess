@@ -55,7 +55,16 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         self.defaultImg = UIImage(named: "whiteBG") ?? UIImage()
         super.init()
         setupPreviewLayer()
+        
+        if cameraManager.deviceType == .builtInWideAngleCamera {
+            self.currentZoomFactor = 2.0
+        }
+        else {
+            self.currentZoomFactor = 1.0
+        }
     }
+    
+    
     
     
     
@@ -141,7 +150,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         // 카메라 전환 시 적절한 초기 줌 팩터 설정
         if cameraPosition == .back {
             if cameraManager.deviceType == .builtInUltraWideCamera {
-                currentZoomFactor = 1.0  // 0.5x로 표시됨
+                currentZoomFactor = 2.0
             } else {
                 currentZoomFactor = 1.0
             }
@@ -174,14 +183,25 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         lastScale = factor
         
         // 현재 줌 상태에서 변화량을 적용
-        let newZoomFactor = currentZoomFactor * delta
+        var newZoomFactor = currentZoomFactor * delta
         
-        // 제스처로 인한 줌 팩터를 가장 가까운 줌 옵션으로 매핑
-        let mappedZoomFactor = mapToNearestZoomFactor(newZoomFactor)
-        setZoom(factor: mappedZoomFactor)
+        // 최소/최대 줌 팩터 제한
+        if let device = cameraManager.videoDeviceInput?.device {
+            let minZoom: CGFloat = 1.0
+            let maxZoom: CGFloat = device.deviceType == .builtInUltraWideCamera ? 4.0 : 3.0
+            newZoomFactor = min(max(newZoomFactor, minZoom), maxZoom)
+            
+            // 줌 적용
+            cameraManager.zoom(newZoomFactor)
+            
+            // currentZoomFactor 실시간 업데이트
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                currentZoomFactor = newZoomFactor
+            }
+        }
     }
 
-    // 새로운 함수 추가
+    
     private func mapToNearestZoomFactor(_ factor: CGFloat) -> CGFloat {
         let zoomFactors: [CGFloat] = cameraPosition == .back ?
             [0.5, 1.0, 2.0, 3.0] : [1.0, 2.0, 3.0]
@@ -204,6 +224,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
                 factor
             }
             
+            device.ramp(toVideoZoomFactor: actualZoomFactor, withRate: 100.0)
             device.videoZoomFactor = actualZoomFactor
             device.unlockForConfiguration()
             currentZoomFactor = factor // 실제 줌 팩터 저장
