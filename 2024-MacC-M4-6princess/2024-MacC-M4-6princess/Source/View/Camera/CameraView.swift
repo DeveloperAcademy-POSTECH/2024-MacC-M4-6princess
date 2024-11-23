@@ -19,7 +19,6 @@ struct CameraView: View {
     @StateObject var frameManager = FrameManager()
     
     private var cameraPreview: some View  {
-        
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
@@ -34,7 +33,6 @@ struct CameraView: View {
                 }
             }
             .allowsHitTesting(false)
-            
         }
     }
     
@@ -42,17 +40,23 @@ struct CameraView: View {
         
         NavigationStack {
             ZStack{
-                //TODO: 줌 한 화면대로 처리되도록
-                cameraPreview
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                    .gesture(MagnificationGesture()
-                        .onChanged { val in
-                            viewModel.zoom(factor: val)
-                        }
-                        .onEnded { _ in
-                            viewModel.zoomInitialize()
-                        }
-                    )
+                VStack(spacing: 0) {
+                                Color.clear
+                                    .frame(height: 94) // TopView 높이만큼 여백 확보
+                                
+                                cameraPreview
+                                    .frame(width: UIScreen.main.bounds.width,
+                                           height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                                    .gesture(MagnificationGesture()
+                                        .onChanged { val in
+                                            viewModel.zoom(factor: val)
+                                        }
+                                        .onEnded { _ in
+                                            viewModel.zoomInitialize()
+                                        })
+                                
+                                Spacer()
+                            }
                 VStack {
                     CameraTopView(viewModel: viewModel)
                     Spacer()
@@ -172,12 +176,11 @@ struct CameraView: View {
                 //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
-                MFView(context: viewContext)
-                    .environment(\.managedObjectContext, viewContext)
+                MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
+//                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
-                    .environmentObject(naviManager)
-                    .environmentObject(frameManager)
+                    
                 
             }
             .statusBar(hidden: true)
