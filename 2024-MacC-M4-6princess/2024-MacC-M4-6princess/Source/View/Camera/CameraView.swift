@@ -17,9 +17,6 @@ struct CameraView: View {
     //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
     @StateObject var frameManager = FrameManager()
-    //    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
-    //        _frameImage = frameImage
-    //    }
     
     private var cameraPreview: some View  {
         
@@ -30,7 +27,6 @@ struct CameraView: View {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
             Group{
-                // ✅
                 if let image = frameManager.resultImage {
                     Image(uiImage: image)
                         .resizable()
@@ -57,17 +53,6 @@ struct CameraView: View {
                             viewModel.zoomInitialize()
                         }
                     )
-//                Group{
-//                    // ✅
-//                    if let image = frameManager.resultImage {
-//                        Image(uiImage: image)
-//                            .resizable()
-//                            .aspectRatio(contentMode: .fill)
-//                    }
-//                }
-//                .allowsHitTesting(false)
-                
-                
                 VStack {
                     CameraTopView(viewModel: viewModel)
                     Spacer()
@@ -191,8 +176,8 @@ struct CameraView: View {
                     .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
-                    .environmentObject(naviManager) // ✅
-                    .environmentObject(frameManager) // ✅
+                    .environmentObject(naviManager)
+                    .environmentObject(frameManager)
                 
             }
             .statusBar(hidden: true)
