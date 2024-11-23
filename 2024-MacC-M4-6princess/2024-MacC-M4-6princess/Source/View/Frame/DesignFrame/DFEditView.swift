@@ -10,7 +10,9 @@ struct DFEditView: View {
     @State private var selectionModeIndex: Int = 3
     @State private var lines: [Line] = []
     @State private var thickness: Double = 10.0
-    @Binding var pickedImage: UIImage?
+    //    @Binding var pickedImage: UIImage?
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     
     var body: some View {
         ZStack {
@@ -45,7 +47,6 @@ struct DFEditView: View {
                         HStack {
                             Spacer()
                             Button {
-                                
                                 viewModel.showPreview.toggle()
                                 viewModel.createResult{
                                     
@@ -79,9 +80,12 @@ struct DFEditView: View {
         .onAppear {
             showMaskImage()
         }
-        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
-            DFModifyView(resultImage: $viewModel.outputImage, realImage: $pickedImage)
-        })
+        .onDisappear{ // ✅
+            frameManager.resultImage = viewModel.resultImage
+        }
+        //        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
+        //            DFFrameModifyView()
+        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             toolBarButtons
@@ -263,7 +267,7 @@ private extension DFEditView {
     
     var pickedImageRender: some View {
         VStack {
-            if let image = pickedImage {
+            if let image = frameManager.pickedImage {
                 Image(uiImage: image)
             }
         }
@@ -313,13 +317,15 @@ private extension DFEditView {
 //                            imageList.image.append(image)
                             var newImage = SubjectImage()
                             newImage.image = image
-                            newImage.originalImage = pickedImage
+                            newImage.originalImage = frameManager.pickedImage
                             imageModel.imageList.append(newImage)
                             print("\(imageModel.imageList.count) 길이")
                         }
                     }
                 }
                 viewModel.isShowModifyFrame.toggle()
+                //                viewModel.isShowModifyFrame.toggle()
+                naviManager.push(screen: Screen.modifyFrame) //✅
                 
             } label: {
                 Text("확인")

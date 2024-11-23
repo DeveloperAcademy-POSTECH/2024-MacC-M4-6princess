@@ -14,11 +14,12 @@ struct CameraView: View {
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     @State private var path: NavigationPath = NavigationPath()
-    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
-    
-    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
-        _frameImage = frameImage
-    }
+    //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
+    @StateObject var naviManager = NavigationManager()
+    @StateObject var frameManager = FrameManager()
+    //    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
+    //        _frameImage = frameImage
+    //    }
     
     private var cameraPreview: some View  {
         
@@ -28,6 +29,16 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
+            Group{
+                // ✅
+                if let image = frameManager.resultImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+            }
+            .allowsHitTesting(false)
+            
         }
     }
     
@@ -46,14 +57,15 @@ struct CameraView: View {
                             viewModel.zoomInitialize()
                         }
                     )
-                Group{
-                    if let image = viewModel.frameImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                }
-                .allowsHitTesting(false)
+//                Group{
+//                    // ✅
+//                    if let image = frameManager.resultImage {
+//                        Image(uiImage: image)
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fill)
+//                    }
+//                }
+//                .allowsHitTesting(false)
                 
                 
                 VStack {
@@ -62,6 +74,8 @@ struct CameraView: View {
                     CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     CameraBottomView(viewModel: viewModel)
+                        .environmentObject(naviManager)
+                        .environmentObject(frameManager)
                 }
                 //v end
                 //처음 실행했을 때 - 온보딩 합침
@@ -107,7 +121,8 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isShowMFView.toggle()
+//                                                viewModel.isShowMFView.toggle()
+                                                frameManager.showMFView = true
                                             }
                                         }
                                         else{
@@ -135,7 +150,8 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-                                                viewModel.isShowMFView.toggle()
+//                                                viewModel.isShowMFView.toggle()
+                                                frameManager.showMFView = true
                                             }
                                         }
                                         
@@ -159,29 +175,30 @@ struct CameraView: View {
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }
-            .onChange(of: viewModel.isFrameLoading) { newValue in
+            .onChange(of: frameManager.isFrameLoading) { newValue in
                 if newValue {
                     loadSelectedFrame()
-                    viewModel.isFrameLoading = false
+                    frameManager.isFrameLoading = false
                 }
             }
             .persistentSystemOverlays(.hidden)
             .onAppear {
                 motionManager.startDeviceMotionUpdates()
-                viewModel.frameImage = frameImage
+                //                viewModel.frameImage = frameImage
             }
-            .fullScreenCover(isPresented: $viewModel.isShowMFView) {
-                //TODO: 수정에정
+            .fullScreenCover(isPresented: $frameManager.showMFView) {
                 MFView(context: viewContext)
-                        .environment(\.managedObjectContext, viewContext)
-                        .presentationDetents([.large])
-                        .presentationDragIndicator(.visible)
+                    .environment(\.managedObjectContext, viewContext)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+                    .environmentObject(naviManager) // ✅
+                    .environmentObject(frameManager) // ✅
                 
             }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
-                if let takenImg = viewModel.takenImg,let frameImg = viewModel.frameImage{
+                if let takenImg = viewModel.takenImg,let frameImg = frameManager.resultImage{
                     IEIntroView(bg: takenImg, idol: frameImg)
                 }
                 

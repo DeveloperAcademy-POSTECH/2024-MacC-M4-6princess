@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct DFImageDecoView: View {
-    
-    @Binding var showImagePickerView: Bool
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
+    @ObservedObject var viewModel : DFModifyViewModel
     
     var body: some View {
             
@@ -24,7 +25,8 @@ extension DFImageDecoView {
         VStack {
             Button  {
                 
-                showImagePickerView.toggle()
+//                isShowImagePickerView.toggle()
+                naviManager.push(screen: Screen.photoPicker)
                 
             } label: {
                 ZStack {
@@ -48,7 +50,7 @@ extension DFImageDecoView {
         VStack {
             
             Button  {
-                
+//                viewModel.showStickerSheet = true
             } label: {
                 ZStack {
                     Circle()
@@ -71,7 +73,7 @@ extension DFImageDecoView {
         VStack {
             
             Button  {
-                
+//                viewModel.showTextView = true // zstack 최상단에 텍스트뷰가 보임
             } label: {
                 ZStack {
                     Circle()
@@ -88,8 +90,4 @@ extension DFImageDecoView {
                 .foregroundStyle(.gray01)
         }
     }
-}
-
-#Preview {
-    DFImageDecoView(showImagePickerView: .constant(false))
 }

@@ -21,6 +21,9 @@ class DFModifyViewModel: ObservableObject {
     
     @Published var frameImage: UIImage?
     
+    @Published var showTextView: Bool = false
+    @Published var showStickerSheet: Bool = false
+    
     func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
         
         btnOpacity = 1

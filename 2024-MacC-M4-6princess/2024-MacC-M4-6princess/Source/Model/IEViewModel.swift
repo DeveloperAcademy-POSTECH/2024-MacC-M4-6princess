@@ -116,18 +116,12 @@ class IEViewModel: ObservableObject {
         
     }
     
-    
     /// 사진 저장 함수
     @MainActor
     func saveRenderedView<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
-        // ImageRenderer를 이용해서 합성 이미지 생성
-        //        let renderedImage = ImageRenderer(content: content.frame(width: frameBGSize.width, height: frameBGSize.height))
-        //
-        //        let startPoint = CGPoint(x: 0, y: 82)
         let renderedImage = ImageRenderer(
             content: content
                 .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
-            //                    .offset(x: startPoint.x, y: startPoint.y) // 원하는 시작 위치 설정
         )
         // 해상도
         renderedImage.scale = 8.0
@@ -135,28 +129,11 @@ class IEViewModel: ObservableObject {
         if let uiImage = renderedImage.uiImage {
             self.compositeImage = uiImage
             saveImageToAlbum(uiImage: uiImage)
-//            // 이미지 저장
-//            PHPhotoLibrary.shared().performChanges({
-//                PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
-//            }) { success, error in
-//                DispatchQueue.main.async {
-//                    if success {
-//                        print("성공")
-//                    } else {
-//                        print("실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
-//                    }
-//                }
-//            }
         } else {
             print("렌더링 실패: 이미지 생성 실패")
         }
     }
     
-
-    
-
-    
-
     func saveImageToAlbum(uiImage: UIImage) {
         // 앨범 이름 설정
         let albumName = "Frameet"
@@ -222,9 +199,6 @@ class IEViewModel: ObservableObject {
             saveImageToAlbum(album: album)
         }
     }
-
-
-
 }
 
 

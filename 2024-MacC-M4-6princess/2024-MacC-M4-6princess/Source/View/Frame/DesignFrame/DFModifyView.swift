@@ -11,9 +11,10 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     
     @State private var isFirstLaunching: Bool = true
-    @Binding var resultImage: UIImage?
-    @Binding var realImage: UIImage?
-    @State private var shouldNavigate: Bool = false
+    //    @Binding var resultImage: UIImage?
+    //    @State private var shouldNavigate: Bool = false
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     
     var body: some View {
         
@@ -38,34 +39,50 @@ struct DFModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
-                DFImageDecoView(showImagePickerView: $viewModel.showImagePickerView)
+                DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
             }
+            
+            if viewModel.showTextView {
+                DFTextView(viewModel: viewModel)
+            }
         }
-        .navigationDestination(isPresented: $viewModel.showImagePickerView, destination: {
-            PhotosPickerView()
-        })
+        .sheet(isPresented: $viewModel.showStickerSheet) {
+                    DFStickerView()
+                        .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
+                        .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
+                }
+        //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
+        //            PhotosPickerView()
+        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
-            toolBarButtons
+            if !viewModel.showTextView {
+                toolBarButtons
+            }
+            
         }
         .onChange(of: viewModel.showCamera) { newValue in
             if newValue {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
-                    shouldNavigate = true
+                    //                    shouldNavigate = true
+//                    frameManager.isFrameSelect = false
+                    naviManager.popToRoot()
+                    frameManager.showMFView = false
                 }
             }
         }
-        .fullScreenCover(isPresented: $shouldNavigate) {
-            CameraView(frameImage: $viewModel.frameImage)
-        }
+        //        .fullScreenCover(isPresented: $shouldNavigate) {
+        //            CameraView(frameImage: $viewModel.frameImage)
+        //            //            CameraView(frameImage: $resultImage)
+        //        }
         .onAppear {
-            
-            if let image = resultImage {
-                
-                viewModel.makeImageList()
-                
+            Task {
+                if let image = frameManager.resultImage {
+                    try await Task.sleep(for: .seconds(1))
+                    try await viewModel.makeImageList()
+                }
             }
         }
     }
@@ -124,7 +141,7 @@ private extension DFModifyView {
             Spacer()
             Button {
                 
-                if let image = resultImage {
+                if let image = frameManager.resultImage {
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {

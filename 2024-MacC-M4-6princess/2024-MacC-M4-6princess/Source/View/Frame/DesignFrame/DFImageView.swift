@@ -3,8 +3,8 @@ import SwiftUI
 struct DFImageView: View {
     
     var subjectModel: SubjectImage
-//    @StateObject var viewModel: DFImageViewModel = DFImageViewModel()
-    @ObservedObject var viewModel: DFImageViewModel = DFImageViewModel()
+    @StateObject var viewModel: DFImageViewModel = DFImageViewModel()
+//    @ObservedObject var viewModel: DFImageViewModel = DFImageViewModel()
     
     var body: some View {
         

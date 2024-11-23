@@ -24,7 +24,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var preview: AVCaptureVideoPreviewLayer!
     
     // 프레임 관련 상태
-    @Published var frameImage: UIImage?
+//    @Published var frameImage: UIImage?
     @Published var frameRatio: CGFloat = 4/3
     
     // 타이머 관련 상태
@@ -33,10 +33,10 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var isTakePic = false
     
     // 프레임 선택 관련 상태
-    @Published var isShowMFView = false
-    @Published var selectedFrame: UUID? = nil //CoreData에서 선택한 프레임 id 받아옴
+//    @Published var isShowMFView = false
+//    @Published var selectedFrame: UUID? = nil //CoreData에서 선택한 프레임 id 받아옴
     @Published var isShowAlert = false //프레임 없을 때 alert
-    @Published var isFrameLoading: Bool = false
+//    @Published var isFrameLoading: Bool = false
     @Published var inputImage: UIImage?
     
     //줌 관련
