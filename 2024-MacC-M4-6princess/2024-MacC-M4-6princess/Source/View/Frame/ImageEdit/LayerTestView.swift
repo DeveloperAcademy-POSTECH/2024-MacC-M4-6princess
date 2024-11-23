@@ -111,7 +111,7 @@ struct LayerTestView: View {
             LayerPhotoPicker(layerImages: $layerImages, screenSize: UIScreen.main.bounds.size)
         }
     }
-    // 드래그 변경 시 동작 처리 함수
+    
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
             selectedLayerIndex = index
@@ -130,14 +130,17 @@ struct LayerTestView: View {
                 let steps = abs(currentStep - previousStep)
                 print("위로 이동: steps = \(steps)")
                 moveLayerForward(at: index, steps: steps)
-                selectedLayerIndex = max(index - steps, 0)
+                let newIndex = max(index - steps, 0)
+                selectedLayerIndex = newIndex
             } else if currentStep > previousStep {
                 let steps = abs(currentStep - previousStep)
                 print("아래로 이동: steps = \(steps)")
                 moveLayerBackward(at: index, steps: steps)
-                selectedLayerIndex = min(index + steps, layerImages.count - 1)
+                let newIndex = min(index + steps, layerImages.count - 1)
+                selectedLayerIndex = newIndex
             }
-            previousStep = currentStep
+
+            previousStep = 0 // 단계 초기화
             print("레이어 상태 업데이트 후: \(layerImages.map { $0.order })")
         }
     }
@@ -172,6 +175,5 @@ struct LayerTestView: View {
             currentIndex += 1
         }
     }
-
 
 }
