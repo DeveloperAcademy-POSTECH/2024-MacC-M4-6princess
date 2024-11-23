@@ -9,10 +9,10 @@ import SwiftUI
 import PhotosUI
 
 
-// PHPickerViewController를 사용하는 SwiftUI Wrapper
 struct LayerPhotoPicker: UIViewControllerRepresentable {
-    @Binding var layerImages: [LayerModel]
+    @Binding var layerImages: [LayerImage] // 타입을 LayerImage로 수정
     var screenSize: CGSize
+    
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.selectionLimit = 0
@@ -45,7 +45,14 @@ struct LayerPhotoPicker: UIViewControllerRepresentable {
                         if let uiImage = image as? UIImage {
                             DispatchQueue.main.async {
                                 let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerModel(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
+                                let newLayerImage = LayerImage(
+                                    image: uiImage,
+                                    order: newOrder,
+                                    position: CGPoint(
+                                        x: self.parent.screenSize.width / 2,
+                                        y: self.parent.screenSize.height / 3
+                                    )
+                                )
                                 self.parent.layerImages.append(newLayerImage)
                             }
                         }
