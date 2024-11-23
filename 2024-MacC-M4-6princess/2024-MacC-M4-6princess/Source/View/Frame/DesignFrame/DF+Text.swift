@@ -39,7 +39,7 @@ extension DFTextView{
             case (.trailing, .left): return .center
             case (.leading, .left): return .leading // 유지
             case (.trailing, .right): return .trailing // 유지
-            default: return .center
+//            default: return .center
         }
     }
     var swipeGesture: some Gesture {
