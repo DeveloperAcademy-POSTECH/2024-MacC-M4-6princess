@@ -6,21 +6,22 @@ struct DFModifyView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     
-    @State private var isFirstLaunching: Bool = true
+    @AppStorage("onboarding") var isFirstLaunching: Bool = true
+    @State private var showAgain: Bool = false
     //    @Binding var resultImage: UIImage?
     //    @State private var shouldNavigate: Bool = false
-    @EnvironmentObject var naviManager: NavigationManager
-    @EnvironmentObject var frameManager: FrameManager
     
     var body: some View {
         
         ZStack {
-            if isFirstLaunching == true {
-                DFOnboardingView(isFirstLaunching: $isFirstLaunching)
+            if isFirstLaunching == true && !showAgain == true {
+                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
                     .zIndex(1)
             }
             

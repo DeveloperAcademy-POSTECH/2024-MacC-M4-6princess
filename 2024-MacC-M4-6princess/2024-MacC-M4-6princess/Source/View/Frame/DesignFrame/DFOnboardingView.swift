@@ -2,6 +2,9 @@ import SwiftUI
 
 struct DFOnboardingView: View {
     @Binding var isFirstLaunching: Bool
+    @Binding var showAgain: Bool
+    
+    @Environment(\.dismiss) var dismiss
     var coloredSubstring: String = ""
     
     var body: some View {
@@ -49,13 +52,34 @@ struct DFOnboardingView: View {
                 TextWithColoredSubstring(originalText: "이미지가 이동해요.", coloredSubstring: "이동해요")
                     .font(.footnote)
                 Spacer()
+                
+                Button {
+                    showAgain.toggle()
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.white, lineWidth: 1)
+                            .frame(width: 180, height: 50)
+                        Text("닫기")
+                            .font(.body)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                    }
+                }
+                .padding(.bottom, 10)
+                Button  {
+                    isFirstLaunching.toggle()
+                } label: {
+                    Text("다시보지 않기")
+                        .font(.body)
+                        .foregroundStyle(.white)
+                        .underline(color: .white)
+                }
+                Spacer()
             }
-        }
-        .onTapGesture {
-            isFirstLaunching.toggle()
         }
     }
 }
-//#Preview {
-//    DFOnboardingView()
-//}
+#Preview {
+    DFOnboardingView(isFirstLaunching: .constant(true), showAgain: .constant(false))
+}
