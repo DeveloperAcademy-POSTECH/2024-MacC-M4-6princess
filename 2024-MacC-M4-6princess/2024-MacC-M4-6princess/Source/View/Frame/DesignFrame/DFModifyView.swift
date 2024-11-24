@@ -52,9 +52,6 @@ struct DFModifyView: View {
                         .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
                         .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
                 }
-        //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
-        //            PhotosPickerView()
-        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             if !viewModel.showTextView {
@@ -93,9 +90,9 @@ private extension DFModifyView {
     var imageView: some View {
         
         ZStack {
-            ForEach(imageModel.imageList, id: \.self) { subject in
+            ForEach($imageModel.imageList, id: \.self) { $subject in
                 
-                DFImageView(subjectModel: subject)
+                DFImageView(subjectModel: $subject)
                 
             }
             
@@ -105,8 +102,7 @@ private extension DFModifyView {
     var toolBarButtons: some View {
         HStack {
             Button {
-                imageModel.imageList.removeAll()
-                self.presentationMode.wrappedValue.dismiss()
+                viewModel.isAlert.toggle()
             } label: {
                 HStack {
                     Image(systemName: "chevron.backward")
@@ -117,6 +113,23 @@ private extension DFModifyView {
                         .fontWeight(.regular)
                         .foregroundStyle(.gray01)
                 }
+            }
+            .alert("프레임 편집을 종료하시겠습니까?", isPresented: $viewModel.isAlert) {
+                Button {
+                    viewModel.isAlert.toggle()
+                } label: {
+                    Text("취소")
+                }
+                
+                Button {
+                    imageModel.imageList.removeAll()
+                    naviManager.popToRoot()
+                } label: {
+                    Text("나가기")
+                }
+
+            } message: {
+                Text("종료 시 편집된 내용은 저장되지 않습니다.")
             }
             .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
             
@@ -142,6 +155,7 @@ private extension DFModifyView {
             Button {
                 
                 if let image = frameManager.resultImage {
+                    
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {

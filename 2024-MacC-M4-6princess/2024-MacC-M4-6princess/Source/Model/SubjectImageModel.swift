@@ -9,4 +9,8 @@ struct SubjectImage: Identifiable, Hashable {
     var offSet: CGSize = .zero
     var scale: CGFloat = 1.0
     
+    mutating func saveOffSet(offset: CGSize) {
+        self.offSet = offset
+    }
+    
 }
