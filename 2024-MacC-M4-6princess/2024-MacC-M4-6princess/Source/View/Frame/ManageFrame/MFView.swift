@@ -13,14 +13,8 @@ struct MFView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject var viewModel: MFViewModel
-    @ObservedObject var cameraViewModel: CameraViewModel
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
-    
-    init(context: NSManagedObjectContext) {
-        _viewModel = StateObject(wrappedValue: MFViewModel(context: context))
-        _cameraViewModel = ObservedObject(wrappedValue: CameraViewModel())
-    }
     
     var body: some View {
         NavigationStack(path: $naviManager.route) {
@@ -28,66 +22,11 @@ struct MFView: View {
                 VStack(spacing: 0) {
                     SheetTitleView(viewModel: viewModel)
                     ScrollView {
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-                            Button {
-                                naviManager.push(screen: Screen.photoPicker)
-                            } label: {
-                                VStack(alignment: .center, spacing: 4) {
-                                    Spacer()
-                                    Image("plusIcon")
-                                        .resizable()
-                                        .frame(width: 30, height: 30, alignment: .center)
-                                    Text("새로운\n프레임 만들기")
-                                        .font(.system(size: 13))
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .frame(minHeight: 200)
-                                .background(Color(red: 0.83, green: 0.83, blue: 0.83))
-                            }
-                            .disabled(viewModel.isEditing)
-                            
-                            ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
-                                ZStack(alignment: .topTrailing) {
-                                    Button {
-                                        if viewModel.isEditing {
-                                            viewModel.toggleSelection(for: imageInfo.id)
-                                        } else {
-                                            
-                                            //TODO: 아래 부분 뷰모델 간 데이터 전송 수정 예정
-                                            frameManager.selectedFrame = imageInfo.id
-                                            frameManager.isFrameLoading = true
-                                            
-                                            dismiss()
-                                        }
-                                    } label: {
-                                        if let uiImage = UIImage(data: imageInfo.data) {
-                                            Image(uiImage: uiImage)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: UIScreen.main.bounds.width / 3, height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                                .clipped()
-                                        }
-                                    }
-                                    .frame(width: UIScreen.main.bounds.width / 3, height: (UIScreen.main.bounds.width / 3) * (598 / 375))
-                                    
-                                    if viewModel.isEditing {
-                                        Image(viewModel.selectedImageIds.contains(imageInfo.id) ? "frameCheckIcon" : "")
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                            .background(Circle().fill(Color.gray03))
-                                            .padding(.trailing, 10)
-                                            .padding(.top, 10)
-                                    }
-                                }
-                            }
-                        }
+                        FrameGridItem(viewModel: viewModel)
                     }
                     
                 }
-                .navigationDestination(for: Screen.self) { type in // ✅
+                .navigationDestination(for: Screen.self) { type in
                     FeatureView(type: type)
                 }
                 if viewModel.isEditing {
@@ -148,10 +87,6 @@ struct MFView: View {
                 }
             }
         }
-        .onChange(of: viewModel.selectedImageIds.count) {
-            // CoreData에 변화가 있을 때만 이미지 로드
-            viewModel.loadImages()
-        }
         .onAppear {
             // 처음 한 번만 로드
             if viewModel.imageDataArray.isEmpty {
@@ -160,9 +95,6 @@ struct MFView: View {
         }
         .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
             PhotosPickerView()
-            //                .onAppear {
-            //                    viewModel.isShowMFView.toggle()
-            //                }
         }
     }
 }
@@ -181,6 +113,7 @@ struct SheetTitleView: View {
                 Text("프레임")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
+                    .foregroundColor(.gray01)
                 Spacer()
             }
             HStack(alignment: .center) {
@@ -212,4 +145,80 @@ struct SheetTitleView: View {
     }
 }
 
+
+// MARK: - 그리드 분리
+struct FrameGridItem: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    @ObservedObject var viewModel: MFViewModel
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
+    
+    var body: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
+            Button {
+                naviManager.push(screen: Screen.photoPicker)
+            } label: {
+                VStack(alignment: .center, spacing: 4) {
+                    Image("newFrameCreateLogo")
+                        .resizable()
+                        .frame(width: 80, height: 92)
+                        .padding(.top, 20)
+                        .padding(.bottom, 3)
+                    Text("새로운\n프레임 만들기")
+                        .font(.system(size: 13, weight: .bold))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.white)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 163)
+                .background(.pointPink)
+            }
+            .disabled(viewModel.isEditing)
+            
+            ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
+                GridItemView(imageInfo: imageInfo, isSelected: viewModel.selectedImageIds.contains(imageInfo.id), viewModel: viewModel)
+                    .id(imageInfo.id)
+            }
+        }
+    }
+    
+}
+
+// MARK: - 그리드 각각 분리
+
+struct GridItemView: View {
+    let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
+    let isSelected: Bool
+    @ObservedObject var viewModel: MFViewModel
+    @EnvironmentObject var frameManager: FrameManager
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            if let image = UIImage(data: viewModel.loadImageIfNeeded(for: imageInfo.id) ?? Data()) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: UIScreen.main.bounds.width / 3,
+                           height: (UIScreen.main.bounds.width / 3) * (4 / 3))
+                    .clipped()
+            }
+            
+            if viewModel.isEditing {
+                Image(isSelected ? "frameCheckIcon" : "")
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .background(Circle().fill(Color.gray03))
+                    .padding(.trailing, 10)
+                    .padding(.top, 10)
+            }
+        }
+        .onTapGesture {
+            viewModel.toggleSelection(for: imageInfo.id)
+            dismiss()
+        }
+    }
+}
 

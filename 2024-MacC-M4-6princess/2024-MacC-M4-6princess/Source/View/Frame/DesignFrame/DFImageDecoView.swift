@@ -13,7 +13,7 @@ struct DFImageDecoView: View {
             
             stickerView
             
-            TextView
+            textView
         }
     }
 }
@@ -50,7 +50,7 @@ extension DFImageDecoView {
         VStack {
             
             Button  {
-//                viewModel.showStickerSheet = true
+                viewModel.showStickerSheet = true
             } label: {
                 ZStack {
                     Circle()
@@ -68,12 +68,12 @@ extension DFImageDecoView {
         }
     }
     
-    var TextView: some View {
+    var textView: some View {
         
         VStack {
             
             Button  {
-//                viewModel.showTextView = true // zstack 최상단에 텍스트뷰가 보임
+                viewModel.showTextView = true // zstack 최상단에 텍스트뷰가 보임
             } label: {
                 ZStack {
                     Circle()

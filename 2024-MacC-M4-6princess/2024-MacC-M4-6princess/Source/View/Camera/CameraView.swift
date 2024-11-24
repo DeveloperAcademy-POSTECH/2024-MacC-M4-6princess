@@ -17,12 +17,8 @@ struct CameraView: View {
     //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
     @StateObject var frameManager = FrameManager()
-    //    init(frameImage: Binding<UIImage?> = .constant(nil)) {  // 기본값 설정
-    //        _frameImage = frameImage
-    //    }
     
     private var cameraPreview: some View  {
-        
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
@@ -30,7 +26,6 @@ struct CameraView: View {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
             Group{
-                // ✅
                 if let image = frameManager.resultImage {
                     Image(uiImage: image)
                         .resizable()
@@ -38,7 +33,6 @@ struct CameraView: View {
                 }
             }
             .allowsHitTesting(false)
-            
         }
     }
     
@@ -46,28 +40,23 @@ struct CameraView: View {
         
         NavigationStack {
             ZStack{
-                //TODO: 줌 한 화면대로 처리되도록
-                cameraPreview
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                    .gesture(MagnificationGesture()
-                        .onChanged { val in
-                            viewModel.zoom(factor: val)
-                        }
-                        .onEnded { _ in
-                            viewModel.zoomInitialize()
-                        }
-                    )
-//                Group{
-//                    // ✅
-//                    if let image = frameManager.resultImage {
-//                        Image(uiImage: image)
-//                            .resizable()
-//                            .aspectRatio(contentMode: .fill)
-//                    }
-//                }
-//                .allowsHitTesting(false)
-                
-                
+                VStack(spacing: 0) {
+                                Color.clear
+                                    .frame(height: 94) // TopView 높이만큼 여백 확보
+                                
+                                cameraPreview
+                                    .frame(width: UIScreen.main.bounds.width,
+                                           height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                                    .gesture(MagnificationGesture()
+                                        .onChanged { val in
+                                            viewModel.zoom(factor: val)
+                                        }
+                                        .onEnded { _ in
+                                            viewModel.zoomInitialize()
+                                        })
+                                
+                                Spacer()
+                            }
                 VStack {
                     CameraTopView(viewModel: viewModel)
                     Spacer()
@@ -187,12 +176,11 @@ struct CameraView: View {
                 //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
-                MFView(context: viewContext)
-                    .environment(\.managedObjectContext, viewContext)
+                MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
+//                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
-                    .environmentObject(naviManager) // ✅
-                    .environmentObject(frameManager) // ✅
+                    
                 
             }
             .statusBar(hidden: true)
