@@ -216,8 +216,11 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-            viewModel.toggleSelection(for: imageInfo.id)
-            dismiss()
+            if !viewModel.isEditing {
+                dismiss()
+            }else {
+                viewModel.toggleSelection(for: imageInfo.id)
+            }
         }
     }
 }
