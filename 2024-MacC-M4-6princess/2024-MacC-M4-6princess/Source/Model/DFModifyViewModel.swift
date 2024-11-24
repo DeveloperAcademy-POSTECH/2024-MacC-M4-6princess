@@ -24,6 +24,8 @@ class DFModifyViewModel: ObservableObject {
     @Published var showTextView: Bool = false
     @Published var showStickerSheet: Bool = false
     
+    @Published var isAlert: Bool = false
+    
     func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
         
         btnOpacity = 1
@@ -31,7 +33,8 @@ class DFModifyViewModel: ObservableObject {
         Task {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-            render.scale = scaleCompute(inputImage)
+//            render.scale = scaleCompute(inputImage)
+            render.scale = UIScreen.main.scale
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context)
         }

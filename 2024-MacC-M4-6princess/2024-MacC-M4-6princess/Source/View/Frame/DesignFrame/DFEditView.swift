@@ -314,7 +314,6 @@ private extension DFEditView {
                     viewModel.detectSubject(inputImage: viewModel.resultImage) {
                         
                         if let image = viewModel.outputImage {
-//                            imageList.image.append(image)
                             var newImage = SubjectImage()
                             newImage.image = image
                             newImage.originalImage = frameManager.pickedImage
@@ -325,7 +324,12 @@ private extension DFEditView {
                 }
                 viewModel.isShowModifyFrame.toggle()
                 //                viewModel.isShowModifyFrame.toggle()
-                naviManager.push(screen: Screen.modifyFrame) //✅
+                
+                if naviManager.route.count > 1 {
+                    naviManager.pop()
+                } else {
+                    naviManager.push(screen: Screen.modifyFrame)
+                }//✅
                 
             } label: {
                 Text("확인")

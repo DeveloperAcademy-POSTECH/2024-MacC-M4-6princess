@@ -2,14 +2,16 @@ import SwiftUI
 
 struct DFImageView: View {
     
-    var subjectModel: SubjectImage
+    @Binding var subjectModel: SubjectImage
     @StateObject var viewModel: DFImageViewModel = DFImageViewModel()
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
 //    @ObservedObject var viewModel: DFImageViewModel = DFImageViewModel()
     
     var body: some View {
         
         ZStack{
-//            
+            
             if let image = subjectModel.image, let realImage = subjectModel.originalImage {
                 
                 overlayRect
@@ -23,11 +25,13 @@ struct DFImageView: View {
                     .scaleEffect(viewModel.magnifyScale)
                     .rotationEffect(viewModel.angle)
                     .offset(viewModel.draggedOffSet)
-                    .gesture(magnification.simultaneously(with: moveImage).simultaneously(with: rotate).simultaneously(with: tap))
+                    .opacity(viewModel.isPushedDeleteButton ? 0 : 1)
+//                    .offset(subjectModel.offSet)
                 
             }
             
         }
+        .gesture(rotate.simultaneously(with: moveImage).simultaneously(with: magnification).simultaneously(with: tap))
         .onAppear {
             
             if let image = subjectModel.image, let realImage = subjectModel.originalImage {
@@ -53,29 +57,52 @@ private extension DFImageView {
                 .offset(viewModel.draggedOffSet)
             
             Button {
-                print("오 클릭되었소")
+                if let realImage = subjectModel.originalImage {
+                    frameManager.pickedImage = realImage
+                    naviManager.push(screen: Screen.frameEdit)
+                    
+                }
+                
             } label: {
-                Circle()
-                    .foregroundStyle(Color.gray)
-                    .frame(width: 20, height: 20)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 13)
+                        .foregroundStyle(Color.white)
+                        .frame(width: 40, height: 26)
+                    Text("수정")
+                        .font(.footnote)
+                        .foregroundStyle(Color.black)
+                }
             }
             .offset(viewModel.OffsetCompute(x: -viewModel.width/2, y: -viewModel.height/2))
             
             Button {
-                print("좋아요")
+                viewModel.isPushedDeleteButton.toggle()
+                viewModel.isTappedImage = false
+                
             } label: {
-                Circle()
-                    .foregroundStyle(Color.gray)
-                    .frame(width: 20, height: 20)
+                ZStack {
+                    Circle()
+                        .foregroundStyle(Color.white)
+                        .frame(width: 26, height: 26)
+                    Image(systemName: "xmark")
+                        .foregroundStyle(Color.black)
+                        .frame(width: 20, height: 20)
+                }
             }
             .offset(viewModel.OffsetCompute(x: viewModel.width/2, y: -viewModel.height/2))
             
             Button {
                 print("허허")
             } label: {
-                Circle()
-                    .foregroundStyle(Color.gray)
-                    .frame(width: 20, height: 20)
+                ZStack {
+                    
+                    Circle()
+                        .foregroundStyle(Color.white)
+                        .frame(width: 26, height: 26)
+                    Image("zoomButton")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                }
                 
             }
             .offset(viewModel.OffsetCompute(x: viewModel.width/2, y: viewModel.height/2))
@@ -85,6 +112,8 @@ private extension DFImageView {
 
 private extension DFImageView {
     
+    
+        
     var tap: some Gesture {
         
         TapGesture()
@@ -97,26 +126,35 @@ private extension DFImageView {
     var rotate: some Gesture {
         
         RotateGesture()
+        
             .onChanged { value in
-                viewModel.angle = value.rotation + viewModel.current
+                if viewModel.isTappedImage {
+                    viewModel.angle = value.rotation + viewModel.current
+                    
+                    print(viewModel.angle.degrees)
+                }
             }
             .onEnded { value in
-                viewModel.current += value.rotation
+                if viewModel.isTappedImage {
+                    viewModel.current += value.rotation
+                }
             }
     }
     var moveImage: some Gesture {
         
         DragGesture()
             .onChanged { value in
-                viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
-                viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+                if viewModel.isTappedImage {
+                    viewModel.draggedOffSet.width = (viewModel.accumulatedOffSet.width + value.translation.width)
+                    viewModel.draggedOffSet.height = (viewModel.accumulatedOffSet.height + value.translation.height)
+                }
                 
             }
             .onEnded { value in
-                viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
-                viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
-                print(viewModel.draggedOffSet)
-                
+                if viewModel.isTappedImage {
+                    viewModel.accumulatedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
+                    viewModel.accumulatedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
+                }
             }
         
     }
@@ -125,10 +163,14 @@ private extension DFImageView {
         
         MagnifyGesture()
             .onChanged { value in
-                viewModel.setScaleVolume(value.magnification)
+                if viewModel.isTappedImage {
+                    viewModel.setScaleVolume(value.magnification)
+                }
             }
             .onEnded { value in
-                viewModel.setScaleValue(minimum: 0.2, maximum: 10)
+                if viewModel.isTappedImage {
+                    viewModel.setScaleValue(minimum: 0.2, maximum: 10)
+                }
             }
     }
 }
