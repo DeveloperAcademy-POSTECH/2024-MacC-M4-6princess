@@ -9,6 +9,7 @@ class DFImageViewModel: ObservableObject {
     @Published var accumulatedOffSet: CGSize = .zero
     @Published var angle: Angle = .degrees(0)
     @Published var isTappedImage: Bool = false
+    @Published var isPushedDeleteButton: Bool = false
     
     @Published var width: CGFloat = .zero
     @Published var height: CGFloat = .zero
@@ -54,8 +55,12 @@ class DFImageViewModel: ObservableObject {
     
     func OffsetCompute(x: CGFloat, y: CGFloat) -> CGSize {
         
-        let width = (x+draggedOffSet.width)*magnifyScale
-        let height = (y+draggedOffSet.height)*magnifyScale
+        let computedX = x * CGFloat(cos(angle.degrees * (Double.pi / 180.0))) - y * sin(angle.degrees * (Double.pi / 180.0))
+        let computedY = x * CGFloat(sin(angle.degrees * (Double.pi / 180.0))) + y * cos(angle.degrees * (Double.pi / 180.0))
+
+        
+        let width = computedX * magnifyScale + draggedOffSet.width
+        let height = computedY * magnifyScale + draggedOffSet.height
         
         return CGSize(width: width, height: height)
     }
