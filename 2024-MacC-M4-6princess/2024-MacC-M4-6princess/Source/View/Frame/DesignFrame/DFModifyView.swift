@@ -123,7 +123,7 @@ private extension DFModifyView {
                 } label: {
                     Text("나가기")
                 }
-
+                
             } message: {
                 Text("종료 시 편집된 내용은 저장되지 않습니다.")
             }

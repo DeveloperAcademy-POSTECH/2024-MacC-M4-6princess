@@ -35,8 +35,9 @@ extension DFTextView{
             HStack(spacing: 10) {
                 ForEach(FontStyle.allCases, id: \.self) { fontStyle in
                     Text(fontStyle.displayName) // 한글 이름 표시
-                        .font(fontStyle.applyFont(size: 13)) // 매칭된 영문 폰트 적용
-                        .padding(6)
+                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
+                        .padding(.horizontal,15)
+                        .padding(.vertical,6)
                         .foregroundColor(selectedFont == fontStyle ? .black :.white)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
@@ -51,8 +52,9 @@ extension DFTextView{
                         }
                 }
             }
-            .padding(.horizontal)
+            
         }
+        .padding(.horizontal)
     }
     var colorSelector: some View {
         // fontColor 선택
@@ -62,6 +64,10 @@ extension DFTextView{
                     Circle()
                         .frame(width: colorNum == colorIndex ? 40 : 30)
                         .foregroundColor(colorChip[colorIndex])
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
+                        )
                         .onTapGesture {
                             fontColor = colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
@@ -71,7 +77,7 @@ extension DFTextView{
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal,20)
     }
     var textTabBar: some View {
         ZStack {
@@ -85,7 +91,7 @@ extension DFTextView{
             HStack(spacing: 0) {
                 Text("Aa")
                     .font(.system(size: 16))
-                    .foregroundColor(tab == 0 ? .black : .gray)
+                    .foregroundColor(.black)
                     .frame(width: 105, height: 30)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -127,26 +133,9 @@ extension DFTextView{
                 }
                 .frame(width: 105, height: 30)
             }
-            .padding(.vertical)
+            .padding()
         }
         .frame(height: 40)
         .frame(maxWidth:.infinity)
-        .padding()
-    }
-}
-
-struct TextRenderView: View {
-    let text: String
-    let selectedFont: FontStyle
-    let selectedColor: Color
-    let selectedAlignment: TextAlignment
-    
-    var body: some View {
-        Text(text)
-            .font(selectedFont.applyFont(size: 20))
-            .foregroundColor(selectedColor)
-            .multilineTextAlignment(selectedAlignment)
-            .lineSpacing(5)
-        
     }
 }

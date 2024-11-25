@@ -37,11 +37,11 @@ enum FontStyle: String {
 extension FontStyle: CaseIterable {
     func applyFont(size: CGFloat) -> Font {
         switch self {
-        case .modern:
-            return .custom("Pretendard-Regular",size: size) // 시스템 폰트
-        case .handwriting:
-            return .custom("Hakgyoansim Geurimilgi OTF R", size: size) // 헬베티카 폰트
-        case .bold:
+            case .modern:
+                return .custom("Pretendard-Regular",size: size) // 시스템 폰트
+            case .handwriting:
+                return .custom("Hakgyoansim Geurimilgi OTF R", size: size) // 헬베티카 폰트
+            case .bold:
                 return .custom("Pretendard-Bold",size: size) // 시스템 기본 볼드체
         }
     }
@@ -128,15 +128,15 @@ extension Font {
         registerFont(bundle: Bundle.main , fontName: fontName, fontExtension: ".otf") //change according to your ext.
     }
     fileprivate static func registerFont(bundle: Bundle, fontName: String, fontExtension: String) {
-
+        
         guard let fontURL = bundle.url(forResource: fontName, withExtension: fontExtension),
               let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
               let font = CGFont(fontDataProvider) else {
             fatalError("Couldn't create font from data")
         }
-
+        
         var error: Unmanaged<CFError>?
-
+        
         CTFontManagerRegisterGraphicsFont(font, &error)
     }
 }
