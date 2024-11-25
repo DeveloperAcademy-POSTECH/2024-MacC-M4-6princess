@@ -14,8 +14,9 @@ struct DFTextView: View {
     let colorChip: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
+    
     @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
-   
+    
     var body: some View {
         VStack {
             Spacer()
@@ -26,10 +27,10 @@ struct DFTextView: View {
                 .foregroundColor(fontColor)
                 .font(selectedFont.applyFont(size: fontSize))
                 .lineSpacing(5)
-                .frame(height:UIScreen.main.bounds.height/3)
+                .frame(height:UIScreen.main.bounds.height/5)
                 .background(Color.clear) // 배경을 투명하게 설정
                 .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
-                .gesture(swipeAlignmentGesture)
+                .gesture(tab == 2 ? swipeAlignmentGesture : nil)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("완료") {
@@ -57,6 +58,7 @@ struct DFTextView: View {
             } else if tab == 1 {
                 colorSelector
             }
+            
             textTabBar
             Spacer()
                 .frame(height: keyboardHeight)
@@ -70,5 +72,7 @@ struct DFTextView: View {
         .onAppear {
             isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
         }
+        
     }
+    
 }
