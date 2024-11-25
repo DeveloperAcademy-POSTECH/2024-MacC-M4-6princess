@@ -7,14 +7,6 @@
 import SwiftUI
 import PhotosUI
 
-struct LayerModel: Identifiable {
-    let id = UUID()
-    var image: UIImage
-    var order: Int
-    var position: CGPoint = .zero
-    var scale: CGFloat = 1.0
-    var rotation: Angle = .zero
-}
 struct LayerChangeView: View {
     @State private var layerImages: [LayerModel] = []
     @State private var showImagePicker: Bool = false
@@ -22,7 +14,7 @@ struct LayerChangeView: View {
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
     @State private var previousStep: Int = 0
-
+    @State var distance = 0.0
     var body: some View {
         ZStack {
             ZStack {
@@ -105,117 +97,111 @@ struct LayerChangeView: View {
         .cornerRadius(8)
         .padding(.horizontal, 5)
     }
-
-    // 드래그 제스처 분리
+    // 드래그 제스처를 생성하는 함수
     func dragGesture(for index: Int) -> some Gesture {
+        // 최소 이동 거리 없이 DragGesture를 생성
         DragGesture(minimumDistance: 0)
+            // 드래그 중 발생하는 동작 정의
             .onChanged { value in
                 dragOnChanged(value: value, index: index)
             }
+            // 드래그가 종료되었을 때 발생하는 동작 정의
             .onEnded { _ in
                 dragOnEnded()
             }
     }
 
+
+    // 드래그 중 호출되는 함수
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
-            selectedLayerIndex = index
-            dragStartPosition = layerImages[index].position
-            isDragging = true
-            previousStep = 0
+            selectedLayerIndex = index // 드래그 중인 레이어의 인덱스 저장
+            dragStartPosition = layerImages[index].position // 시작 위치 저장
+            isDragging = true // 드래그 상태 활성화
+            previousStep = 0 // 이전 이동 단계 초기화
+//            print("Drag 시작: index = \(index), position = \(dragStartPosition ?? .zero), previousStep = \(previousStep)")
+            print("Drag 시작: index = \(index)")
         }
+        
+        let dragOffsetY = value.translation.height // 드래그 이동 거리 (Y축 기준)
+        let currentStep = Int(dragOffsetY-distance / 50) // 드래그 이동을 50 단위로 계산해 현재 이동 단계 도출
+//        print("Drag 진행 중: dragOffsetY = \(dragOffsetY), currentStep = \(currentStep), previousStep = \(previousStep)")
 
-        let dragOffsetY = value.translation.height
-        let currentStep = Int(dragOffsetY / 50)
-
+        // 이전 단계와 현재 단계가 다를 때만 실행 (중복 이동 방지)
         if currentStep != previousStep {
             if currentStep < previousStep {
-                let steps = abs(currentStep - previousStep)
-                moveLayerForward(at: index, steps: steps)
-                let newIndex = max(index - steps, 0)
-                selectedLayerIndex = newIndex
+                // 이전 단계보다 더 위로 이동한 경우 (레이어 앞으로 이동)
+                let steps = abs(currentStep - previousStep) // 이동 단계 계산
+                print("위로 이동: steps = \(steps)")
+                moveLayerForward(at: index, steps: steps) // 레이어를 앞으로 이동
+                let newIndex = max(index - steps, 0) // 새로운 인덱스 계산
+                print("index-steps = \(index-steps)")
+                selectedLayerIndex = newIndex // 선택된 레이어 인덱스 업데이트
             } else if currentStep > previousStep {
-                let steps = abs(currentStep - previousStep)
-                moveLayerBackward(at: index, steps: steps)
-                let newIndex = min(index + steps, layerImages.count - 1)
-                selectedLayerIndex = newIndex
+                // 이전 단계보다 더 아래로 이동한 경우 (레이어 뒤로 이동)
+                let steps = abs(currentStep - previousStep) // 이동 단계 계산
+                print("아래로 이동: steps = \(steps)")
+                moveLayerBackward(at: index, steps: steps) // 레이어를 뒤로 이동
+                print("index+steps = \(index+steps)")
+                print("layerImages.count - 1 = \(layerImages.count - 1)")
+                let newIndex = min(index + steps, layerImages.count - 1) // 새로운 인덱스 계산
+                selectedLayerIndex = newIndex // 선택된 레이어 인덱스 업데이트
             }
 
-            previousStep = 0 // 단계 초기화
+            previousStep = currentStep // 이전 단계 업데이트
+//            dragOffsetY = 0
+            distance += dragOffsetY
+            
+            print("레이어 상태 업데이트 후: \(layerImages.map { $0.order })")
         }
     }
 
+    // 드래그 종료 시 호출되는 함수
     func dragOnEnded() {
-        isDragging = false
-        dragStartPosition = nil
-        selectedLayerIndex = nil
-        previousStep = 0
+        print("Drag 종료: selectedLayerIndex = \(selectedLayerIndex ?? -1), previousStep = \(previousStep)")
+        isDragging = false // 드래그 상태 비활성화
+        dragStartPosition = nil // 시작 위치 초기화
+        selectedLayerIndex = nil // 선택된 레이어 초기화
+        previousStep = 0 // 이전 이동 단계 초기화
+        print("최종 레이어 상태: \(layerImages.map { $0.order })")
     }
 
+    // 레이어를 앞으로 이동하는 함수
     private func moveLayerForward(at index: Int, steps: Int) {
         guard steps > 0 else { return }
         var currentIndex = index
+
+        // 변경 전 상태 저장
+        let beforeOrder = layerImages.map { $0.order }
+
         for _ in 0..<steps {
             guard currentIndex > 0 else { return }
-            layerImages.swapAt(currentIndex, currentIndex - 1)
-            currentIndex -= 1
+            layerImages.swapAt(currentIndex, currentIndex - 1) // 현재 레이어와 바로 앞 레이어 교환
+            currentIndex -= 1 // 현재 인덱스를 앞으로 이동
         }
+
+        // 변경 후 상태 저장
+        let afterOrder = layerImages.map { $0.order }
+        print("레이어 변경 (앞으로): \(beforeOrder) -> \(afterOrder)")
     }
 
+    // 레이어를 뒤로 이동하는 함수
     private func moveLayerBackward(at index: Int, steps: Int) {
         guard steps > 0 else { return }
         var currentIndex = index
+
+        // 변경 전 상태 저장
+        let beforeOrder = layerImages.map { $0.order }
+
         for _ in 0..<steps {
             guard currentIndex < layerImages.count - 1 else { return }
-            layerImages.swapAt(currentIndex, currentIndex + 1)
-            currentIndex += 1
+            layerImages.swapAt(currentIndex, currentIndex + 1) // 현재 레이어와 바로 뒤 레이어 교환
+            currentIndex += 1 // 현재 인덱스를 뒤로 이동
         }
-    }
-}
 
-// PHPickerViewController를 사용하는 SwiftUI Wrapper
-struct LayerPhotoPicker2: UIViewControllerRepresentable {
-    @Binding var layerImages: [LayerModel]
-    var screenSize: CGSize
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 0
-        config.filter = .images
-        
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = context.coordinator
-        return picker
+        // 변경 후 상태 저장
+        let afterOrder = layerImages.map { $0.order }
+        print("레이어 변경 (뒤로): \(beforeOrder) -> \(afterOrder)")
     }
-    
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: LayerPhotoPicker2
-        
-        init(_ parent: LayerPhotoPicker2) {
-            self.parent = parent
-        }
-        
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
-            
-            for result in results {
-                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
-                        if let uiImage = image as? UIImage {
-                            DispatchQueue.main.async {
-                                let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerModel(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
-                                self.parent.layerImages.append(newLayerImage)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 }
