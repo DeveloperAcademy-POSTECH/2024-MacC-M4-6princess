@@ -8,21 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    
-//    @State private var inputImage: UIImage?
-//    @StateObject var vm: DFFrameModifyViewModel = DFFrameModifyViewModel()
+
     @StateObject var imageModel: ImageListModel = ImageListModel()
     
     var body: some View {
         
-//        CameraView()
-//            .environmentObject(imageModel)
-        IEDevelopView()
-        //        CMView()
-        //        IEProgressView()
+        CameraView()
+            .environmentObject(imageModel)
+//        IEDevelopView()
+
     }
 }
 
-//#Preview {
-//    ContentView()
-//}

@@ -48,11 +48,12 @@ struct LayerTestView: View {
                         .onTapGesture {
                             selectedLayerIndex = index
                         }
-                        .overlay(
-                            LongPressGestureRecognizerWrapper(isEditing: $isEditing, selectedLayerIndex: $selectedLayerIndex, currentIndex: index)
-                        )
+                        
                 }
             }
+            .overlay(
+                LongPressGestureRecognizerWrapper(isEditing: $isEditing)
+            )
             .frame(width: 300, height: 300)
             .padding()
             
@@ -86,12 +87,12 @@ struct LayerTestView: View {
     private func combinedGesture(for index: Int) -> some Gesture {
         DragGesture()
             .onChanged { value in
-                if selectedLayerIndex == index {
+                if isEditing, selectedLayerIndex == index { // isEditing이 true일 때만 실행
                     activeDragOffset = value.translation
                 }
             }
             .onEnded { value in
-                if selectedLayerIndex == index {
+                if isEditing, selectedLayerIndex == index { // isEditing이 true일 때만 실행
                     layerImages[index].position.x += activeDragOffset.width
                     layerImages[index].position.y += activeDragOffset.height
                     activeDragOffset = .zero
@@ -100,12 +101,12 @@ struct LayerTestView: View {
             .simultaneously(
                 with: MagnificationGesture()
                     .onChanged { value in
-                        if selectedLayerIndex == index {
+                        if isEditing, selectedLayerIndex == index { // isEditing이 true일 때만 실행
                             activeScale = value
                         }
                     }
                     .onEnded { value in
-                        if selectedLayerIndex == index {
+                        if isEditing, selectedLayerIndex == index { // isEditing이 true일 때만 실행
                             layerImages[index].scale *= activeScale
                             activeScale = 1.0
                         }
@@ -114,64 +115,19 @@ struct LayerTestView: View {
             .simultaneously(
                 with: RotationGesture()
                     .onChanged { angle in
-                        if selectedLayerIndex == index {
+                        if isEditing, selectedLayerIndex == index { // isEditing이 true일 때만 실행
                             activeRotation = angle
                         }
                     }
                     .onEnded { angle in
-                        if selectedLayerIndex == index {
+                        if isEditing, selectedLayerIndex == index { // isEditing이 true일 때만 실행
                             layerImages[index].rotation += activeRotation
                             activeRotation = .zero
                         }
                     }
             )
     }
+
+
 }
-// UIKit의 LongPressGestureRecognizer를 SwiftUI에 통합
-struct LongPressGestureRecognizerWrapper: UIViewRepresentable {
-    @Binding var isEditing: Bool // 에디팅 모드 상태를 바인딩
-    @Binding var selectedLayerIndex: Int? // 현재 선택된 레이어 인덱스를 바인딩
-    var currentIndex: Int // 현재 레이어의 인덱스
-    
-    // UIView 생성 및 UILongPressGestureRecognizer 추가
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        let gestureRecognizer = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleLongPress))
-        view.addGestureRecognizer(gestureRecognizer) // 뷰에 제스처 연결
-        view.isUserInteractionEnabled = true // 사용자 상호작용 활성화
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // UIView 업데이트 로직 (필요하지 않아 비워둠)
-    }
-    
-    // Coordinator 생성
-    func makeCoordinator() -> Coordinator {
-        Coordinator(isEditing: $isEditing, selectedLayerIndex: $selectedLayerIndex, currentIndex: currentIndex)
-    }
-    
-    // UILongPressGestureRecognizer 처리를 위한 Coordinator 클래스
-    class Coordinator: NSObject {
-        @Binding var isEditing: Bool // 에디팅 모드 상태를 바인딩
-        @Binding var selectedLayerIndex: Int? // 현재 선택된 레이어 인덱스를 바인딩
-        var currentIndex: Int // 현재 레이어의 인덱스
-        
-        // 초기화
-        init(isEditing: Binding<Bool>, selectedLayerIndex: Binding<Int?>, currentIndex: Int) {
-            _isEditing = isEditing
-            _selectedLayerIndex = selectedLayerIndex
-            self.currentIndex = currentIndex
-        }
-        
-        // Long press 동작 처리 메서드
-        @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-            if gestureRecognizer.state == .began {
-                isEditing = true // 에디팅 모드 시작
-                selectedLayerIndex = currentIndex // 현재 레이어 선택
-            } else if gestureRecognizer.state == .ended {
-                isEditing = false // 에디팅 모드 종료
-            }
-        }
-    }
-}
+
