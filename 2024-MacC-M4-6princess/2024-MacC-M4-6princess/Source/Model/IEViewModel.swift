@@ -37,8 +37,27 @@ class IEViewModel: ObservableObject {
     @Published var saveAnimate = false
     // 완료 버튼 클릭시 발생되는 최종 이미지를 저장
     @Published var compositeImage:UIImage?
-    @Published var bgImg = UIImage(named: "6princess")!
-    @Published var idolImg = UIImage(named: "Felix")!
+//    @Published var bgImg = UIImage(named: "6princess")!
+//    @Published var idolImg = UIImage(named: "Felix")!
+    @Published var bgImg: UIImage?
+    @Published var idolImg: UIImage?
+
+    init() {
+        bgImg = UIImage(named: "6princess")
+        idolImg = UIImage(named: "Felix")
+        
+        // 이미지 로드 실패 시 기본 이미지 설정
+        if bgImg == nil {
+            print("배경 이미지 로드 실패")
+            bgImg = UIImage() // 빈 이미지 또는 기본 이미지
+        }
+        
+        if idolImg == nil {
+            print("아이돌 이미지 로드 실패")
+            idolImg = UIImage() // 빈 이미지 또는 기본 이미지
+        }
+    }
+
     
     
     /// for Undo/Redo
