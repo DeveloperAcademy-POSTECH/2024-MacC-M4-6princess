@@ -13,6 +13,7 @@ class MFViewModel: ObservableObject {
     @Published var isShowPhotosPicker: Bool = false
     @Published var isEditing: Bool = false
     @Published var selectedImageIds: Set<UUID> = []
+    @Published var isDeleteAlert: Bool = false
     
     private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
