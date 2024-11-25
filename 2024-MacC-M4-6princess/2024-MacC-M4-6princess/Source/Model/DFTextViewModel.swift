@@ -41,6 +41,29 @@ extension DFTextView{
                 //            default: return .center
         }
     }
+    
+    func imageForAlignment(_ alignment: TextAlignment) -> String {
+        switch alignment {
+        case .leading:
+            return "df.alignment.leading"
+        case .center:
+            return "df.alignment.center"
+        case .trailing:
+            return "df.alignment.trailing"
+
+        }
+    }
+    func toggleTextAlignment() {
+        switch textAlignment {
+        case .leading:
+            textAlignment = .center
+        case .center:
+            textAlignment = .trailing
+        case .trailing:
+            textAlignment = .leading
+      
+        }
+    }
 }
 
 
@@ -89,6 +112,7 @@ struct LayerPhotoPicker2: UIViewControllerRepresentable {
             }
         }
     }
+    
 }
 struct LayerModel: Identifiable {
     let id = UUID()
