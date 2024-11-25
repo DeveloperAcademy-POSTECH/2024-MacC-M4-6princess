@@ -15,19 +15,19 @@ struct DFTextView: View {
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
     
+    @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     
     var body: some View {
         VStack {
+            Spacer()
             TextEditor(text: $txt)
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity
-                )
+                .padding()
                 .focused($isKeyboardVisible) // 키보드 활성 상태와 연결
                 .multilineTextAlignment(textAlignment) // 동적 텍스트 정렬
                 .foregroundColor(fontColor)
                 .font(selectedFont.applyFont(size: fontSize))
                 .lineSpacing(5)
+                .frame(height:UIScreen.main.bounds.height/5)
                 .background(Color.clear) // 배경을 투명하게 설정
                 .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
                 .gesture(tab == 2 ? swipeAlignmentGesture : nil)
@@ -58,14 +58,21 @@ struct DFTextView: View {
             } else if tab == 1 {
                 colorSelector
             }
+            
             textTabBar
+            Spacer()
+                .frame(height: keyboardHeight)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .animation(.easeOut(duration: 0.3))
+        .keyboardHeight($keyboardHeight)
         .background(
             Color.black.opacity(0.5) // 반투명 검정색
-            
         )
-        .ignoresSafeArea(.all)
+        .ignoresSafeArea(.keyboard)
+        .onAppear {
+            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
+        }
+        
     }
+    
 }
-
