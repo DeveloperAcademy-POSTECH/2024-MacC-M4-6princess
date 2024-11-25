@@ -15,6 +15,7 @@ struct DFModifyView: View {
     //    @State private var shouldNavigate: Bool = false
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
+    @State var isEditing: Bool = false 
     
     var body: some View {
         
@@ -86,6 +87,10 @@ private extension DFModifyView {
     var imageView: some View {
         
         ZStack {
+            if isEditing{
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+            }
             ForEach($imageModel.imageList, id: \.self) { $subject in
                 
                 DFImageView(subjectModel: $subject)
@@ -93,6 +98,9 @@ private extension DFModifyView {
             }
             
         }
+        .overlay(
+            LongPressGestureRecognizerWrapper(isEditing: $isEditing)
+        )
     }
     
     var toolBarButtons: some View {

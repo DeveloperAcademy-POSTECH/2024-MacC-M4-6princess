@@ -7,20 +7,12 @@
 
 import SwiftUI
 import PhotosUI
-// 이미지와 순서를 관리하는 구조체
-struct LayerImage: Identifiable {
-    let id = UUID()
-    var image: UIImage
-    var order: Int
-    var position: CGPoint // 이미지 위치
-    var scale: CGFloat = 1.0      // 이미지 크기
-    var rotation: Angle = .zero   // 이미지 회전 각도
-    
-}
-// PHPickerViewController를 사용하는 SwiftUI Wrapper
+
+
 struct LayerPhotoPicker: UIViewControllerRepresentable {
-    @Binding var layerImages: [LayerImage]
+    @Binding var layerImages: [LayerImage] // 타입을 LayerImage로 수정
     var screenSize: CGSize
+    
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.selectionLimit = 0
@@ -53,7 +45,14 @@ struct LayerPhotoPicker: UIViewControllerRepresentable {
                         if let uiImage = image as? UIImage {
                             DispatchQueue.main.async {
                                 let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerImage(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
+                                let newLayerImage = LayerImage(
+                                    image: uiImage,
+                                    order: newOrder,
+                                    position: CGPoint(
+                                        x: self.parent.screenSize.width / 2,
+                                        y: self.parent.screenSize.height / 3
+                                    )
+                                )
                                 self.parent.layerImages.append(newLayerImage)
                             }
                         }
