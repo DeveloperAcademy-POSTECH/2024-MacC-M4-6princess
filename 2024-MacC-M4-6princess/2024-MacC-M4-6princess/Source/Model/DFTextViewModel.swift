@@ -20,7 +20,7 @@ extension DFTextView{
                 selectedAlignment: textAlignment
             )
         )
-        renderer.scale = displayScale
+        renderer.scale = 10
         if let uiImage = renderer.uiImage {
             renderedImage = uiImage
             
