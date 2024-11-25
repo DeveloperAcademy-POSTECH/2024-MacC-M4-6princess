@@ -32,7 +32,7 @@ struct MFView: View {
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
-                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
+                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지... -> 제이미가 변경된 코어데이터 스키마 넘겨주면 수정하기
                             naviManager.push(screen: Screen.frameEdit)
                         } label: {
                             ZStack {
@@ -92,6 +92,9 @@ struct MFView: View {
             if viewModel.imageDataArray.isEmpty {
                 viewModel.loadImages()
             }
+        }
+        .onChange(of: viewModel.imageDataArray.count) {
+            viewModel.loadImages()
         }
         .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
             PhotosPickerView()
@@ -194,6 +197,7 @@ struct GridItemView: View {
     @ObservedObject var viewModel: MFViewModel
     @EnvironmentObject var frameManager: FrameManager
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -217,11 +221,21 @@ struct GridItemView: View {
         }
         .onTapGesture {
             if !viewModel.isEditing {
+                frameManager.updateSelectedFrame(
+                            id: imageInfo.id,
+                            image: UIImage(data: viewModel.loadImageIfNeeded(for: imageInfo.id)!)!,
+                            context: viewContext
+                        )
+                viewModel.toggleSelection(for: imageInfo.id)
+                frameManager.selectedFrame = viewModel.selectedFrame
+                frameManager.pickedImage = viewModel.pickedImage
+                frameManager.isFrameLoading = viewModel.isFrameLoading
+                
                 dismiss()
-            }else {
+            } else {
                 viewModel.toggleSelection(for: imageInfo.id)
             }
         }
     }
+    
 }
-

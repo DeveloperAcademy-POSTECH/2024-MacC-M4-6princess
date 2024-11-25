@@ -10,10 +10,10 @@ import AVFoundation
 import Photos
 
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
-    
     //온보딩 확인용
 //    @State var firstTime = false
     @AppStorage("openFirstTime") var firstTime = false
+//    @ObservedObject var frameManager = FrameManager()
     
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false
@@ -21,6 +21,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     @Published var picData = Data(count: 0)
     @Published var takenImg: UIImage?
     @Published var nextView = false
+    @Published var saveComplete = false
     @Published var frameSize = CGRect(origin: .zero, size: .zero)
     @Published var preview: AVCaptureVideoPreviewLayer!
     
@@ -48,6 +49,10 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     let defaultImg: UIImage
     var ScreenSize:CGSize = UIScreen.main.bounds.size
     let cameraManager: CameraManager
+    
+    //저장 관련
+    @Published var frameBGSize: CGSize = .zero
+    @Published var compositeImage:UIImage?
 
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
@@ -63,10 +68,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             self.currentZoomFactor = 1.0
         }
     }
-    
-    
-    
-    
     
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
@@ -89,12 +90,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             return
         }
         
-        guard let imageData = photo.fileDataRepresentation() else {
-            print("사진 데이터가 유효하지 않음")
-            return
-        }
-        
-        guard var image = UIImage(data: imageData) else {
+        guard let imageData = photo.fileDataRepresentation(),
+              var image = UIImage(data: imageData) else {
             print("이미지를 생성할 수 없습니다.")
             return
         }
@@ -107,14 +104,26 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         // 이미지의 방향을 .up으로 수정
         image = fixOrientation(image)
         
+        // 원하는 비율로 이미지 크롭
         let croppedImage = cropToAspectRatio(image: image)
+        
+        // 합성 이미지 생성
+        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+        let compositeImage = renderer.image { context in
+            // 크롭된 이미지 그리기
+            croppedImage.draw(in: CGRect(origin: .zero, size: frameSize.size))
+            
+            // 프레임 이미지 합성
+            frameImage.draw(in: CGRect(origin: .zero, size: frameSize.size))
+        }
         
         DispatchQueue.main.async {
             self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
-            self.takenImg = croppedImage
+            self.takenImg = compositeImage
             self.nextView = true
+            self.saveImageToAlbum(uiImage: compositeImage)
             print("nextView:\(self.nextView)")
-            print("이미지 사이즈: \(image.size)")
+            print("이미지 사이즈: \(croppedImage.size)")
             print("사진이 성공적으로 처리되었습니다")
         }
     }
@@ -251,6 +260,113 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         } else {
             // 전면 카메라는 1.0...3.0 범위 사용
             return 1.0...3.0
+        }
+    }
+    
+    //MARK: 실험 함수
+//    @MainActor
+//    func capturePreview<T: View>(content: T) { //Content라는 타입을 찾을 수 없어서, 제너릭 타입으로 진행
+//        let renderedImage = ImageRenderer(
+//            content: content
+//                .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
+//        )
+//        // 해상도
+//        renderedImage.scale = 8.0
+//        
+//        if let uiImage = renderedImage.uiImage {
+//            self.compositeImage = uiImage
+//            saveImageToAlbum(uiImage: uiImage)
+//        } else {
+//            print("렌더링 실패: 이미지 생성 실패")
+//        }
+//    }
+    
+    // CameraViewModel에 추가
+    func processCapturedImage(_ photo: AVCapturePhoto) {
+        guard let imageData = photo.fileDataRepresentation(),
+              let capturedImage = UIImage(data: imageData) else { return }
+        
+        let renderer = UIGraphicsImageRenderer(size: frameSize.size)
+        
+        let compositeImage = renderer.image { context in
+            // 캡처된 사진을 프레임 크기에 맞게 그리기
+            capturedImage.draw(in: CGRect(origin: .zero, size: frameSize.size))
+            
+            // 프레임 이미지 합성
+            if let frameImage = frameManager.resultImage {
+                frameImage.draw(in: CGRect(origin: .zero, size: frameSize.size))
+            }
+        }
+        
+        self.takenImg = compositeImage
+        saveImageToAlbum(uiImage: compositeImage)
+        self.nextView = true
+        self.cameraManager.stopSession()
+    }
+    
+    func saveImageToAlbum(uiImage: UIImage) {
+        // 앨범 이름 설정
+        let albumName = "Frameet"
+        
+        // 1. 앨범 가져오기 또는 생성하기
+        func getAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
+            // 앨범이 이미 존재하는지 확인
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
+            let fetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+            
+            if let album = fetchResult.firstObject {
+                // 앨범이 이미 존재하면 반환
+                completion(album)
+            } else {
+                // 앨범이 존재하지 않으면 생성
+                var albumPlaceholder: PHObjectPlaceholder?
+                PHPhotoLibrary.shared().performChanges({
+                    let createAlbumRequest = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumName)
+                    albumPlaceholder = createAlbumRequest.placeholderForCreatedAssetCollection
+                }) { success, error in
+                    if success, let placeholder = albumPlaceholder {
+                        let fetchResult = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [placeholder.localIdentifier], options: nil)
+                        completion(fetchResult.firstObject)
+                    } else {
+                        print("앨범 생성 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                        completion(nil)
+                    }
+                }
+            }
+        }
+        
+        // 2. 사진 저장 및 앨범에 추가
+        func saveImageToAlbum(album: PHAssetCollection?) {
+            guard let album = album else {
+                print("앨범을 찾을 수 없습니다.")
+                return
+            }
+            
+            PHPhotoLibrary.shared().performChanges({
+                // 이미지 저장
+                let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: uiImage)
+                
+                // 앨범에 추가하기 위한 요청
+                if let assetPlaceholder = creationRequest.placeholderForCreatedAsset,
+                   let albumChangeRequest = PHAssetCollectionChangeRequest(for: album) {
+                    let fastEnumeration = NSArray(array: [assetPlaceholder])
+                    albumChangeRequest.addAssets(fastEnumeration)
+                }
+            }) { success, error in
+                DispatchQueue.main.async {
+                    if success {
+                        print("사진이 앨범 '\(albumName)'에 성공적으로 저장되었습니다.")
+                    } else {
+                        print("사진 저장 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                    }
+                }
+            }
+        }
+        
+        // 앨범 가져오기 또는 생성 후 사진 저장
+        getAlbum { album in
+            saveImageToAlbum(album: album)
         }
     }
 }

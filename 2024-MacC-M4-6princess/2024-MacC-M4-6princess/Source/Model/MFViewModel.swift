@@ -14,13 +14,15 @@ class MFViewModel: ObservableObject {
     @Published var isEditing: Bool = false
     @Published var selectedImageIds: Set<UUID> = []
     
+    @Published var selectedFrame: UUID?
+    @Published var pickedImage: UIImage?
+    @Published var isFrameLoading: Bool = false
+    
     private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
-    private var frameManager: FrameManager
     
-    init(context: NSManagedObjectContext, frameManager: FrameManager) {
+    init(context: NSManagedObjectContext) {
         self.viewContext = context
-        self.frameManager = frameManager
     }
     
     
@@ -116,29 +118,29 @@ class MFViewModel: ObservableObject {
     
     ///이미지 선택 토글 함수
     func toggleSelection(for id: UUID) {
-        if isEditing {
-            DispatchQueue.main.async {
-                if self.selectedImageIds.contains(id) {
-                    self.selectedImageIds.remove(id)
-                } else {
-                    self.selectedImageIds.insert(id)
+            if isEditing {
+                DispatchQueue.main.async {
+                    if self.selectedImageIds.contains(id) {
+                        self.selectedImageIds.remove(id)
+                    } else {
+                        self.selectedImageIds.insert(id)
+                    }
                 }
             }
+            else {
+                selectFrame(id: id)
+            }
         }
-        else {
-            selectFrame(id: id)
-        }
-    }
     
     func selectFrame(id: UUID) {
-            if let imageData = loadImageData(for: id),
-               let uiImage = UIImage(data: imageData) {
-                DispatchQueue.main.async {
-                    self.frameManager.selectedFrame = id
-                    self.frameManager.pickedImage = uiImage
-                    self.frameManager.isFrameLoading = true
-                }
-            }
+        if let imageData = loadImageData(for: id),
+                      let uiImage = UIImage(data: imageData) {
+                       DispatchQueue.main.async {
+                           self.selectedFrame = id
+                           self.pickedImage = uiImage
+                           self.isFrameLoading = true
+                       }
+                   }
         }
     
 }

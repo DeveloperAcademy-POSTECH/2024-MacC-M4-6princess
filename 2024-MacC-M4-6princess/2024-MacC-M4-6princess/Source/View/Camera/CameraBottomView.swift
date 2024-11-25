@@ -46,12 +46,12 @@ struct CameraBottomView: View {
                     
                     //셔터 버튼
                     Button {
+                        self.viewModel.isTakePic = true
                         if frameManager.resultImage != nil{
-                            self.viewModel.isTakePic = true
                             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
+//                                viewModel.capturePreview(content: CameraView().cameraPreview)
                                 viewModel.takePic()
-                                viewModel.cameraManager.stopSession()
-                            }
+                                    }
                         } else {
                             viewModel.isShowAlert = true
                         }

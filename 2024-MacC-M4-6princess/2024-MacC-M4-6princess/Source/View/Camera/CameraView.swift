@@ -16,9 +16,9 @@ struct CameraView: View {
     @State private var path: NavigationPath = NavigationPath()
     //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
-    @StateObject var frameManager = FrameManager()
+    @EnvironmentObject var frameManager: FrameManager
     
-    private var cameraPreview: some View  {
+    var cameraPreview: some View  {
         GeometryReader { geo in
             CameraPreview(viewModel: viewModel)
                 .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
@@ -26,7 +26,7 @@ struct CameraView: View {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
             Group{
-                if let image = frameManager.resultImage {
+                if let image = frameManager.pickedImage {
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -38,7 +38,7 @@ struct CameraView: View {
     
     var body: some View {
         
-        NavigationStack {
+        NavigationStack(path: $naviManager.route) {
             ZStack{
                 VStack(spacing: 0) {
                                 Color.clear
@@ -176,7 +176,7 @@ struct CameraView: View {
                 //                viewModel.frameImage = frameImage
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
-                MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
+                MFView(viewModel: MFViewModel(context: viewContext))
 //                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
@@ -186,8 +186,9 @@ struct CameraView: View {
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
-                if let takenImg = viewModel.takenImg,let frameImg = frameManager.resultImage{
-                    IEIntroView(bg: takenImg, idol: frameImg)
+                if let takenImg = viewModel.takenImg,
+                   let frameImg = frameManager.resultImage{
+                    CamSaveView(bg: takenImg, idol: frameImg, viewModel: viewModel)
                 }
                 
             }
