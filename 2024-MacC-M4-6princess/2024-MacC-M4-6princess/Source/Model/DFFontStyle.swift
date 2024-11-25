@@ -9,7 +9,7 @@ import SwiftUI
 
 enum FontStyle: String {
     case modern = "Pretendard-Regular"
-    case handwriting = "Hakgyoansim Geurimilgi OTF R"
+    case handwriting = "HakgyoansimGeurimilgiOTF-R"
     case bold = "Pretendard-Bold" // 시스템 기본 볼드체
     
     var displayName: String {
@@ -22,16 +22,26 @@ enum FontStyle: String {
                 return "볼드체"
         }
     }
+    func printFamilyFont(){
+        // 폰트 체크 하기
+        UIFont.familyNames.sorted().forEach { familyName in
+            print("*** \(familyName) ***")
+            UIFont.fontNames(forFamilyName: familyName).forEach { fontName in
+                print("\(fontName)")
+            }
+            print("---------------------")
+        }
+    }
 }
 
 extension FontStyle: CaseIterable {
     func applyFont(size: CGFloat) -> Font {
         switch self {
-        case .modern:
-            return .custom("Pretendard-Regular",size: size) // 시스템 폰트
-        case .handwriting:
-            return .custom("Hakgyoansim Geurimilgi OTF R", size: size) // 헬베티카 폰트
-        case .bold:
+            case .modern:
+                return .custom("Pretendard-Regular",size: size) // 시스템 폰트
+            case .handwriting:
+                return .custom("Hakgyoansim Geurimilgi OTF R", size: size) // 헬베티카 폰트
+            case .bold:
                 return .custom("Pretendard-Bold",size: size) // 시스템 기본 볼드체
         }
     }
@@ -118,15 +128,15 @@ extension Font {
         registerFont(bundle: Bundle.main , fontName: fontName, fontExtension: ".otf") //change according to your ext.
     }
     fileprivate static func registerFont(bundle: Bundle, fontName: String, fontExtension: String) {
-
+        
         guard let fontURL = bundle.url(forResource: fontName, withExtension: fontExtension),
               let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
               let font = CGFont(fontDataProvider) else {
             fatalError("Couldn't create font from data")
         }
-
+        
         var error: Unmanaged<CFError>?
-
+        
         CTFontManagerRegisterGraphicsFont(font, &error)
     }
 }
