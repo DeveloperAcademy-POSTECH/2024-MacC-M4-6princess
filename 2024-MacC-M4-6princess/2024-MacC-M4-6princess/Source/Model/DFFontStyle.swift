@@ -9,7 +9,7 @@ import SwiftUI
 
 enum FontStyle: String {
     case modern = "Pretendard-Regular"
-    case handwriting = "Hakgyoansim Geurimilgi OTF R"
+    case handwriting = "HakgyoansimGeurimilgiOTF-R"
     case bold = "Pretendard-Bold" // 시스템 기본 볼드체
     
     var displayName: String {
@@ -20,6 +20,16 @@ enum FontStyle: String {
                 return "손글씨체"
             case .bold:
                 return "볼드체"
+        }
+    }
+    func printFamilyFont(){
+        // 폰트 체크 하기
+        UIFont.familyNames.sorted().forEach { familyName in
+            print("*** \(familyName) ***")
+            UIFont.fontNames(forFamilyName: familyName).forEach { fontName in
+                print("\(fontName)")
+            }
+            print("---------------------")
         }
     }
 }

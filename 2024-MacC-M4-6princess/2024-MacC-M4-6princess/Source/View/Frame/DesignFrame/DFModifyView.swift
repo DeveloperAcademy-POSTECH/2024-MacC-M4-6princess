@@ -44,22 +44,13 @@ struct DFModifyView: View {
             }
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
-                    
             }
         }
-        //        .fullScreenCover(isPresented: $viewModel.showTextView
-        ////                         , onDismiss: stateNone
-        //        ) {
-        //            DFTextView(viewModel: viewModel)
-        //        }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)
                 .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
                 .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
         }
-        //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
-        //            PhotosPickerView()
-        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             if !viewModel.showTextView {
@@ -71,17 +62,13 @@ struct DFModifyView: View {
             if newValue {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
-                    //                    shouldNavigate = true
-                    //                    frameManager.isFrameSelect = false
+                    frameManager.showMFView = false
                     naviManager.popToRoot()
                     frameManager.showMFView = false
+                    
                 }
             }
         }
-        //        .fullScreenCover(isPresented: $shouldNavigate) {
-        //            CameraView(frameImage: $viewModel.frameImage)
-        //            //            CameraView(frameImage: $resultImage)
-        //        }
         .onAppear {
             Task {
                 if let image = frameManager.resultImage {
