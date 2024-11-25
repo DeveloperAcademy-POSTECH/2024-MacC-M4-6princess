@@ -119,7 +119,7 @@ extension DFTextView{
                 .frame(width: 105, height: 30)
                 
                 Group {
-                    Image(imageForAlignment(textAlignment))
+                    Image("df.alignment")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 105, height: 30)
@@ -129,11 +129,9 @@ extension DFTextView{
                         )
                         .onTapGesture {
                             tab = 2
-                            toggleTextAlignment() // 텍스트 정렬 변경 함수 호출
                         }
                 }
                 .frame(width: 105, height: 30)
-
             }
             .padding()
         }
