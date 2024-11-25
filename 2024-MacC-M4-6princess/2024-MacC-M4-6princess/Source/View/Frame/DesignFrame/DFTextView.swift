@@ -15,22 +15,19 @@ struct DFTextView: View {
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
 
-    @State private var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
+    @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
 
     var body: some View {
         VStack {
             Spacer()
             TextEditor(text: $txt)
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity
-                )
                 .padding()
                 .focused($isKeyboardVisible) // 키보드 활성 상태와 연결
                 .multilineTextAlignment(textAlignment) // 동적 텍스트 정렬
                 .foregroundColor(fontColor)
                 .font(selectedFont.applyFont(size: fontSize))
                 .lineSpacing(5)
+                .frame(height:UIScreen.main.bounds.height/5)
                 .background(Color.clear) // 배경을 투명하게 설정
                 .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
                 .gesture(tab == 2 ? swipeAlignmentGesture : nil)
@@ -63,44 +60,67 @@ struct DFTextView: View {
             }
 
             textTabBar
-                .padding(.bottom, keyboardHeight) // 키보드 높이만큼 여백 추가
+            Spacer()
+                .frame(height: keyboardHeight)
+//                .padding(.bottom, keyboardHeight) // 키보드 높이만큼 여백 추가
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//        .offset(y: -keyboardHeight / 2)
+                .animation(.easeOut(duration: 0.3))
+                
+                .keyboardHeight($keyboardHeight)
+//                .keyboardHeight($keyboardHeight)
+//        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             Color.black.opacity(0.5) // 반투명 검정색
         )
         .ignoresSafeArea(.keyboard)
         .onAppear {
             isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
-            addKeyboardObservers() // 키보드 관찰자 추가
+//            addKeyboardObservers() // 키보드 관찰자 추가
         }
         .onDisappear {
-            removeKeyboardObservers() // 키보드 관찰자 제거
+//            removeKeyboardObservers() // 키보드 관찰자 제거
         }
+        
     }
 
-    private func addKeyboardObservers() {
-        NotificationCenter.default.addObserver(
-            forName: UIResponder.keyboardWillShowNotification,
-            object: nil,
-            queue: .main
-        ) { notification in
-            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                keyboardHeight = keyboardFrame.height
-            }
-        }
+}
+import Foundation
+import SwiftUI
 
-        NotificationCenter.default.addObserver(
-            forName: UIResponder.keyboardWillHideNotification,
-            object: nil,
-            queue: .main
-        ) { _ in
-            keyboardHeight = 0
-        }
+struct KeyboardProvider : ViewModifier {
+    
+    //키보드 높이값
+    var keyboardHeight: Binding<CGFloat>
+    
+    func body(content: Content) -> some View {
+        content
+        //키보드 올라가기 직전 노티를 받으면 나오는 객체
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification),
+                       perform: { notification in
+                guard let userInfo = notification.userInfo,
+                      let keyboardRect = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+                
+                //키보드 높이값 . 바인딩 원본 객체 연결 -> 전달
+                self.keyboardHeight.wrappedValue = keyboardRect.height
+                
+            })
+        //키보드 닫기 전 보내는 노티 받으면 실행
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification),
+                         perform: { _ in
+                //키보드 높이값 0으로 변경
+                self.keyboardHeight.wrappedValue = 0
+            })
     }
+}
 
-    private func removeKeyboardObservers() {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+public extension View {
+    func keyboardHeight(_ state: Binding<CGFloat>) -> some View {
+        self.modifier(KeyboardProvider(keyboardHeight: state))
     }
+    
+    func hideKeyboard() {
+        let resign = #selector(UIResponder.resignFirstResponder)
+        UIApplication.shared.sendAction(resign, to: nil, from: nil, for: nil)
+      }
 }

@@ -51,6 +51,7 @@ struct DFModifyView: View {
                 .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
                 .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
         }
+        .ignoresSafeArea(.keyboard)
         .navigationBarBackButtonHidden()
         .toolbar {
             if !viewModel.showTextView {
