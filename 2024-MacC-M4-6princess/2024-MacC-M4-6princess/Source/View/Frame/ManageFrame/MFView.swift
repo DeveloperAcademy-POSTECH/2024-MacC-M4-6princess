@@ -47,6 +47,7 @@ struct MFView: View {
                                     .foregroundColor(.white)
                             }
                         }
+                        .disabled(viewModel.selectedImageIds.count > 1)
                         Button {
                             viewModel.deleteSelectedImages()
                         } label: {
@@ -159,21 +160,31 @@ struct FrameGridItem: View {
             Button {
                 naviManager.push(screen: Screen.photoPicker)
             } label: {
-                VStack(alignment: .center, spacing: 4) {
-                    Image("newFrameCreateLogo")
-                        .resizable()
-                        .frame(width: 80, height: 92)
-                        .padding(.top, 20)
-                        .padding(.bottom, 3)
-                    Text("새로운\n프레임 만들기")
-                        .font(.system(size: 13, weight: .bold))
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.white)
-                    Spacer()
+                ZStack {
+                    VStack(alignment: .center, spacing: 4) {
+                        Image("newFrameCreateLogo")
+                            .resizable()
+                            .frame(width: 80, height: 92)
+                            .padding(.top, 20)
+                            .padding(.bottom, 3)
+                        Text("새로운\n프레임 만들기")
+                            .font(.system(size: 13, weight: .bold))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 163)
+                    .background(.pointPink)
+                    
+                    if viewModel.isEditing {
+                        Rectangle()
+                            .frame(maxWidth: .infinity)
+                            .frame(minHeight: 163)
+                            .background(.black)
+                            .opacity(0.7)
+                    }
                 }
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 163)
-                .background(.pointPink)
             }
             .disabled(viewModel.isEditing)
             
