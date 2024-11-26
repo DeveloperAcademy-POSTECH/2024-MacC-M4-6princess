@@ -6,21 +6,19 @@ struct DFModifyView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var managedContext
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     
-    @State private var isFirstLaunching: Bool = true
-    //    @Binding var resultImage: UIImage?
-    //    @State private var shouldNavigate: Bool = false
-    @EnvironmentObject var naviManager: NavigationManager
-    @EnvironmentObject var frameManager: FrameManager
-    
+    @AppStorage("onboarding") var isFirstLaunching: Bool = true
+    @State private var showAgain: Bool = false
     var body: some View {
         
         ZStack {
-            if isFirstLaunching == true {
-                DFOnboardingView(isFirstLaunching: $isFirstLaunching)
+            if isFirstLaunching == true && !showAgain == true {
+                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
                     .zIndex(1)
             }
             
@@ -30,7 +28,6 @@ struct DFModifyView: View {
                         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     
                     imageView
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     
                     RoundedRectangle(cornerRadius: 30)
                         .fill(Color.white)
@@ -39,6 +36,7 @@ struct DFModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
+                .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                 DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
             }
@@ -74,24 +72,81 @@ struct DFModifyView: View {
             Task {
                 if let image = frameManager.resultImage {
                     try await Task.sleep(for: .seconds(1))
-                    try await viewModel.makeImageList()
+                    viewModel.makeImageList()
                 }
             }
         }
     }
 }
 
+
 private extension DFModifyView {
     
     var imageView: some View {
         
         ZStack {
-            ForEach($imageModel.imageList, id: \.self) { $subject in
-                
-                DFImageView(subjectModel: $subject)
-                
-            }
             
+            ForEach($imageModel.imageList) { $subject in
+                
+                if let image = subject.image, let realImage = subject.originalImage {
+                    
+                    ZStack {
+                        
+                        let size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                        
+                        DFOverlayBoxView(model: $subject, size: size)
+                            .opacity(subject.isTapped && viewModel.isTappedImage ? 1 : 0)
+                            .zIndex(1)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                            .scaleEffect(subject.getScale())
+                            .rotationEffect(subject.getAngle())
+                            .offset(subject.getOffset())
+                            .onTapGesture {
+                                if subject.isTapped {
+                                    subject.isTapped = false
+                                } else {
+                                    subject.isTapped = true
+                                }
+                                viewModel.isTappedImage = true                            }
+                            .gesture(DragGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        print(value.translation)
+                                        viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.accumulatedOffSet = .zero
+                                    }))
+                            .simultaneousGesture(RotateGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        if viewModel.current == .zero {
+                                            viewModel.current = subject.getAngle()
+                                        }
+                                        viewModel.angle = value.rotation + viewModel.current
+                                        subject.setAngle(angle: viewModel.angle)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.current = .zero
+                                    }))
+                            .simultaneousGesture(MagnifyGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        viewModel.setScaleVolume(value.magnification, subject: subject)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                                    }))
+                    }
+                }
+                /// 이미지가 아닌 경우, 즉 스티커 및 텍스트인 경우의 코드를 밑에 적어주세요
+            }
         }
     }
     
@@ -131,27 +186,29 @@ private extension DFModifyView {
             
             Spacer(minLength: UIScreen.main.bounds.width / 20)
             
-            Button {
-                //                viewModel.reDo()
-            } label: {
-                Image("back")
-                    .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
-            }
-            .padding(.trailing, 14)
-            
-            Button {
-                //                viewModel.unDo()
-            } label: {
-                Image("front")
-                    .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
-            }
-            .padding(.trailing, 60)
+//            Button {
+//                //                viewModel.reDo()
+//            } label: {
+//                Image("back")
+//                    .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
+//            }
+//            .padding(.trailing, 14)
+//            
+//            Button {
+//                //                viewModel.unDo()
+//            } label: {
+//                Image("front")
+//                    .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
+//            }
+//            .padding(.trailing, 60)
             
             Spacer()
+                .frame(width: 150)
             Button {
                 
                 if let image = frameManager.resultImage {
                     
+                    viewModel.isTappedImage = false
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {

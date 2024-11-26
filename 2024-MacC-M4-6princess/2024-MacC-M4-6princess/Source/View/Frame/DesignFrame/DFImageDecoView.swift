@@ -25,7 +25,6 @@ extension DFImageDecoView {
         VStack {
             Button  {
                 
-//                isShowImagePickerView.toggle()
                 naviManager.push(screen: Screen.photoPicker)
                 
             } label: {
