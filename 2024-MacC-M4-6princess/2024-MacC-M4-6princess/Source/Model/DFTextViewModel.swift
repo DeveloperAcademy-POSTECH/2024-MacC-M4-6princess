@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-
+import PhotosUI
 //MARK: ViewModel 만드는 대신 extension으로 함수만 따로 뺌
 extension DFTextView{
     @MainActor
@@ -41,5 +41,84 @@ extension DFTextView{
                 //            default: return .center
         }
     }
+    
+    func imageForAlignment(_ alignment: TextAlignment) -> String {
+        switch alignment {
+        case .leading:
+            return "df.alignment.leading"
+        case .center:
+            return "df.alignment.center"
+        case .trailing:
+            return "df.alignment.trailing"
+
+        }
+    }
+    func toggleTextAlignment() {
+        switch textAlignment {
+        case .leading:
+            textAlignment = .center
+        case .center:
+            textAlignment = .trailing
+        case .trailing:
+            textAlignment = .leading
+      
+        }
+    }
 }
 
+
+// PHPickerViewController를 사용하는 SwiftUI Wrapper
+struct LayerPhotoPicker2: UIViewControllerRepresentable {
+    @Binding var layerImages: [LayerModel]
+    var screenSize: CGSize
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 0
+        config.filter = .images
+        
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: LayerPhotoPicker2
+        
+        init(_ parent: LayerPhotoPicker2) {
+            self.parent = parent
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            
+            for result in results {
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+                        if let uiImage = image as? UIImage {
+                            DispatchQueue.main.async {
+                                let newOrder = self.parent.layerImages.count + 1
+                                let newLayerImage = LayerModel(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
+                                self.parent.layerImages.append(newLayerImage)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+}
+struct LayerModel: Identifiable {
+    let id = UUID()
+    var image: UIImage
+    var order: Int
+    var position: CGPoint = .zero
+    var scale: CGFloat = 1.0
+    var rotation: Angle = .zero
+}
