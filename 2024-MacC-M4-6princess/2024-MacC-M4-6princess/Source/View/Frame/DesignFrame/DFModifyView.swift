@@ -14,9 +14,6 @@ struct DFModifyView: View {
     
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     @State private var showAgain: Bool = false
-    //    @Binding var resultImage: UIImage?
-    //    @State private var shouldNavigate: Bool = false
-    
     var body: some View {
         
         ZStack {
@@ -31,7 +28,6 @@ struct DFModifyView: View {
                         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     
                     imageView
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                     
                     RoundedRectangle(cornerRadius: 30)
                         .fill(Color.white)
@@ -40,27 +36,20 @@ struct DFModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
+                .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                 DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
             }
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
-                    
+                
             }
         }
-        //        .fullScreenCover(isPresented: $viewModel.showTextView
-        ////                         , onDismiss: stateNone
-        //        ) {
-        //            DFTextView(viewModel: viewModel)
-        //        }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)
                 .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
                 .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
         }
-        //        .navigationDestination(isPresented: $viewModel.isShowImagePickerView, destination: {
-        //            PhotosPickerView()
-        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             if !viewModel.showTextView {
@@ -72,39 +61,91 @@ struct DFModifyView: View {
             if newValue {
                 // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
-                    //                    shouldNavigate = true
-                    //                    frameManager.isFrameSelect = false
                     naviManager.popToRoot()
                     frameManager.showMFView = false
                 }
             }
         }
-        //        .fullScreenCover(isPresented: $shouldNavigate) {
-        //            CameraView(frameImage: $viewModel.frameImage)
-        //            //            CameraView(frameImage: $resultImage)
-        //        }
         .onAppear {
             Task {
                 if let image = frameManager.resultImage {
                     try await Task.sleep(for: .seconds(1))
-                    try await viewModel.makeImageList()
+                    viewModel.makeImageList()
                 }
             }
         }
     }
 }
 
+
 private extension DFModifyView {
     
     var imageView: some View {
         
         ZStack {
-            ForEach($imageModel.imageList, id: \.self) { $subject in
-                
-                DFImageView(subjectModel: $subject)
-                
-            }
             
+            ForEach($imageModel.imageList) { $subject in
+                
+                if let image = subject.image, let realImage = subject.originalImage {
+                    
+                    ZStack {
+                        
+                        let size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                        
+                        DFOverlayBoxView(model: $subject, size: size)
+                            .opacity(subject.isTapped && viewModel.isTappedImage ? 1 : 0)
+                            .zIndex(1)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                            .scaleEffect(subject.getScale())
+                            .rotationEffect(subject.getAngle())
+                            .offset(subject.getOffset())
+                            .onTapGesture {
+                                if subject.isTapped {
+                                    subject.isTapped = false
+                                } else {
+                                    subject.isTapped = true
+                                }
+                                viewModel.isTappedImage = subject.isTapped
+                            }
+                            .gesture(DragGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        print(value.translation)
+                                        viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.accumulatedOffSet = .zero
+                                    }))
+                            .simultaneousGesture(RotateGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        if viewModel.current == .zero {
+                                            viewModel.current = subject.getAngle()
+                                        }
+                                        viewModel.angle = value.rotation + viewModel.current
+                                        subject.setAngle(angle: viewModel.angle)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.current = .zero
+                                    }))
+                            .simultaneousGesture(MagnifyGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        viewModel.setScaleVolume(value.magnification, subject: subject)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                                    }))
+                    }
+                }
+                /// 이미지가 아닌 경우, 즉 스티커 및 텍스트인 경우의 코드를 밑에 적어주세요
+            }
         }
     }
     
@@ -136,7 +177,7 @@ private extension DFModifyView {
                 } label: {
                     Text("나가기")
                 }
-
+                
             } message: {
                 Text("종료 시 편집된 내용은 저장되지 않습니다.")
             }
@@ -144,27 +185,29 @@ private extension DFModifyView {
             
             Spacer(minLength: UIScreen.main.bounds.width / 20)
             
-            Button {
-                //                viewModel.reDo()
-            } label: {
-                Image("back")
-                    .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
-            }
-            .padding(.trailing, 14)
-            
-            Button {
-                //                viewModel.unDo()
-            } label: {
-                Image("front")
-                    .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
-            }
-            .padding(.trailing, 60)
+//            Button {
+//                //                viewModel.reDo()
+//            } label: {
+//                Image("back")
+//                    .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
+//            }
+//            .padding(.trailing, 14)
+//            
+//            Button {
+//                //                viewModel.unDo()
+//            } label: {
+//                Image("front")
+//                    .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
+//            }
+//            .padding(.trailing, 60)
             
             Spacer()
+                .frame(width: 150)
             Button {
                 
                 if let image = frameManager.resultImage {
                     
+                    viewModel.isTappedImage = false
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {

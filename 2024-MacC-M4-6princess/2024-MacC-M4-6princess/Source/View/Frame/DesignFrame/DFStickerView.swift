@@ -50,7 +50,7 @@ struct DFStickerView: View {
                                 .cornerRadius(10)
                         }
                         .onTapGesture {
-                            var newImage = SubjectImage()
+                            let newImage = SubjectImage()
                             if let image = UIImage(named: imageName) {
                                 newImage.image = image
                                 newImage.originalImage = image

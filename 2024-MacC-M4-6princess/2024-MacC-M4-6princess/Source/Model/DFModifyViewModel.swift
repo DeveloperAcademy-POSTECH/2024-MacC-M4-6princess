@@ -6,6 +6,14 @@ import CoreData
 @MainActor
 class DFModifyViewModel: ObservableObject {
     
+    
+    @Published var magnifyScale = 1.0
+    @Published var lastScale = 1.0
+    @Published var current: Angle = .degrees(0)
+    @Published var draggedOffSet: CGSize = .zero
+    @Published var accumulatedOffSet: CGSize = .zero
+    @Published var angle: Angle = .degrees(0)
+    
     @Published var btnOpacity: Double = 0.0
     
     @Published var showCamera: Bool = false
@@ -13,6 +21,7 @@ class DFModifyViewModel: ObservableObject {
 
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
+    @Published var isTappedImage: Bool = false
     
     @Published var outputImage: UIImage?
     @Published var indexOfImageList: Int = 0
@@ -25,6 +34,46 @@ class DFModifyViewModel: ObservableObject {
     @Published var showStickerSheet: Bool = false
     
     @Published var isAlert: Bool = false
+    
+    
+    
+    func setScaleValue(minimum: CGFloat, maximum: CGFloat, subject: SubjectImage) {
+        
+        if subject.getScale() < minimum {
+            subject.setScale(scale: minimum)
+            
+        } else if subject.getScale() > maximum {
+            subject.setScale(scale: maximum)
+        }
+        lastScale = 1.0
+        
+    }
+    
+    ///스케일의 변화량(속도) 을 동일하게 하기 위한 메소드
+    func setScaleVolume(_ magnify: CGFloat, subject: SubjectImage) {
+        
+        let scaleVolume = magnify / lastScale
+        subject.scale *= scaleVolume
+        lastScale = magnify
+    }
+    
+    func dragGestureTask(subject: SubjectImage, changed: CGSize) {
+        
+        if accumulatedOffSet == .zero {
+            accumulatedOffSet = subject.getOffset()
+        }
+        draggedOffSet.width = accumulatedOffSet.width + changed.width
+        draggedOffSet.height = accumulatedOffSet.height + changed.height
+        subject.setOffset(offset: draggedOffSet)
+    }
+    
+    func setSizeCompute(image: UIImage, realImage: UIImage) -> CGSize {
+        
+        let width = image.size.width / scaleCompute(realImage)
+        let height = image.size.height / scaleCompute(realImage)
+        
+        return .init(width: width, height: height)
+    }
     
     func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
         

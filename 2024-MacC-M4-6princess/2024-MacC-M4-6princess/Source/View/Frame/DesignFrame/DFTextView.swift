@@ -35,7 +35,7 @@ struct DFTextView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("완료") {
                             renderTextImage(text: txt)
-                            var newImage = SubjectImage()
+                            let newImage = SubjectImage()
                             if let image = renderedImage {
                                 newImage.image = image
                                 newImage.originalImage = image

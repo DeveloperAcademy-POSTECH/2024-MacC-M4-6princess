@@ -314,11 +314,20 @@ private extension DFEditView {
                     viewModel.detectSubject(inputImage: viewModel.resultImage) {
                         
                         if let image = viewModel.outputImage {
-                            var newImage = SubjectImage()
-                            newImage.image = image
-                            newImage.originalImage = frameManager.pickedImage
-                            imageModel.imageList.append(newImage)
-                            print("\(imageModel.imageList.count) 길이")
+                            
+                            if let model = frameManager.changedSubject {
+                                
+                                model.image = image
+                                frameManager.changedSubject = nil
+                                
+                            } else {
+                                
+                                let newImage = SubjectImage()
+                                newImage.image = image
+                                newImage.originalImage = frameManager.pickedImage
+                                imageModel.imageList.append(newImage)
+                                print("\(imageModel.imageList.count) 길이")
+                            }
                         }
                     }
                 }
