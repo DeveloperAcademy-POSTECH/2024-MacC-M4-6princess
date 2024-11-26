@@ -24,7 +24,8 @@ struct DFModifyView: View {
             
             VStack {
                 ZStack {
-                    Color(Color.background)
+                    Image("checkBox")
+                        .resizable()
                         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     
                     imageView
