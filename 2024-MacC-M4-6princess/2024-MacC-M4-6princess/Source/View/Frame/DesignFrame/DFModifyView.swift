@@ -110,8 +110,7 @@ private extension DFModifyView {
                                 } else {
                                     subject.isTapped = true
                                 }
-                                viewModel.isTappedImage = subject.isTapped
-                            }
+                                viewModel.isTappedImage = true                            }
                             .gesture(DragGesture()
                                 .onChanged({ value in
                                     if subject.isTapped {
