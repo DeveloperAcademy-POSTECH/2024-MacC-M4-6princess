@@ -47,8 +47,10 @@ struct MFView: View {
                                     .foregroundColor(.white)
                             }
                         }
+                        .disabled(viewModel.selectedImageIds.count > 1)
                         Button {
-                            viewModel.deleteSelectedImages()
+
+                            viewModel.isDeleteAlert = true
                         } label: {
                             ZStack {
                                 Rectangle()
@@ -86,6 +88,33 @@ struct MFView: View {
                     }
                 }
             }
+            .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
+                Button {
+                    viewModel.deleteSelectedImages()
+                    print("삭제중...")
+                } label: {
+                    Text("삭제")
+                        .font(.system(size: 17))
+                        .foregroundColor(.blue)
+                        .fontWeight(.semibold)
+                }
+
+                Button("취소", role: .cancel) { }
+            } message: {
+                Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+            }
+//            .alert(isPresented: $viewModel.isDeleteAlert) {
+//                        Alert(
+//                            title: Text("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?"),
+//                            message: Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+//                            
+//                            primaryButton: .destructive(Text("삭제")) {
+//                                viewModel.deleteSelectedImages()
+//                                print("Deleting...")
+//                            },
+//                            secondaryButton: .cancel(Text("취소"))
+//                        )
+//                    }
         }
         .onAppear {
             // 처음 한 번만 로드
@@ -159,21 +188,31 @@ struct FrameGridItem: View {
             Button {
                 naviManager.push(screen: Screen.photoPicker)
             } label: {
-                VStack(alignment: .center, spacing: 4) {
-                    Image("newFrameCreateLogo")
-                        .resizable()
-                        .frame(width: 80, height: 92)
-                        .padding(.top, 20)
-                        .padding(.bottom, 3)
-                    Text("새로운\n프레임 만들기")
-                        .font(.system(size: 13, weight: .bold))
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.white)
-                    Spacer()
+                ZStack {
+                    VStack(alignment: .center, spacing: 4) {
+                        Image("newFrameCreateLogo")
+                            .resizable()
+                            .frame(width: 80, height: 92)
+                            .padding(.top, 20)
+                            .padding(.bottom, 3)
+                        Text("새로운\n프레임 만들기")
+                            .font(.system(size: 13, weight: .bold))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 163)
+                    .background(.pointPink)
+                    
+                    if viewModel.isEditing {
+                        Rectangle()
+                            .frame(maxWidth: .infinity)
+                            .frame(minHeight: 163)
+                            .background(.black)
+                            .opacity(0.7)
+                    }
                 }
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 163)
-                .background(.pointPink)
             }
             .disabled(viewModel.isEditing)
             
@@ -216,8 +255,12 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-            viewModel.toggleSelection(for: imageInfo.id)
-            dismiss()
+            if !viewModel.isEditing {
+                viewModel.toggleSelection(for: imageInfo.id)
+                dismiss()
+            }else {
+                viewModel.toggleSelection(for: imageInfo.id)
+            }
         }
     }
 }
