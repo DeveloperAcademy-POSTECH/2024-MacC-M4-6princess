@@ -356,6 +356,7 @@ private extension DFModifyView {
                     imageModel.imageList.forEach {
                         $0.isTapped = viewModel.isTappedImage
                     }
+                    
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
@@ -363,7 +364,7 @@ private extension DFModifyView {
                         viewModel.btnOpacity = 0
                         viewModel.showCamera = true
                         imageModel.imageList.removeAll()
-                        
+                        frameManager.resultImage = viewModel.frameImage
                     }
                     
                     
