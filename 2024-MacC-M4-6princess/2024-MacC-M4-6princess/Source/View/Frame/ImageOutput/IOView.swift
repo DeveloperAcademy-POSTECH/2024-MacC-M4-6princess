@@ -19,7 +19,9 @@ struct IOView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var body: some View {
         VStack{
-            Spacer()
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                Spacer()
+        }
             // 후보정 레이어 편집 뷰
             canvasView
                 .onAppear{

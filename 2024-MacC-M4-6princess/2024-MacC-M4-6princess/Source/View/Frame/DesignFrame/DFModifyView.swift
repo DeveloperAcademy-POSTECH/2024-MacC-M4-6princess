@@ -13,7 +13,7 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
-    @State private var showAgain: Bool = false
+    @State var showAgain: Bool = false
     var body: some View {
         
         ZStack {
@@ -21,32 +21,39 @@ struct DFModifyView: View {
                 DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
                     .zIndex(1)
             }
-            
-            VStack {
-                ZStack {
-                    Image("checkBox")
-                        .resizable()
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
-                    
-                    imageView
-                    
-                    RoundedRectangle(cornerRadius: 30)
-                        .fill(Color.white)
-                        .opacity(viewModel.btnOpacity)
-                        .frame(width: 175, height: 38)
-                        .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                    
-                }
-                .onTapGesture {
-                    viewModel.isTappedImage = false
-                    
-                    imageModel.imageList.forEach {
-                        $0.isTapped = viewModel.isTappedImage
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                VStack {
+                    ZStack {
+                        Image("checkBox")
+                            .resizable()
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
+                        
+                        imageView
+                        
+                        RoundedRectangle(cornerRadius: 30)
+                            .fill(Color.white)
+                            .opacity(viewModel.btnOpacity)
+                            .frame(width: 175, height: 38)
+                            .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                        
                     }
+                    .onTapGesture {
+                        viewModel.isTappedImage = false
+                        
+                        imageModel.imageList.forEach {
+                            $0.isTapped = viewModel.isTappedImage
+                        }
+                    }
+                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                    DFImageDecoView(viewModel: viewModel)
+                        .padding(.top, 58)
                 }
-                .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-                DFImageDecoView(viewModel: viewModel)
-                    .padding(.top, 58)
+              
+            }
+            else{
+                
+                modifyIpad
+                
             }
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
@@ -88,7 +95,7 @@ struct DFModifyView: View {
 }
 
 
-private extension DFModifyView {
+extension DFModifyView {
     
     var imageView: some View {
         
@@ -303,7 +310,7 @@ private extension DFModifyView {
                         .fontWeight(.semibold)
                         .foregroundStyle(.gray01)
                     
-                    Text("프레임선택")
+                    Text("프레임 선택")
                         .fontWeight(.regular)
                         .foregroundStyle(.gray01)
                 }
@@ -388,4 +395,5 @@ private extension DFModifyView {
             
         }
     }
+    
 }
