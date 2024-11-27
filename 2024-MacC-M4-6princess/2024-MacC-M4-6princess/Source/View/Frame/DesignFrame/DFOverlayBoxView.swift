@@ -57,22 +57,22 @@ struct DFOverlayBoxView: View {
             }
             .offset(viewModel.OffsetCompute(x: size.width/2, y: -size.height/2, subject: model))
             
-            Button {
-                viewModel.isPushedZoom = true
-            } label: {
-                ZStack {
-                    
-                    Circle()
-                        .foregroundStyle(Color.white)
-                        .frame(width: 26, height: 26)
-                    Image("zoomButton")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                }
-                
-            }
-            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
-            .gesture(zoomDrag)
+//            Button {
+//                viewModel.isPushedZoom = true
+//            } label: {
+//                ZStack {
+//                    
+//                    Circle()
+//                        .foregroundStyle(Color.white)
+//                        .frame(width: 26, height: 26)
+//                    Image("zoomButton")
+//                        .resizable()
+//                        .frame(width: 20, height: 20)
+//                }
+//                
+//            }
+//            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
+//            .gesture(zoomDrag)
         }
         
     }

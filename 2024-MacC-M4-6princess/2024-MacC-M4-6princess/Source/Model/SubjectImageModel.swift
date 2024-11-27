@@ -13,7 +13,7 @@ class SubjectImage: Identifiable {
     var scale: CGFloat = 1.0
     var originalText: String = ""
     
-    var isTapped: Bool = false
+    var isTapped: Bool = true
     
     let id: UUID = UUID()
     

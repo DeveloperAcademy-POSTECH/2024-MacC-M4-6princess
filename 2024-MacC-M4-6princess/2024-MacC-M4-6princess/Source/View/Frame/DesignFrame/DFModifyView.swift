@@ -93,7 +93,7 @@ private extension DFModifyView {
                     
                     ZStack {
                         
-                        let size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                        var size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
                         
                         DFOverlayBoxView(model: $subject, size: size)
                             .opacity(subject.isTapped && viewModel.isTappedImage ? 1 : 0)
@@ -111,16 +111,16 @@ private extension DFModifyView {
                                 } else {
                                     subject.isTapped = true
                                 }
-                                viewModel.isTappedImage = true                            }
+//                                viewModel.isTappedImage = true
+                            }
                             .gesture(DragGesture()
                                 .onChanged({ value in
-                                    if subject.isTapped {
-                                        print(value.translation)
-                                        viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                                    }
+                                    print(value.translation)
+                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
                                 })
                                     .onEnded({ value in
                                         viewModel.accumulatedOffSet = .zero
+                                        subject.isTapped = true
                                     }))
                             .simultaneousGesture(RotateGesture()
                                 .onChanged({ value in
