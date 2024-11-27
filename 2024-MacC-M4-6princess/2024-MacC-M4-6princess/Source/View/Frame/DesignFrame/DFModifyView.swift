@@ -113,12 +113,19 @@ private extension DFModifyView {
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
                             .onTapGesture {
-                                if viewModel.isTappedImage {
-                                    viewModel.isTappedImage = false
+                                                           
+                                if subject.isTapped {
+                                    if viewModel.isTappedImage {
+                                        viewModel.isTappedImage = false
+                                    }
+                                    subject.isTapped = viewModel.isTappedImage
+                                    
                                 } else {
-                                    viewModel.isTappedImage = true
+                                    if !viewModel.isTappedImage {
+                                        viewModel.isTappedImage = true
+                                    }
+                                    subject.isTapped = viewModel.isTappedImage
                                 }
-                                subject.isTapped = viewModel.isTappedImage
                             }
                             .gesture(DragGesture()
                                 .onChanged({ value in
@@ -154,7 +161,134 @@ private extension DFModifyView {
                                     }))
                     }
                 }
-                /// 이미지가 아닌 경우, 즉 스티커 및 텍스트인 경우의 코드를 밑에 적어주세요
+                else if let image = subject.sticker {
+                    ZStack {
+                        
+                        let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
+                        
+                        DFOverlayBoxTextView(model: $subject, size: size)
+                            .opacity(subject.isTapped ? 1 : 0)
+                            .zIndex(1)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width:size.width,height:size.height)
+                            .scaleEffect(subject.getScale())
+                            .rotationEffect(subject.getAngle())
+                            .offset(subject.getOffset())
+                            .onTapGesture {
+                                
+                                if subject.isTapped {
+                                    if viewModel.isTappedImage {
+                                        viewModel.isTappedImage = false
+                                    }
+                                    subject.isTapped = viewModel.isTappedImage
+                                    
+                                } else {
+                                    if !viewModel.isTappedImage {
+                                        viewModel.isTappedImage = true
+                                    }
+                                    subject.isTapped = viewModel.isTappedImage
+                                }
+                            }
+                            .gesture(DragGesture()
+                                .onChanged({ value in
+                                    print(value.translation)
+                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                })
+                                    .onEnded({ value in
+                                        viewModel.accumulatedOffSet = .zero
+                                        viewModel.isTappedImage = true
+                                        subject.isTapped = viewModel.isTappedImage
+                                    }))
+                            .simultaneousGesture(RotateGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        if viewModel.current == .zero {
+                                            viewModel.current = subject.getAngle()
+                                        }
+                                        viewModel.angle = value.rotation + viewModel.current
+                                        subject.setAngle(angle: viewModel.angle)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.current = .zero
+                                    }))
+                            .simultaneousGesture(MagnifyGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        viewModel.setScaleVolume(value.magnification, subject: subject)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                                    }))
+                    }
+                }
+                else if let image = subject.text{
+                    ZStack {
+                        
+                        let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
+                        
+                        DFOverlayBoxTextView(model: $subject, size: size)
+                            .opacity(subject.isTapped ? 1 : 0)
+                            .zIndex(1)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width:size.width,height:size.height)
+                            .scaleEffect(subject.getScale())
+                            .rotationEffect(subject.getAngle())
+                            .offset(subject.getOffset())
+                            .onTapGesture {
+                                
+                                if subject.isTapped {
+                                    if viewModel.isTappedImage {
+                                        viewModel.isTappedImage = false
+                                    }
+                                    subject.isTapped = viewModel.isTappedImage
+                                    
+                                } else {
+                                    if !viewModel.isTappedImage {
+                                        viewModel.isTappedImage = true
+                                    }
+                                    subject.isTapped = viewModel.isTappedImage
+                                }
+                            }
+                            .gesture(DragGesture()
+                                .onChanged({ value in
+                                    print(value.translation)
+                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                })
+                                    .onEnded({ value in
+                                        viewModel.accumulatedOffSet = .zero
+                                        viewModel.isTappedImage = true
+                                        subject.isTapped = viewModel.isTappedImage
+                                    }))
+                            .simultaneousGesture(RotateGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        if viewModel.current == .zero {
+                                            viewModel.current = subject.getAngle()
+                                        }
+                                        viewModel.angle = value.rotation + viewModel.current
+                                        subject.setAngle(angle: viewModel.angle)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.current = .zero
+                                    }))
+                            .simultaneousGesture(MagnifyGesture()
+                                .onChanged({ value in
+                                    if subject.isTapped {
+                                        viewModel.setScaleVolume(value.magnification, subject: subject)
+                                    }
+                                })
+                                    .onEnded({ value in
+                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                                    }))
+                    }
+                }
             }
         }
     }

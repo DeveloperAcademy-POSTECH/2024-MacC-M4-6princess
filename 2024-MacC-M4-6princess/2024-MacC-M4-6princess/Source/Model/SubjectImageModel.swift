@@ -6,7 +6,7 @@ class SubjectImage: Identifiable {
     var image: UIImage?
     var originalImage: UIImage?
     var sticker: UIImage?
-    var text: String?
+    var text: UIImage?
     
     var angle: Angle = .degrees(0)
     var offset: CGSize = .zero
@@ -16,6 +16,24 @@ class SubjectImage: Identifiable {
     var isTapped: Bool = true
     
     let id: UUID = UUID()
+    
+    
+//    func setTappedState(_ state: Bool) {
+//        print(isTapped)
+//        isTapped = state
+//        print(isTapped)
+//        
+//    }
+    
+    func getTapState() -> Bool {
+        return isTapped
+    }
+    
+    func isTappedToggle() {
+        print(isTapped)
+        isTapped.toggle()
+        print(isTapped)
+    }
     
     func setScale(scale: CGFloat) {
         self.scale = scale
