@@ -65,7 +65,7 @@ class DFEditViewModel: ObservableObject {
             }
             
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             
             completionHandler()
         }

@@ -328,17 +328,23 @@ private extension DFEditView {
                                 imageModel.imageList.append(newImage)
                                 print("\(imageModel.imageList.count) 길이")
                             }
+                            
+                            if naviManager.route.count > 1 {
+                                naviManager.pop()
+                            } else {
+                                naviManager.push(screen: Screen.modifyFrame)
+                            }//✅
                         }
                     }
                 }
-                viewModel.isShowModifyFrame.toggle()
+//                viewModel.isShowModifyFrame.toggle()
                 //                viewModel.isShowModifyFrame.toggle()
                 
-                if naviManager.route.count > 1 {
-                    naviManager.pop()
-                } else {
-                    naviManager.push(screen: Screen.modifyFrame)
-                }//✅
+//                if naviManager.route.count > 1 {
+//                    naviManager.pop()
+//                } else {
+//                    naviManager.push(screen: Screen.modifyFrame)
+//                }//✅
                 
             } label: {
                 Text("확인")
