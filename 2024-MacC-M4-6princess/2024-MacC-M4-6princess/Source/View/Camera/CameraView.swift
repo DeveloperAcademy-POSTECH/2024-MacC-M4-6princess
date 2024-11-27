@@ -180,6 +180,8 @@ struct CameraView: View {
 //                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
+                    .environmentObject(naviManager)
+                    .environmentObject(frameManager)
                     
                 
             }

@@ -40,7 +40,7 @@ extension FontStyle: CaseIterable {
             case .modern:
                 return .custom("Pretendard-Regular",size: size) // 시스템 폰트
             case .handwriting:
-                return .custom("HakgyoansimGeurimilgiOTF-R", size: size) // 헬베티카 폰트
+                return .custom("Hakgyoansim Geurimilgi OTF R", size: size) // 헬베티카 폰트
             case .bold:
                 return .custom("Pretendard-Bold",size: size) // 시스템 기본 볼드체
         }

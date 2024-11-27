@@ -166,7 +166,7 @@ private extension DFModifyView {
                         
                         let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
                         
-                        DFOverlayBoxTextView(model: $subject, size: size)
+                        DFOverlayBoxView(model: $subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
                         
@@ -230,7 +230,7 @@ private extension DFModifyView {
                         
                         let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
                         
-                        DFOverlayBoxTextView(model: $subject, size: size)
+                        DFOverlayBoxView(model: $subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
                         

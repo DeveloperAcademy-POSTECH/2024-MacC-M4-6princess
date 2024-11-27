@@ -21,7 +21,7 @@ struct DFOverlayBoxView: View {
                 .rotationEffect(model.getAngle())
                 .offset(model.getOffset())
             
-            if let realImage = model.originalImage {
+            if let _ = model.image, let realImage = model.originalImage {
                 
                 Button {
                     
