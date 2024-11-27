@@ -9,21 +9,19 @@ import SwiftUI
 
 //메인뷰 하단 뷰(셔터버튼, 기타 버튼 등)
 struct CameraBottomView: View {
-    @ObservedObject var viewModel: CameraViewModel
-    @StateObject var motionManager = MotionManager()
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @EnvironmentObject var naviManager:NavigationManager
     @EnvironmentObject var frameManager:FrameManager
+    @ObservedObject var viewModel: CameraViewModel
+    @StateObject var motionManager = MotionManager()
+
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
-            //        if horizontalSizeClass == .regular{
             VStack{
                 Spacer()
-                HStack (){
+                HStack{
                     
                     //프레임 불러오기 버튼
                     Button {
-//                        viewModel.isShowMFView.toggle()
                         frameManager.showMFView = true
                         viewModel.cameraManager.stopSession()
                         print("프레임 버튼 눌림")

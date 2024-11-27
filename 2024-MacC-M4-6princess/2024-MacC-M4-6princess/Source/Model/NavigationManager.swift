@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - NavigationManager
 // @EnvironmentObject로 주입하여 전역적으로 사용 가능
 public final class NavigationManager: ObservableObject {
-
+    
     // NavigationPath는 현재 네비게이션 경로를 관리
     @Published public var route = NavigationPath()
     
@@ -22,7 +22,7 @@ public final class NavigationManager: ObservableObject {
     public func push<T: Hashable>(screen: T) {
         route.append(screen)
     }
-//    naviManager.push(screen: .pho)
+    //    naviManager.push(screen: .pho)
     /// 네비게이션 스택에서 마지막 화면 제거
     @MainActor
     public func pop() {
@@ -62,6 +62,7 @@ public enum Screen: Hashable {
     case frameEdit   // DFFrameEditView 화면
     case modifyFrame // DFModifyFrame 화면
     case testFrame
+    case manageFrame
 }
 
 // MARK: - FeatureView
@@ -72,15 +73,17 @@ struct FeatureView: View {
     var body: some View {
         // Screen 타입에 따라 다른 뷰를 렌더링
         switch type {
-            case .photoPicker:
-                PhotosPickerView()
-            case .frameEdit:
-                DFEditView()
-            case .modifyFrame:
-                DFModifyView()
-            case .testFrame:
-                DFTestFrameView()
-                
+        case .photoPicker:
+            PhotosPickerView()
+        case .frameEdit:
+            DFEditView()
+        case .modifyFrame:
+            DFModifyView()
+        case .testFrame:
+            DFTestFrameView()
+        case .manageFrame:
+            MFView()
+            
         }
     }
 }

@@ -11,12 +11,12 @@ import CoreData
 
 struct CameraView: View {
     @Environment(\.managedObjectContext) var viewContext
+    @EnvironmentObject var frameManager: FrameManager
+    @State private var path: NavigationPath = NavigationPath()
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-    @State private var path: NavigationPath = NavigationPath()
-    //    @Binding var frameImage: UIImage?  // 옵셔널 바인딩
     @StateObject var naviManager = NavigationManager()
-    @StateObject var frameManager = FrameManager()
+    
     
     private var cameraPreview: some View  {
         GeometryReader { geo in
@@ -38,25 +38,25 @@ struct CameraView: View {
     
     var body: some View {
         
-        NavigationStack {
+        NavigationStack(path: $naviManager.route) {
             ZStack{
                 VStack(spacing: 0) {
-                                Color.clear
-                                    .frame(height: 94) // TopView 높이만큼 여백 확보
-                                
-                                cameraPreview
-                                    .frame(width: UIScreen.main.bounds.width,
-                                           height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                                    .gesture(MagnificationGesture()
-                                        .onChanged { val in
-                                            viewModel.zoom(factor: val)
-                                        }
-                                        .onEnded { _ in
-                                            viewModel.zoomInitialize()
-                                        })
-                                
-                                Spacer()
+                    Color.clear
+                        .frame(height: 94) // TopView 높이만큼 여백 확보
+                    
+                    cameraPreview
+                        .frame(width: UIScreen.main.bounds.width,
+                               height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                        .gesture(MagnificationGesture()
+                            .onChanged { val in
+                                viewModel.zoom(factor: val)
                             }
+                            .onEnded { _ in
+                                viewModel.zoomInitialize()
+                            })
+                    
+                    Spacer()
+                }
                 VStack {
                     CameraTopView(viewModel: viewModel)
                     Spacer()
@@ -110,7 +110,7 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-//                                                viewModel.isShowMFView.toggle()
+                                                //                                                viewModel.isShowMFView.toggle()
                                                 frameManager.showMFView = true
                                             }
                                         }
@@ -139,7 +139,7 @@ struct CameraView: View {
                                             }
                                             .onTapGesture {
                                                 viewModel.firstTime = true
-//                                                viewModel.isShowMFView.toggle()
+                                                //                                                viewModel.isShowMFView.toggle()
                                                 frameManager.showMFView = true
                                             }
                                         }
@@ -164,6 +164,7 @@ struct CameraView: View {
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }
+            
             .onChange(of: frameManager.isFrameLoading) { newValue in
                 if newValue {
                     loadSelectedFrame()
@@ -171,6 +172,7 @@ struct CameraView: View {
                 }
             }
             .persistentSystemOverlays(.hidden)
+<<<<<<< Updated upstream
             .onAppear {
                 motionManager.startDeviceMotionUpdates()
                 //                viewModel.frameImage = frameImage
@@ -185,6 +187,8 @@ struct CameraView: View {
                     
                 
             }
+=======
+>>>>>>> Stashed changes
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
@@ -193,12 +197,23 @@ struct CameraView: View {
                 }
                 
             }
+            .onChange(of: frameManager.showMFView) { newValue in
+                if newValue {
+                    naviManager.push(screen: Screen.manageFrame)
+                    frameManager.showMFView = false // 상태 초기화
+                }
+            }
             
         }
+        .navigationDestination(for: Screen.self) { screen in
+            FeatureView(type: screen)
+        }
+        
         .onAppear {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
+            motionManager.startDeviceMotionUpdates()
         }
         
     }

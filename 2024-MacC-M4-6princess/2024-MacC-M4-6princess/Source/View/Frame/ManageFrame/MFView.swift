@@ -11,129 +11,136 @@ import CoreData
 
 struct MFView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.managedObjectContext) private var viewContext
-    @StateObject var viewModel: MFViewModel
+    @Environment(\.managedObjectContext) var viewContext
+    @StateObject var viewModel: MFViewModel = MFViewModel()
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     
     var body: some View {
-        NavigationStack(path: $naviManager.route) {
-            ZStack(alignment: .bottom) {
-                VStack(spacing: 0) {
-                    SheetTitleView(viewModel: viewModel)
-                    ScrollView {
-                        FrameGridItem(viewModel: viewModel)
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                SheetTitleView(viewModel: viewModel)
+                ScrollView {
+                    FrameGridItem(viewModel: viewModel)
+                }
+                
+            }
+            if viewModel.isEditing {
+                HStack(spacing: 10) {
+                    Button {
+                        //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
+                        naviManager.push(screen: Screen.frameEdit)
+                    } label: {
+                        ZStack {
+                            Rectangle()
+                                .foregroundColor(.clear)
+                                .frame(width: 164, height: 60)
+                                .background(viewModel.selectedImageIds.count > 1 ? .gray03 : .pointPink)
+                                .cornerRadius(10)
+                            Text("수정하기")
+                                .font(.system(size: 17))
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .disabled(viewModel.selectedImageIds.count > 1)
+                    Button {
+                        
+                        viewModel.isDeleteAlert = true
+                    } label: {
+                        ZStack {
+                            Rectangle()
+                                .foregroundColor(.white)
+                                .frame(width: 164, height: 60)
+                                .cornerRadius(10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .inset(by: 1)
+                                        .stroke(.pointPink, lineWidth: 2)
+                                )
+                            Text("삭제하기")
+                                .font(.system(size: 17))
+                                .foregroundColor(.pointPink)
+                                .fontWeight(.bold)
+                        }
                     }
                     
                 }
-                .navigationDestination(for: Screen.self) { type in
-                    FeatureView(type: type)
-                }
-                if viewModel.isEditing {
-                    HStack(spacing: 10) {
-                        Button {
-                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
-                            naviManager.push(screen: Screen.frameEdit)
-                        } label: {
-                            ZStack {
-                                Rectangle()
-                                    .foregroundColor(.clear)
-                                    .frame(width: 164, height: 60)
-                                    .background(viewModel.selectedImageIds.count > 1 ? .gray03 : .pointPink)
-                                    .cornerRadius(10)
-                                Text("수정하기")
-                                    .font(.system(size: 17))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        .disabled(viewModel.selectedImageIds.count > 1)
-                        Button {
-
-                            viewModel.isDeleteAlert = true
-                        } label: {
-                            ZStack {
-                                Rectangle()
-                                    .foregroundColor(.white)
-                                    .frame(width: 164, height: 60)
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .inset(by: 1)
-                                            .stroke(.pointPink, lineWidth: 2)
-                                    )
-                                Text("삭제하기")
-                                    .font(.system(size: 17))
-                                    .foregroundColor(.pointPink)
-                                    .fontWeight(.bold)
-                            }
-                        }
-                        
-                    }
-                    .background {
-                        Rectangle()
-                            .foregroundColor(.clear)
-                            .frame(width: UIScreen.main.bounds.width, height: 130)
-                            .background(
-                                LinearGradient(
-                                    stops: [
-                                        Gradient.Stop(color: .white.opacity(0), location: 0.00),
-                                        Gradient.Stop(color: .white, location: 0.30),
-                                        Gradient.Stop(color: .white, location: 1.00),
-                                    ],
-                                    startPoint: UnitPoint(x: 0.5, y: 0),
-                                    endPoint: UnitPoint(x: 0.5, y: 1)
-                                )
+                .background {
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: UIScreen.main.bounds.width, height: 130)
+                        .background(
+                            LinearGradient(
+                                stops: [
+                                    Gradient.Stop(color: .white.opacity(0), location: 0.00),
+                                    Gradient.Stop(color: .white, location: 0.30),
+                                    Gradient.Stop(color: .white, location: 1.00),
+                                ],
+                                startPoint: UnitPoint(x: 0.5, y: 0),
+                                endPoint: UnitPoint(x: 0.5, y: 1)
                             )
-                    }
+                        )
                 }
             }
-            .onAppear {
-                // 처음 한 번만 로드
-    //            if viewModel.imageDataArray.isEmpty {
-                    viewModel.loadImages()
-    //            }
-            }
-            .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
-                Button {
-                    viewModel.deleteSelectedImages()
-                    print("삭제중...")
-                } label: {
-                    Text("삭제")
-                        .font(.system(size: 17))
-                        .foregroundColor(.blue)
-                        .fontWeight(.semibold)
-                }
-
-                Button("취소", role: .cancel) { }
-            } message: {
-                Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
-            }
-//            .alert(isPresented: $viewModel.isDeleteAlert) {
-//                        Alert(
-//                            title: Text("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?"),
-//                            message: Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
-//                            
-//                            primaryButton: .destructive(Text("삭제")) {
-//                                viewModel.deleteSelectedImages()
-//                                print("Deleting...")
-//                            },
-//                            secondaryButton: .cancel(Text("취소"))
-//                        )
-//                    }
+        }
+        .onAppear {
+            loadImages()
         }
         
-        .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
-            PhotosPickerView()
+        .navigationBarHidden(true)
+        .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
+            Button {
+                viewModel.deleteSelectedImages()
+                print("삭제중...")
+            } label: {
+                Text("삭제")
+                    .font(.system(size: 17))
+                    .foregroundColor(.blue)
+                    .fontWeight(.semibold)
+            }
+            
+            Button("취소", role: .cancel) { }
+        } message: {
+            Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+        }
+        //            .alert(isPresented: $viewModel.isDeleteAlert) {
+        //                        Alert(
+        //                            title: Text("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?"),
+        //                            message: Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+        //
+        //                            primaryButton: .destructive(Text("삭제")) {
+        //                                viewModel.deleteSelectedImages()
+        //                                print("Deleting...")
+        //                            },
+        //                            secondaryButton: .cancel(Text("취소"))
+        //                        )
+        //                    }
+    }
+    
+    private func loadImages() {
+        let request = StoreImages.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+        
+        do {
+            let storedImages = try viewContext.fetch(request)
+            viewModel.imageDataArray = storedImages.compactMap { storeImage in
+                guard let id = storeImage.uuid else { return nil }
+                return (id: id, data: Data(), isLoaded: false)
+            }
+        } catch {
+            print("이미지 로드 실패: \(error)")
         }
     }
 }
+
 
 
 // MARK: - 프레임관리 상단바 커스텀
 
 struct SheetTitleView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var naviManager: NavigationManager
     @ObservedObject var viewModel: MFViewModel
     
     var body: some View {
@@ -180,14 +187,16 @@ struct SheetTitleView: View {
 struct FrameGridItem: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
-    @ObservedObject var viewModel: MFViewModel
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
+    @ObservedObject var viewModel: MFViewModel
+    
     
     var body: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
             Button {
                 naviManager.push(screen: Screen.photoPicker)
+                print("새로운 프레임 만들기 버튼 눌림")
             } label: {
                 ZStack {
                     VStack(alignment: .center, spacing: 4) {

@@ -15,44 +15,39 @@ class MFViewModel: ObservableObject {
     @Published var selectedImageIds: Set<UUID> = []
     @Published var isDeleteAlert: Bool = false
     
-    private var viewContext: NSManagedObjectContext
+    @Environment(\.managedObjectContext) var viewContext
+    @EnvironmentObject var frameManager: FrameManager
     private var imageCache: [UUID: Data] = [:]
-    private var frameManager: FrameManager
-    
-    init(context: NSManagedObjectContext, frameManager: FrameManager) {
-        self.viewContext = context
-        self.frameManager = frameManager
-    }
     
     
     ///코어데이터에서 이미지 id를 가져옴
-    func loadImages() {
-            let request = StoreImages.fetchRequest()
-            request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
-            
-            do {
-                let storedImages = try viewContext.fetch(request)
-                imageDataArray = storedImages.compactMap { storeImage in
-                    guard let id = storeImage.uuid else { return nil }
-                    return (id: id, data: Data(), isLoaded: false)
-                }
-            } catch {
-                print("이미지 로드 실패: \(error)")
-            }
-        }
+//    func loadImages() {
+//        let request = StoreImages.fetchRequest()
+//        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+//        
+//        do {
+//            let storedImages = try viewContext.fetch(request)
+//            imageDataArray = storedImages.compactMap { storeImage in
+//                guard let id = storeImage.uuid else { return nil }
+//                return (id: id, data: Data(), isLoaded: false)
+//            }
+//        } catch {
+//            print("이미지 로드 실패: \(error)")
+//        }
+//    }
     
     ///특정 이미지가 필요할 때 로드(해당 Id가 없을 때만 로드)
     func loadImageIfNeeded(for id: UUID) -> Data? {
-            if let cached = imageCache[id] {
-                return cached
-            }
-            
-            if let imageData = loadImageData(for: id) {
-                imageCache[id] = imageData
-                return imageData
-            }
-            return nil
+        if let cached = imageCache[id] {
+            return cached
         }
+        
+        if let imageData = loadImageData(for: id) {
+            imageCache[id] = imageData
+            return imageData
+        }
+        return nil
+    }
     
     ///특정 이미지 데이터를 가져옴
     func loadImageData(for id: UUID) -> Data? {
@@ -61,10 +56,12 @@ class MFViewModel: ObservableObject {
         
         do {
             guard let storeImage = try viewContext.fetch(request).first,
-                  let imageData = storeImage.image else {
+                  let imageData = storeImage.image,
+                  let uiImage = UIImage(data: imageData) else {
                 return nil
             }
-            return downsampleImage(UIImage(data: imageData)!,
+            
+            return downsampleImage(uiImage,
                                    to: CGSize(width: UIScreen.main.bounds.width / 3,
                                               height: (UIScreen.main.bounds.width / 3) * (4 / 3)))?.jpegData(compressionQuality: 0.5)
         } catch {
@@ -72,6 +69,23 @@ class MFViewModel: ObservableObject {
             return nil
         }
     }
+//    func loadImageData(for id: UUID) -> Data? {
+//        let request = StoreImages.fetchRequest()
+//        request.predicate = NSPredicate(format: "uuid == %@", id as CVarArg)
+//        
+//        do {
+//            guard let storeImage = try viewContext.fetch(request).first,
+//                  let imageData = storeImage.image else {
+//                return nil
+//            }
+//            return downsampleImage(UIImage(data: imageData)!,
+//                                   to: CGSize(width: UIScreen.main.bounds.width / 3,
+//                                              height: (UIScreen.main.bounds.width / 3) * (4 / 3)))?.jpegData(compressionQuality: 0.5)
+//        } catch {
+//            print("Failed to fetch image: \(error)")
+//            return nil
+//        }
+//    }
     
     ///선택된 이미지들을 코어데이터에서 삭제
     func deleteSelectedImages() {
@@ -84,7 +98,7 @@ class MFViewModel: ObservableObject {
                 viewContext.delete(image)
             }
             try viewContext.save()
-            loadImages()
+//            loadImages()
             selectedImageIds.removeAll()
             isEditing = false
         } catch {
@@ -132,14 +146,14 @@ class MFViewModel: ObservableObject {
     }
     
     func selectFrame(id: UUID) {
-            if let imageData = loadImageData(for: id),
-               let uiImage = UIImage(data: imageData) {
-                DispatchQueue.main.async {
-                    self.frameManager.selectedFrame = id
-                    self.frameManager.pickedImage = uiImage
-                    self.frameManager.isFrameLoading = true
-                }
+        if let imageData = loadImageData(for: id),
+           let uiImage = UIImage(data: imageData) {
+            DispatchQueue.main.async {
+                self.frameManager.selectedFrame = id
+                self.frameManager.pickedImage = uiImage
+                self.frameManager.isFrameLoading = true
             }
         }
+    }
     
 }
