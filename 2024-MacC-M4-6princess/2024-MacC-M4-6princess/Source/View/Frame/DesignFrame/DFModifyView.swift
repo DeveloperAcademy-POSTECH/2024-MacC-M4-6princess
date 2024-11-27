@@ -37,6 +37,13 @@ struct DFModifyView: View {
                         .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                     
                 }
+                .onTapGesture {
+                    viewModel.isTappedImage = false
+                    
+                    imageModel.imageList.forEach {
+                        $0.isTapped = viewModel.isTappedImage
+                    }
+                }
                 .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
                 DFImageDecoView(viewModel: viewModel)
                     .padding(.top, 58)
@@ -96,7 +103,7 @@ private extension DFModifyView {
                         var size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
                         
                         DFOverlayBoxView(model: $subject, size: size)
-                            .opacity(subject.isTapped && viewModel.isTappedImage ? 1 : 0)
+                            .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
                         
                         Image(uiImage: image)
@@ -106,12 +113,10 @@ private extension DFModifyView {
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
                             .onTapGesture {
-                                if subject.isTapped {
-                                    subject.isTapped = false
-                                } else {
-                                    subject.isTapped = true
+                                if !viewModel.isTappedImage {
+                                    viewModel.isTappedImage.toggle()
                                 }
-//                                viewModel.isTappedImage = true
+                                subject.isTapped = viewModel.isTappedImage
                             }
                             .gesture(DragGesture()
                                 .onChanged({ value in
@@ -120,7 +125,8 @@ private extension DFModifyView {
                                 })
                                     .onEnded({ value in
                                         viewModel.accumulatedOffSet = .zero
-                                        subject.isTapped = true
+                                        viewModel.isTappedImage = true
+                                        subject.isTapped = viewModel.isTappedImage
                                     }))
                             .simultaneousGesture(RotateGesture()
                                 .onChanged({ value in
