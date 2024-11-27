@@ -37,7 +37,7 @@ struct DFTextView: View {
                             renderTextImage(text: txt)
                             let newImage = SubjectImage()
                             if let image = renderedImage {
-                                newImage.text = image
+                                newImage.image = image
                                 newImage.originalImage = image
                                 imageModel.imageList.append(newImage)
                             } else {
