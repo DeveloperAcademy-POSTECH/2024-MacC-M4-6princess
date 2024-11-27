@@ -88,6 +88,12 @@ struct MFView: View {
                     }
                 }
             }
+            .onAppear {
+                // 처음 한 번만 로드
+    //            if viewModel.imageDataArray.isEmpty {
+                    viewModel.loadImages()
+    //            }
+            }
             .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
                 Button {
                     viewModel.deleteSelectedImages()
@@ -116,12 +122,7 @@ struct MFView: View {
 //                        )
 //                    }
         }
-        .onAppear {
-            // 처음 한 번만 로드
-            if viewModel.imageDataArray.isEmpty {
-                viewModel.loadImages()
-            }
-        }
+        
         .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
             PhotosPickerView()
         }
