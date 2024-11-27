@@ -6,7 +6,7 @@ class SubjectImage: Identifiable {
     var image: UIImage?
     var originalImage: UIImage?
     var sticker: UIImage?
-    var text: String?
+    var text: UIImage?
     
     var angle: Angle = .degrees(0)
     var offset: CGSize = .zero
