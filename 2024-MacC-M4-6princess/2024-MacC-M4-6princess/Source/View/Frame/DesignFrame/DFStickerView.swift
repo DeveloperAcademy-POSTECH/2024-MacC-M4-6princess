@@ -52,7 +52,7 @@ struct DFStickerView: View {
                         .onTapGesture {
                             let newImage = SubjectImage()
                             if let image = UIImage(named: imageName) {
-                                newImage.sticker = image
+                                newImage.image = image
                                 newImage.originalImage = image
 //                                newImage.scale = 0.5
                                 imageModel.imageList.append(newImage)
