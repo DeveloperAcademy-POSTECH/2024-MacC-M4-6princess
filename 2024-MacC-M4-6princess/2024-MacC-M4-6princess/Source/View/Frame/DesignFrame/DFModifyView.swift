@@ -113,8 +113,10 @@ private extension DFModifyView {
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
                             .onTapGesture {
-                                if !viewModel.isTappedImage {
-                                    viewModel.isTappedImage.toggle()
+                                if viewModel.isTappedImage {
+                                    viewModel.isTappedImage = false
+                                } else {
+                                    viewModel.isTappedImage = true
                                 }
                                 subject.isTapped = viewModel.isTappedImage
                             }
@@ -216,6 +218,10 @@ private extension DFModifyView {
                 if let image = frameManager.resultImage {
                     
                     viewModel.isTappedImage = false
+                    
+                    imageModel.imageList.forEach {
+                        $0.isTapped = viewModel.isTappedImage
+                    }
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
