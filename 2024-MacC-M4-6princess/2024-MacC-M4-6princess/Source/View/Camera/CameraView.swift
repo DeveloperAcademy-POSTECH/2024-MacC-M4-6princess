@@ -188,13 +188,22 @@ struct CameraView: View {
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
-                if let takenImg = viewModel.takenImg,let frameImg = frameManager.resultImage{
+                if let takenImg = viewModel.takenImg, let frameImg = frameManager.resultImage {
                     IOView(bg: takenImg, idol: frameImg)
+                } else {
+                    EmptyView()
+                    .onAppear {
+                        viewModel.errorMessage = "프레임이 없습니다. 다시 촬영해주세요."
+                        viewModel.showErrorAlert = true
+                                }
                 }
-                
             }
+
             
         }
+        .alert(isPresented: $viewModel.showErrorAlert) {
+            Alert(title: Text("오류 발생"), message: Text(viewModel.errorMessage), dismissButton: .default(Text("확인")))
+               }
         .onAppear {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
