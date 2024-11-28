@@ -40,7 +40,7 @@ struct IECanvasView: View {
                 )
         }
         .onAppear {
-            viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
+//            viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
         }
         .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
     }
