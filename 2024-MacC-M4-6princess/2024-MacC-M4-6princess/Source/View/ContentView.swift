@@ -13,9 +13,9 @@ struct ContentView: View {
     
     var body: some View {
         
-        CameraView()
-            .environmentObject(imageModel)
-//        IEDevelopView()
+//        CameraView()
+//            .environmentObject(imageModel)
+        IEDevelopView()
         //        CMView()
         //        IEProgressView()
     }
