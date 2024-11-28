@@ -33,8 +33,12 @@ struct LayerLongPressView: View {
             .frame(width: 300, height: 300)
             .padding()
             
-            VStack {
+            HStack {
                 layerIndicator
+                Spacer()
+            }
+            
+            VStack {
                 Spacer()
                 Button(action: {
                     showImagePicker = true
@@ -53,29 +57,36 @@ struct LayerLongPressView: View {
         }
     }
     
-    // 레이어 순서 표시 뷰 (이전 코드로 복원)
+    // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
             ForEach(layerImages.indices, id: \.self) { index in
-                HStack {
-                    if index == selectedLayerIndex {
-                        RoundedRectangle(cornerRadius: 3)
-                            .frame(width: 24, height: 4)
-                            .foregroundColor(.white)
-                            .padding(.leading, 4)
-                    } else {
-                        RoundedRectangle(cornerRadius: 3)
-                            .frame(width: 12, height: 4)
-                            .foregroundColor(.gray.opacity(0.5))
-                            .padding(.leading, 4)
+                if index == selectedLayerIndex {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            RoundedRectangle(cornerRadius: 3)
+                                .frame(width: 24, height: 4)
+                                .foregroundColor(.white)
+                                .padding(.leading, 4)
+                            Spacer()
+                        }
+                        Spacer()
                     }
-                    Spacer()
+                    .frame(height: 6)
+                } else {
+                    HStack {
+                        Image("heart.union")
+                            .resizable()
+                            .frame(width: 8, height: 6)
+                        Spacer()
+                    }
                 }
             }
         }
         .padding(6)
         .frame(width: 40)
-        .background(Color.black.opacity(0.7))
+        .background(Color.gray)
         .cornerRadius(8)
         .padding(.horizontal, 5)
     }
@@ -85,6 +96,7 @@ struct LayerLongPressView: View {
         LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
             .onEnded { _ in
                 isLongPressed = true // 길게 눌림 활성화
+                selectedLayerIndex = index
                 print("isLongPressed 눌림")
             }
             .simultaneously(with: DragGesture(minimumDistance: 0)
@@ -150,3 +162,4 @@ struct LayerLongPressView: View {
         }
     }
 }
+//.gesture(longPressAndDragGesture(for: index)) // 제스처 분리
