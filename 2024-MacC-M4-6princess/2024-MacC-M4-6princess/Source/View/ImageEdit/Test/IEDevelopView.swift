@@ -11,7 +11,7 @@ struct IEDevelopView: View {
   
     var body: some View {
         
+        LayerLongPressView()
         
-        }
     }
 }
