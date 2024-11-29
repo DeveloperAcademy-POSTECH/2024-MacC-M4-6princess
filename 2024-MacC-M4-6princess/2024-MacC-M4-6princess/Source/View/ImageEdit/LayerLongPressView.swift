@@ -148,11 +148,12 @@ struct LayerLongPressView: View {
     
     // 레이어를 앞으로 이동
        private func moveLayerForward(at index: Int, steps: Int) {
-           guard steps < 0 else { return }
+           guard steps > 0 else { return }
            var currentIndex = index
            for _ in 0..<steps {
                guard currentIndex > 0 else { return }
-//               print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+               guard currentIndex < layerImages.count else { return }
+               print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
                layerImages.swapAt(currentIndex, currentIndex - 1)
                currentIndex -= 1
            }
@@ -164,8 +165,8 @@ struct LayerLongPressView: View {
            var currentIndex = index
            for _ in 0..<steps {
                guard currentIndex < layerImages.count - 1 else { return }
-               guard currentIndex > 0 else { return }
-//               print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+               guard currentIndex >= 0 else { return }
+               print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
                layerImages.swapAt(currentIndex, currentIndex + 1)
                currentIndex += 1
            }
