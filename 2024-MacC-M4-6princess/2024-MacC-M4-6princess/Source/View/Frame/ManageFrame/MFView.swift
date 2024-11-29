@@ -32,8 +32,11 @@ struct MFView: View {
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
-                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
-                            naviManager.push(screen: Screen.frameEdit)
+//                            frameManager.resultImage = UIImage(id: viewModel.selectedImageIds)
+                            if let selectedImageData = viewModel.imageDataArray.first(where: { $0.id == viewModel.selectedImageIds.first }) {
+                                    frameManager.resultImage = UIImage(data: selectedImageData.data)
+                                }
+                            naviManager.push(screen: Screen.modifyFrame)
                         } label: {
                             ZStack {
                                 Rectangle()
