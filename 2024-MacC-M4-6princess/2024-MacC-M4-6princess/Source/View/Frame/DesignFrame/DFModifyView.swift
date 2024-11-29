@@ -39,9 +39,10 @@ struct DFModifyView: View {
                         
                     }
                     .onTapGesture {
+                        viewModel.isTappedImage = false
                         
                         imageModel.imageList.forEach {
-                            $0.isTapped = false
+                            $0.isTapped = viewModel.isTappedImage
                         }
                     }
                     .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))

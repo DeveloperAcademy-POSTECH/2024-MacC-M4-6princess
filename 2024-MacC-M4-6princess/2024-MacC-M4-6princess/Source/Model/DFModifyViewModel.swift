@@ -21,6 +21,7 @@ class DFModifyViewModel: ObservableObject {
 
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
+    @Published var isTappedImage: Bool = false
     
     @Published var outputImage: UIImage?
     @Published var indexOfImageList: Int = 0
