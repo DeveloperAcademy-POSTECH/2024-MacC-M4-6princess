@@ -21,6 +21,7 @@ struct DFModifyView: View {
                 DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
                     .zIndex(1)
             }
+            
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 VStack {
                     ZStack {
@@ -101,15 +102,16 @@ extension DFModifyView {
         
         ZStack {
             
-            ForEach($imageModel.imageList) { $subject in
+            ForEach(imageModel.imageList) { subject in
                 
                 if let image = subject.image, let realImage = subject.originalImage {
                     
+                    
                     ZStack {
                         
-                        var size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                        let size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
                         
-                        DFOverlayBoxView(model: $subject, size: size)
+                        DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
                         
@@ -120,19 +122,16 @@ extension DFModifyView {
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
                             .onTapGesture {
-                                                           
-                                if subject.isTapped {
-                                    if viewModel.isTappedImage {
-                                        viewModel.isTappedImage = false
-                                    }
-                                    subject.isTapped = viewModel.isTappedImage
+                                
+                                if !subject.isTapped {
                                     
-                                } else {
-                                    if !viewModel.isTappedImage {
-                                        viewModel.isTappedImage = true
-                                    }
-                                    subject.isTapped = viewModel.isTappedImage
+                                    viewModel.modelListControl(subject: subject)
+                                    
                                 }
+                                subject.isTapped.toggle()
+                                imageModel.imageList.append(subject)
+                                imageModel.imageList.removeLast()
+                                
                             }
                             .gesture(DragGesture()
                                 .onChanged({ value in
@@ -141,8 +140,10 @@ extension DFModifyView {
                                 })
                                     .onEnded({ value in
                                         viewModel.accumulatedOffSet = .zero
-                                        viewModel.isTappedImage = true
-                                        subject.isTapped = viewModel.isTappedImage
+                                        viewModel.modelListControl(subject: subject)
+                                        subject.isTapped = true
+                                        imageModel.imageList.append(subject)
+                                        imageModel.imageList.removeLast()
                                     }))
                             .simultaneousGesture(RotateGesture()
                                 .onChanged({ value in
@@ -173,7 +174,7 @@ extension DFModifyView {
                         
                         let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
                         
-                        DFOverlayBoxView(model: $subject, size: size)
+                        DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
                         
@@ -185,18 +186,14 @@ extension DFModifyView {
                             .offset(subject.getOffset())
                             .onTapGesture {
                                 
-                                if subject.isTapped {
-                                    if viewModel.isTappedImage {
-                                        viewModel.isTappedImage = false
-                                    }
-                                    subject.isTapped = viewModel.isTappedImage
+                                if !subject.isTapped {
                                     
-                                } else {
-                                    if !viewModel.isTappedImage {
-                                        viewModel.isTappedImage = true
-                                    }
-                                    subject.isTapped = viewModel.isTappedImage
+                                    viewModel.modelListControl(subject: subject)
+                                    
                                 }
+                                subject.isTapped.toggle()
+                                imageModel.imageList.append(subject)
+                                imageModel.imageList.removeLast()
                             }
                             .gesture(DragGesture()
                                 .onChanged({ value in
@@ -205,8 +202,10 @@ extension DFModifyView {
                                 })
                                     .onEnded({ value in
                                         viewModel.accumulatedOffSet = .zero
-                                        viewModel.isTappedImage = true
-                                        subject.isTapped = viewModel.isTappedImage
+                                        viewModel.modelListControl(subject: subject)
+                                        subject.isTapped = true
+                                        imageModel.imageList.append(subject)
+                                        imageModel.imageList.removeLast()
                                     }))
                             .simultaneousGesture(RotateGesture()
                                 .onChanged({ value in
@@ -237,7 +236,7 @@ extension DFModifyView {
                         
                         let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
                         
-                        DFOverlayBoxView(model: $subject, size: size)
+                        DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
                         
@@ -249,18 +248,14 @@ extension DFModifyView {
                             .offset(subject.getOffset())
                             .onTapGesture {
                                 
-                                if subject.isTapped {
-                                    if viewModel.isTappedImage {
-                                        viewModel.isTappedImage = false
-                                    }
-                                    subject.isTapped = viewModel.isTappedImage
+                                if !subject.isTapped {
                                     
-                                } else {
-                                    if !viewModel.isTappedImage {
-                                        viewModel.isTappedImage = true
-                                    }
-                                    subject.isTapped = viewModel.isTappedImage
+                                    viewModel.modelListControl(subject: subject)
+                                    
                                 }
+                                subject.isTapped.toggle()
+                                imageModel.imageList.append(subject)
+                                imageModel.imageList.removeLast()
                             }
                             .gesture(DragGesture()
                                 .onChanged({ value in
@@ -268,9 +263,13 @@ extension DFModifyView {
                                     viewModel.dragGestureTask(subject: subject, changed: value.translation)
                                 })
                                     .onEnded({ value in
+                                        
                                         viewModel.accumulatedOffSet = .zero
-                                        viewModel.isTappedImage = true
-                                        subject.isTapped = viewModel.isTappedImage
+                                        viewModel.modelListControl(subject: subject)
+                                        subject.isTapped = true
+                                        imageModel.imageList.append(subject)
+                                        imageModel.imageList.removeLast()
+                                        
                                     }))
                             .simultaneousGesture(RotateGesture()
                                 .onChanged({ value in
@@ -356,22 +355,35 @@ extension DFModifyView {
                 .frame(width: 150)
             Button {
                 
+                
+                
                 if let image = frameManager.resultImage {
                     
-                    viewModel.isTappedImage = false
-                    
                     imageModel.imageList.forEach {
-                        $0.isTapped = viewModel.isTappedImage
+                        $0.isTapped = false
                     }
                     
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
-                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
+                    
+                    if let _  = frameManager.selectedFrame {
+                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext) {
+                            
+                            viewModel.btnOpacity = 0
+                            viewModel.showCamera = true
+                            imageModel.imageList.removeAll()
+                            frameManager.resultImage = viewModel.frameImage
+                            frameManager.selectedFrame = nil
+                        }
+                    } else {
                         
-                        viewModel.btnOpacity = 0
-                        viewModel.showCamera = true
-                        imageModel.imageList.removeAll()
-                        frameManager.resultImage = viewModel.frameImage
+                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
+                            
+                            viewModel.btnOpacity = 0
+                            viewModel.showCamera = true
+                            imageModel.imageList.removeAll()
+                            frameManager.resultImage = viewModel.frameImage
+                        }
                     }
                     
                     

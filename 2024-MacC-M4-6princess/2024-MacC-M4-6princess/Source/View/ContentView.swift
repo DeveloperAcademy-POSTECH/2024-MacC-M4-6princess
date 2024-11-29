@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @StateObject var imageModel: ImageListModel = ImageListModel()
+    @ObservedObject var imageModel: ImageListModel = ImageListModel()
     
     var body: some View {
         

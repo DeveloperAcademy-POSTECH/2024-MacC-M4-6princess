@@ -54,6 +54,12 @@ struct DFStickerView: View {
                             if let image = UIImage(named: imageName) {
                                 newImage.sticker = image
                                 newImage.originalImage = image
+                                ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
+                                imageModel.imageList.forEach {
+                                    if $0.isTapped {
+                                        $0.isTapped = false
+                                    }
+                                }
 //                                newImage.scale = 0.5
                                 imageModel.imageList.append(newImage)
                             } else {

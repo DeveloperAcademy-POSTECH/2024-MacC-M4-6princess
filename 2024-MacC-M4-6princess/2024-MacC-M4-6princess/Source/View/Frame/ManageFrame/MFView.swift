@@ -11,10 +11,11 @@ import CoreData
 
 struct MFView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.managedObjectContext) var viewContext
     @StateObject var viewModel: MFViewModel
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
+    @EnvironmentObject var imageModel: ImageListModel
     
     var body: some View {
         NavigationStack(path: $naviManager.route) {
@@ -33,7 +34,22 @@ struct MFView: View {
                     HStack(spacing: 10) {
                         Button {
                             //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
-                            naviManager.push(screen: Screen.frameEdit)
+                            viewModel.imageDataArray.forEach {
+                                if $0.id == viewModel.selectedImageIds.first {
+                                    viewModel.selectFrame(id: $0.id)
+                                    loadSelectedFrame()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                        
+                                        let newImage = SubjectImage()
+                                        if let image = frameManager.resultImage {
+                                            newImage.image = image
+                                            newImage.originalImage = newImage.image
+                                            imageModel.imageList.append(newImage)
+                                        }
+                                    }
+                                }
+                            }
+                            naviManager.push(screen: Screen.modifyFrame)
                         } label: {
                             ZStack {
                                 Rectangle()
