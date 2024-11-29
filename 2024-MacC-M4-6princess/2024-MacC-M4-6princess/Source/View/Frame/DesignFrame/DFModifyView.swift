@@ -355,6 +355,8 @@ extension DFModifyView {
                 .frame(width: 150)
             Button {
                 
+                
+                
                 if let image = frameManager.resultImage {
                     
                     imageModel.imageList.forEach {
@@ -363,12 +365,25 @@ extension DFModifyView {
                     
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
-                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
+                    
+                    if let _  = frameManager.selectedFrame {
+                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext) {
+                            
+                            viewModel.btnOpacity = 0
+                            viewModel.showCamera = true
+                            imageModel.imageList.removeAll()
+                            frameManager.resultImage = viewModel.frameImage
+                            frameManager.selectedFrame = nil
+                        }
+                    } else {
                         
-                        viewModel.btnOpacity = 0
-                        viewModel.showCamera = true
-                        imageModel.imageList.removeAll()
-                        frameManager.resultImage = viewModel.frameImage
+                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
+                            
+                            viewModel.btnOpacity = 0
+                            viewModel.showCamera = true
+                            imageModel.imageList.removeAll()
+                            frameManager.resultImage = viewModel.frameImage
+                        }
                     }
                     
                     
