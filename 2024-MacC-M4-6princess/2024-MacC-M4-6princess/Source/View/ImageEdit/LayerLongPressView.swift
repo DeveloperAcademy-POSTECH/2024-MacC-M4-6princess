@@ -10,7 +10,7 @@ import PhotosUI
 struct LayerLongPressView: View {
     @State private var layerImages: [LayerModel] = []
     @State private var showImagePicker: Bool = false
-    @State private var dragStartPosition: CGPoint?
+//    @State private var dragStartPosition: CGPoint?
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
     @State private var isLongPressed: Bool = false // 1초 길게 누름 상태
@@ -122,7 +122,7 @@ struct LayerLongPressView: View {
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
             selectedLayerIndex = index
-            dragStartPosition = layerImages[index].position
+//            dragStartPosition = layerImages[index].position
             isDragging = true
         }
 
@@ -142,30 +142,33 @@ struct LayerLongPressView: View {
     // 드래그 종료 시 호출되는 함수
     func dragOnEnded() {
         isDragging = false
-        dragStartPosition = nil
+//        dragStartPosition = nil
         selectedLayerIndex = nil
     }
-
+    
     // 레이어를 앞으로 이동
-    private func moveLayerForward(at index: Int, steps: Int) {
-        guard steps > 0 else { return }
-        var currentIndex = index
-        for _ in 0..<steps {
-            guard currentIndex > 0 else { return }
-            layerImages.swapAt(currentIndex, currentIndex - 1)
-            currentIndex -= 1
-        }
-    }
+       private func moveLayerForward(at index: Int, steps: Int) {
+           guard steps < 0 else { return }
+           var currentIndex = index
+           for _ in 0..<steps {
+               guard currentIndex > 0 else { return }
+//               print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+               layerImages.swapAt(currentIndex, currentIndex - 1)
+               currentIndex -= 1
+           }
+       }
 
-    // 레이어를 뒤로 이동
-    private func moveLayerBackward(at index: Int, steps: Int) {
-        guard steps > 0 else { return }
-        var currentIndex = index
-        for _ in 0..<steps {
-            guard currentIndex < layerImages.count - 1 else { return }
-            layerImages.swapAt(currentIndex, currentIndex + 1)
-            currentIndex += 1
-        }
-    }
+       // 레이어를 뒤로 이동
+       private func moveLayerBackward(at index: Int, steps: Int) {
+           guard steps > 0 else { return }
+           var currentIndex = index
+           for _ in 0..<steps {
+               guard currentIndex < layerImages.count - 1 else { return }
+               guard currentIndex > 0 else { return }
+//               print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+               layerImages.swapAt(currentIndex, currentIndex + 1)
+               currentIndex += 1
+           }
+       }
 }
 //.gesture(longPressAndDragGesture(for: index)) // 제스처 분리
