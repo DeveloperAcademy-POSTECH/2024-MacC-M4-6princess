@@ -12,14 +12,27 @@ import Photos
 struct IOView: View {
     var bg:UIImage
     var idol:UIImage
-    @StateObject var viewModel = IEViewModel()
+    //    @StateObject var viewModel = IEViewModel()
+    @StateObject var viewModel = IOViewModel()
     @GestureState var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
     @State var isAnimating = false
     @State var isSave = false
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var body: some View {
         VStack{
-            Spacer()
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                Spacer()
+            }
+            
+            
+            HStack(alignment: .center, spacing: 14) {
+                Text("저장완료")
+                    .font(.system(size:17))
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.gray01)
+            }
+            .padding(.vertical)
             // 후보정 레이어 편집 뷰
             canvasView
                 .onAppear{
@@ -27,48 +40,19 @@ struct IOView: View {
                     viewModel.saveRenderedView(content: canvasView)
                     viewModel.saveAnimate = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        //                                viewModel.savePhoto = true
                         isSave = true
                     }
                     print("canvasView onAppear")
                 }
-            //                    Spacer()
-            //                    if isSave {
-            //                        Image("check.save")
-            //                            .resizable()
-            //                            .scaledToFit()
-            //                            .frame(width: 40, height: 40)
-            //                            .padding()
-            //                            .onAppear{
-            //                                isAnimating = false
-            //                            }
-            //                        Text("갤러리에 저장완료!")
-            //                            .foregroundColor(.pointPink)
-            //                            .fontWeight(.bold)
-            //
-            //                    } else {
-            //                        Circle()
-            //                            .strokeBorder(style: StrokeStyle(lineWidth: 7, dash: [5]))
-            //                            .frame(width: 40, height: 40)
-            //                            .foregroundColor(.pointPink)
-            //                            .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
-            //                            .animation(
-            //                                Animation.linear(duration: 2)
-            //                                    .repeatForever(autoreverses: false),
-            //                                value: isAnimating
-            //                            )
-            //                            .padding()
-            //                        Text("저장 중..")
-            //                            .foregroundColor(.pointPink)
-            //                            .fontWeight(.bold)
-            //                    }
             
             VStack{
+                //                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 Text("저장된 사진은 갤러리에서 확인해주세요.")
                     .font(.system(size:12))
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray01)
                     .padding()
+                //                }
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
                 }) {
@@ -83,15 +67,21 @@ struct IOView: View {
                                 .font(.system(size: 18, weight: .bold))
                         )
                 }
-                
-                
             }
-            .frame(height: (UIScreen.main.bounds.height-(UIScreen.main.bounds.width*4/3))/2)
+            //            .frame(height: (UIScreen.main.bounds.height-(UIScreen.main.bounds.width*4/3))/2)
+            Spacer()
+            
         }
         .onAppear{
             viewModel.bgImg = bg
             viewModel.idolImg = idol
+            viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
+            
+            
             print("body onAppear")
+        }
+        .alert(isPresented: $viewModel.showAlert) {
+            Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
         // 상단 툴바
         .navigationBarBackButtonHidden()

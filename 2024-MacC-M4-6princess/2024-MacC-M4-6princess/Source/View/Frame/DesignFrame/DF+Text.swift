@@ -76,8 +76,10 @@ extension DFTextView{
                         }
                 }
             }
+            .padding(.vertical)
         }
         .padding(.horizontal,20)
+//        .padding(.vertical,20)
     }
     var textTabBar: some View {
         ZStack {
