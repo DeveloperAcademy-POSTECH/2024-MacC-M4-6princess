@@ -321,7 +321,11 @@ private extension DFEditView {
                                 frameManager.changedSubject = nil
                                 
                             } else {
-                                
+                                imageModel.imageList.forEach {
+                                    if $0.isTapped {
+                                        $0.isTapped = false
+                                    }
+                                }
                                 let newImage = SubjectImage()
                                 newImage.image = image
                                 newImage.originalImage = frameManager.pickedImage

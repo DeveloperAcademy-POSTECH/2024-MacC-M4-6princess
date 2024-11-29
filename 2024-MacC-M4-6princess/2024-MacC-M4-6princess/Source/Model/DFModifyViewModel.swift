@@ -21,7 +21,6 @@ class DFModifyViewModel: ObservableObject {
 
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
-    @Published var isTappedImage: Bool = true
     
     @Published var outputImage: UIImage?
     @Published var indexOfImageList: Int = 0
@@ -35,7 +34,19 @@ class DFModifyViewModel: ObservableObject {
     
     @Published var isAlert: Bool = false
     
+    @Published var modelList: [SubjectImage] = []
     
+    
+    
+    func modelListControl(subject: SubjectImage) {
+        
+        modelList.append(subject)
+        
+        if modelList.count == 2 {
+            modelList[0].isTapped = false
+            modelList.removeFirst()
+        }
+    }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat, subject: SubjectImage) {
         
