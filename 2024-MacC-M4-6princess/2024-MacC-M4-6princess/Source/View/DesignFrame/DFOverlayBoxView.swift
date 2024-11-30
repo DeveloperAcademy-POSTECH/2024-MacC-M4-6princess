@@ -6,7 +6,7 @@ struct DFOverlayBoxView: View {
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     @ObservedObject var viewModel: DFOverlayBoxViewModel = DFOverlayBoxViewModel()
-    @Binding var model: SubjectImage
+    var model: SubjectImage
     var size: CGSize
     
     var body: some View {

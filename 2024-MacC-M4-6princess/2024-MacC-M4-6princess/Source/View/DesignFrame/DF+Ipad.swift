@@ -25,10 +25,9 @@ extension DFModifyView{
                 
             }
             .onTapGesture {
-                viewModel.isTappedImage = false
                 
                 imageModel.imageList.forEach {
-                    $0.isTapped = viewModel.isTappedImage
+                    $0.isTapped = false
                 }
             }
             .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))

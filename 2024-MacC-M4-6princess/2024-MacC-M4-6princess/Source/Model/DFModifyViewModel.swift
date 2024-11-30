@@ -18,10 +18,10 @@ class DFModifyViewModel: ObservableObject {
     
     @Published var showCamera: Bool = false
     @Published var showImagePickerView: Bool = false
-
+    
     @Published var isPushedSaveBtn: Bool = false
     @Published var saveStateText: String = ""
-    @Published var isTappedImage: Bool = true
+    @Published var isTappedImage: Bool = false
     
     @Published var outputImage: UIImage?
     @Published var indexOfImageList: Int = 0
@@ -35,7 +35,19 @@ class DFModifyViewModel: ObservableObject {
     
     @Published var isAlert: Bool = false
     
+    @Published var modelList: [SubjectImage] = []
     
+    
+    
+    func modelListControl(subject: SubjectImage) {
+        
+        modelList.append(subject)
+        
+        if modelList.count == 2 {
+            modelList[0].isTapped = false
+            modelList.removeFirst()
+        }
+    }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat, subject: SubjectImage) {
         
@@ -75,6 +87,7 @@ class DFModifyViewModel: ObservableObject {
         return .init(width: width, height: height)
     }
     
+    
     func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
         
         btnOpacity = 1
@@ -82,7 +95,7 @@ class DFModifyViewModel: ObservableObject {
         Task {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-//            render.scale = scaleCompute(inputImage)
+            //            render.scale = scaleCompute(inputImage)
             render.scale = UIScreen.main.scale
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context)
@@ -92,6 +105,44 @@ class DFModifyViewModel: ObservableObject {
             completionHandler()
         }
         
+    }
+    
+    func updateImage(view: some View, frameManager: FrameManager, viewContext: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
+        
+        guard let frameId = frameManager.selectedFrame else {
+            frameManager.resultImage = nil
+            return
+        }
+        
+        btnOpacity = 1
+        
+        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
+        fetchRequest.fetchLimit = 1
+        
+        
+        Task {
+            // 저장 완료 메시지 숨기기
+            let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+            render.scale = UIScreen.main.scale
+            frameImage = render.uiImage
+            
+            do {
+                let results = try viewContext.fetch(fetchRequest)
+                if let storedImage = results.first {
+                    storedImage.image = frameImage?.pngData()
+                }
+                saveContext(context: viewContext)
+                
+            } catch {
+                print("Error fetching frame: \(error)")
+                frameManager.resultImage = nil
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            completionHandler()
+        }
     }
     
     func saveContext(context: NSManagedObjectContext) {
@@ -154,43 +205,43 @@ class DFModifyViewModel: ObservableObject {
         return resultImage
     }
     
-//    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
-//        
-//        let newImage = StoreImages(context: context)
-//        
-//        newImage.image = albumImageData
-//        newImage.subjectImage = subjectImageData
-//        newImage.uuid = UUID()
-//        newImage.isSelected = false
-//        newImage.angle = angle.degrees
-//        newImage.x = draggedOffSet.width
-//        newImage.y = draggedOffSet.height
-//        newImage.scale = magnifyScale
-//        
-//        saveContext(context: context)
-//    }
+    //    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
+    //
+    //        let newImage = StoreImages(context: context)
+    //
+    //        newImage.image = albumImageData
+    //        newImage.subjectImage = subjectImageData
+    //        newImage.uuid = UUID()
+    //        newImage.isSelected = false
+    //        newImage.angle = angle.degrees
+    //        newImage.x = draggedOffSet.width
+    //        newImage.y = draggedOffSet.height
+    //        newImage.scale = magnifyScale
+    //
+    //        saveContext(context: context)
+    //    }
     
     
-//    func reDo() {
-//        
-//        if indexOfImageList > 0 {
-//            indexOfImageList -= 1
-//            angle = imageList[indexOfImageList].angle
-//            current = imageList[indexOfImageList].angle
-//            magnifyScale = imageList[indexOfImageList].scale
-//            draggedOffSet = imageList[indexOfImageList].offSet
-//        }
-//    }
-//    
-//    func unDo() {
-//        
-//        if imageList.count - 1 > indexOfImageList {
-//            indexOfImageList += 1
-//            angle = imageList[indexOfImageList].angle
-//            current = imageList[indexOfImageList].angle
-//            magnifyScale = imageList[indexOfImageList].scale
-//            draggedOffSet = imageList[indexOfImageList].offSet
-//        }
-//    }
-
+    //    func reDo() {
+    //
+    //        if indexOfImageList > 0 {
+    //            indexOfImageList -= 1
+    //            angle = imageList[indexOfImageList].angle
+    //            current = imageList[indexOfImageList].angle
+    //            magnifyScale = imageList[indexOfImageList].scale
+    //            draggedOffSet = imageList[indexOfImageList].offSet
+    //        }
+    //    }
+    //
+    //    func unDo() {
+    //
+    //        if imageList.count - 1 > indexOfImageList {
+    //            indexOfImageList += 1
+    //            angle = imageList[indexOfImageList].angle
+    //            current = imageList[indexOfImageList].angle
+    //            magnifyScale = imageList[indexOfImageList].scale
+    //            draggedOffSet = imageList[indexOfImageList].offSet
+    //        }
+    //    }
+    
 }
