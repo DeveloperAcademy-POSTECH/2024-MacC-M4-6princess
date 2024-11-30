@@ -8,17 +8,17 @@ import SwiftUI
 import PhotosUI
 
 struct LayerLongPressView: View {
-    @State private var layerImages: [LayerModel] = []
+    @State private var imageList: [LayerModel] = []
     @State private var showImagePicker: Bool = false
-//    @State private var dragStartPosition: CGPoint?
+    //    @State private var dragStartPosition: CGPoint?
     @State private var isDragging: Bool = false
     @State private var selectedLayerIndex: Int?
-    @State private var isLongPressed: Bool = false // 1초 길게 누름 상태
+    @State private var isLongPressed: Bool = false
     var body: some View {
         ZStack {
             ZStack {
-                ForEach(layerImages.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
-                    let layer = layerImages[index]
+                ForEach(imageList.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
+                    let layer = imageList[index]
                     Image(uiImage: layer.image)
                         .resizable()
                         .scaledToFit()
@@ -59,14 +59,14 @@ struct LayerLongPressView: View {
             .padding()
         }
         .sheet(isPresented: $showImagePicker) {
-            LayerPhotoPicker2(layerImages: $layerImages, screenSize: UIScreen.main.bounds.size)
+            LayerPhotoPicker2(layerImages: $imageList, screenSize: UIScreen.main.bounds.size)
         }
     }
     
     // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(layerImages.indices, id: \.self) { index in
+            ForEach(imageList.indices, id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -117,18 +117,18 @@ struct LayerLongPressView: View {
                 }
             )
     }
-
+    
     // 드래그 중 호출되는 함수
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
             selectedLayerIndex = index
-//            dragStartPosition = layerImages[index].position
+            //            dragStartPosition = layerImages[index].position
             isDragging = true
         }
-
+        
         let dragOffsetY = value.translation.height
         let currentStep = Int(dragOffsetY / 50)
-
+        
         if let currentIndex = selectedLayerIndex, currentStep != currentIndex {
             if currentStep < currentIndex {
                 moveLayerForward(at: currentIndex, steps: abs(currentStep - currentIndex))
@@ -138,38 +138,38 @@ struct LayerLongPressView: View {
             selectedLayerIndex = currentStep
         }
     }
-
+    
     // 드래그 종료 시 호출되는 함수
     func dragOnEnded() {
         isDragging = false
-//        dragStartPosition = nil
+        //        dragStartPosition = nil
         selectedLayerIndex = nil
     }
     
     // 레이어를 앞으로 이동
-       private func moveLayerForward(at index: Int, steps: Int) {
-           guard steps > 0 else { return }
-           var currentIndex = index
-           for _ in 0..<steps {
-               guard currentIndex > 0 else { return }
-               guard currentIndex < layerImages.count else { return }
-               print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
-               layerImages.swapAt(currentIndex, currentIndex - 1)
-               currentIndex -= 1
-           }
-       }
-
-       // 레이어를 뒤로 이동
-       private func moveLayerBackward(at index: Int, steps: Int) {
-           guard steps > 0 else { return }
-           var currentIndex = index
-           for _ in 0..<steps {
-               guard currentIndex < layerImages.count - 1 else { return }
-               guard currentIndex >= 0 else { return }
-               print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
-               layerImages.swapAt(currentIndex, currentIndex + 1)
-               currentIndex += 1
-           }
-       }
+    private func moveLayerForward(at index: Int, steps: Int) {
+        guard steps > 0 else { return }
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex > 0 else { return }
+            guard currentIndex < imageList.count else { return }
+            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+            imageList.swapAt(currentIndex, currentIndex - 1)
+            currentIndex -= 1
+        }
+    }
+    
+    // 레이어를 뒤로 이동
+    private func moveLayerBackward(at index: Int, steps: Int) {
+        guard steps > 0 else { return }
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex < imageList.count - 1 else { return }
+            guard currentIndex >= 0 else { return }
+            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+            imageList.swapAt(currentIndex, currentIndex + 1)
+            currentIndex += 1
+        }
+    }
 }
 //.gesture(longPressAndDragGesture(for: index)) // 제스처 분리
