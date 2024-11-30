@@ -8,17 +8,18 @@ import SwiftUI
 import PhotosUI
 
 struct LayerLongPressView: View {
-    @State private var imageList: [LayerModel] = []
+    
     @State private var showImagePicker: Bool = false
     //    @State private var dragStartPosition: CGPoint?
-    @State private var isDragging: Bool = false
-    @State private var selectedLayerIndex: Int?
-    @State private var isLongPressed: Bool = false
+    @State private var layerList: [LayerModel] = []
+    @State var isDragging: Bool = false
+    @State var selectedLayerIndex: Int?
+    @State var isLongPressed: Bool = false
     var body: some View {
         ZStack {
             ZStack {
-                ForEach(imageList.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
-                    let layer = imageList[index]
+                ForEach(layerList.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
+                    let layer = layerList[index]
                     Image(uiImage: layer.image)
                         .resizable()
                         .scaledToFit()
@@ -59,14 +60,14 @@ struct LayerLongPressView: View {
             .padding()
         }
         .sheet(isPresented: $showImagePicker) {
-            LayerPhotoPicker2(layerImages: $imageList, screenSize: UIScreen.main.bounds.size)
+            LayerPhotoPicker2(layerImages: $layerList, screenSize: UIScreen.main.bounds.size)
         }
     }
     
     // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(imageList.indices, id: \.self) { index in
+            ForEach(layerList.indices, id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -147,27 +148,27 @@ struct LayerLongPressView: View {
     }
     
     // 레이어를 앞으로 이동
-    private func moveLayerForward(at index: Int, steps: Int) {
+    func moveLayerForward(at index: Int, steps: Int) {
         guard steps > 0 else { return }
         var currentIndex = index
         for _ in 0..<steps {
             guard currentIndex > 0 else { return }
-            guard currentIndex < imageList.count else { return }
+            guard currentIndex < layerList.count else { return }
             print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
-            imageList.swapAt(currentIndex, currentIndex - 1)
+            layerList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
     }
     
     // 레이어를 뒤로 이동
-    private func moveLayerBackward(at index: Int, steps: Int) {
+    func moveLayerBackward(at index: Int, steps: Int) {
         guard steps > 0 else { return }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex < imageList.count - 1 else { return }
+            guard currentIndex < layerList.count - 1 else { return }
             guard currentIndex >= 0 else { return }
             print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
-            imageList.swapAt(currentIndex, currentIndex + 1)
+            layerList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
     }

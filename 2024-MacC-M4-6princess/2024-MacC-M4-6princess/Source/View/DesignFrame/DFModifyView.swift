@@ -14,10 +14,11 @@ struct DFModifyView: View {
     
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     @State var showAgain: Bool = false
-    
+    @State var layerList: [SubjectImage] = []
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
+    
     
     var body: some View {
         
@@ -45,7 +46,6 @@ struct DFModifyView: View {
                     }
                     .onTapGesture {
                         viewModel.isTappedImage = false
-                        
                         imageModel.imageList.forEach {
                             $0.isTapped = viewModel.isTappedImage
                         }
@@ -57,9 +57,7 @@ struct DFModifyView: View {
                 
             }
             else{
-                
                 modifyIpad
-                
             }
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
@@ -259,7 +257,7 @@ extension DFModifyView {
     // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(viewModel.imageList.indices, id: \.self) { index in
+            ForEach(layerList.indices.reversed(), id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -295,6 +293,7 @@ extension DFModifyView {
         LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
             .onEnded { _ in
                 isLongPressed = true // 길게 눌림 활성화
+                layerList = imageModel.imageList
                 selectedLayerIndex = index
                 print("isLongPressed 눌림")
             }
@@ -328,6 +327,7 @@ extension DFModifyView {
             } else {
                 moveLayerBackward(at: currentIndex, steps: abs(currentStep - currentIndex))
             }
+            imageModel.imageList = layerList
             selectedLayerIndex = currentStep
         }
     }
@@ -345,9 +345,9 @@ extension DFModifyView {
         var currentIndex = index
         for _ in 0..<steps {
             guard currentIndex > 0 else { return }
-            guard currentIndex < viewModel.imageList.count else { return }
+            guard currentIndex < layerList.count else { return }
             print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
-            viewModel.imageList.swapAt(currentIndex, currentIndex - 1)
+            layerList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
     }
@@ -357,10 +357,10 @@ extension DFModifyView {
         guard steps > 0 else { return }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex < viewModel.imageList.count - 1 else { return }
+            guard currentIndex < layerList.count - 1 else { return }
             guard currentIndex >= 0 else { return }
             print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
-            viewModel.imageList.swapAt(currentIndex, currentIndex + 1)
+            layerList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
     }
