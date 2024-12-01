@@ -14,7 +14,7 @@ struct DFModifyView: View {
     
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     @State var showAgain: Bool = false
-    @State var layerList: [SubjectImage] = []
+//    @State var layerList: [SubjectImage] = []
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
@@ -257,7 +257,7 @@ extension DFModifyView {
     // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(layerList.indices.reversed(), id: \.self) { index in
+            ForEach(imageModel.imageList.indices.reversed(), id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -293,7 +293,6 @@ extension DFModifyView {
         LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
             .onEnded { _ in
                 isLongPressed = true // 길게 눌림 활성화
-                layerList = imageModel.imageList
                 selectedLayerIndex = index
                 print("isLongPressed 눌림")
             }
@@ -327,7 +326,7 @@ extension DFModifyView {
             } else {
                 moveLayerBackward(at: currentIndex, steps: abs(currentStep - currentIndex))
             }
-            imageModel.imageList = layerList
+//            imageModel.imageList = layerList
             selectedLayerIndex = currentStep
         }
     }
@@ -345,10 +344,12 @@ extension DFModifyView {
         var currentIndex = index
         for _ in 0..<steps {
             guard currentIndex > 0 else { return }
-            guard currentIndex < layerList.count else { return }
+            guard currentIndex < imageModel.imageList.count else { return }
             print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
-            layerList.swapAt(currentIndex, currentIndex - 1)
+            imageModel.imageList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
+            imageModel.imageList.append(imageModel.imageList[currentIndex])
+            imageModel.imageList.removeLast()
         }
     }
     
@@ -357,11 +358,13 @@ extension DFModifyView {
         guard steps > 0 else { return }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex < layerList.count - 1 else { return }
+            guard currentIndex < imageModel.imageList.count - 1 else { return }
             guard currentIndex >= 0 else { return }
             print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
-            layerList.swapAt(currentIndex, currentIndex + 1)
+            imageModel.imageList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
+            imageModel.imageList.append(imageModel.imageList[currentIndex])
+            imageModel.imageList.removeLast()
         }
     }
     var toolBarButtons: some View {
