@@ -114,11 +114,3 @@ struct LayerPhotoPicker2: UIViewControllerRepresentable {
     }
     
 }
-struct LayerModel: Identifiable {
-    let id = UUID()
-    var image: UIImage
-    var order: Int
-    var position: CGPoint = .zero
-    var scale: CGFloat = 1.0
-    var rotation: Angle = .zero
-}
