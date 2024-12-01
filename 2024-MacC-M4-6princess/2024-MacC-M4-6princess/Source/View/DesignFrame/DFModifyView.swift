@@ -14,6 +14,12 @@ struct DFModifyView: View {
     
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     @State var showAgain: Bool = false
+    @State var layerList: [SubjectImage] = []
+    @State var isDragging: Bool = false
+    @State var selectedLayerIndex: Int?
+    @State var isLongPressed: Bool = false
+    
+    
     var body: some View {
         
         ZStack {
@@ -40,7 +46,6 @@ struct DFModifyView: View {
                     }
                     .onTapGesture {
                         viewModel.isTappedImage = false
-                        
                         imageModel.imageList.forEach {
                             $0.isTapped = viewModel.isTappedImage
                         }
@@ -49,15 +54,23 @@ struct DFModifyView: View {
                     DFImageDecoView(viewModel: viewModel)
                         .padding(.top, 58)
                 }
-              
+                
             }
             else{
-                
                 modifyIpad
-                
             }
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
+            }
+            VStack{
+                Spacer()
+                HStack{
+                    if isLongPressed{
+                        layerIndicator
+                    }
+                    Spacer()
+                }
+                Spacer()
             }
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
@@ -102,14 +115,15 @@ extension DFModifyView {
         
         ZStack {
             
-            ForEach(imageModel.imageList) { subject in
+            ForEach(imageModel.imageList.indices, id: \.self) { index in
+                let subject = imageModel.imageList[index]
                 
                 if let image = subject.image, let realImage = subject.originalImage {
-                    
-                    
                     ZStack {
-                        
-                        let size: CGSize = .init(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                        let size: CGSize = .init(
+                            width: image.size.width / viewModel.scaleCompute(realImage),
+                            height: image.size.height / viewModel.scaleCompute(realImage)
+                        )
                         
                         DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
@@ -117,188 +131,239 @@ extension DFModifyView {
                         
                         Image(uiImage: image)
                             .resizable()
-                            .frame(width: image.size.width / viewModel.scaleCompute(realImage), height: image.size.height / viewModel.scaleCompute(realImage))
+                            .frame(width: size.width, height: size.height)
                             .scaleEffect(subject.getScale())
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
                             .onTapGesture {
-                                
                                 if !subject.isTapped {
-                                    
                                     viewModel.modelListControl(subject: subject)
-                                    
                                 }
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
-                                
                             }
-                            .gesture(DragGesture()
-                                .onChanged({ value in
-                                    print(value.translation)
-                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                                })
-                                    .onEnded({ value in
-                                        viewModel.accumulatedOffSet = .zero
-                                        viewModel.modelListControl(subject: subject)
-                                        subject.isTapped = true
-                                        imageModel.imageList.append(subject)
-                                        imageModel.imageList.removeLast()
-                                    }))
-                            .simultaneousGesture(RotateGesture()
-                                .onChanged({ value in
-                                    if subject.isTapped {
-                                        if viewModel.current == .zero {
-                                            viewModel.current = subject.getAngle()
-                                        }
-                                        viewModel.angle = value.rotation + viewModel.current
-                                        subject.setAngle(angle: viewModel.angle)
-                                    }
-                                })
-                                    .onEnded({ value in
-                                        viewModel.current = .zero
-                                    }))
-                            .simultaneousGesture(MagnifyGesture()
-                                .onChanged({ value in
-                                    if subject.isTapped {
-                                        viewModel.setScaleVolume(value.magnification, subject: subject)
-                                    }
-                                })
-                                    .onEnded({ value in
-                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
-                                    }))
+                            .gesture(combinedGesture(subject: subject))
+                            .simultaneousGesture(longPressAndDragGesture(for: index))
+                    }
+                } else if let image = subject.sticker {
+                    ZStack {
+                        let size: CGSize = .init(
+                            width: UIScreen.main.bounds.width / 2,
+                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+                        )
+                        
+                        DFOverlayBoxView(model: subject, size: size)
+                            .opacity(subject.isTapped ? 1 : 0)
+                            .zIndex(1)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width: size.width, height: size.height)
+                            .scaleEffect(subject.getScale())
+                            .rotationEffect(subject.getAngle())
+                            .offset(subject.getOffset())
+                            .onTapGesture {
+                                if !subject.isTapped {
+                                    viewModel.modelListControl(subject: subject)
+                                }
+                                subject.isTapped.toggle()
+                                imageModel.imageList.append(subject)
+                                imageModel.imageList.removeLast()
+                            }
+                            .gesture(combinedGesture(subject: subject))
+                            .simultaneousGesture(longPressAndDragGesture(for: index))
+                    }
+                } else if let image = subject.text {
+                    ZStack {
+                        let size: CGSize = .init(
+                            width: UIScreen.main.bounds.width / 2,
+                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+                        )
+                        
+                        DFOverlayBoxView(model: subject, size: size)
+                            .opacity(subject.isTapped ? 1 : 0)
+                            .zIndex(1)
+                        
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width: size.width, height: size.height)
+                            .scaleEffect(subject.getScale())
+                            .rotationEffect(subject.getAngle())
+                            .offset(subject.getOffset())
+                            .onTapGesture {
+                                if !subject.isTapped {
+                                    viewModel.modelListControl(subject: subject)
+                                }
+                                subject.isTapped.toggle()
+                                imageModel.imageList.append(subject)
+                                imageModel.imageList.removeLast()
+                            }
+                            .gesture(combinedGesture(subject: subject))
+                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }
-                else if let image = subject.sticker {
-                    ZStack {
-                        
-                        let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
-                        
-                        DFOverlayBoxView(model: subject, size: size)
-                            .opacity(subject.isTapped ? 1 : 0)
-                            .zIndex(1)
-                        
-                        Image(uiImage: image)
-                            .resizable()
-                            .frame(width:size.width,height:size.height)
-                            .scaleEffect(subject.getScale())
-                            .rotationEffect(subject.getAngle())
-                            .offset(subject.getOffset())
-                            .onTapGesture {
-                                
-                                if !subject.isTapped {
-                                    
-                                    viewModel.modelListControl(subject: subject)
-                                    
-                                }
-                                subject.isTapped.toggle()
-                                imageModel.imageList.append(subject)
-                                imageModel.imageList.removeLast()
-                            }
-                            .gesture(DragGesture()
-                                .onChanged({ value in
-                                    print(value.translation)
-                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                                })
-                                    .onEnded({ value in
-                                        viewModel.accumulatedOffSet = .zero
-                                        viewModel.modelListControl(subject: subject)
-                                        subject.isTapped = true
-                                        imageModel.imageList.append(subject)
-                                        imageModel.imageList.removeLast()
-                                    }))
-                            .simultaneousGesture(RotateGesture()
-                                .onChanged({ value in
-                                    if subject.isTapped {
-                                        if viewModel.current == .zero {
-                                            viewModel.current = subject.getAngle()
-                                        }
-                                        viewModel.angle = value.rotation + viewModel.current
-                                        subject.setAngle(angle: viewModel.angle)
-                                    }
-                                })
-                                    .onEnded({ value in
-                                        viewModel.current = .zero
-                                    }))
-                            .simultaneousGesture(MagnifyGesture()
-                                .onChanged({ value in
-                                    if subject.isTapped {
-                                        viewModel.setScaleVolume(value.magnification, subject: subject)
-                                    }
-                                })
-                                    .onEnded({ value in
-                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
-                                    }))
+            }
+            
+        }
+    }
+    func combinedGesture(subject: SubjectImage) -> some Gesture {
+        DragGesture()
+            .onChanged { value in
+                if !isLongPressed{
+                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                }
+            }
+            .onEnded { value in
+                if !isLongPressed {
+                    viewModel.accumulatedOffSet = .zero
+                    viewModel.modelListControl(subject: subject)
+                    subject.isTapped = true
+                    imageModel.imageList.append(subject)
+                    imageModel.imageList.removeLast()
+                }
+                
+            }
+            .simultaneously(with: RotateGesture()
+                .onChanged { value in
+                    if !isLongPressed && subject.isTapped  {
+                        if viewModel.current == .zero {
+                            viewModel.current = subject.getAngle()
+                        }
+                        viewModel.angle = value.rotation + viewModel.current
+                        subject.setAngle(angle: viewModel.angle)
                     }
                 }
-                else if let image = subject.text{
-                    ZStack {
-                        
-                        let size: CGSize = .init(width: UIScreen.main.bounds.width/2,height: UIScreen.main.bounds.width / 2 * (image.size.height/image.size.width))
-                        
-                        DFOverlayBoxView(model: subject, size: size)
-                            .opacity(subject.isTapped ? 1 : 0)
-                            .zIndex(1)
-                        
-                        Image(uiImage: image)
+                .onEnded { value in
+                    if !isLongPressed{
+                        viewModel.current = .zero
+                    }
+                }
+            )
+            .simultaneously(with: MagnifyGesture()
+                .onChanged { value in
+                    if !isLongPressed && subject.isTapped {
+                        viewModel.setScaleVolume(value.magnification, subject: subject)
+                    }
+                }
+                .onEnded { value in
+                    if !isLongPressed{
+                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                    }
+                }
+            )
+    }
+    
+    // 레이어 순서 표시 뷰
+    var layerIndicator: some View {
+        VStack(spacing: 6) {
+            ForEach(layerList.indices.reversed(), id: \.self) { index in
+                if index == selectedLayerIndex {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            RoundedRectangle(cornerRadius: 3)
+                                .frame(width: 24, height: 4)
+                                .foregroundColor(.white)
+                                .padding(.leading, 4)
+                            Spacer()
+                        }
+                        Spacer()
+                    }
+                    .frame(height: 6)
+                } else {
+                    HStack {
+                        Image("heart.union")
                             .resizable()
-                            .frame(width:size.width,height:size.height)
-                            .scaleEffect(subject.getScale())
-                            .rotationEffect(subject.getAngle())
-                            .offset(subject.getOffset())
-                            .onTapGesture {
-                                
-                                if !subject.isTapped {
-                                    
-                                    viewModel.modelListControl(subject: subject)
-                                    
-                                }
-                                subject.isTapped.toggle()
-                                imageModel.imageList.append(subject)
-                                imageModel.imageList.removeLast()
-                            }
-                            .gesture(DragGesture()
-                                .onChanged({ value in
-                                    print(value.translation)
-                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                                })
-                                    .onEnded({ value in
-                                        
-                                        viewModel.accumulatedOffSet = .zero
-                                        viewModel.modelListControl(subject: subject)
-                                        subject.isTapped = true
-                                        imageModel.imageList.append(subject)
-                                        imageModel.imageList.removeLast()
-                                        
-                                    }))
-                            .simultaneousGesture(RotateGesture()
-                                .onChanged({ value in
-                                    if subject.isTapped {
-                                        if viewModel.current == .zero {
-                                            viewModel.current = subject.getAngle()
-                                        }
-                                        viewModel.angle = value.rotation + viewModel.current
-                                        subject.setAngle(angle: viewModel.angle)
-                                    }
-                                })
-                                    .onEnded({ value in
-                                        viewModel.current = .zero
-                                    }))
-                            .simultaneousGesture(MagnifyGesture()
-                                .onChanged({ value in
-                                    if subject.isTapped {
-                                        viewModel.setScaleVolume(value.magnification, subject: subject)
-                                    }
-                                })
-                                    .onEnded({ value in
-                                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
-                                    }))
+                            .frame(width: 8, height: 6)
+                        Spacer()
                     }
                 }
             }
         }
+        .padding(6)
+        .frame(width: 40)
+        .background(Color.gray)
+        .cornerRadius(8)
+        .padding(.horizontal, 5)
     }
     
+    // 1초 길게 누르고 드래그 제스처를 생성하는 함수
+    func longPressAndDragGesture(for index: Int) -> some Gesture {
+        LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
+            .onEnded { _ in
+                isLongPressed = true // 길게 눌림 활성화
+                layerList = imageModel.imageList
+                selectedLayerIndex = index
+                print("isLongPressed 눌림")
+            }
+            .simultaneously(with: DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    if isLongPressed { // 길게 누른 상태에서만 드래그 동작
+                        dragOnChanged(value: value, index: index)
+                    }
+                }
+                .onEnded { _ in
+                    dragOnEnded()
+                    isLongPressed = false // 길게 누름 상태 초기화
+                }
+            )
+    }
+    
+    // 드래그 중 호출되는 함수
+    func dragOnChanged(value: DragGesture.Value, index: Int) {
+        if !isDragging {
+            selectedLayerIndex = index
+            //            dragStartPosition = layerImages[index].position
+            isDragging = true
+        }
+        
+        let dragOffsetY = value.translation.height
+        let currentStep = Int(dragOffsetY / 50)
+        
+        if let currentIndex = selectedLayerIndex, currentStep != currentIndex {
+            if currentStep < currentIndex {
+                moveLayerForward(at: currentIndex, steps: abs(currentStep - currentIndex))
+            } else {
+                moveLayerBackward(at: currentIndex, steps: abs(currentStep - currentIndex))
+            }
+            imageModel.imageList = layerList
+            selectedLayerIndex = currentStep
+        }
+    }
+    
+    // 드래그 종료 시 호출되는 함수
+    func dragOnEnded() {
+        isDragging = false
+        //        dragStartPosition = nil
+        selectedLayerIndex = nil
+    }
+    
+    // 레이어를 앞으로 이동
+    func moveLayerForward(at index: Int, steps: Int) {
+        guard steps > 0 else { return }
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex > 0 else { return }
+            guard currentIndex < layerList.count else { return }
+            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+            layerList.swapAt(currentIndex, currentIndex - 1)
+            currentIndex -= 1
+        }
+    }
+    
+    // 레이어를 뒤로 이동
+    func moveLayerBackward(at index: Int, steps: Int) {
+        guard steps > 0 else { return }
+        var currentIndex = index
+        for _ in 0..<steps {
+            guard currentIndex < layerList.count - 1 else { return }
+            guard currentIndex >= 0 else { return }
+            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+            layerList.swapAt(currentIndex, currentIndex + 1)
+            currentIndex += 1
+        }
+    }
     var toolBarButtons: some View {
         HStack {
             Button {
@@ -334,22 +399,6 @@ extension DFModifyView {
             .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
             
             Spacer(minLength: UIScreen.main.bounds.width / 20)
-            
-//            Button {
-//                //                viewModel.reDo()
-//            } label: {
-//                Image("back")
-//                    .colorMultiply(viewModel.indexOfImageList > 0 ? .black : .gray03)
-//            }
-//            .padding(.trailing, 14)
-//            
-//            Button {
-//                //                viewModel.unDo()
-//            } label: {
-//                Image("front")
-//                    .colorMultiply(viewModel.indexOfImageList < viewModel.imageList.count - 1 ? .black : .gray03)
-//            }
-//            .padding(.trailing, 60)
             
             Spacer()
                 .frame(width: 150)

@@ -5,7 +5,7 @@ struct DFTextView: View {
     @State var txt = ""
     @State var selectedFont: FontStyle = .modern
     @State var fontSize: Double = 20
-    @State var fontColor: Color = .white
+    @State var fontColor: Color = .black
     @State var renderedImage: UIImage?
     @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
     @State var tab = 0
