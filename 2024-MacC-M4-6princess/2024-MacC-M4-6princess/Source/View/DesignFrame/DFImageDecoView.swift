@@ -38,7 +38,7 @@ extension DFImageDecoView {
             }
             .padding(.bottom, 5)
             
-            Text("사진추가")
+            Text("사진 추가")
                 .font(.caption)
                 .foregroundStyle(.gray01)
         }
