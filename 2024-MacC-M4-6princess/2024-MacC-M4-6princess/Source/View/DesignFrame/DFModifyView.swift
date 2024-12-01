@@ -322,12 +322,17 @@ struct DFModifyView: View {
                     }
                 } else if let image = subject.text {
                     ZStack {
-                        let newWidth = min(CGFloat(subject.rawText.count)*UIScreen.main.bounds.width/10,UIScreen.main.bounds.width)
+                        let newText = subject.textStyle?.rawText ?? "l"
+
+                        let newWidth = min(CGFloat(newText.count)*UIScreen.main.bounds.width/10,UIScreen.main.bounds.width)
                         let size: CGSize = .init(
                             width: newWidth,
                             height: newWidth * (image.size.height / image.size.width)
                         )
-                        
+//                        let size: CGSize = .init(
+//                            width: UIScreen.main.bounds.width,
+//                            height: UIScreen.main.bounds.width)
+//                        
                         DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)

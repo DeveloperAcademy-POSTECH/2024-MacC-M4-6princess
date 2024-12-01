@@ -40,7 +40,7 @@ struct DFTextView: View {
                             if let image = renderedImage {
                                 newImage.text = image
                                 newImage.originalImage = image
-                                newImage.rawText = txt
+                                newImage.textStyle = TextStyle(rawText: txt, font: selectedFont, color: fontColor, alignment: textAlignment)
                                 ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
                                 imageModel.imageList.forEach {
                                     if $0.isTapped {
