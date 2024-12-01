@@ -49,7 +49,6 @@ struct DFModifyView: View {
                     DFImageDecoView(viewModel: viewModel)
                         .padding(.top, 58)
                 }
-                
             }
             else{
                 modifyIpad
@@ -138,8 +137,6 @@ struct DFModifyView: View {
     }
     
     // 1초 길게 누르고 드래그 제스처를 생성하는 함수
-    
-    
         func longPressAndDragGesture(for index: Int) -> some Gesture {
             LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
                 .onEnded { _ in
@@ -168,36 +165,6 @@ struct DFModifyView: View {
                     }
                 )
         }
-//    func longPressAndDragGesture(for index: Int) -> some Gesture {
-//        LongPressGesture(minimumDuration: 0.5)
-//            .sequenced(before: DragGesture())
-//            .onChanged { value in
-//                if case .second(true, let dragValue?) = value { // 드래그 상태
-//                    if isLongPressed {
-//                        dragOnChanged(value: dragValue, index: index)
-//                    }
-//                }
-//            }
-//            .onEnded { value in
-//                switch value {
-//                case .first(true): // LongPressGesture 완료 후 DragGesture 시작 전
-//                    isLongPressed = true // 길게 누름 활성화
-//                    selectedLayerIndex = index
-//                    imageListUpdate()
-//                    print("isLongPressed 눌림")
-//                case .second(true, _): // DragGesture가 완료된 상태
-//                    dragOnEnded()
-//                    beforeDragOffsetY = .zero
-//                    isLongPressed = false
-//                    imageListUpdate()
-//                default:
-//                    break
-//                }
-//            }
-//    }
-
-
-    
     
     func imageListUpdate() {
         // 길게 누름 상태 초기화
@@ -323,7 +290,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.removeLast()
                             }
                             .gesture(combinedGesture(subject: subject))
-                            .simultaneousGesture(longPressAndDragGesture(for: index))
+                            .gesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.sticker {
                     ZStack {
@@ -351,13 +318,14 @@ struct DFModifyView: View {
                                 imageModel.imageList.removeLast()
                             }
                             .gesture(combinedGesture(subject: subject))
-                            .simultaneousGesture(longPressAndDragGesture(for: index))
+                            .gesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.text {
                     ZStack {
+                        let newWidth = min(CGFloat(subject.rawText.count)*UIScreen.main.bounds.width/10,UIScreen.main.bounds.width)
                         let size: CGSize = .init(
-                            width: UIScreen.main.bounds.width / 2,
-                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+                            width: newWidth,
+                            height: newWidth * (image.size.height / image.size.width)
                         )
                         
                         DFOverlayBoxView(model: subject, size: size)
@@ -379,7 +347,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.removeLast()
                             }
                             .gesture(combinedGesture(subject: subject))
-                            .simultaneousGesture(longPressAndDragGesture(for: index))
+                            .gesture(longPressAndDragGesture(for: index))
                     }
                 }
             }
@@ -390,10 +358,3 @@ struct DFModifyView: View {
     
 }
 
-
-extension DFModifyView {
-    
-    
-    
-    
-}
