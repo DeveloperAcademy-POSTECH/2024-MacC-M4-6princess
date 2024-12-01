@@ -14,10 +14,7 @@ extension DFTextView{
     func renderTextImage(text: String){
         let renderer = ImageRenderer(
             content: TextRenderView(
-                text: text,
-                selectedFont: selectedFont,
-                selectedColor: fontColor,
-                selectedAlignment: textAlignment
+                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
             )
         )
         renderer.scale = 10
