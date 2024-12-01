@@ -52,9 +52,11 @@ extension DFTextView{
                         }
                 }
             }
+            .padding(.horizontal,5)
             
         }
-        .padding(.horizontal)
+        .frame(width: 335)
+        //        .padding(.horizontal)
     }
     var colorSelector: some View {
         // fontColor 선택
@@ -76,10 +78,11 @@ extension DFTextView{
                         }
                 }
             }
-            .padding(.vertical)
+            .padding(5)
         }
-        .padding(.horizontal,20)
-//        .padding(.vertical,20)
+        .frame(width: 335)
+        //        .padding(.horizontal,20)
+        //        .padding(.vertical,20)
     }
     var textTabBar: some View {
         ZStack {
@@ -135,11 +138,13 @@ extension DFTextView{
                         }
                 }
                 .frame(width: 105, height: 30)
-
+                
             }
             .padding()
         }
+        //        .padding(.horizontal,15)
         .frame(height: 40)
         .frame(maxWidth:.infinity)
+        
     }
 }
