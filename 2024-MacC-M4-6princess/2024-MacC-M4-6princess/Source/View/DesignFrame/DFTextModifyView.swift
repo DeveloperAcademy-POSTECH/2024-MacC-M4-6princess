@@ -6,22 +6,22 @@
 //
 import SwiftUI
 
-struct DFTextEditView: View {
+struct DFTextModifyView: View {
     @ObservedObject var viewModel: DFModifyViewModel
-//    @State var txt = ""
+    //    @State var txt = ""
     @Binding var style: TextStyle
-//    @State var selectedFont: FontStyle = .modern
-//    @State var fontSize: Double = 20
-//    @State var fontColor: Color = ColorPreset.colorPallete[0]
+    //    @State var selectedFont: FontStyle = .modern
+    //    @State var fontSize: Double = 20
+    //    @State var fontColor: Color = ColorPreset.colorPallete[0]
     @State var renderedImage: UIImage?
     @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
     @State var tab = 0
     @State var colorNum = 0
-//    @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
+    //    @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
-    
+    @EnvironmentObject var frameManager: FrameManager
     @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     
     var body: some View {
@@ -47,20 +47,27 @@ struct DFTextEditView: View {
                             if let image = renderedImage {
                                 newImage.text = image
                                 newImage.originalImage = image
-//                                newImage.rawText = style.rawText
+                                //                                newImage.rawText = style.rawText
                                 newImage.textStyle = style
+                                if let uuid = frameManager.textUUID, let index = imageModel.imageList.firstIndex(where: {$0.id == uuid}){
+                                    imageModel.imageList[index] = newImage
+                                }
+                                else{
+                                    /// 에러처리
+                                    ///
+                                }
                                 ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
                                 imageModel.imageList.forEach {
                                     if $0.isTapped {
                                         $0.isTapped = false
                                     }
                                 }
-                                imageModel.imageList.append(newImage)
+                                //                                imageModel.imageList.append(newImage)
                             } else {
                                 //TODO: 에러 처리 해야함
                                 print("Image not found")
                             }
-                            viewModel.showTextView = false
+                            frameManager.showTextModifyView = false
                         }
                     }
                 }
@@ -93,7 +100,7 @@ struct DFTextEditView: View {
     
 }
 
-extension DFTextEditView{
+extension DFTextModifyView{
     // 정렬 방향 정의
     enum SwipeDirection {
         case left, right
@@ -233,7 +240,7 @@ extension DFTextEditView{
         
     }
 }
-extension DFTextEditView{
+extension DFTextModifyView{
     @MainActor
     func renderTextImage(text: String){
         let renderer = ImageRenderer(
@@ -265,24 +272,24 @@ extension DFTextEditView{
     
     func imageForAlignment(_ alignment: TextAlignment) -> String {
         switch alignment {
-        case .leading:
-            return "df.alignment.leading"
-        case .center:
-            return "df.alignment.center"
-        case .trailing:
-            return "df.alignment.trailing"
-
+            case .leading:
+                return "df.alignment.leading"
+            case .center:
+                return "df.alignment.center"
+            case .trailing:
+                return "df.alignment.trailing"
+                
         }
     }
     func toggleTextAlignment() {
         switch style.alignment {
-        case .leading:
+            case .leading:
                 style.alignment = .center
-        case .center:
+            case .center:
                 style.alignment = .trailing
-        case .trailing:
+            case .trailing:
                 style.alignment = .leading
-      
+                
         }
     }
 }

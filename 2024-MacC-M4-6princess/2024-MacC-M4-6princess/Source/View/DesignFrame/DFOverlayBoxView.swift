@@ -42,6 +42,28 @@ struct DFOverlayBoxView: View {
                 .offset(viewModel.OffsetCompute(x: -size.width/2, y: -size.height/2, subject: model))
             }
             
+            if let textStyle = model.textStyle {
+                
+                Button {
+                    frameManager.selectedTextStyle = textStyle
+                    frameManager.showTextModifyView = true
+                    frameManager.textUUID = model.id
+                    //                    frameManager.pickedImage = realImage
+                    //                    frameManager.changedSubject = model
+                    //                    naviManager.push(screen: Screen.frameEdit)
+                    
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 13)
+                            .foregroundStyle(Color.white)
+                            .frame(width: 40, height: 26)
+                        Text("수정")
+                            .font(.footnote)
+                            .foregroundStyle(Color.black)
+                    }
+                }
+                .offset(viewModel.OffsetCompute(x: -size.width/2, y: -size.height/2, subject: model))
+            }
             Button {
                 imageModel.imageList.removeAll(where: { $0.id == model.id })
                 
@@ -57,22 +79,22 @@ struct DFOverlayBoxView: View {
             }
             .offset(viewModel.OffsetCompute(x: size.width/2, y: -size.height/2, subject: model))
             
-//            Button {
-//                viewModel.isPushedZoom = true
-//            } label: {
-//                ZStack {
-//                    
-//                    Circle()
-//                        .foregroundStyle(Color.white)
-//                        .frame(width: 26, height: 26)
-//                    Image("zoomButton")
-//                        .resizable()
-//                        .frame(width: 20, height: 20)
-//                }
-//                
-//            }
-//            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
-//            .gesture(zoomDrag)
+            //            Button {
+            //                viewModel.isPushedZoom = true
+            //            } label: {
+            //                ZStack {
+            //                    
+            //                    Circle()
+            //                        .foregroundStyle(Color.white)
+            //                        .frame(width: 26, height: 26)
+            //                    Image("zoomButton")
+            //                        .resizable()
+            //                        .frame(width: 20, height: 20)
+            //                }
+            //                
+            //            }
+            //            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
+            //            .gesture(zoomDrag)
         }
         
     }

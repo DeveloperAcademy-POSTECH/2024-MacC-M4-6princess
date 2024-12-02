@@ -56,6 +56,18 @@ struct DFModifyView: View {
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
             }
+            if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
+                DFTextModifyView(
+                    viewModel: viewModel,
+                    style: Binding(
+                        get: { textStyle },
+                        set: { newValue in
+                            frameManager.selectedTextStyle = newValue
+                        }
+                    )
+                )
+            }
+            
             VStack{
                 Spacer()
                 HStack{
@@ -137,34 +149,29 @@ struct DFModifyView: View {
     }
     
     // 1초 길게 누르고 드래그 제스처를 생성하는 함수
-        func longPressAndDragGesture(for index: Int) -> some Gesture {
-            LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
-                .onEnded { _ in
-                    isLongPressed = true // 길게 눌림 활성화
-                    selectedLayerIndex = index
-                    imageListUpdate()
-    
-                    print("isLongPressed 눌림")
+    func longPressAndDragGesture(for index: Int) -> some Gesture {
+        LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
+            .onEnded { _ in
+                isLongPressed = true // 길게 눌림 활성화
+                selectedLayerIndex = index
+                imageListUpdate()
+                
+                print("isLongPressed 눌림")
+            }
+            .simultaneously(with: DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    if isLongPressed { // 길게 누른 상태에서만 드래그 동작
+                        dragOnChanged(value: value, index: index)
+                    }
                 }
-                .simultaneously(with: DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        if isLongPressed { // 길게 누른 상태에서만 드래그 동작
-                            
-                                dragOnChanged(value: value, index: index)
-                            
-                        }
-                    }
-                    .onEnded { _ in
-                        withAnimation{
-                            dragOnEnded()
-                            beforeDragOffsetY = .zero
-                            isLongPressed = false
-                            imageListUpdate()
-                        }
-    
-                    }
-                )
-        }
+                .onEnded { _ in
+                    dragOnEnded()
+                    beforeDragOffsetY = .zero
+                    isLongPressed = false
+                    imageListUpdate()
+                }
+            )
+    }
     
     func imageListUpdate() {
         // 길게 누름 상태 초기화
@@ -261,6 +268,12 @@ struct DFModifyView: View {
     var imageView: some View {
         
         ZStack {
+            Color.clear
+                .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
+                .onTapGesture {
+                    isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
+                }
+            
             ForEach(imageModel.imageList.indices, id: \.self) { index in
                 let subject = imageModel.imageList[index]
                 
@@ -290,7 +303,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.removeLast()
                             }
                             .gesture(combinedGesture(subject: subject))
-                            .gesture(longPressAndDragGesture(for: index))
+                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.sticker {
                     ZStack {
@@ -318,21 +331,17 @@ struct DFModifyView: View {
                                 imageModel.imageList.removeLast()
                             }
                             .gesture(combinedGesture(subject: subject))
-                            .gesture(longPressAndDragGesture(for: index))
+                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.text {
                     ZStack {
                         let newText = subject.textStyle?.rawText ?? "l"
-
+                        
                         let newWidth = min(CGFloat(newText.count)*UIScreen.main.bounds.width/10,UIScreen.main.bounds.width)
                         let size: CGSize = .init(
                             width: newWidth,
                             height: newWidth * (image.size.height / image.size.width)
                         )
-//                        let size: CGSize = .init(
-//                            width: UIScreen.main.bounds.width,
-//                            height: UIScreen.main.bounds.width)
-//                        
                         DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)
@@ -352,7 +361,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.removeLast()
                             }
                             .gesture(combinedGesture(subject: subject))
-                            .gesture(longPressAndDragGesture(for: index))
+                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }
             }

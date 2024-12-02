@@ -31,6 +31,7 @@ class DFModifyViewModel: ObservableObject {
     @Published var frameImage: UIImage?
     
     @Published var showTextView: Bool = false
+//    @Published var showTextModifyView: Bool = false
     @Published var showStickerSheet: Bool = false
     
     @Published var isAlert: Bool = false
