@@ -10,15 +10,16 @@ import PhotosUI
 struct LayerLongPressView: View {
     
     @State private var showImagePicker: Bool = false
-    //    @State private var dragStartPosition: CGPoint?
     @State private var layerList: [LayerModel] = []
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
+    @State var beforeDragOffsetY: CGFloat = .zero
+    
     var body: some View {
         ZStack {
             ZStack {
-                ForEach(layerList.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
+                ForEach(layerList.indices, id: \.self) { index in
                     let layer = layerList[index]
                     Image(uiImage: layer.image)
                         .resizable()
@@ -34,14 +35,61 @@ struct LayerLongPressView: View {
                                 .padding(5),
                             alignment: .bottom
                         )
-                        .gesture(longPressAndDragGesture(for: index)) // 제스처 분리
+                        .gesture(
+                            LongPressGesture(minimumDuration: 0.5)
+                                .onEnded { _ in
+                                    isLongPressed = true
+                                    selectedLayerIndex = index
+                                    print("isLongPressed 눌림")
+                                }
+                                .simultaneously(with: DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        if isLongPressed {
+                                            dragOnChanged(value: value, index: index)
+                                        }
+                                    }
+                                    .onEnded { _ in
+                                        dragOnEnded()
+                                        beforeDragOffsetY = .zero
+                                        isLongPressed = false
+                                    }
+                                )
+                        )
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    if !isLongPressed {
+                                        layerList[index].scale = value
+                                    }
+                                }
+
+                        )
+                        .simultaneousGesture(
+                            DragGesture()
+                            .onChanged{ value in
+                                if !isLongPressed {
+                                    layerList[index].position = value.location
+                                }
+                                
+                            }
+                        )
+                        .simultaneousGesture(
+                            RotationGesture()
+                                .onChanged { value in
+                                    if !isLongPressed {
+                                        layerList[index].rotation = value
+                                    }
+                                }
+                        )
                 }
             }
             .frame(width: 300, height: 300)
             .padding()
             
             HStack {
-                layerIndicator
+                if isLongPressed {
+                    layerIndicator
+                }
                 Spacer()
             }
             
@@ -64,10 +112,9 @@ struct LayerLongPressView: View {
         }
     }
     
-    // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(layerList.indices, id: \.self) { index in
+            ForEach(layerList.indices.reversed(), id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -98,79 +145,73 @@ struct LayerLongPressView: View {
         .padding(.horizontal, 5)
     }
     
-    // 1초 길게 누르고 드래그 제스처를 생성하는 함수
-    func longPressAndDragGesture(for index: Int) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
-            .onEnded { _ in
-                isLongPressed = true // 길게 눌림 활성화
-                selectedLayerIndex = index
-                print("isLongPressed 눌림")
-            }
-            .simultaneously(with: DragGesture(minimumDistance: 0)
-                .onChanged { value in
-                    if isLongPressed { // 길게 누른 상태에서만 드래그 동작
-                        dragOnChanged(value: value, index: index)
-                    }
-                }
-                .onEnded { _ in
-                    dragOnEnded()
-                    isLongPressed = false // 길게 누름 상태 초기화
-                }
-            )
-    }
-    
-    // 드래그 중 호출되는 함수
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
             selectedLayerIndex = index
-            //            dragStartPosition = layerImages[index].position
             isDragging = true
         }
         
         let dragOffsetY = value.translation.height
-        let currentStep = Int(dragOffsetY / 50)
+        let diff = dragOffsetY - beforeDragOffsetY
+        var currentStep = Int(diff / 50)
+        if diff < 0 && diff > -50 {
+            currentStep = 0
+        }
         
-        if let currentIndex = selectedLayerIndex, currentStep != currentIndex {
-            if currentStep < currentIndex {
-                moveLayerForward(at: currentIndex, steps: abs(currentStep - currentIndex))
+        if let currentIndex = selectedLayerIndex, currentStep != 0 {
+            if diff > 0 {
+                if currentIndex - currentStep < 0 {
+                    currentStep = currentIndex
+                }
+                selectedLayerIndex = moveLayerForward(at: currentIndex, steps: abs(currentStep))
+                beforeDragOffsetY = dragOffsetY
             } else {
-                moveLayerBackward(at: currentIndex, steps: abs(currentStep - currentIndex))
+                if currentStep + currentIndex > layerList.count {
+                    let diff = currentStep + currentIndex - layerList.count
+                    currentStep = layerList.count - currentIndex
+                }
+                selectedLayerIndex = moveLayerBackward(at: currentIndex, steps: abs(currentStep))
+                beforeDragOffsetY = dragOffsetY
             }
-            selectedLayerIndex = currentStep
         }
     }
     
-    // 드래그 종료 시 호출되는 함수
     func dragOnEnded() {
         isDragging = false
-        //        dragStartPosition = nil
         selectedLayerIndex = nil
     }
     
-    // 레이어를 앞으로 이동
-    func moveLayerForward(at index: Int, steps: Int) {
-        guard steps > 0 else { return }
+    func moveLayerForward(at index: Int, steps: Int) -> Int {
+        guard steps > 0 else { return index }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex > 0 else { return }
-            guard currentIndex < layerList.count else { return }
-            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+            guard currentIndex > 0 else { return 0 }
+            guard currentIndex < layerList.count else { return layerList.count - 1 }
             layerList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
+        return currentIndex
     }
     
-    // 레이어를 뒤로 이동
-    func moveLayerBackward(at index: Int, steps: Int) {
-        guard steps > 0 else { return }
+    func moveLayerBackward(at index: Int, steps: Int) -> Int {
+        guard steps > 0 else { return index }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex < layerList.count - 1 else { return }
-            guard currentIndex >= 0 else { return }
-            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+            guard currentIndex < layerList.count - 1 else { return layerList.count - 1 }
+            guard currentIndex >= 0 else { return 0 }
             layerList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
+        return currentIndex
     }
 }
-//.gesture(longPressAndDragGesture(for: index)) // 제스처 분리
+
+struct LayerModel: Identifiable {
+    let id = UUID()
+    var image: UIImage
+    var order: Int
+    var position: CGPoint = .zero
+    var scale: CGFloat = 1.0
+    var rotation: Angle = .zero
+}
+

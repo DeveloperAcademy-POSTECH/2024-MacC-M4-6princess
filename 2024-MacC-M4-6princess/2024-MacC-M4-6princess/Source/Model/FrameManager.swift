@@ -18,4 +18,9 @@ public final class FrameManager: ObservableObject {
     
     @Published var selectedFrame: UUID? = nil //CoreData에서 선택한 프레임 id 받아옴
     @Published var isFrameLoading: Bool = false
+    
+    // 텍스트 수정뷰 관련 변수
+    @Published var selectedTextStyle:TextStyle?
+    @Published var showTextModifyView: Bool = false
+    @Published var textUUID: UUID?
 }

@@ -60,7 +60,7 @@ struct DFStickerView: View {
                                         $0.isTapped = false
                                     }
                                 }
-//                                newImage.scale = 0.5
+                                //                                newImage.scale = 0.5
                                 imageModel.imageList.append(newImage)
                             } else {
                                 //TODO: 에러 처리 해야함
@@ -70,7 +70,7 @@ struct DFStickerView: View {
                             viewModel.showStickerSheet = false
                             
                         }
-
+                        
                         .frame(width: 80, height: 80) // 정사각형 박스 크기
                     }
                 }
