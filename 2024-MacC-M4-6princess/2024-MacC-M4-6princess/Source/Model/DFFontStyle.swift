@@ -49,8 +49,8 @@ extension FontStyle: CaseIterable {
 
 struct ColorPreset {
     static let colorPallete: [Color] = [
-        Color.black,
         Color.white,
+        Color.black,
         Color.redStrong,
         Color.redLight,
         Color.orangeStrong,
