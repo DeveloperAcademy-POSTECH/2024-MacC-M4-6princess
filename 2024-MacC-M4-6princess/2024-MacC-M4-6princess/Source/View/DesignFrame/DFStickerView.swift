@@ -5,6 +5,7 @@
 //  Created by ram on 11/22/24.
 //
 import SwiftUI
+import FirebaseAnalytics
 
 struct DFStickerView: View {
     @StateObject var viewModel:DFModifyViewModel
@@ -62,6 +63,9 @@ struct DFStickerView: View {
                                 }
                                 //                                newImage.scale = 0.5
                                 imageModel.imageList.append(newImage)
+                                Analytics.logEvent("A5_스티커선택", parameters: [
+                                    "sticker_name": imageName
+                                ])
                                 viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
                             } else {
                                 //TODO: 에러 처리 해야함

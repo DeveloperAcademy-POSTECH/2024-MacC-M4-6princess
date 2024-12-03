@@ -1,6 +1,7 @@
 import SwiftUI
 import Vision
 import CoreImage.CIFilterBuiltins
+import FirebaseAnalytics
 
 struct DFEditView: View {
     
@@ -79,6 +80,7 @@ struct DFEditView: View {
         }
         .onAppear {
             showMaskImage()
+            Analytics.logEvent("A4_누끼따기", parameters: nil)
         }
         .onDisappear{ // ✅
             frameManager.resultImage = viewModel.resultImage

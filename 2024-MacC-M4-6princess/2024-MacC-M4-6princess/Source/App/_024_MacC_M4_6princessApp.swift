@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct _024_MacC_M4_6princessApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var environmentModel = EnvironmentModel()
     @StateObject private var frameManager = FrameManager()
     @StateObject private var naviManager = NavigationManager()
@@ -23,6 +25,15 @@ struct _024_MacC_M4_6princessApp: App {
                 .environmentObject(naviManager)
                 .environmentObject(frameManager)
         }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        
+        return true
     }
 }
 

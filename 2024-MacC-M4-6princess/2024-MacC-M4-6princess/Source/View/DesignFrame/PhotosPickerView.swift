@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import FirebaseAnalytics
 
 struct PhotosPickerView: View {
     //    enum PickerType {
@@ -27,9 +28,14 @@ struct PhotosPickerView: View {
             .photosPickerDisabledCapabilities([.search, .collectionNavigation, .stagingArea])
             .photosPickerStyle(.inline)
         }
+        .onAppear {
+            Analytics.logEvent("A3_사진선택", parameters: nil)
+        }
         .navigationBarBackButtonHidden()
         .onChange(of: selectedItem) {
-            
+            if !selectedItem.isEmpty {
+                Analytics.logEvent("A3_갤러리사진선택", parameters: nil)
+            }
             Task {
                 if let data = try await selectedItem[0].loadTransferable(type: Data.self) {
                     frameManager.pickedImage = UIImage(data:data)
