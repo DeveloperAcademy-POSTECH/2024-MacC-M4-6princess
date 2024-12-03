@@ -49,7 +49,7 @@ struct DFEditView: View {
                             Spacer()
                             Button {
                                 viewModel.showPreview.toggle()
-                                viewModel.createResult{
+                                viewModel.createResult{ _ in
                                     
                                 }
                                 
@@ -78,6 +78,13 @@ struct DFEditView: View {
                 }
             }
         }
+        .alert(isPresented: $viewModel.isRenderFailed) {
+            Alert(
+                title: Text("오류 발생"),
+                message: Text("이미지 렌더링에 실패했습니다. 다시 시도해주세요."),
+                dismissButton: .default(Text("확인"))
+            )
+        }
         .onAppear {
             showMaskImage()
             Analytics.logEvent("A4_누끼따기", parameters: nil)
@@ -85,9 +92,6 @@ struct DFEditView: View {
         .onDisappear{ // ✅
             frameManager.resultImage = viewModel.resultImage
         }
-        //        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
-        //            DFFrameModifyView()
-        //        })
         .navigationBarBackButtonHidden()
         .toolbar {
             toolBarButtons
@@ -311,57 +315,55 @@ private extension DFEditView {
             
             Spacer()
             Button {
-                
-                viewModel.createResult {
-                    viewModel.detectSubject(inputImage: viewModel.resultImage) {
-                        
-                        if let image = viewModel.outputImage {
-                            
-                            if let model = frameManager.changedSubject {
-                                
-                                model.image = image
-                                frameManager.changedSubject = nil
-                                
-                            } else {
-                                imageModel.imageList.forEach {
-                                    if $0.isTapped {
+                guard !viewModel.clickedButton else { return } // 이미 클릭되었는지 확인
+                viewModel.clickedButton = true
+                viewModel.createResult { success in
+                    if success {
+                        viewModel.detectSubject(inputImage: viewModel.resultImage) { success in
+                            if success, let image = viewModel.outputImage {
+                                if let model = frameManager.changedSubject {
+                                    model.image = image
+                                    frameManager.changedSubject = nil
+                                } else {
+                                    imageModel.imageList.forEach {
                                         $0.isTapped = false
                                     }
+                                    let newImage = SubjectImage()
+                                    newImage.image = image
+                                    newImage.originalImage = frameManager.pickedImage
+                                    imageModel.imageList.append(newImage)
                                 }
-                                let newImage = SubjectImage()
-                                newImage.image = image
-                                newImage.originalImage = frameManager.pickedImage
-                                imageModel.imageList.append(newImage)
-                                print("\(imageModel.imageList.count) 길이")
+                                naviManager.push(screen: Screen.modifyFrame)
+                                viewModel.isRenderFailed = false
+                            } else {
+                                print("Failed in detectSubject")
+                                viewModel.isRenderFailed = true
                             }
                             
-//                            if naviManager.route.count > 1 {
-//                                naviManager.pop()
-//                            } else {
-//                                naviManager.push(screen: Screen.modifyFrame)
-//                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                naviManager.push(screen: Screen.modifyFrame)
-                            }
-//                            naviManager.push(screen: Screen.modifyFrame)
+                            //                            if naviManager.route.count > 1 {
+                            //                                naviManager.pop()
+                            //                            } else {
+                            //                                naviManager.push(screen: Screen.modifyFrame)
+                            //                            }
+                            
+                            naviManager.push(screen: Screen.modifyFrame)
+                            
+                            //                            naviManager.push(screen: Screen.modifyFrame)
                         }
+                    } else {
+                        print("Failed in createResult")
+                        viewModel.isRenderFailed = true
                     }
+                    viewModel.clickedButton = false
                 }
-//                viewModel.isShowModifyFrame.toggle()
-                //                viewModel.isShowModifyFrame.toggle()
-                
-//                if naviManager.route.count > 1 {
-//                    naviManager.pop()
-//                } else {
-//                    naviManager.push(screen: Screen.modifyFrame)
-//                }//✅
-                
             } label: {
                 Text("확인")
                     .fontWeight(.semibold)
                     .foregroundStyle(.pointPink)
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
+            .disabled(viewModel.clickedButton) // 버튼이 클릭된 동안 비활성화
+            
             .padding(1)
             
         }
