@@ -42,12 +42,12 @@ class DFModifyViewModel: ObservableObject {
         
         MagnifyGesture()
             .onChanged { value in
-                if let subject = self.modelList.first {
+                if let subject = self.modelList.first, subject.isTapped {
                     self.setScaleVolume(value.magnification, subject: subject)
                 }
             }
             .onEnded { value in
-                if let subject = self.modelList.first {
+                if let subject = self.modelList.first, subject.isTapped {
                     self.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
                 }
                 
@@ -55,7 +55,7 @@ class DFModifyViewModel: ObservableObject {
             .simultaneously(with: RotateGesture()
                 .onChanged({ value in
                     
-                    if let subject = self.modelList.first {
+                    if let subject = self.modelList.first, subject.isTapped {
                         if self.current == .zero {
                             self.current = subject.getAngle()
                         }
