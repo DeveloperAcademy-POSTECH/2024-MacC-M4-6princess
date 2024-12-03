@@ -16,6 +16,7 @@ struct TextRenderView: View {
             .foregroundColor(style.color)
             .multilineTextAlignment(style.alignment)
             .lineSpacing(5)
+            .padding(.vertical,3)
     }
 }
 
