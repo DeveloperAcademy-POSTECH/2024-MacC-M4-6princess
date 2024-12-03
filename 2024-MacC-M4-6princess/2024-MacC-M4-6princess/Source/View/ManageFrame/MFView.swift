@@ -8,6 +8,7 @@
 import SwiftUI
 import PhotosUI
 import CoreData
+import FirebaseAnalytics
 
 struct MFView: View {
     @Environment(\.dismiss) private var dismiss
@@ -138,6 +139,9 @@ struct MFView: View {
 //                        )
 //                    }
         }
+        .onAppear{
+            Analytics.logEvent("A2_프레임관리", parameters: nil)
+        }
         
         .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
             PhotosPickerView()
@@ -204,6 +208,7 @@ struct FrameGridItem: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
             Button {
                 naviManager.push(screen: Screen.photoPicker)
+                Analytics.logEvent("A2_새로운프레임만들기", parameters: nil)
             } label: {
                 ZStack {
                     VStack(alignment: .center, spacing: 4) {
@@ -274,6 +279,7 @@ struct GridItemView: View {
         .onTapGesture {
             if !viewModel.isEditing {
                 viewModel.toggleSelection(for: imageInfo.id)
+                Analytics.logEvent("A2_프레임선택", parameters: nil)
                 dismiss()
             }else {
                 viewModel.toggleSelection(for: imageInfo.id)

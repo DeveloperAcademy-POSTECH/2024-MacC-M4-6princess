@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 
 //메인뷰 하단 뷰(셔터버튼, 기타 버튼 등)
 struct CameraBottomView: View {
@@ -51,6 +52,7 @@ struct CameraBottomView: View {
                             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                                 viewModel.takePic()
                                 viewModel.cameraManager.stopSession()
+                                Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
                             }
                         } else {
                             viewModel.isShowAlert = true

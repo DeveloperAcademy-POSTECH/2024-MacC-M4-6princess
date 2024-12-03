@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Photos
+import FirebaseAnalytics
 
 // 이미지 편집 메인 화면
 struct IOView: View {
@@ -76,7 +77,7 @@ struct IOView: View {
             viewModel.bgImg = bg
             viewModel.idolImg = idol
             viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
-            
+            Analytics.logEvent("A6_사진저장", parameters: nil)
             
             print("body onAppear")
         }

@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation
 import CoreData
+import FirebaseAnalytics
 
 struct DFModifyView: View {
     
@@ -104,6 +105,7 @@ struct DFModifyView: View {
                     viewModel.makeImageList()
                 }
             }
+            Analytics.logEvent("A5_프레임수정", parameters: nil)
         }
     }
 }
@@ -423,6 +425,7 @@ extension DFModifyView {
                             imageModel.imageList.removeAll()
                             frameManager.resultImage = viewModel.frameImage
                             frameManager.selectedFrame = nil
+                            Analytics.logEvent("A5_프레임저장", parameters: nil)
                         }
                     } else {
                         
