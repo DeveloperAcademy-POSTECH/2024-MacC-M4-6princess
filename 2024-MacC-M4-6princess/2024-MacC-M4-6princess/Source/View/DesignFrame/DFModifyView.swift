@@ -33,8 +33,10 @@ struct DFModifyView: View {
                         
                         imageView
                             .onAppear {
-                                if let _ = imageModel.imageList.last!.image {
-                                    viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+                                if let list = imageModel.imageList.last {
+                                    if let _ = list.image {
+                                        viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+                                    }
                                 }
                             }
                         
