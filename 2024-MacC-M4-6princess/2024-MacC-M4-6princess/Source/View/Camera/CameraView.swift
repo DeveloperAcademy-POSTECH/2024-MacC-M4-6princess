@@ -210,8 +210,6 @@ struct CameraView: View {
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
             Analytics.logEvent("A1_카메라", parameters: nil)
-            Analytics.logEvent("timeline", parameters: nil)
-            
         }
         
     }
