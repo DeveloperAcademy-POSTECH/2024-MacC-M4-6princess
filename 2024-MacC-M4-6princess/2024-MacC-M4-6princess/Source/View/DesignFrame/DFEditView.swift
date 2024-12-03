@@ -337,6 +337,16 @@ private extension DFEditView {
                                 print("Failed in detectSubject")
                                 viewModel.isRenderFailed = true
                             }
+                            
+//                            if naviManager.route.count > 1 {
+//                                naviManager.pop()
+//                            } else {
+//                                naviManager.push(screen: Screen.modifyFrame)
+//                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                naviManager.push(screen: Screen.modifyFrame)
+                            }
+//                            naviManager.push(screen: Screen.modifyFrame)
                         }
                     } else {
                         print("Failed in createResult")
