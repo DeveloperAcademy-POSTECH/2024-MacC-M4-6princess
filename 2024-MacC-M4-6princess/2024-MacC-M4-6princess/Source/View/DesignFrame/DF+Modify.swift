@@ -11,22 +11,18 @@ import CoreData
 
 extension DFModifyView{
     func combinedGesture(subject: SubjectImage) -> some Gesture {
-        DragGesture()
+        MagnifyGesture()
             .onChanged { value in
-                if !isLongPressed{
-                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                if !isLongPressed && subject.isTapped {
+                    viewModel.setScaleVolume(value.magnification, subject: subject)
                 }
             }
             .onEnded { value in
-                if !isLongPressed {
-                    viewModel.accumulatedOffSet = .zero
-                    viewModel.modelListControl(subject: subject)
-                    subject.isTapped = true
-                    imageModel.imageList.append(subject)
-                    imageModel.imageList.removeLast()
+                if !isLongPressed{
+                    viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
                 }
-                
             }
+        
             .simultaneously(with: RotateGesture()
                 .onChanged { value in
                     if !isLongPressed && subject.isTapped  {
@@ -43,17 +39,23 @@ extension DFModifyView{
                     }
                 }
             )
-            .simultaneously(with: MagnifyGesture()
+            .simultaneously(with: DragGesture()
                 .onChanged { value in
-                    if !isLongPressed && subject.isTapped {
-                        viewModel.setScaleVolume(value.magnification, subject: subject)
+                    if !isLongPressed{
+                        viewModel.dragGestureTask(subject: subject, changed: value.translation)
                     }
                 }
                 .onEnded { value in
-                    if !isLongPressed{
-                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                    if !isLongPressed {
+                        viewModel.accumulatedOffSet = .zero
+                        viewModel.modelListControl(subject: subject)
+                        subject.isTapped = true
+                        imageModel.imageList.append(subject)
+                        imageModel.imageList.removeLast()
                     }
+                    
                 }
+                                
             )
     }
     var toolBarButtons: some View {

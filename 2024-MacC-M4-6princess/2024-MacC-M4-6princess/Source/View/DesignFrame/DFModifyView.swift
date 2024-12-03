@@ -87,7 +87,7 @@ struct DFModifyView: View {
         .ignoresSafeArea(.keyboard)
         .navigationBarBackButtonHidden()
         .toolbar {
-            if !viewModel.showTextView {
+            if !viewModel.showTextView && !frameManager.showTextModifyView {
                 toolBarButtons
             }
             
@@ -214,8 +214,8 @@ struct DFModifyView: View {
                 /// 인덱스 감소
                 selectedLayerIndex = moveLayerForward(at: currentIndex, steps: abs(currentStep))
                 beforeDragOffsetY = dragOffsetY
-                imageModel.imageList.append(imageModel.imageList[0])
-                imageModel.imageList.removeLast()
+                imageListUpdate()
+               
             } else {
                 if currentStep + currentIndex > imageModel.imageList.count{
                     let diff = currentStep + currentIndex - imageModel.imageList.count
@@ -224,8 +224,7 @@ struct DFModifyView: View {
                 /// 인덱스 증가
                 selectedLayerIndex = moveLayerBackward(at: currentIndex, steps: abs(currentStep))
                 beforeDragOffsetY = dragOffsetY
-                imageModel.imageList.append(imageModel.imageList[0])
-                imageModel.imageList.removeLast()
+                imageListUpdate()
             }
         }
     }
@@ -276,7 +275,36 @@ struct DFModifyView: View {
             
             ForEach(imageModel.imageList.indices, id: \.self) { index in
                 let subject = imageModel.imageList[index]
-                
+//                if let image = subject.sticker {
+//                    ZStack {
+//                        let size: CGSize = .init(
+//                            width: UIScreen.main.bounds.width / 2,
+//                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+//                        )
+//                        
+//                        DFOverlayBoxView(model: subject, size: size)
+//                            .opacity(subject.isTapped ? 1 : 0)
+//                            .zIndex(1)
+//                        
+//                        Image(uiImage: image)
+//                            .resizable()
+//                            .frame(width: size.width, height: size.height)
+//                            .scaleEffect(subject.getScale())
+//                            .rotationEffect(subject.getAngle())
+//                            .offset(subject.getOffset())
+//                            .onTapGesture {
+//                                if !subject.isTapped {
+//                                    viewModel.modelListControl(subject: subject)
+//                                }
+//                                subject.isTapped.toggle()
+//                                imageModel.imageList.append(subject)
+//                                imageModel.imageList.removeLast()
+//                            }
+//                            .gesture(longPressAndDragGesture(for: index))
+//
+//                            .gesture(combinedGesture(subject: subject))
+//                    }
+//                }
                 if let image = subject.image, let realImage = subject.originalImage {
                     ZStack {
                         let size: CGSize = .init(
@@ -302,8 +330,9 @@ struct DFModifyView: View {
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                             }
+                            .gesture(longPressAndDragGesture(for: index))
+
                             .gesture(combinedGesture(subject: subject))
-                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.sticker {
                     ZStack {
@@ -330,10 +359,12 @@ struct DFModifyView: View {
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                             }
+                            .gesture(longPressAndDragGesture(for: index))
+
                             .gesture(combinedGesture(subject: subject))
-                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
-                } else if let image = subject.text {
+                }
+                else if let image = subject.text {
                     ZStack {
                         let newText = subject.textStyle?.rawText ?? "l"
                         
@@ -360,8 +391,8 @@ struct DFModifyView: View {
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                             }
+                            .gesture(longPressAndDragGesture(for: index))
                             .gesture(combinedGesture(subject: subject))
-                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }
             }

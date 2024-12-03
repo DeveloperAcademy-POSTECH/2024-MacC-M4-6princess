@@ -8,16 +8,11 @@ import SwiftUI
 
 struct DFTextModifyView: View {
     @ObservedObject var viewModel: DFModifyViewModel
-    //    @State var txt = ""
     @Binding var style: TextStyle
-    //    @State var selectedFont: FontStyle = .modern
-    //    @State var fontSize: Double = 20
-    //    @State var fontColor: Color = ColorPreset.colorPallete[0]
     @State var renderedImage: UIImage?
     @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
     @State var tab = 0
     @State var colorNum = 0
-    //    @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
@@ -62,7 +57,6 @@ struct DFTextModifyView: View {
                                         $0.isTapped = false
                                     }
                                 }
-                                //                                imageModel.imageList.append(newImage)
                             } else {
                                 //TODO: 에러 처리 해야함
                                 print("Image not found")
