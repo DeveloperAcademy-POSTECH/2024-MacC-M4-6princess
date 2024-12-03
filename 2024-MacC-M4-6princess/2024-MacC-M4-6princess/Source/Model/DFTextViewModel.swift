@@ -14,10 +14,7 @@ extension DFTextView{
     func renderTextImage(text: String){
         let renderer = ImageRenderer(
             content: TextRenderView(
-                text: text,
-                selectedFont: selectedFont,
-                selectedColor: fontColor,
-                selectedAlignment: textAlignment
+                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
             )
         )
         renderer.scale = 10
@@ -113,12 +110,4 @@ struct LayerPhotoPicker2: UIViewControllerRepresentable {
         }
     }
     
-}
-struct LayerModel: Identifiable {
-    let id = UUID()
-    var image: UIImage
-    var order: Int
-    var position: CGPoint = .zero
-    var scale: CGFloat = 1.0
-    var rotation: Angle = .zero
 }

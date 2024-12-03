@@ -146,8 +146,9 @@ class DFEditViewModel: ObservableObject {
                 self.resultImage = resultImage
             }
         }
-        
-        completionHandler()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            completionHandler()
+        }
     }
     
     func removeBackground() {

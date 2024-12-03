@@ -61,11 +61,12 @@ struct DFStickerView: View {
                                         $0.isTapped = false
                                     }
                                 }
-//                                newImage.scale = 0.5
+                                //                                newImage.scale = 0.5
                                 imageModel.imageList.append(newImage)
                                 Analytics.logEvent("A5_스티커선택", parameters: [
                                     "sticker_name": imageName
                                 ])
+                                viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
                             } else {
                                 //TODO: 에러 처리 해야함
                                 print("Image not found")
@@ -74,7 +75,7 @@ struct DFStickerView: View {
                             viewModel.showStickerSheet = false
                             
                         }
-
+                        
                         .frame(width: 80, height: 80) // 정사각형 박스 크기
                     }
                 }

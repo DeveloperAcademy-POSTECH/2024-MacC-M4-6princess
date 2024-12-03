@@ -31,13 +31,44 @@ class DFModifyViewModel: ObservableObject {
     @Published var frameImage: UIImage?
     
     @Published var showTextView: Bool = false
+//    @Published var showTextModifyView: Bool = false
     @Published var showStickerSheet: Bool = false
     
     @Published var isAlert: Bool = false
     
     @Published var modelList: [SubjectImage] = []
     
-    
+    func backgroundGesture() -> some Gesture {
+        
+        MagnifyGesture()
+            .onChanged { value in
+                if let subject = self.modelList.first, subject.isTapped {
+                    self.setScaleVolume(value.magnification, subject: subject)
+                }
+            }
+            .onEnded { value in
+                if let subject = self.modelList.first, subject.isTapped {
+                    self.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                }
+                
+            }
+            .simultaneously(with: RotateGesture()
+                .onChanged({ value in
+                    
+                    if let subject = self.modelList.first, subject.isTapped {
+                        if self.current == .zero {
+                            self.current = subject.getAngle()
+                        }
+                        self.angle = value.rotation + self.current
+                        subject.setAngle(angle: self.angle)
+                    }
+                })
+                .onEnded({ value in
+                    self.current = .zero
+                })
+            )
+        
+    }
     
     func modelListControl(subject: SubjectImage) {
         

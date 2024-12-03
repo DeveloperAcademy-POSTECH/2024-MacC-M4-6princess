@@ -6,20 +6,20 @@
 //
 import SwiftUI
 import PhotosUI
-
 struct LayerLongPressView: View {
+    @EnvironmentObject var viewModel: LayerListViewModel
     
     @State private var showImagePicker: Bool = false
-    //    @State private var dragStartPosition: CGPoint?
-    @State private var layerList: [LayerModel] = []
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
+    @State var beforeDragOffsetY: CGFloat = .zero
+    
     var body: some View {
         ZStack {
             ZStack {
-                ForEach(layerList.indices.reversed(), id: \.self) { index in // 가장 위에 오는 것이 index == 0
-                    let layer = layerList[index]
+                ForEach(viewModel.layerList.indices, id: \.self) { index in
+                    let layer = viewModel.layerList[index]
                     Image(uiImage: layer.image)
                         .resizable()
                         .scaledToFit()
@@ -34,14 +34,59 @@ struct LayerLongPressView: View {
                                 .padding(5),
                             alignment: .bottom
                         )
-                        .gesture(longPressAndDragGesture(for: index)) // 제스처 분리
+                        .gesture(
+                            LongPressGesture(minimumDuration: 0.5)
+                                .onEnded { _ in
+                                    isLongPressed = true
+                                    selectedLayerIndex = index
+                                    print("isLongPressed 눌림")
+                                }
+                                .simultaneously(with: DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        if isLongPressed {
+                                            dragOnChanged(value: value, index: index)
+                                        }
+                                    }
+                                    .onEnded { _ in
+                                        dragOnEnded()
+                                        beforeDragOffsetY = .zero
+                                        isLongPressed = false
+                                    }
+                                )
+                        )
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    if !isLongPressed {
+                                        viewModel.layerList[index].scale = value
+                                    }
+                                }
+                        )
+                        .simultaneousGesture(
+                            DragGesture()
+                            .onChanged { value in
+                                if !isLongPressed {
+                                    viewModel.layerList[index].position = value.location
+                                }
+                            }
+                        )
+                        .simultaneousGesture(
+                            RotationGesture()
+                                .onChanged { value in
+                                    if !isLongPressed {
+                                        viewModel.layerList[index].rotation = value
+                                    }
+                                }
+                        )
                 }
             }
             .frame(width: 300, height: 300)
             .padding()
             
             HStack {
-                layerIndicator
+                if isLongPressed {
+                    layerIndicator
+                }
                 Spacer()
             }
             
@@ -60,14 +105,13 @@ struct LayerLongPressView: View {
             .padding()
         }
         .sheet(isPresented: $showImagePicker) {
-            LayerPhotoPicker2(layerImages: $layerList, screenSize: UIScreen.main.bounds.size)
+            LayerPhotoPicker2(layerImages: $viewModel.layerList, screenSize: UIScreen.main.bounds.size)
         }
     }
     
-    // 레이어 순서 표시 뷰
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(layerList.indices, id: \.self) { index in
+            ForEach(viewModel.layerList.indices.reversed(), id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -98,79 +142,139 @@ struct LayerLongPressView: View {
         .padding(.horizontal, 5)
     }
     
-    // 1초 길게 누르고 드래그 제스처를 생성하는 함수
-    func longPressAndDragGesture(for index: Int) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
-            .onEnded { _ in
-                isLongPressed = true // 길게 눌림 활성화
-                selectedLayerIndex = index
-                print("isLongPressed 눌림")
-            }
-            .simultaneously(with: DragGesture(minimumDistance: 0)
-                .onChanged { value in
-                    if isLongPressed { // 길게 누른 상태에서만 드래그 동작
-                        dragOnChanged(value: value, index: index)
-                    }
-                }
-                .onEnded { _ in
-                    dragOnEnded()
-                    isLongPressed = false // 길게 누름 상태 초기화
-                }
-            )
-    }
-    
-    // 드래그 중 호출되는 함수
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {
             selectedLayerIndex = index
-            //            dragStartPosition = layerImages[index].position
             isDragging = true
         }
         
         let dragOffsetY = value.translation.height
-        let currentStep = Int(dragOffsetY / 50)
+        let diff = dragOffsetY - beforeDragOffsetY
+        var currentStep = Int(diff / 50)
+        if diff < 0 && diff > -50 {
+            currentStep = 0
+        }
         
-        if let currentIndex = selectedLayerIndex, currentStep != currentIndex {
-            if currentStep < currentIndex {
-                moveLayerForward(at: currentIndex, steps: abs(currentStep - currentIndex))
+        if let currentIndex = selectedLayerIndex, currentStep != 0 {
+            if diff > 0 {
+                if currentIndex - currentStep < 0 {
+                    currentStep = currentIndex
+                }
+                selectedLayerIndex = moveLayerForward(at: currentIndex, steps: abs(currentStep))
+                beforeDragOffsetY = dragOffsetY
             } else {
-                moveLayerBackward(at: currentIndex, steps: abs(currentStep - currentIndex))
+                if currentStep + currentIndex > viewModel.layerList.count {
+                    let diff = currentStep + currentIndex - viewModel.layerList.count
+                    currentStep = viewModel.layerList.count - currentIndex
+                }
+                selectedLayerIndex = moveLayerBackward(at: currentIndex, steps: abs(currentStep))
+                beforeDragOffsetY = dragOffsetY
             }
-            selectedLayerIndex = currentStep
         }
     }
     
-    // 드래그 종료 시 호출되는 함수
     func dragOnEnded() {
         isDragging = false
-        //        dragStartPosition = nil
         selectedLayerIndex = nil
     }
     
-    // 레이어를 앞으로 이동
-    func moveLayerForward(at index: Int, steps: Int) {
-        guard steps > 0 else { return }
+    func moveLayerForward(at index: Int, steps: Int) -> Int {
+        guard steps > 0 else { return index }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex > 0 else { return }
-            guard currentIndex < layerList.count else { return }
-            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
-            layerList.swapAt(currentIndex, currentIndex - 1)
+            guard currentIndex > 0 else { return 0 }
+            guard currentIndex < viewModel.layerList.count else { return viewModel.layerList.count - 1 }
+            viewModel.layerList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
+        return currentIndex
     }
     
-    // 레이어를 뒤로 이동
-    func moveLayerBackward(at index: Int, steps: Int) {
-        guard steps > 0 else { return }
+    func moveLayerBackward(at index: Int, steps: Int) -> Int {
+        guard steps > 0 else { return index }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex < layerList.count - 1 else { return }
-            guard currentIndex >= 0 else { return }
-            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
-            layerList.swapAt(currentIndex, currentIndex + 1)
+            guard currentIndex < viewModel.layerList.count - 1 else { return viewModel.layerList.count - 1 }
+            guard currentIndex >= 0 else { return 0 }
+            viewModel.layerList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
+        return currentIndex
     }
 }
-//.gesture(longPressAndDragGesture(for: index)) // 제스처 분리
+
+struct LayerModel: Identifiable {
+    let id = UUID()
+    var image: UIImage
+    var order: Int
+    var position: CGPoint = .zero
+    var scale: CGFloat = 1.0
+    var rotation: Angle = .zero
+}
+
+import SwiftUI
+
+class LayerListViewModel: ObservableObject {
+    @Published var layerList: [LayerModel] = []
+}
+//import SwiftUI
+//
+//enum ImageType {
+//    case regular // 일반 이미지
+//    case sticker // 스티커
+//    case text    // 텍스트
+//}
+//
+//class SubjectImage: Identifiable {
+//    var image: UIImage? // 모든 유형의 이미지
+//    var originalImage: UIImage?
+//    var type: ImageType // 이미지의 유형을 나타내는 enum
+//    var textStyle: TextStyle?
+//    var angle: Angle = .degrees(0)
+//    var offset: CGSize = .zero
+//    var scale: CGFloat = 1.0
+//    var originalText: String = ""
+//    
+//    var isTapped: Bool = true
+//    
+//    let id: UUID = UUID()
+//    
+//    init(image: UIImage?, originalImage: UIImage? = nil, type: ImageType, textStyle: TextStyle? = nil) {
+//        self.image = image
+//        self.originalImage = originalImage
+//        self.type = type
+//        self.textStyle = textStyle
+//    }
+//    
+//    func getTapState() -> Bool {
+//        return isTapped
+//    }
+//    
+//    func isTappedToggle() {
+//        isTapped.toggle()
+//    }
+//    
+//    func setScale(scale: CGFloat) {
+//        self.scale = scale
+//    }
+//    
+//    func setAngle(angle: Angle) {
+//        self.angle = angle
+//    }
+//    
+//    func setOffset(offset: CGSize) {
+//        self.offset = offset
+//    }
+//    
+//    func getOffset() -> CGSize {
+//        return offset
+//    }
+//    
+//    func getScale() -> CGFloat {
+//        return scale
+//    }
+//    
+//    func getAngle() -> Angle {
+//        return angle
+//    }
+//}

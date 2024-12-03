@@ -8,17 +8,21 @@
 import SwiftUI
 
 struct TextRenderView: View {
-    let text: String
-    let selectedFont: FontStyle
-    let selectedColor: Color
-    let selectedAlignment: TextAlignment
+    let style: TextStyle
     
     var body: some View {
-        Text(text)
-            .font(selectedFont.applyFont(size: 20))
-            .foregroundColor(selectedColor)
-            .multilineTextAlignment(selectedAlignment)
+        Text(style.rawText)
+            .font(style.font.applyFont(size: 20))
+            .foregroundColor(style.color)
+            .multilineTextAlignment(style.alignment)
             .lineSpacing(5)
-        
+            .padding(.vertical,3)
     }
+}
+
+struct TextStyle {
+    var rawText: String
+    var font: FontStyle
+    var color: Color
+    var alignment: TextAlignment
 }
