@@ -72,8 +72,8 @@ class DFEditViewModel: ObservableObject {
             }
         }
     }
-
-
+    
+    
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         
@@ -154,8 +154,8 @@ class DFEditViewModel: ObservableObject {
             }
         }
     }
-
-
+    
+    
     func removeBackground() {
         
         var mask: UIImage?

@@ -78,12 +78,12 @@ struct DFEditView: View {
             }
         }
         .alert(isPresented: $viewModel.isRenderFailed) {
-                   Alert(
-                       title: Text("오류 발생"),
-                       message: Text("렌더링에 실패했습니다. 다시 시도해주세요."),
-                       dismissButton: .default(Text("확인"))
-                   )
-               }
+            Alert(
+                title: Text("오류 발생"),
+                message: Text("이미지 렌더링에 실패했습니다. 다시 시도해주세요."),
+                dismissButton: .default(Text("확인"))
+            )
+        }
         .onAppear {
             showMaskImage()
         }
@@ -200,7 +200,7 @@ private extension DFEditView {
                     .scaleEffect(viewModel.magnifyScale)
                     .offset(viewModel.draggedOffSet)
                 
-
+                
                 canvas
                     .offset(y: -10)
                     .opacity(viewModel.showPreview ? 0 : 1)
@@ -338,15 +338,15 @@ private extension DFEditView {
                                 viewModel.isRenderFailed = true
                             }
                             
-//                            if naviManager.route.count > 1 {
-//                                naviManager.pop()
-//                            } else {
-//                                naviManager.push(screen: Screen.modifyFrame)
-//                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                naviManager.push(screen: Screen.modifyFrame)
-                            }
-//                            naviManager.push(screen: Screen.modifyFrame)
+                            //                            if naviManager.route.count > 1 {
+                            //                                naviManager.pop()
+                            //                            } else {
+                            //                                naviManager.push(screen: Screen.modifyFrame)
+                            //                            }
+                            
+                            naviManager.push(screen: Screen.modifyFrame)
+                            
+                            //                            naviManager.push(screen: Screen.modifyFrame)
                         }
                     } else {
                         print("Failed in createResult")
@@ -361,7 +361,7 @@ private extension DFEditView {
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
             .disabled(viewModel.clickedButton) // 버튼이 클릭된 동안 비활성화
-
+            
             .padding(1)
             
         }
