@@ -23,8 +23,12 @@ struct DFModifyView: View {
                 DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
                     .zIndex(1)
             }
-            
-            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+            Color.clear
+                .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
+                .onTapGesture {
+                    isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
+                }
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 VStack {
                     ZStack {
                         Image("checkBox")
@@ -96,7 +100,7 @@ struct DFModifyView: View {
         .ignoresSafeArea(.keyboard)
         .navigationBarBackButtonHidden()
         .toolbar {
-            if !viewModel.showTextView {
+            if !viewModel.showTextView && !frameManager.showTextModifyView {
                 toolBarButtons
             }
             
@@ -277,11 +281,7 @@ struct DFModifyView: View {
     var imageView: some View {
         
         ZStack {
-            Color.clear
-                .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
-                .onTapGesture {
-                    isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
-                }
+            
             
             ForEach(imageModel.imageList.indices, id: \.self) { index in
                 let subject = imageModel.imageList[index]
@@ -380,4 +380,3 @@ struct DFModifyView: View {
     
     
 }
-

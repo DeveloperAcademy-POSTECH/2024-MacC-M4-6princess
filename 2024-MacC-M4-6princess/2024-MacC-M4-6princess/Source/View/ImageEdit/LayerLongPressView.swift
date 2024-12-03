@@ -6,11 +6,10 @@
 //
 import SwiftUI
 import PhotosUI
-
 struct LayerLongPressView: View {
+    @EnvironmentObject var viewModel: LayerListViewModel
     
     @State private var showImagePicker: Bool = false
-    @State private var layerList: [LayerModel] = []
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
@@ -19,8 +18,8 @@ struct LayerLongPressView: View {
     var body: some View {
         ZStack {
             ZStack {
-                ForEach(layerList.indices, id: \.self) { index in
-                    let layer = layerList[index]
+                ForEach(viewModel.layerList.indices, id: \.self) { index in
+                    let layer = viewModel.layerList[index]
                     Image(uiImage: layer.image)
                         .resizable()
                         .scaledToFit()
@@ -59,25 +58,23 @@ struct LayerLongPressView: View {
                             MagnificationGesture()
                                 .onChanged { value in
                                     if !isLongPressed {
-                                        layerList[index].scale = value
+                                        viewModel.layerList[index].scale = value
                                     }
                                 }
-
                         )
                         .simultaneousGesture(
                             DragGesture()
-                            .onChanged{ value in
+                            .onChanged { value in
                                 if !isLongPressed {
-                                    layerList[index].position = value.location
+                                    viewModel.layerList[index].position = value.location
                                 }
-                                
                             }
                         )
                         .simultaneousGesture(
                             RotationGesture()
                                 .onChanged { value in
                                     if !isLongPressed {
-                                        layerList[index].rotation = value
+                                        viewModel.layerList[index].rotation = value
                                     }
                                 }
                         )
@@ -108,13 +105,13 @@ struct LayerLongPressView: View {
             .padding()
         }
         .sheet(isPresented: $showImagePicker) {
-            LayerPhotoPicker2(layerImages: $layerList, screenSize: UIScreen.main.bounds.size)
+            LayerPhotoPicker2(layerImages: $viewModel.layerList, screenSize: UIScreen.main.bounds.size)
         }
     }
     
     var layerIndicator: some View {
         VStack(spacing: 6) {
-            ForEach(layerList.indices.reversed(), id: \.self) { index in
+            ForEach(viewModel.layerList.indices.reversed(), id: \.self) { index in
                 if index == selectedLayerIndex {
                     VStack {
                         Spacer()
@@ -166,9 +163,9 @@ struct LayerLongPressView: View {
                 selectedLayerIndex = moveLayerForward(at: currentIndex, steps: abs(currentStep))
                 beforeDragOffsetY = dragOffsetY
             } else {
-                if currentStep + currentIndex > layerList.count {
-                    let diff = currentStep + currentIndex - layerList.count
-                    currentStep = layerList.count - currentIndex
+                if currentStep + currentIndex > viewModel.layerList.count {
+                    let diff = currentStep + currentIndex - viewModel.layerList.count
+                    currentStep = viewModel.layerList.count - currentIndex
                 }
                 selectedLayerIndex = moveLayerBackward(at: currentIndex, steps: abs(currentStep))
                 beforeDragOffsetY = dragOffsetY
@@ -186,8 +183,8 @@ struct LayerLongPressView: View {
         var currentIndex = index
         for _ in 0..<steps {
             guard currentIndex > 0 else { return 0 }
-            guard currentIndex < layerList.count else { return layerList.count - 1 }
-            layerList.swapAt(currentIndex, currentIndex - 1)
+            guard currentIndex < viewModel.layerList.count else { return viewModel.layerList.count - 1 }
+            viewModel.layerList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
         return currentIndex
@@ -197,9 +194,9 @@ struct LayerLongPressView: View {
         guard steps > 0 else { return index }
         var currentIndex = index
         for _ in 0..<steps {
-            guard currentIndex < layerList.count - 1 else { return layerList.count - 1 }
+            guard currentIndex < viewModel.layerList.count - 1 else { return viewModel.layerList.count - 1 }
             guard currentIndex >= 0 else { return 0 }
-            layerList.swapAt(currentIndex, currentIndex + 1)
+            viewModel.layerList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
         return currentIndex
@@ -215,3 +212,69 @@ struct LayerModel: Identifiable {
     var rotation: Angle = .zero
 }
 
+import SwiftUI
+
+class LayerListViewModel: ObservableObject {
+    @Published var layerList: [LayerModel] = []
+}
+//import SwiftUI
+//
+//enum ImageType {
+//    case regular // 일반 이미지
+//    case sticker // 스티커
+//    case text    // 텍스트
+//}
+//
+//class SubjectImage: Identifiable {
+//    var image: UIImage? // 모든 유형의 이미지
+//    var originalImage: UIImage?
+//    var type: ImageType // 이미지의 유형을 나타내는 enum
+//    var textStyle: TextStyle?
+//    var angle: Angle = .degrees(0)
+//    var offset: CGSize = .zero
+//    var scale: CGFloat = 1.0
+//    var originalText: String = ""
+//    
+//    var isTapped: Bool = true
+//    
+//    let id: UUID = UUID()
+//    
+//    init(image: UIImage?, originalImage: UIImage? = nil, type: ImageType, textStyle: TextStyle? = nil) {
+//        self.image = image
+//        self.originalImage = originalImage
+//        self.type = type
+//        self.textStyle = textStyle
+//    }
+//    
+//    func getTapState() -> Bool {
+//        return isTapped
+//    }
+//    
+//    func isTappedToggle() {
+//        isTapped.toggle()
+//    }
+//    
+//    func setScale(scale: CGFloat) {
+//        self.scale = scale
+//    }
+//    
+//    func setAngle(angle: Angle) {
+//        self.angle = angle
+//    }
+//    
+//    func setOffset(offset: CGSize) {
+//        self.offset = offset
+//    }
+//    
+//    func getOffset() -> CGSize {
+//        return offset
+//    }
+//    
+//    func getScale() -> CGFloat {
+//        return scale
+//    }
+//    
+//    func getAngle() -> Angle {
+//        return angle
+//    }
+//}
