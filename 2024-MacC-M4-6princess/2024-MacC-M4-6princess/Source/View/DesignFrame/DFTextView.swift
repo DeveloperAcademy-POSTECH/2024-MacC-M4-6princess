@@ -48,6 +48,7 @@ struct DFTextView: View {
                                     }
                                 }
                                 imageModel.imageList.append(newImage)
+                                viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
                             } else {
                                 //TODO: 에러 처리 해야함
                                 print("Image not found")

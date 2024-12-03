@@ -16,6 +16,7 @@ struct DFModifyView: View {
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
     @State var beforeDragOffsetY: CGFloat = .zero
+    
     var body: some View {
         ZStack {
             if isFirstLaunching == true && !showAgain == true {
@@ -23,7 +24,7 @@ struct DFModifyView: View {
                     .zIndex(1)
             }
             
-            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
                 VStack {
                     ZStack {
                         Image("checkBox")
@@ -31,6 +32,11 @@ struct DFModifyView: View {
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                         
                         imageView
+                            .onAppear {
+                                if let _ = imageModel.imageList.last!.image {
+                                    viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+                                }
+                            }
                         
                         RoundedRectangle(cornerRadius: 30)
                             .fill(Color.white)
@@ -39,6 +45,7 @@ struct DFModifyView: View {
                             .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                         
                     }
+                    .gesture(viewModel.backgroundGesture())
                     .onTapGesture {
                         viewModel.isTappedImage = false
                         imageModel.imageList.forEach {
