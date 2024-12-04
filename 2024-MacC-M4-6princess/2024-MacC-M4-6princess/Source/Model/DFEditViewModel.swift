@@ -28,7 +28,8 @@ class DFEditViewModel: ObservableObject {
     @Published var outputImage: UIImage?
     
     @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
-    
+    @Published var clickedButton = false
+    @Published var isRenderFailed = false
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
     
@@ -47,29 +48,30 @@ class DFEditViewModel: ObservableObject {
         return detectedSubjects
     }
     
-    func detectSubject(inputImage: UIImage?, completionHandler: @escaping () -> Void) {
-        
-        Task { @MainActor in
-            
-            do {
-                guard let inputImage = inputImage else { return }
-                detectedObjects = try await self.analyzeImage(inputImage)
-                print("탐지된 피사체: \(detectedObjects.count)")
-                for i in detectedObjects {
-                    interaction.highlightedSubjects.insert(i)
-                    try await generateImageForAllSelectedObjects()
-                }
-                
-            } catch {
-                print("none object detected")
-            }
-            
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            
-            completionHandler()
-        }
-    }
+    func detectSubject(inputImage: UIImage?, completionHandler: @escaping (Bool) -> Void) {
+          Task { @MainActor in
+              do {
+                  guard let inputImage = inputImage else {
+                      print("Input image is nil")
+                      completionHandler(false) // 실패
+                      return
+                  }
+                  
+                  detectedObjects = try await self.analyzeImage(inputImage)
+                  print("탐지된 피사체: \(detectedObjects.count)")
+                  
+                  for i in detectedObjects {
+                      interaction.highlightedSubjects.insert(i)
+                      try await generateImageForAllSelectedObjects()
+                  }
+                  
+                  completionHandler(true) // 성공
+              } catch {
+                  print("Failed to detect objects: \(error)")
+                  completionHandler(false) // 실패
+              }
+          }
+      }
     
     func setScaleValue(minimum: CGFloat, maximum: CGFloat) {
         
@@ -128,28 +130,27 @@ class DFEditViewModel: ObservableObject {
             deleteLines = true
         }
     }
-    func createResult(completionHandler: @escaping () -> Void) {
-        
-        var resultImage: UIImage?
-        
-        guard let inputImage = CIImage(image: inputImage ?? UIImage()) else {
-            print("Failed to create CIImage")
-            return
-        }
-        
-        Task { @MainActor in
-            
-            if let maskImage = maskImage {
-                
-                let outputImage = apply(mask: CIImage(image: maskImage)!, to: inputImage)
-                resultImage = convertToUIImage(ciImage: outputImage)
-                self.resultImage = resultImage
-            }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            completionHandler()
-        }
-    }
+    func createResult(completionHandler: @escaping (Bool) -> Void) {
+           var resultImage: UIImage?
+           
+           guard let inputImage = CIImage(image: inputImage ?? UIImage()) else {
+               print("Failed to create CIImage")
+               completionHandler(false) // 실패
+               return
+           }
+           
+           Task { @MainActor in
+               if let maskImage = maskImage {
+                   let outputImage = apply(mask: CIImage(image: maskImage)!, to: inputImage)
+                   resultImage = convertToUIImage(ciImage: outputImage)
+                   self.resultImage = resultImage
+                   completionHandler(true) // 성공
+               } else {
+                   print("Mask image is nil")
+                   completionHandler(false) // 실패
+               }
+           }
+       }
     
     func removeBackground() {
         
