@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var layerListViewModel = LayerListViewModel()
     @ObservedObject var imageModel = ImageListModel()
-    
+     
     var body: some View {
         
         CameraView().environmentObject(imageModel)
