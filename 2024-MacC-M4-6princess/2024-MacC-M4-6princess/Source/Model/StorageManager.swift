@@ -26,7 +26,7 @@ final class StorageManager {
            }
         let deviceName = UIDevice.current.name.replacingOccurrences(of: " ", with: "") // 공백을 "_"로 대체
         let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyyMMddHHmmssSSS" // 년월일시분초밀리초
+            dateFormatter.dateFormat = "yyyyMMdd_HHmmss_SSS" // 년월일시분초밀리초
             let timestamp = dateFormatter.string(from: Date())
            
 //           let path = "showcase2024/\(UUID().uuidString).jpeg"
