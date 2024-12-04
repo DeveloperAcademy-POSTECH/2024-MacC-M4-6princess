@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Photos
+import FirebaseCore
+import FirebaseStorage
 
 // 이미지 편집 메인 화면
 struct IOView: View {
@@ -43,6 +45,31 @@ struct IOView: View {
                         isSave = true
                     }
                     print("canvasView onAppear")
+                    Task {
+                        if let compositeImage = viewModel.compositeImage {
+                            do {
+                                let result = try await StorageManager.shared.uploadImage(image: compositeImage)
+                                print("Image uploaded successfully! Path: \(result.path), Name: \(result.name)")
+                            } catch {
+                                print("Image upload failed with error: \(error.localizedDescription)")
+                            }
+                        } else {
+                            print("No image to upload.")
+                        }
+                    }
+
+
+//                    if let compositeImage = viewModel.compositeImage{
+//                        let image = UIImage(named: "exampleImage")! // 테스트용 이미지
+//                           do {
+//                               let result = try await
+//                               print("Image uploaded successfully!")
+//                               print("Path: \(result.path), Name: \(result.name)")
+//                           } catch {
+//                               print("Image upload failed: \(error.localizedDescription)")
+//                           }
+//                    }
+                    
                 }
             
             VStack{
@@ -58,11 +85,25 @@ struct IOView: View {
                 }) {
                     Rectangle()
                         .foregroundColor(.clear)
-                        .frame(width: 335, height: 60)
+                        .frame(width:.infinity,height: 60)
                         .background(Color.pointPink)
                         .cornerRadius(10)
                         .overlay(
                             Text("카메라로 이동")
+                                .foregroundColor(.white)
+                                .font(.system(size: 18, weight: .bold))
+                        )
+                }
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Rectangle()
+                        .foregroundColor(.black)
+                        .frame(width:.infinity,height: 60)
+                        .background(Color.pointPink)
+                        .cornerRadius(10)
+                        .overlay(
+                            Text("QR 생성")
                                 .foregroundColor(.white)
                                 .font(.system(size: 18, weight: .bold))
                         )

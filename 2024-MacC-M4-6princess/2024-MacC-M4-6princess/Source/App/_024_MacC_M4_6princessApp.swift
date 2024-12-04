@@ -6,7 +6,17 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+
+    return true
+  }
+}
 @main
 struct _024_MacC_M4_6princessApp: App {
     @StateObject private var environmentModel = EnvironmentModel()
@@ -15,6 +25,7 @@ struct _024_MacC_M4_6princessApp: App {
     let persistenceController = PersistenceController.shared
     
     var body: some Scene {
+        @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext,

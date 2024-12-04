@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		218F75A92CFF6F5A0015A417 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 218F75A82CFF6F5A0015A417 /* FirebaseAnalytics */; };
+		218F75AB2CFF6F5A0015A417 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 218F75AA2CFF6F5A0015A417 /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		89A94AC02CA9B66300824592 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -42,6 +47,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				218F75A92CFF6F5A0015A417 /* FirebaseAnalytics in Frameworks */,
+				218F75AB2CFF6F5A0015A417 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +107,8 @@
 			);
 			name = "2024-MacC-M4-6princess";
 			packageProductDependencies = (
+				218F75A82CFF6F5A0015A417 /* FirebaseAnalytics */,
+				218F75AA2CFF6F5A0015A417 /* FirebaseStorage */,
 			);
 			productName = "2024-MacC-M4-6princess";
 			productReference = 89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */;
@@ -177,6 +186,9 @@
 			);
 			mainGroup = 89A94AA62CA9B64C00824592;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				218F75A72CFF6F5A0015A417 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 89A94AB02CA9B64C00824592 /* Products */;
 			projectDirPath = "";
@@ -582,6 +594,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		218F75A72CFF6F5A0015A417 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		218F75A82CFF6F5A0015A417 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 218F75A72CFF6F5A0015A417 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		218F75AA2CFF6F5A0015A417 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 218F75A72CFF6F5A0015A417 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 89A94AA72CA9B64C00824592 /* Project object */;
 }
