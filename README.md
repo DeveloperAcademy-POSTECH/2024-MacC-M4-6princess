@@ -2,7 +2,8 @@
 # :iphone: [Project/App Name]
 [Logo/Cover Image]
 
-[App statement]
+[App statement] 
+아이돌 팬이 갤러리에 저장된 최애의 사진을 업로드하면, 자동으로 배경이 제거된 사진을 배치하고 스티커, 텍스트로 프레임을 만듭니다. 최애와 함께하는 특별한 일상을 만들어주는 앱 입니다. 
 
 ## :fireworks: Screenshots
 
