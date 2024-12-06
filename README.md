@@ -30,5 +30,6 @@ ex) <img src="https://img.shields.io/badge/Swift-FA7343?style=flat&logo=Swift&lo
 
 
 ## :people_hugging: Authors
+<img width="711" alt="image" src="https://github.com/user-attachments/assets/91c1fc93-dced-4d54-a11d-eecfc5db7a85">
 
 @darongzzang, @piriram, @takemos, @skylar0817, @Super-BaeNana, @yejinkang1025
