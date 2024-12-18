@@ -24,13 +24,17 @@ struct DFModifyView: View {
                 DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
                     .zIndex(1)
             }
+            /// 이건 뭐에요?
             Color.clear
                 .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
                 .onTapGesture {
                     isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
                 }
+            
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                
                 VStack {
+                    /// 이미지 캔버스
                     ZStack {
                         Image("checkBox")
                             .resizable()
@@ -60,6 +64,7 @@ struct DFModifyView: View {
                         }
                     }
                     .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                    /// 하단 뷰(DFModifyBottomView로 수정 요청 예정)
                     DFImageDecoView(viewModel: viewModel)
                         .padding(.top, 58)
                 }
@@ -67,9 +72,11 @@ struct DFModifyView: View {
             else{
                 modifyIpad
             }
+            /// 이미지데코뷰에서 텍스트뷰를 클릭시 열림
             if viewModel.showTextView {
                 DFTextView(viewModel:viewModel)
             }
+            /// 텍스트를 수정할 때 열림
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
                 DFTextModifyView(
                     viewModel: viewModel,
@@ -106,6 +113,7 @@ struct DFModifyView: View {
             }
             
         }
+        /// @@ 저장버튼 눌렀을 때  코드로 대체 가능함,불필요한 onChange 함수 남발 자제 요청
         .onChange(of: viewModel.showCamera) { newValue in
             if newValue {
                 // 1초 후에 화면 전환
@@ -128,165 +136,12 @@ struct DFModifyView: View {
         }
     }
     
-    
-    // 레이어 순서 표시 뷰
-    var layerIndicator: some View {
-        VStack(spacing: 6) {
-            ForEach(imageModel.imageList.indices.reversed(), id: \.self) { index in
-                if index == selectedLayerIndex {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            RoundedRectangle(cornerRadius: 3)
-                                .frame(width: 24, height: 4)
-                                .foregroundColor(.white)
-                                .padding(.leading, 4)
-                            Spacer()
-                        }
-                        Spacer()
-                    }
-                    .frame(height: 6)
-                } else {
-                    HStack {
-                        Image("heart.union")
-                            .resizable()
-                            .frame(width: 8, height: 6)
-                        Spacer()
-                    }
-                }
-            }
-        }
-        .padding(6)
-        .frame(width: 40)
-        .background(Color.gray)
-        .cornerRadius(8)
-        .padding(.horizontal, 5)
-    }
-    
-    // 1초 길게 누르고 드래그 제스처를 생성하는 함수
-    func longPressAndDragGesture(for index: Int) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
-            .onEnded { _ in
-                isLongPressed = true // 길게 눌림 활성화
-                selectedLayerIndex = index
-                imageListUpdate()
-                
-                print("isLongPressed 눌림")
-            }
-            .simultaneously(with: DragGesture(minimumDistance: 0)
-                .onChanged { value in
-                    if isLongPressed { // 길게 누른 상태에서만 드래그 동작
-                        dragOnChanged(value: value, index: index)
-                    }
-                }
-                .onEnded { _ in
-                    dragOnEnded()
-                    beforeDragOffsetY = .zero
-                    isLongPressed = false
-                    imageListUpdate()
-                }
-            )
-    }
-    
-    func imageListUpdate() {
-        // 길게 누름 상태 초기화
-        if imageModel.imageList.count > 0 {
-            imageModel.imageList.append(imageModel.imageList[0])
-            imageModel.imageList.removeLast()
-        }
-    }
-    // 드래그 중 호출되는 함수
-    func dragOnChanged(value: DragGesture.Value, index: Int) {
-        if !isDragging {
-            selectedLayerIndex = index
-            isDragging = true
-        }
-        
-        let dragOffsetY = value.translation.height
-        // 차이
-        let diff = dragOffsetY - beforeDragOffsetY
-        /*
-         0 -> 50 (backward) => 50
-         0 -> -50 (forward) => -50
-         */
-        var currentStep = Int(diff / 50)
-        if diff < 0 && diff > -50 {
-            currentStep = 0
-        }
-        // 밑으로 내리면 -> backward (index 증가)
-        // 밑으로 내리면 dragOffsetY가 양수
-        // 위로 올리면 -> Forward (index 감소)
-        // 위로 올리면 dragOffsetY가 마이너스
-        
-        if let currentIndex = selectedLayerIndex,
-           currentStep != 0
-        //            currentStep != currentIndex
-        {
-            if diff > 0 {
-                if currentIndex - currentStep < 0{
-                    currentStep = currentIndex
-                }
-                /// 인덱스 감소
-                selectedLayerIndex = moveLayerForward(at: currentIndex, steps: abs(currentStep))
-                beforeDragOffsetY = dragOffsetY
-                imageModel.imageList.append(imageModel.imageList[0])
-                imageModel.imageList.removeLast()
-            } else {
-                if currentStep + currentIndex > imageModel.imageList.count{
-                    let diff = currentStep + currentIndex - imageModel.imageList.count
-                    currentStep = imageModel.imageList.count - currentIndex
-                }
-                /// 인덱스 증가
-                selectedLayerIndex = moveLayerBackward(at: currentIndex, steps: abs(currentStep))
-                beforeDragOffsetY = dragOffsetY
-                imageModel.imageList.append(imageModel.imageList[0])
-                imageModel.imageList.removeLast()
-            }
-        }
-    }
-    
-    // 드래그 종료 시 호출되는 함수
-    func dragOnEnded() {
-        isDragging = false
-        selectedLayerIndex = nil
-    }
-    
-    
-    // 레이어를 앞으로 이동
-    func moveLayerForward(at index: Int, steps: Int) -> Int{
-        guard steps > 0 else { return index}
-        var currentIndex = index
-        print("forward steps:\(steps)")
-        for _ in 0..<steps {
-            guard currentIndex > 0 else { return 0}
-            guard currentIndex < imageModel.imageList.count else { return imageModel.imageList.count - 1}
-            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
-            imageModel.imageList.swapAt(currentIndex, currentIndex - 1)
-            currentIndex -= 1
-        }
-        return currentIndex
-    }
-    
-    // 레이어를 뒤로 이동
-    func moveLayerBackward(at index: Int, steps: Int) -> Int{
-        guard steps > 0 else { return index}
-        var currentIndex = index
-        for _ in 0..<steps {
-            guard currentIndex < imageModel.imageList.count - 1 else { return imageModel.imageList.count-1}
-            guard currentIndex >= 0 else { return 0}
-            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
-            imageModel.imageList.swapAt(currentIndex, currentIndex + 1)
-            currentIndex += 1
-        }
-        return currentIndex
-    }
     var imageView: some View {
         
         ZStack {
-            
-            
             ForEach(imageModel.imageList.indices, id: \.self) { index in
                 let subject = imageModel.imageList[index]
+                
                 
                 if let image = subject.image, let realImage = subject.originalImage {
                     ZStack {
