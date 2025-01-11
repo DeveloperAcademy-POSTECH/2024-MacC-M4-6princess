@@ -29,8 +29,14 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     // 타이머 관련 상태
     @Published var delayTime: TimeInterval = 0.0
-    @Published var isPushedTimer = 0
     @Published var isTakePic = false
+    @Published var remainingTime: TimeInterval = 0
+    @Published var backgroundOpacity: Double = 0
+    @Published var opacity: Double = 1
+    @Published var showCountdown: Bool = true
+    
+    // 타이머 관련 상태 - iPad
+    @Published var isPushedTimer: Int = 0
     
     // 프레임 선택 관련 상태
     @Published var isShowAlert = false //프레임 없을 때 alert

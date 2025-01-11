@@ -9,15 +9,14 @@ import SwiftUI
 
 struct CameraTimerView: View {
     @StateObject var motionManager = MotionManager()
-    @Binding var delayTime: Double
-    @Binding var isPushed: Int
+    @ObservedObject var viewModel: CameraViewModel
     
     var body: some View {
         VStack(alignment: .center, spacing: 4)  {
             Button {
-                isPushed = (isPushed + 1) % 4
+                viewModel.isPushedTimer = (viewModel.isPushedTimer + 1) % 4
             } label: {
-                switch isPushed {
+                switch viewModel.isPushedTimer {
                 case 0:
                     Image("timerIcon")
                         .resizable()
@@ -25,7 +24,7 @@ struct CameraTimerView: View {
                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                         .onAppear {
-                            self.delayTime = 0
+                            viewModel.delayTime = 0
                             print("타이며 0초 설정됨")
                         }
                 case 1:
@@ -41,7 +40,7 @@ struct CameraTimerView: View {
                     .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     .onAppear {
-                        self.delayTime = 3
+                        viewModel.delayTime = 3
                         print("타이며 3초 설정됨")
                     }
                 case 2:
@@ -57,7 +56,7 @@ struct CameraTimerView: View {
                     .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     .onAppear {
-                        self.delayTime = 5
+                        viewModel.delayTime = 5
                         print("타이며 5초 설정됨")
                     }
                 case 3:
@@ -73,7 +72,7 @@ struct CameraTimerView: View {
                     .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     .onAppear {
-                        self.delayTime = 7
+                        viewModel.delayTime = 7
                         print("타이며 7초 설정됨")
                     }
                 default:

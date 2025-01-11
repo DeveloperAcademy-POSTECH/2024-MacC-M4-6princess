@@ -159,7 +159,7 @@ struct CameraView: View {
                     
                 }
                 if viewModel.delayTime != 0 && viewModel.isTakePic == true {
-                    CameraTimerSecondsView(delayTime: $viewModel.delayTime, isTakePic: $viewModel.isTakePic)
+                    CameraTimerSecondsView(viewModel: CameraViewModel())
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }
@@ -176,7 +176,6 @@ struct CameraView: View {
             }
             .fullScreenCover(isPresented: $frameManager.showMFView) {
                 MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
-//                    .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                     .environmentObject(naviManager)
