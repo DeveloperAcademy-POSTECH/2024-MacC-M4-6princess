@@ -12,16 +12,17 @@ struct DFModifyView: View {
     @EnvironmentObject var imageModel: ImageListModel
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
-    @State var showAgain: Bool = false
+
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
     @State var beforeDragOffsetY: CGFloat = .zero
     
     var body: some View {
+        
         ZStack {
-            if isFirstLaunching == true && !showAgain == true {
-                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $showAgain)
+            if isFirstLaunching == true && !viewModel.showAgain == true {
+                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
                     .zIndex(1)
             }
             Color.clear
@@ -29,6 +30,7 @@ struct DFModifyView: View {
                 .onTapGesture {
                     isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
                 }
+            
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 VStack {
                     ZStack {
@@ -280,10 +282,10 @@ struct DFModifyView: View {
         }
         return currentIndex
     }
+    
     var imageView: some View {
         
         ZStack {
-            
             
             ForEach(imageModel.imageList.indices, id: \.self) { index in
                 let subject = imageModel.imageList[index]
@@ -313,7 +315,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                             }
-                            .gesture(combinedGesture(subject: subject))
+//                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.sticker {
@@ -341,7 +343,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                             }
-                            .gesture(combinedGesture(subject: subject))
+//                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.text {
@@ -371,7 +373,7 @@ struct DFModifyView: View {
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                             }
-                            .gesture(combinedGesture(subject: subject))
+//                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }

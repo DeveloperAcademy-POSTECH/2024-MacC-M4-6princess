@@ -27,6 +27,10 @@ class DFEditViewModel: ObservableObject {
     
     @Published var outputImage: UIImage?
     
+    @Published var selectionModeIndex: Int = 3
+    @Published var lines: [Line] = []
+    @Published var thickness: Double = 10.0
+    
     @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
     @Published var clickedButton = false
     @Published var isRenderFailed = false
@@ -103,15 +107,98 @@ class DFEditViewModel: ObservableObject {
         return inputImage?.size.height ?? 0
     }
     
+    func showMaskImage(content: some View) {
+        
+        let render = ImageRenderer(content: content)
+        render.scale = 1
+        self.inputImage = render.uiImage
+        self.removeBackground()
+        if self.maskImageList.count == 0 && self.maskImage != nil {
+            self.maskImageList.append(self.maskImage)
+        }
+        
+    }
+    
+    func drawLines(startLocation: CGPoint, location: CGPoint) {
+        if lines.isEmpty  {
+            lines = [Line(color: .white, points: [startLocation], mode: Mode(rawValue: selectionModeIndex)!, lineWidth: thickness  / magnifyScale)]
+        } else {
+            var newLine = Line(color: .white, points: [], mode:  Mode(rawValue: selectionModeIndex)!, lineWidth: thickness  / magnifyScale)
+            if startLocation != lines[lines.count - 1].points.first {
+                newLine.points = [startLocation]
+                lines.append(newLine)
+                print("Start new point")
+            } else {
+                print("Change point event")
+                let changedValue = location
+                lines[lines.count - 1].points.append(changedValue)
+            }
+        }
+    }
+    
+    func toolSelect(_ selected: String) {
+        
+        if selectionModeIndex != 3 {
+            
+            if (selected == "brush" && selectionModeIndex == 0) || (selected == "erase" && selectionModeIndex == 1) {
+                selectionModeIndex = 3
+            } else if selected == "brush" && selectionModeIndex == 1 {
+                selectionModeIndex = 0
+            } else if selected == "erase" && selectionModeIndex == 0 {
+                selectionModeIndex = 1
+            }
+            
+        } else {
+            
+            if selected == "brush" {
+                selectionModeIndex = 0
+                
+            } else {
+                selectionModeIndex = 1
+            }
+        }
+    }
+    
+    func deleteAllLines() {
+        if deleteLines {
+            lines.removeAll()
+            deleteLines = false
+        }
+    }
+    
+    func updateLine(context: inout GraphicsContext) {
+        
+        for line in lines {
+            var path = Path()
+            path.addLines(line.points)
+            if line.mode == .draw {
+                context.blendMode = .normal
+                context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
+            } else {
+                context.blendMode = .clear
+                context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
+            }
+        }
+    }
+    
+//    func scaleCompute(_ image: UIImage) -> CGFloat {
+//        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+//        
+//        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
+//            scale = image.size.width / UIScreen.main.bounds.width
+//            print("\(scale)")
+//        }
+//        print("\(image.size.width)  \(image.size.height)")
+//        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
+//        return scale
+//    }
+    
     func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.height * 0.76)
+        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
         
         if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
             scale = image.size.width / UIScreen.main.bounds.width
-            print("\(scale)")
         }
-        print("\(image.size.width)  \(image.size.height)")
-        print("\(UIScreen.main.bounds.width) \(UIScreen.main.bounds.height)")
         return scale
     }
     
