@@ -11,6 +11,7 @@ import CoreData
 
 extension DFModifyView{
     func combinedGesture(subject: SubjectImage) -> some Gesture {
+        
         DragGesture()
             .onChanged { value in
                 if !isLongPressed{
