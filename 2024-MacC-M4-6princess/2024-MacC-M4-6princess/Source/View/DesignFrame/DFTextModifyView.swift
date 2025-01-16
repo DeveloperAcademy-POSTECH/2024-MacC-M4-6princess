@@ -267,6 +267,8 @@ extension DFTextModifyView{
         }
     }
     
+    //TODO: 함수명 바꾸기
+    /// 이미지명을 내어주는 함수
     func imageForAlignment(_ alignment: TextAlignment) -> String {
         switch alignment {
             case .leading:
@@ -278,6 +280,8 @@ extension DFTextModifyView{
                 
         }
     }
+    
+    
     func toggleTextAlignment() {
         switch style.alignment {
             case .leading:

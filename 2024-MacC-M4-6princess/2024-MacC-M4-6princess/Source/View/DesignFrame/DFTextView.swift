@@ -36,7 +36,10 @@ struct DFTextView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("완료") {
-                            renderTextImage(text: viewModel.txt)
+                            //TODO: 함수로 만들기
+                            // viewModel.rederedImage에 텍스트 이미지 저장
+                            viewModel.renderTextImage(text: viewModel.txt)
+                            
                             let newImage = SubjectImage()
                             if let image = viewModel.renderedImage {
                                 newImage.text = image
@@ -54,6 +57,7 @@ struct DFTextView: View {
                                 //TODO: 에러 처리 해야함
                                 print("Image not found")
                             }
+                            
                             modiViewModel.showTextView = false
                         }
                     }

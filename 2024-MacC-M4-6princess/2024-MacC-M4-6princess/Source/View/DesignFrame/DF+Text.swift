@@ -9,10 +9,7 @@ import Foundation
 import SwiftUI
 
 extension DFTextView{
-    // 정렬 방향 정의
-    enum SwipeDirection {
-        case left, right
-    }
+   
     
     var swipeAlignmentGesture: some Gesture {
         DragGesture()
@@ -20,11 +17,11 @@ extension DFTextView{
                 // 스와이프 감지
                 if value.translation.width < 0 { // 왼쪽 스와이프
                     withAnimation {
-                        viewModel.textAlignment = computeNextAlignment(for: viewModel.textAlignment, direction: .left)
+                        viewModel.textAlignment = viewModel.computeNextAlignment(for: viewModel.textAlignment, direction: .left)
                     }
                 } else if value.translation.width > 0 { // 오른쪽 스와이프
                     withAnimation {
-                        viewModel.textAlignment = computeNextAlignment(for: viewModel.textAlignment, direction: .right)
+                        viewModel.textAlignment = viewModel.computeNextAlignment(for: viewModel.textAlignment, direction: .right)
                     }
                 }
             }
@@ -124,7 +121,7 @@ extension DFTextView{
                 .frame(width: 105, height: 30)
                 
                 Group {
-                    Image(imageForAlignment(viewModel.textAlignment))
+                    Image(viewModel.imageForAlignment(viewModel.textAlignment))
                         .resizable()
                         .scaledToFit()
                         .frame(width: 105, height: 30)
@@ -134,7 +131,7 @@ extension DFTextView{
                         )
                         .onTapGesture {
                             viewModel.tab = 2
-                            toggleTextAlignment() // 텍스트 정렬 변경 함수 호출
+                            viewModel.toggleTextAlignment() // 텍스트 정렬 변경 함수 호출
                         }
                 }
                 .frame(width: 105, height: 30)

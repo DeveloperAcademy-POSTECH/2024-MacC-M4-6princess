@@ -19,26 +19,12 @@ class DFTextViewModel: ObservableObject {
     @Published var colorNum = 0
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
-}
-//MARK: ViewModel 만드는 대신 extension으로 함수만 따로 뺌
-extension DFTextView{
-    @MainActor
-    func renderTextImage(text: String){
-        let renderer = ImageRenderer(
-            content: TextRenderView(
-                style: TextStyle(rawText: text, font: viewModel.selectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
-            )
-        )
-        renderer.scale = 10
-        if let uiImage = renderer.uiImage {
-            viewModel.renderedImage = uiImage
-            
-        }
-        else{
-            print("render 실패")
-        }
+    
+    // 정렬 방향 정의
+    enum SwipeDirection {
+        case left, right
     }
-    // 정렬 상태 변경 함수
+    // 정렬 상태 변경 함수 -> swift했을 때만
     func computeNextAlignment(for current: TextAlignment, direction: SwipeDirection) -> TextAlignment {
         switch (current, direction) {
             case (.center, .left): return .leading
@@ -51,6 +37,7 @@ extension DFTextView{
         }
     }
     
+    /// 정렬 이미지명을 String으로 출력
     func imageForAlignment(_ alignment: TextAlignment) -> String {
         switch alignment {
         case .leading:
@@ -62,17 +49,46 @@ extension DFTextView{
 
         }
     }
+    
+    //TODO: 함수명 바꾸기
+    /// 누를 때마다 정렬이 바뀜
     func toggleTextAlignment() {
-        switch viewModel.textAlignment {
+        switch textAlignment {
         case .leading:
-                viewModel.textAlignment = .center
+                textAlignment = .center
         case .center:
-                viewModel.textAlignment = .trailing
+                textAlignment = .trailing
         case .trailing:
-                viewModel.textAlignment = .leading
+                textAlignment = .leading
       
         }
     }
+    
+    @MainActor
+    func renderTextImage(text: String){
+        let tmp = ImageRenderer(
+            content: TextRenderView(
+                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
+            )
+        )
+        //TODO: scale 계산 부분 넣기
+        tmp.scale = 10
+        if let uiImage = tmp.uiImage {
+            renderedImage = uiImage
+        }
+        else{
+            print("text render 실패")
+        }
+    }
+    
+}
+//MARK: ViewModel 만드는 대신 extension으로 함수만 따로 뺌
+extension DFTextView{
+    
+    
+    
+    
+    
 }
 
 
