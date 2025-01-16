@@ -8,18 +8,30 @@
 import Foundation
 import SwiftUI
 import PhotosUI
+class DFTextViewModel: ObservableObject {
+    @Published var txt = ""
+    @Published var selectedFont: FontStyle = .modern
+    @Published var fontSize: Double = 20
+    @Published var fontColor: Color = ColorPreset.colorPallete[0]
+    @Published var renderedImage: UIImage?
+    @Published var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
+    @Published var tab = 0
+    @Published var colorNum = 0
+    @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
+    let colorChip: [Color] = ColorPreset.colorPallete
+}
 //MARK: ViewModel 만드는 대신 extension으로 함수만 따로 뺌
 extension DFTextView{
     @MainActor
     func renderTextImage(text: String){
         let renderer = ImageRenderer(
             content: TextRenderView(
-                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
+                style: TextStyle(rawText: text, font: viewModel.selectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
             )
         )
         renderer.scale = 10
         if let uiImage = renderer.uiImage {
-            renderedImage = uiImage
+            viewModel.renderedImage = uiImage
             
         }
         else{
@@ -51,13 +63,13 @@ extension DFTextView{
         }
     }
     func toggleTextAlignment() {
-        switch textAlignment {
+        switch viewModel.textAlignment {
         case .leading:
-            textAlignment = .center
+                viewModel.textAlignment = .center
         case .center:
-            textAlignment = .trailing
+                viewModel.textAlignment = .trailing
         case .trailing:
-            textAlignment = .leading
+                viewModel.textAlignment = .leading
       
         }
     }

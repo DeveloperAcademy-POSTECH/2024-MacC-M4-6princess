@@ -70,7 +70,7 @@ struct DFModifyView: View {
                 modifyIpad
             }
             if viewModel.showTextView {
-                DFTextView(viewModel:viewModel)
+                DFTextView(modiViewModel:viewModel)
             }
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
                 DFTextModifyView(

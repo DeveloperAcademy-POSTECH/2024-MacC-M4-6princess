@@ -9,15 +9,18 @@ import SwiftUI
 struct DFTextModifyView: View {
     @ObservedObject var viewModel: DFModifyViewModel
     @Binding var style: TextStyle
+    
     @State var renderedImage: UIImage?
-    @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
+    
     @State var tab = 0
     @State var colorNum = 0
+    @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
+    
     let colorChip: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var frameManager: FrameManager
-    @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
+    @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
     
     var body: some View {
         VStack {

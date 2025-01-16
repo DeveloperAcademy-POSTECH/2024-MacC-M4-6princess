@@ -6,6 +6,8 @@
 //
 import SwiftUI
 import FirebaseAnalytics
+/// 코드가 복잡하지 않아서 viewModel 사용안함
+
 
 struct DFStickerView: View {
     @StateObject var viewModel:DFModifyViewModel
