@@ -3,20 +3,9 @@ import SwiftUI
 struct DFTextView: View {
     @ObservedObject var modiViewModel: DFModifyViewModel
     @ObservedObject var viewModel = DFTextViewModel()
-//    @State var txt = ""
-//    @State var selectedFont: FontStyle = .modern
-//    @State var fontSize: Double = 20
-//    @State var fontColor: Color = ColorPreset.colorPallete[0]
-//    @State var renderedImage: UIImage?
     @FocusState var isKeyboardVisible: Bool // 키보드 상태 관리
-//    @State var tab = 0
-//    @State var colorNum = 0
-//    @State var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
-    
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
-    
-//    @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     
     var body: some View {
         VStack {
@@ -29,7 +18,6 @@ struct DFTextView: View {
                 .font(viewModel.selectedFont.applyFont(size: viewModel.fontSize))
                 .lineSpacing(5)
                 .frame(height:UIScreen.main.bounds.height/4)
-            //isKeyboardVisible
                 .background(Color.clear) // 배경을 투명하게 설정
                 .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
                 .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)

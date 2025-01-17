@@ -64,6 +64,7 @@ class DFTextViewModel: ObservableObject {
         }
     }
     
+    /// DFTextView에서 사용
     @MainActor
     func renderTextImage(text: String){
         let tmp = ImageRenderer(
@@ -78,6 +79,24 @@ class DFTextViewModel: ObservableObject {
         }
         else{
             print("text render 실패")
+        }
+    }
+    
+    /// DFTextModifyView에서 사용
+    @MainActor
+    func renderTextImage(text: String, style: TextStyle){
+        let renderer = ImageRenderer(
+            content: TextRenderView(
+                style: style
+            )
+        )
+        renderer.scale = 10
+        if let uiImage = renderer.uiImage {
+            renderedImage = uiImage
+            
+        }
+        else{
+            print("render 실패")
         }
     }
     

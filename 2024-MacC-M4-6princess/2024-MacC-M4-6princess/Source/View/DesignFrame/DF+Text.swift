@@ -145,3 +145,140 @@ extension DFTextView{
         
     }
 }
+extension DFTextModifyView{
+   
+    
+    var swipeAlignmentGesture: some Gesture {
+        DragGesture()
+            .onEnded { value in
+                // 스와이프 감지
+                if value.translation.width < 0 { // 왼쪽 스와이프
+                    withAnimation {
+                        style.alignment = viewModel.computeNextAlignment(for: style.alignment, direction: .left)
+                    }
+                } else if value.translation.width > 0 { // 오른쪽 스와이프
+                    withAnimation {
+                        style.alignment = viewModel.computeNextAlignment(for: style.alignment, direction: .right)
+                    }
+                }
+            }
+    }
+    var fontSelector: some View {
+        // 폰트 선택 ScrollView
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
+                    Text(fontStyle.displayName) // 한글 이름 표시
+                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
+                        .padding(.horizontal,15)
+                        .padding(.vertical,6)
+                        .foregroundColor(style.font == fontStyle ? Color.black : Color.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(style.font == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+                                )
+                        )
+                        .onTapGesture {
+                            style.font = fontStyle
+                        }
+                }
+            }
+            .padding(.horizontal,5)
+            
+        }
+        .frame(width: 335)
+        //        .padding(.horizontal)
+    }
+    var colorSelector: some View {
+        // fontColor 선택
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(0..<viewModel.colorChip.count, id: \.self) { colorIndex in
+                    Circle()
+                        .frame(width: viewModel.colorNum == colorIndex ? 40 : 30)
+                        .foregroundColor(viewModel.colorChip[colorIndex])
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
+                        )
+                        .onTapGesture {
+                            style.color = viewModel.colorChip[colorIndex]
+                            withAnimation(.easeInOut(duration: 0.36)) {
+                                viewModel.colorNum = colorIndex
+                            }
+                        }
+                }
+            }
+            .padding(5)
+        }
+        .frame(width: 335)
+        //        .padding(.horizontal,20)
+        //        .padding(.vertical,20)
+    }
+    var textTabBar: some View {
+        ZStack {
+            Rectangle()
+                .foregroundColor(.clear)
+                .frame(width: 335, height: 40)
+                .background(.white)
+                .cornerRadius(10)
+                .opacity(0.5)
+            
+            HStack(spacing: 0) {
+                Text("Aa")
+                    .font(.system(size: 16))
+                    .foregroundColor(.black)
+                    .frame(width: 105, height: 30)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(viewModel.tab == 0 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                    )
+                    .onTapGesture {
+                        viewModel.tab = 0
+                    }
+                    .frame(width: 105, height: 30)
+                
+                Group {
+                    Image("df.colorChip")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(3)
+                        .frame(width: 105, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(viewModel.tab == 1 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                        )
+                        .onTapGesture {
+                            viewModel.tab = 1
+                        }
+                }
+                .frame(width: 105, height: 30)
+                
+                Group {
+                    Image(viewModel.imageForAlignment(style.alignment))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 105, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(viewModel.tab == 2 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                        )
+                        .onTapGesture {
+                            viewModel.tab = 2
+                            viewModel.toggleTextAlignment() // 텍스트 정렬 변경 함수 호출
+                        }
+                }
+                .frame(width: 105, height: 30)
+                
+            }
+            .padding()
+        }
+        //        .padding(.horizontal,15)
+        .frame(height: 40)
+        .frame(maxWidth:.infinity)
+        
+    }
+}
