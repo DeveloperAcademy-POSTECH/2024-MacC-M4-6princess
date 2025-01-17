@@ -58,22 +58,22 @@ struct IOView: View {
                     .padding()
                 HStack(spacing: 16) {
                     
-                    Button(action: {
-                        showQRSheet = true
-                    }) {
-                        RoundedRectangle(cornerRadius: 10) // RoundedRectangle을 사용
-                            .stroke(Color.pointPink, lineWidth: 1) // 테두리 추가
-                            .background(
-                                RoundedRectangle(cornerRadius: 10) // 동일한 모서리 반경의 배경
-                                    .foregroundColor(.white)
-                            )
-                            .frame(height: 60) // 높이 설정
-                            .overlay(
-                                Text("QR 보기")
-                                    .foregroundColor(.pointPink)
-                                    .font(.system(size: 18, weight: .bold))
-                            )
-                    }
+//                    Button(action: {
+//                        showQRSheet = true
+//                    }) {
+//                        RoundedRectangle(cornerRadius: 10) // RoundedRectangle을 사용
+//                            .stroke(Color.pointPink, lineWidth: 1) // 테두리 추가
+//                            .background(
+//                                RoundedRectangle(cornerRadius: 10) // 동일한 모서리 반경의 배경
+//                                    .foregroundColor(.white)
+//                            )
+//                            .frame(height: 60) // 높이 설정
+//                            .overlay(
+//                                Text("QR 보기")
+//                                    .foregroundColor(.pointPink)
+//                                    .font(.system(size: 18, weight: .bold))
+//                            )
+//                    }
 
                     // 카메라로 이동 버튼
                     Button(action: {
@@ -106,10 +106,10 @@ struct IOView: View {
             
             print("body onAppear")
         }
-        .onDisappear {
-            // QR 보기를 안눌렀으면 파이어베이스에서 사진 삭제
-                   deleteUploadedImageIfNeeded()
-               }
+//        .onDisappear {
+//            // QR 보기를 안눌렀으면 파이어베이스에서 사진 삭제
+//                   deleteUploadedImageIfNeeded()
+//               }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
