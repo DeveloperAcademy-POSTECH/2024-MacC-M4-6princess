@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct DFTextModifyView: View {
-    @ObservedObject var viewModel: DFModifyViewModel
+    @ObservedObject var modiViewModel: DFModifyViewModel
     @Binding var style: TextStyle
     
     @State var renderedImage: UIImage?
