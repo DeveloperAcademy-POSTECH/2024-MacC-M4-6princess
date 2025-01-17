@@ -9,14 +9,15 @@ import SwiftUI
 struct DFTextModifyView: View {
     @ObservedObject var modiViewModel: DFModifyViewModel
     @Binding var style: TextStyle
+    @StateObject var viewModel = DFTextViewModel()
     
     @State var renderedImage: UIImage?
     
-    @State var tab = 0
-    @State var colorNum = 0
-    @State var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
+//    @State var viewModel.tab = 0
+//    @State var viewModel.colorNum = 0
+//    @State var viewModel.keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     
-    let colorChip: [Color] = ColorPreset.colorPallete
+//    let colorChip: [Color] = ColorPreset.colorPallete
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var frameManager: FrameManager
@@ -36,7 +37,7 @@ struct DFTextModifyView: View {
             //isKeyboardVisible
                 .background(Color.clear) // 배경을 투명하게 설정
                 .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
-                .gesture(tab == 2 ? swipeAlignmentGesture : nil)
+                .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("완료") {
@@ -72,19 +73,19 @@ struct DFTextModifyView: View {
                     isKeyboardVisible.toggle()
                 }
             
-            if tab == 0 {
+            if viewModel.tab == 0 {
                 fontSelector
                 
-            } else if tab == 1 {
+            } else if viewModel.tab == 1 {
                 colorSelector
             }
             
             textTabBar
             Spacer()
-                .frame(height: keyboardHeight)
+                .frame(height: viewModel.keyboardHeight)
         }
         .animation(.easeOut(duration: 0.3))
-        .keyboardHeight($keyboardHeight)
+        .keyboardHeight($viewModel.keyboardHeight)
         .background(
             Color.black.opacity(0.5) // 반투명 검정색
         )
@@ -151,18 +152,18 @@ extension DFTextModifyView{
         // fontColor 선택
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(0..<colorChip.count, id: \.self) { colorIndex in
+                ForEach(0..<viewModel.colorChip.count, id: \.self) { colorIndex in
                     Circle()
-                        .frame(width: colorNum == colorIndex ? 40 : 30)
-                        .foregroundColor(colorChip[colorIndex])
+                        .frame(width: viewModel.colorNum == colorIndex ? 40 : 30)
+                        .foregroundColor(viewModel.colorChip[colorIndex])
                         .overlay(
                             Circle()
                                 .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
                         )
                         .onTapGesture {
-                            style.color = colorChip[colorIndex]
+                            style.color = viewModel.colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
-                                colorNum = colorIndex
+                                viewModel.colorNum = colorIndex
                             }
                         }
                 }
@@ -189,10 +190,10 @@ extension DFTextModifyView{
                     .frame(width: 105, height: 30)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(tab == 0 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                            .fill(viewModel.tab == 0 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
                     )
                     .onTapGesture {
-                        tab = 0
+                        viewModel.tab = 0
                     }
                     .frame(width: 105, height: 30)
                 
@@ -204,10 +205,10 @@ extension DFTextModifyView{
                         .frame(width: 105, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(tab == 1 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                                .fill(viewModel.tab == 1 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
                         )
                         .onTapGesture {
-                            tab = 1
+                            viewModel.tab = 1
                         }
                 }
                 .frame(width: 105, height: 30)
@@ -219,10 +220,10 @@ extension DFTextModifyView{
                         .frame(width: 105, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(tab == 2 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                                .fill(viewModel.tab == 2 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
                         )
                         .onTapGesture {
-                            tab = 2
+                            viewModel.tab = 2
                             toggleTextAlignment() // 텍스트 정렬 변경 함수 호출
                         }
                 }
