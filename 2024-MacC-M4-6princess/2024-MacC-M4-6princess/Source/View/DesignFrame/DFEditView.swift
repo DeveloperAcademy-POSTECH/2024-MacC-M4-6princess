@@ -8,9 +8,6 @@ struct DFEditView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var imageModel: ImageListModel
     @ObservedObject var viewModel: DFEditViewModel = DFEditViewModel()
-    @State private var selectionModeIndex: Int = 3
-    @State private var lines: [Line] = []
-    @State private var thickness: Double = 10.0
     //    @Binding var pickedImage: UIImage?
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
@@ -26,7 +23,7 @@ struct DFEditView: View {
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 4/3))
                     
                     if let image = viewModel.resultImage {
-                        let scale = scaleCompute(image)
+                        let scale = viewModel.scaleCompute(image)
                         
                         Image(uiImage: image)
                             .resizable()
@@ -41,7 +38,7 @@ struct DFEditView: View {
                     Circle()
                         .stroke(.white)
                         .opacity(viewModel.isShowThick ? 1 : 0)
-                        .frame(width: thickness, height: thickness)
+                        .frame(width: viewModel.thickness , height: viewModel.thickness )
                     
                     VStack {
                         Spacer()
@@ -91,7 +88,7 @@ struct DFEditView: View {
             )
         }
         .onAppear {
-            showMaskImage()
+            viewModel.showMaskImage(content: pickedImageRender)
             Analytics.logEvent("A4_누끼따기", parameters: nil)
         }
         .onDisappear{ // ✅
@@ -112,29 +109,6 @@ struct DFEditView: View {
 
 
 ///
-private extension DFEditView {
-    
-    enum Mode {
-        case draw
-        case eraser
-        
-        init?(rawValue: Int) {
-            switch rawValue {
-                case 0: self = .draw
-                case 1: self = .eraser
-                default: return nil
-            }
-        }
-    }
-    
-    struct Line {
-        var color: Color
-        var points: [CGPoint]
-        var mode: Mode
-        var lineWidth: Double = 10.0
-    }
-    
-}
 
 ///
 private extension DFEditView {
@@ -143,15 +117,15 @@ private extension DFEditView {
         
         DragGesture()
             .onChanged{ dragValue in
-                if selectionModeIndex == 0 || selectionModeIndex == 1 {
-                    drawLines(startLocation: dragValue.startLocation, location: dragValue.location)
+                if viewModel.selectionModeIndex == 0 || viewModel.selectionModeIndex == 1 {
+                    viewModel.drawLines(startLocation: dragValue.startLocation, location: dragValue.location)
                     print("\(dragValue.startLocation)")
                     
                 }
             }
             .onEnded{ dragValue in
                 
-                if selectionModeIndex == 0 || selectionModeIndex == 1 {
+                if viewModel.selectionModeIndex == 0 || viewModel.selectionModeIndex == 1 {
                     makeHistory()
                 }
             }
@@ -161,7 +135,7 @@ private extension DFEditView {
         
         DragGesture()
             .onChanged { value in
-                if selectionModeIndex == 3 && viewModel.magnifyScale > 1.0 {
+                if viewModel.selectionModeIndex == 3 && viewModel.magnifyScale > 1.0 {
                     
                     viewModel.draggedOffSet.width = viewModel.accumulatedOffSet.width + value.translation.width
                     viewModel.draggedOffSet.height = viewModel.accumulatedOffSet.height + value.translation.height
@@ -170,7 +144,7 @@ private extension DFEditView {
             }
             .onEnded { value in
                 
-                if selectionModeIndex == 3 && viewModel.magnifyScale > 1.0 {
+                if viewModel.selectionModeIndex == 3 && viewModel.magnifyScale > 1.0 {
                     
                     viewModel.accumulatedOffSet.width += value.translation.width
                     viewModel.accumulatedOffSet.height += value.translation.height
@@ -199,7 +173,7 @@ private extension DFEditView {
             
             if let image = viewModel.inputImage {
                 
-                let scale = scaleCompute(image)
+                let scale = viewModel.scaleCompute(image)
                 
                 Image(uiImage: image)
                     .resizable()
@@ -223,18 +197,19 @@ private extension DFEditView {
     }
     
     var thicknessControl: some View {
+        
         ZStack {
             Rectangle()
                 .fill(Color.black.opacity(0.5))
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 20)
             Slider(
-                value: $thickness,
+                value: $viewModel.thickness ,
                 in: 0...50,
                 step: 1
             ) {
                 Text("Title")
             } minimumValueLabel: {
-                Text("\(Int(thickness))")
+                Text("\(Int(viewModel.thickness ))")
                     .foregroundStyle(.white)
             } maximumValueLabel: {
                 Text("")
@@ -259,20 +234,10 @@ private extension DFEditView {
                 context.draw(Image(uiImage: image).resizable(), in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             }
             
-            for line in lines {
-                var path = Path()
-                path.addLines(line.points)
-                if line.mode == .draw {
-                    context.blendMode = .normal
-                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
-                } else {
-                    context.blendMode = .clear
-                    context.stroke(path, with: .color(line.color), style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
-                }
-            }
+            viewModel.updateLine(context: &context)
         }
         .onChange(of: viewModel.maskImage) {
-            deleteAllLines()
+            viewModel.deleteAllLines()
         }
         .colorMultiply(viewModel.maskColor)
         .opacity(viewModel.opacity)
@@ -349,15 +314,8 @@ private extension DFEditView {
                                 viewModel.isRenderFailed = true
                             }
                             
-                            //                            if naviManager.route.count > 1 {
-                            //                                naviManager.pop()
-                            //                            } else {
-                            //                                naviManager.push(screen: Screen.modifyFrame)
-                            //                            }
                             
                             naviManager.push(screen: Screen.modifyFrame)
-                            
-                            //                            naviManager.push(screen: Screen.modifyFrame)
                         }
                     } else {
                         print("Failed in createResult")
@@ -383,7 +341,7 @@ private extension DFEditView {
         
         HStack(spacing: UIScreen.main.bounds.width / 2.4) {
             Button {
-                toolSelect("brush")
+                viewModel.toolSelect("brush")
             } label: {
                 ZStack {
                     Circle()
@@ -391,16 +349,16 @@ private extension DFEditView {
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                     Image("brush")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                        .colorMultiply(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                        .colorMultiply(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                     Text("브러쉬")
-                        .foregroundStyle(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                        .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
                 }
             }
             
             Button {
-                toolSelect("erase")
+                viewModel.toolSelect("erase")
                 
             } label: {
                 ZStack {
@@ -409,9 +367,9 @@ private extension DFEditView {
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                     Image("erase")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                        .colorMultiply(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                        .colorMultiply(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                     Text("지우개")
-                        .foregroundStyle(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                        .foregroundStyle(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
                 }
@@ -424,7 +382,7 @@ private extension DFEditView {
         
         HStack(spacing: UIScreen.main.bounds.width / 2.4) {
             Button {
-                toolSelect("brush")
+                viewModel.toolSelect("brush")
             } label: {
                 ZStack {
                     Circle()
@@ -432,16 +390,16 @@ private extension DFEditView {
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                     Image("brush")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                        .colorMultiply(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                        .colorMultiply(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                     Text("브러쉬")
-                        .foregroundStyle(selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                        .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
                 }
             }
             
             Button {
-                toolSelect("erase")
+                viewModel.toolSelect("erase")
                 
             } label: {
                 ZStack {
@@ -450,9 +408,9 @@ private extension DFEditView {
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                     Image("erase")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                        .colorMultiply(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                        .colorMultiply(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                     Text("지우개")
-                        .foregroundStyle(selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                        .foregroundStyle(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
                 }
@@ -465,26 +423,6 @@ private extension DFEditView {
 
 private extension DFEditView {
     
-    private func showMaskImage() {
-        
-        let render = ImageRenderer(content: pickedImageRender)
-        render.scale = 1
-        viewModel.inputImage = render.uiImage
-        viewModel.removeBackground()
-        if viewModel.maskImageList.count == 0 && viewModel.maskImage != nil {
-            viewModel.maskImageList.append(viewModel.maskImage)
-        }
-        
-    }
-    
-    private func scaleCompute(_ image: UIImage) -> CGFloat {
-        var scale: CGFloat = image.size.height / (UIScreen.main.bounds.width * 4/3)
-        
-        if image.size.width / scale > UIScreen.main.bounds.width || image.size.width >= image.size.height {
-            scale = image.size.width / UIScreen.main.bounds.width
-        }
-        return scale
-    }
     
     private func makeHistory() {
         
@@ -494,64 +432,17 @@ private extension DFEditView {
         
         viewModel.opacity = 1
         viewModel.maskColor = .white
-        let render = ImageRenderer(content: self.canvas.frame(width: viewModel.getWidth() / scaleCompute(viewModel.inputImage!), height: viewModel.getHeight() / scaleCompute(viewModel.inputImage!)))
-        render.scale = scaleCompute(viewModel.inputImage!)
+        let render = ImageRenderer(content: self.canvas.frame(width: viewModel.getWidth() / viewModel.scaleCompute(viewModel.inputImage!), height: viewModel.getHeight() / viewModel.scaleCompute(viewModel.inputImage!)))
+        render.scale = viewModel.scaleCompute(viewModel.inputImage!)
         
         viewModel.appendMaskImage(render.uiImage)
     }
-    
-    private func drawLines(startLocation: CGPoint, location: CGPoint) {
-        if lines.isEmpty  {
-            lines = [Line(color: .white, points: [startLocation], mode: Mode(rawValue: selectionModeIndex)!, lineWidth: thickness / viewModel.magnifyScale)]
-        } else {
-            var newLine = Line(color: .white, points: [], mode:  Mode(rawValue: selectionModeIndex)!, lineWidth: thickness / viewModel.magnifyScale)
-            if startLocation != lines[lines.count - 1].points.first {
-                newLine.points = [startLocation]
-                lines.append(newLine)
-                print("Start new point")
-            } else {
-                print("Change point event")
-                let changedValue = location
-                lines[lines.count - 1].points.append(changedValue)
-            }
-        }
-    }
-    
+        
     private func thumbImageCustom() {
         let render = ImageRenderer(content: Circle().frame(width: 16, height: 16).foregroundStyle(.white))
         render.scale = UIScreen.main.scale
         let thumbImage = render.uiImage
         UISlider.appearance().setThumbImage(thumbImage, for: .normal)
-    }
-    
-    private func toolSelect(_ selected: String) {
-        
-        if selectionModeIndex != 3 {
-            
-            if (selected == "brush" && selectionModeIndex == 0) || (selected == "erase" && selectionModeIndex == 1) {
-                selectionModeIndex = 3
-            } else if selected == "brush" && selectionModeIndex == 1 {
-                selectionModeIndex = 0
-            } else if selected == "erase" && selectionModeIndex == 0 {
-                selectionModeIndex = 1
-            }
-            
-        } else {
-            
-            if selected == "brush" {
-                selectionModeIndex = 0
-                
-            } else {
-                selectionModeIndex = 1
-            }
-        }
-    }
-    
-    private func deleteAllLines() {
-        if viewModel.deleteLines {
-            lines.removeAll()
-            viewModel.deleteLines = false
-        }
     }
 }
 //#Preview {
