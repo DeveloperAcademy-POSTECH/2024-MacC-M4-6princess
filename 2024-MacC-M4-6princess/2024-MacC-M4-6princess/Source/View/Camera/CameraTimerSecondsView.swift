@@ -2,35 +2,30 @@ import SwiftUI
 import Combine
 
 struct CameraTimerSecondsView: View {
-    @Binding var delayTime: TimeInterval
-    @Binding var isTakePic: Bool
-    @State private var remainingTime: TimeInterval = 0
-    @State private var backgroundOpacity: Double = 0
-    @State private var opacity: Double = 1
-    @State private var showCountdown: Bool = true
-    @State private var timer: AnyCancellable?
+    @ObservedObject var viewModel: CameraViewModel
+    @State private var timer: AnyCancellable? //지울수없어요
     
     var body: some View {
         ZStack {
-            if remainingTime > 0 {
-                Text("\(Int(remainingTime))")
+            if viewModel.remainingTime > 0 {
+                Text("\(Int(viewModel.remainingTime))")
                     .font(.system(size: 200))
                     .foregroundColor(.white)
-                    .opacity(opacity)
-                    .animation(.easeInOut(duration: 0.2), value: opacity)
+                    .opacity(viewModel.opacity)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.opacity)
                     .shadow(color: Color.black.opacity(0.4), radius: 10)
             }
         }
         .onAppear {
             startTimer()
         }
-        .onChange(of: remainingTime, initial: false) { oldValue, newValue in
-            if newValue < delayTime && newValue >= 0 {
-                showCountdown = true
-                opacity = 1
+        .onChange(of: viewModel.remainingTime, initial: false) { oldValue, newValue in
+            if newValue < viewModel.delayTime && newValue >= 0 {
+                viewModel.showCountdown = true
+                viewModel.opacity = 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     withAnimation(.easeOut(duration: 0.3)) {
-                        opacity = 0
+                        viewModel.opacity = 0
                     }
                 }
             }
@@ -39,21 +34,21 @@ struct CameraTimerSecondsView: View {
     
     private func startTimer() {
         guard timer == nil else { return }
-        remainingTime = delayTime
+        viewModel.remainingTime = viewModel.delayTime
         
         timer = timerPublisher()
             .sink { [self] _ in
-                if remainingTime > 0 {
-                    remainingTime -= 1
-                    backgroundOpacity += (0.6 / delayTime)
-                    print("-1초 : 현재 남은 시간은 \(remainingTime)")
+                if viewModel.remainingTime > 0 {
+                    viewModel.remainingTime -= 1
+                    viewModel.backgroundOpacity += (0.6 / viewModel.delayTime)
+                    print("-1초 : 현재 남은 시간은 \(viewModel.remainingTime)")
                 }
-                if remainingTime <= 0 {
+                if viewModel.remainingTime <= 0 {
                     timer?.cancel()
                     timer = nil
-                    opacity = 0
-                    backgroundOpacity = 0
-                    isTakePic = false
+                    viewModel.opacity = 0
+                    viewModel.backgroundOpacity = 0
+                    viewModel.isTakePic = false
                 }
             }
     }

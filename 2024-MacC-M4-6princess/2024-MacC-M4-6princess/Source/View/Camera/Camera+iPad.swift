@@ -62,7 +62,7 @@ extension CameraBottomView {
                 Spacer()
                 
                 //타이머 설정 버튼
-                CameraTimerView(delayTime: $viewModel.delayTime, isPushed: $viewModel.isPushedTimer)
+                CameraTimerView(viewModel: viewModel)
             }
             Spacer()
         }
