@@ -57,6 +57,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         case notAuthorized
     }
     
+    //카메라 접근권한 체크 함수
     func checkVideoAuthorizaion() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -80,6 +81,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         }
     }
     
+    //카메라를 처음에 세팅하는 함수
     func setUp() {
         do {
             self.session.beginConfiguration()
@@ -135,7 +137,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
 
     
-    
+    //기기의 카메라 렌즈 사양에 따라 카메라(비디오렌즈)를 선택
     func getBestCamera(from devices: [AVCaptureDevice]) -> AVCaptureDevice? {
         // 우선순위에 따라 카메라 선택
         if let ultraWideCamera = devices.first(where: { $0.deviceType == .builtInUltraWideCamera }) {
@@ -149,7 +151,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         return devices.first
     }
 
-    
+    //카메라 전후면 전환
     func changeCamera() {
         guard let currentInput = self.session.inputs.first as? AVCaptureDeviceInput else { return }
         
@@ -209,6 +211,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         session.commitConfiguration()
     }
     
+    //카메라 세션 시작
     func startSession() {
         Task {
             if !self.session.isRunning {
@@ -217,6 +220,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         }
     }
     
+    //카메라 세션 멈춤
     func stopSession() {
         Task {
             if !self.session.isRunning {
@@ -225,6 +229,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         }
     }
     
+    //사진 처리를 시작하는 함수
     func takePicture(delegate: AVCapturePhotoCaptureDelegate) {
         guard session.isRunning else {
             print("세션이 실행중이지 않습니다")
@@ -239,6 +244,8 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
             self.output.capturePhoto(with: settings, delegate: delegate)
         }
     }
+    
+    //줌 범위를 확인하고 부드럽게 해주는 줌 모션을 관리하는 함수
     func zoom(_ zoom: CGFloat) {
         guard let device = self.videoDeviceInput?.device else { return }
         

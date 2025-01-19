@@ -82,7 +82,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         preview.videoGravity = .resizeAspectFill
     }
     
-    
+    //무음으로 작업할때만 사용하는 함수. 지우면 슬퍼요
     //    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
     //        print("카메라 셔터음 무음으로 변경됨")
     //        AudioServicesDisposeSystemSoundID(1108)
@@ -91,6 +91,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
     //        AudioServicesDisposeSystemSoundID(1108)
     //    }
+    
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -128,6 +129,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
     }
     
+    //이미지를 비율에 맞게 크롭
     func cropToAspectRatio(image: UIImage) -> UIImage  {
         let cgImage = image.cgImage!
         let width = CGFloat(cgImage.width)
@@ -144,6 +146,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
     }
     
+    //셔터가 눌리면 실행되는 함수
     func takePic() {
         // 메인 큐에서 실행
         DispatchQueue.main.async {
@@ -152,6 +155,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
     }
     
+    //카메라 전후면 전환(초기 줌 팩터를 다시 맞춰줌)
     func changeCamera() {
         cameraManager.changeCamera()
         cameraPosition = cameraManager.videoDeviceInput?.device.position ?? .back
@@ -170,6 +174,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         lastScale = 1.0
     }
     
+    //이미지 방향 수정 함수
     func fixOrientation(_ image: UIImage) -> UIImage {
         // 이미지의 방향이 이미 .up이면 그대로 반환
         if image.imageOrientation == .up {
@@ -187,6 +192,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         return normalizedImage
     }
     
+    //메인 줌 함수
     func zoom(factor: CGFloat) {
         let delta = factor / lastScale
         lastScale = factor
@@ -210,14 +216,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
     }
 
-    
-    private func mapToNearestZoomFactor(_ factor: CGFloat) -> CGFloat {
-        let zoomFactors: [CGFloat] = cameraPosition == .back ?
-            [0.5, 1.0, 2.0, 3.0] : [1.0, 2.0, 3.0]
-        
-        return zoomFactors.min(by: { abs($0 - factor) < abs($1 - factor) }) ?? factor
-    }
-
+    //해당 factor로 줌을 해주는 함수
     func setZoom(factor: CGFloat) {
         guard let device = cameraManager.videoDeviceInput?.device else { return }
         
@@ -242,11 +241,13 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
     }
 
+    //줌 스케일 초기화
     func zoomInitialize() {
         lastScale = 1.0  // 제스처를 위한 scale만 초기화
         print("lastScale 초기화됨")
     }
 
+    //기기에 따른 줌 범위 설정
     func getZoomRange(for device: AVCaptureDevice) -> ClosedRange<CGFloat> {
         if device.position == .back {
             switch device.deviceType {
