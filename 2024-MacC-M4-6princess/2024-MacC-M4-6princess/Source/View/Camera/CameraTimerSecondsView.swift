@@ -3,7 +3,7 @@ import Combine
 
 struct CameraTimerSecondsView: View {
     @ObservedObject var viewModel: CameraViewModel
-    @State private var timer: AnyCancellable?
+    @State private var timer: AnyCancellable? //지울수없어요
     
     var body: some View {
         ZStack {

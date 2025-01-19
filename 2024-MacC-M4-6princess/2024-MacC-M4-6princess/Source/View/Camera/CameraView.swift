@@ -159,7 +159,7 @@ struct CameraView: View {
                     
                 }
                 if viewModel.delayTime != 0 && viewModel.isTakePic == true {
-                    CameraTimerSecondsView(viewModel: CameraViewModel())
+                    CameraTimerSecondsView(viewModel: viewModel)
                         .ignoresSafeArea(.all, edges: .all)
                 }
             }

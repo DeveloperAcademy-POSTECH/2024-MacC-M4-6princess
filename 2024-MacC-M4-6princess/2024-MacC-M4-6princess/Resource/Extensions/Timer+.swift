@@ -7,22 +7,34 @@
 
 import Foundation
 
-enum TimerDuration: Int, CaseIterable {
+enum TimerState: Int, CaseIterable {
     case off = 0
-    case threeSeconds = 3
-    case fiveSeconds = 5
-    case sevenSeconds = 7
+    case threeSeconds = 1
+    case fiveSeconds = 2
+    case sevenSeconds = 3
     
-    var displayText: String {
+    var duration: TimeInterval {
         switch self {
-        case .off: return ""
-        case .threeSeconds: return "3"
-        case .fiveSeconds: return "5"
-        case .sevenSeconds: return "7"
+        case .off: return 0
+        case .threeSeconds: return 3
+        case .fiveSeconds: return 5
+        case .sevenSeconds: return 7
         }
     }
     
     var icon: String {
-        self == .off ? "timerIcon" : "timerSecondBGIcon"
+        switch self {
+        case .off: return "timerIcon"
+        case .threeSeconds, .fiveSeconds, .sevenSeconds: return "timerSecondBGIcon"
+        }
+    }
+    
+    var displayText: String? {
+        switch self {
+        case .off: return nil
+        case .threeSeconds: return "3"
+        case .fiveSeconds: return "5"
+        case .sevenSeconds: return "7"
+        }
     }
 }
