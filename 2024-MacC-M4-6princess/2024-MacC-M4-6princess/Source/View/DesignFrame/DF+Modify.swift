@@ -42,36 +42,78 @@ extension DFModifyView{
     
     // 레이어 순서 표시 뷰(구버전)
     var newLayerIndicator: some View {
-        VStack(spacing: 6) {
-            ForEach(imageModel.imageList.indices.reversed(), id: \.self) { index in
-                if index == selectedLayerIndex {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            RoundedRectangle(cornerRadius: 3)
-                                .frame(width: 24, height: 4)
-                                .foregroundColor(.white)
-                                .padding(.leading, 4)
-                            Spacer()
+        HStack{
+            Group{
+                VStack() {
+                    
+                    Button(action: {
+                        withAnimation(.spring()) {
+                            isPressedUp = true
                         }
-                        Spacer()
+                        // 일정 시간 후 다시 false로 복구
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.spring()) {
+                                isPressedUp = false
+                            }
+                        }
+                    }) {
+                        HStack {
+                            Image("layer.up")
+                                .frame(width: 14, height: 14)
+                                .scaleEffect(isPressedUp ? 1.2 : 1.0)
+                        }
+                        .padding(5)
+                        .frame(width: 24, height: 24, alignment: .leading)
+                        .background(.white)
+                        .cornerRadius(12)
                     }
-                    .frame(height: 6)
-                } else {
-                    HStack {
-                        Image("heart.union")
-                            .resizable()
-                            .frame(width: 8, height: 6)
-                        Spacer()
+                    
+                    // caption
+                    Text("앞으로")
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Spacer()
+                        .frame(height: 12)
+                    Button(action: {
+                        withAnimation(.spring()) {
+                            isPressedDown = true
+                        }
+                        // 일정 시간 후 다시 false로 복구
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.spring()) {
+                                isPressedDown = false
+                            }
+                        }
+                    }) {
+                        HStack {
+                            Image("layer.down")
+                                .frame(width: 14, height: 14)
+                                .scaleEffect(isPressedDown ? 1.2 : 1.0)
+                        }
+                        .padding(5)
+                        .frame(width: 24, height: 24, alignment: .leading)
+                        .background(.white)
+                        .cornerRadius(12)
                     }
+        
+                    // caption
+                    Text("뒤로")
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
+                .padding(.vertical, 8)
+                .frame(width: 40, height: 116, alignment: .topLeading)
+                .background(.gray03)
+                .cornerRadius(20)
             }
+            .padding(5)
+            Spacer()
+            
         }
-        .padding(6)
-        .frame(width: 40)
-        .background(Color.gray)
-        .cornerRadius(8)
-        .padding(.horizontal, 5)
     }
     
     func imageListUpdate() {

@@ -17,7 +17,10 @@ struct DFModifyView: View {
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
     @State var beforeDragOffsetY: CGFloat = .zero
-    
+    @State var isPressedUp = false
+    @State var isPressedDown = false
+    @State var selectedSubject: SubjectImage? = nil
+    @State var selectedIndex: Int? = nil
     var body: some View {
         
         ZStack {
@@ -52,6 +55,11 @@ struct DFModifyView: View {
                             .opacity(viewModel.btnOpacity)
                             .frame(width: 175, height: 38)
                             .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                        if let selected = selectedSubject,selected.isTapped{
+                            newLayerIndicator
+                        }
+                        
+                        
                         
                     }
                     .gesture(viewModel.backgroundGesture())
@@ -84,16 +92,16 @@ struct DFModifyView: View {
                 )
             }
             
-            VStack{
-                Spacer()
-                HStack{
-                    if isLongPressed{
-                        oldLayerIndicator
-                    }
-                    Spacer()
-                }
-                Spacer()
-            }
+//            VStack{
+//                Spacer()
+//                HStack{
+//                    if isLongPressed{
+//                        oldLayerIndicator
+//                    }
+//                    Spacer()
+//                }
+//                Spacer()
+//            }
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)
@@ -163,6 +171,8 @@ struct DFModifyView: View {
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
+                                selectedIndex = index
+                                selectedSubject = subject
                             }
                         //                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
