@@ -201,6 +201,8 @@ struct DFModifyView: View {
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
+                                selectedIndex = index
+                                selectedSubject = subject
                             }
                         //                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
@@ -231,6 +233,8 @@ struct DFModifyView: View {
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
+                                selectedIndex = index
+                                selectedSubject = subject
                             }
                         //                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))

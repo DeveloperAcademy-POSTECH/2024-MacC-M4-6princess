@@ -47,6 +47,12 @@ extension DFModifyView{
                 VStack() {
                     
                     Button(action: {
+                        if let index = selectedIndex{
+                            selectedIndex=moveLayerBackward(at: index, steps: 1)
+                        }
+                        else{
+                            // 에러처리
+                        }
                         withAnimation(.spring()) {
                             isPressedUp = true
                         }
@@ -77,6 +83,13 @@ extension DFModifyView{
                     Spacer()
                         .frame(height: 12)
                     Button(action: {
+                        if let index = selectedIndex{
+                            selectedIndex=moveLayerForward(at: index, steps: 1)
+                            
+                        }
+                        else{
+                            // 에러처리
+                        }
                         withAnimation(.spring()) {
                             isPressedDown = true
                         }
