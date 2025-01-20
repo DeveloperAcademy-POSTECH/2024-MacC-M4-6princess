@@ -17,10 +17,7 @@ struct DFModifyView: View {
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
     @State var beforeDragOffsetY: CGFloat = .zero
-    @State var isPressedUp = false
-    @State var isPressedDown = false
-    @State var selectedSubject: SubjectImage? = nil
-    @State var selectedIndex: Int? = nil
+    
     var body: some View {
         
         ZStack {
@@ -55,7 +52,7 @@ struct DFModifyView: View {
                             .opacity(viewModel.btnOpacity)
                             .frame(width: 175, height: 38)
                             .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                        if let selected = selectedSubject,selected.isTapped{
+                        if let selected = viewModel.selectedSubject,selected.isTapped{
                             newLayerIndicator
                         }
                         
@@ -171,8 +168,8 @@ struct DFModifyView: View {
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
-                                selectedIndex = index
-                                selectedSubject = subject
+                                viewModel.selectedIndex = index
+                                viewModel.selectedSubject = subject
                             }
                         //                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
@@ -201,8 +198,8 @@ struct DFModifyView: View {
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
-                                selectedIndex = index
-                                selectedSubject = subject
+                                viewModel.selectedIndex = index
+                                viewModel.selectedSubject = subject
                             }
                         //                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
@@ -233,14 +230,24 @@ struct DFModifyView: View {
                                 subject.isTapped.toggle()
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
-                                selectedIndex = index
-                                selectedSubject = subject
+                                viewModel.selectedIndex = index
+                                viewModel.selectedSubject = subject
                             }
                         //                            .gesture(combinedGesture(subject: subject))
                             .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }
             }
+            
+        }
+        .onAppear{
+            // 선택된 subject의 레이어 변동창 띄어줌
+            
+            viewModel.selectedSubject = imageModel.imageList.last
+            viewModel.selectedIndex = imageModel.imageList.indices.last
+//            if selectedSubject != nil {
+//                selectedSubject?.isTapped = true
+//            }
             
         }
     }

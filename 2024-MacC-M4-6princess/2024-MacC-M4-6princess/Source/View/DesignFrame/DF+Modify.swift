@@ -41,32 +41,36 @@ extension DFModifyView{
     }
     
     // 레이어 순서 표시 뷰(구버전)
+    fileprivate func extractedFunc() {
+        if let index = viewModel.selectedIndex{
+            viewModel.selectedIndex = moveLayerBackward(at: index, steps: 1)
+        }
+        else{
+            // 에러처리
+        }
+        withAnimation(.spring()) {
+            viewModel.isPressedUp = true
+        }
+        // 일정 시간 후 다시 false로 복구
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.spring()) {
+                viewModel.isPressedUp = false
+            }
+        }
+    }
+    
     var newLayerIndicator: some View {
         HStack{
             Group{
                 VStack() {
                     
                     Button(action: {
-                        if let index = selectedIndex{
-                            selectedIndex=moveLayerBackward(at: index, steps: 1)
-                        }
-                        else{
-                            // 에러처리
-                        }
-                        withAnimation(.spring()) {
-                            isPressedUp = true
-                        }
-                        // 일정 시간 후 다시 false로 복구
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation(.spring()) {
-                                isPressedUp = false
-                            }
-                        }
+                        extractedFunc()
                     }) {
                         HStack {
                             Image("layer.up")
                                 .frame(width: 14, height: 14)
-                                .scaleEffect(isPressedUp ? 1.2 : 1.0)
+                                .scaleEffect(viewModel.isPressedUp ? 1.2 : 1.0)
                         }
                         .padding(5)
                         .frame(width: 24, height: 24, alignment: .leading)
@@ -83,27 +87,27 @@ extension DFModifyView{
                     Spacer()
                         .frame(height: 12)
                     Button(action: {
-                        if let index = selectedIndex{
-                            selectedIndex=moveLayerForward(at: index, steps: 1)
+                        if let index = viewModel.selectedIndex{
+                            viewModel.selectedIndex=moveLayerForward(at: index, steps: 1)
                             
                         }
                         else{
                             // 에러처리
                         }
                         withAnimation(.spring()) {
-                            isPressedDown = true
+                            viewModel.isPressedDown = true
                         }
                         // 일정 시간 후 다시 false로 복구
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             withAnimation(.spring()) {
-                                isPressedDown = false
+                                viewModel.isPressedDown = false
                             }
                         }
                     }) {
                         HStack {
                             Image("layer.down")
                                 .frame(width: 14, height: 14)
-                                .scaleEffect(isPressedDown ? 1.2 : 1.0)
+                                .scaleEffect(viewModel.isPressedDown ? 1.2 : 1.0)
                         }
                         .padding(5)
                         .frame(width: 24, height: 24, alignment: .leading)

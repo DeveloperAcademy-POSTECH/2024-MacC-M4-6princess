@@ -40,6 +40,16 @@ class DFModifyViewModel: ObservableObject {
     
     @Published var showAgain: Bool = false
     
+    /// 레이어 변경 관련 변수
+    @Published var isPressedUp = false
+    @Published var isPressedDown = false
+    @Published var selectedSubject: SubjectImage? = nil
+    @Published var selectedIndex: Int? = nil {
+            didSet {
+                print("이전 값: \(oldValue ?? -1), 새로운 값: \(selectedIndex ?? -1)")
+            }
+        }
+    
     func backgroundGesture() -> some Gesture {
         
         MagnifyGesture()
@@ -254,6 +264,7 @@ class DFModifyViewModel: ObservableObject {
         resultImage = imageList[indexOfImageList].image
         return resultImage
     }
+    
     
     //    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
     //
