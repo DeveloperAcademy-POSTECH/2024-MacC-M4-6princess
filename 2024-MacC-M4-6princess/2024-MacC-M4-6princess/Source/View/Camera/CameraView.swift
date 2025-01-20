@@ -180,8 +180,6 @@ struct CameraView: View {
                     .presentationDragIndicator(.visible)
                     .environmentObject(naviManager)
                     .environmentObject(frameManager)
-                    
-                
             }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
