@@ -13,6 +13,8 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     
+    
+    /// 구버전 레이어 관련한 것으로 조만간 파일로 정리한 뒤 삭제할 예정입니다.
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
     @State var isLongPressed: Bool = false
@@ -25,6 +27,7 @@ struct DFModifyView: View {
                 DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
                     .zIndex(1)
             }
+            
             Color.clear
                 .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
                 .onTapGesture {
@@ -55,9 +58,6 @@ struct DFModifyView: View {
                         if let selected = viewModel.selectedSubject,selected.isTapped{
                             newLayerIndicator
                         }
-                        
-                        
-                        
                     }
                     .gesture(viewModel.backgroundGesture())
                     .onTapGesture {
@@ -89,16 +89,16 @@ struct DFModifyView: View {
                 )
             }
             
-//            VStack{
-//                Spacer()
-//                HStack{
-//                    if isLongPressed{
-//                        oldLayerIndicator
-//                    }
-//                    Spacer()
-//                }
-//                Spacer()
-//            }
+            //            VStack{
+            //                Spacer()
+            //                HStack{
+            //                    if isLongPressed{
+            //                        oldLayerIndicator
+            //                    }
+            //                    Spacer()
+            //                }
+            //                Spacer()
+            //            }
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)
@@ -243,11 +243,13 @@ struct DFModifyView: View {
         .onAppear{
             // 선택된 subject의 레이어 변동창 띄어줌
             
-            viewModel.selectedSubject = imageModel.imageList.last
-            viewModel.selectedIndex = imageModel.imageList.indices.last
-//            if selectedSubject != nil {
-//                selectedSubject?.isTapped = true
-//            }
+            if imageModel.imageList.count > 1{ // 레이어가 한개이하이면 레이어 선택창이 나타나지않음
+                viewModel.selectedSubject = imageModel.imageList.last
+                viewModel.selectedIndex = imageModel.imageList.indices.last
+            }
+            //            if selectedSubject != nil {
+            //                selectedSubject?.isTapped = true
+            //            }
             
         }
     }

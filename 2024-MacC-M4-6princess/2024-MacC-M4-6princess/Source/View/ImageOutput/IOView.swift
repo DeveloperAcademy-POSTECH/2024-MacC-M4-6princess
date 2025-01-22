@@ -29,14 +29,27 @@ struct IOView: View {
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 Spacer()
             }
-            HStack(alignment: .center, spacing: 14) {
-                Text("저장완료")
-                    .font(.system(size:17))
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.gray01)
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                HStack(alignment: .center, spacing: 14) {
+                    Text("저장완료")
+                        .font(.system(size:17))
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
+                }
+                .padding(.vertical)
             }
-            .padding(.vertical)
+            else{
+                HStack(alignment: .center, spacing: 14) {
+                    Text("저장완료")
+                        .font(.system(size:17))
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
+                }
+                .padding(.vertical,5)
+            }
+            
             // 후보정 레이어 편집 뷰
             canvasView
                 .onAppear{
@@ -50,52 +63,67 @@ struct IOView: View {
                     uploadImage()
                 }
             
-            VStack{
-                Text("저장된 사진은 갤러리에서 확인해주세요.")
-                    .font(.system(size:12))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.gray01)
-                    .padding()
-                HStack(spacing: 16) {
-                    
-//                    Button(action: {
-//                        showQRSheet = true
-//                    }) {
-//                        RoundedRectangle(cornerRadius: 10) // RoundedRectangle을 사용
-//                            .stroke(Color.pointPink, lineWidth: 1) // 테두리 추가
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 10) // 동일한 모서리 반경의 배경
-//                                    .foregroundColor(.white)
-//                            )
-//                            .frame(height: 60) // 높이 설정
-//                            .overlay(
-//                                Text("QR 보기")
-//                                    .foregroundColor(.pointPink)
-//                                    .font(.system(size: 18, weight: .bold))
-//                            )
-//                    }
-
-                    // 카메라로 이동 버튼
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Rectangle()
-                            .foregroundColor(.clear)
-                            .frame(height: 60)
-                            .background(Color.pointPink)
-                            .cornerRadius(10)
-                            .overlay(
-                                Text("카메라로 이동")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 18, weight: .bold))
-                            )
+            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                VStack{
+                    Text("저장된 사진은 갤러리에서 확인해주세요.")
+                        .font(.system(size:12))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
+                        .padding()
+                    HStack(spacing: 16) {
+                        // 카메라로 이동 버튼
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            Rectangle()
+                                .foregroundColor(.clear)
+                                .frame(height: 60)
+                                .background(Color.pointPink)
+                                .cornerRadius(10)
+                                .overlay(
+                                    Text("카메라로 이동")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 18, weight: .bold))
+                                )
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-
+                Spacer()
             }
-            Spacer()
+            else{
+                VStack{
+                    Text("저장된 사진은 갤러리에서 확인해주세요.")
+                        .font(.system(size:12))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
+                        .padding(5)
+                    HStack(spacing: 16) {
+                        // 카메라로 이동 버튼
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            Rectangle()
+                                .foregroundColor(.clear)
+                                .frame(height: 40)
+                                .background(Color.pointPink)
+                                .cornerRadius(10)
+                                .overlay(
+                                    Text("카메라로 이동")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 18, weight: .bold))
+                                )
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    
+                }
+                Spacer()
+            }
+            
             
         }
         .onAppear{
@@ -106,10 +134,10 @@ struct IOView: View {
             
             print("body onAppear")
         }
-//        .onDisappear {
-//            // QR 보기를 안눌렀으면 파이어베이스에서 사진 삭제
-//                   deleteUploadedImageIfNeeded()
-//               }
+        //        .onDisappear {
+        //            // QR 보기를 안눌렀으면 파이어베이스에서 사진 삭제
+        //                   deleteUploadedImageIfNeeded()
+        //               }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
@@ -117,39 +145,39 @@ struct IOView: View {
         // 상단 툴바
         .navigationBarBackButtonHidden()
         .sheet(isPresented: $showQRSheet) {
-                    QRCodeSheetView(qrCodeImage: qrCodeImage)
-                }
+            QRCodeSheetView(qrCodeImage: qrCodeImage)
+        }
     }
     var canvasView: some View {
         IOCanvasView(viewModel: viewModel)
     }
     private func uploadImage() {
         guard let selectedImage = viewModel.compositeImage else { return }
-            isUploading = true
-            StorageManager.shared.uploadImage(image: selectedImage) { result in
-                DispatchQueue.main.async {
-                    isUploading = false
-                    switch result {
+        isUploading = true
+        StorageManager.shared.uploadImage(image: selectedImage) { result in
+            DispatchQueue.main.async {
+                isUploading = false
+                switch result {
                     case .success(let url):
                         self.qrCodeImage = QRCodeGenerator.shared.generateQRCode(from: url.absoluteString)
-                            self.uploadedImagePath = url.path // 업로드된 이미지 경로 저장
+                        self.uploadedImagePath = url.path // 업로드된 이미지 경로 저장
                     case .failure(let error):
                         self.uploadError = error.localizedDescription
-                    }
                 }
             }
         }
+    }
     private func deleteUploadedImageIfNeeded() {
-         guard let path = uploadedImagePath else { return }
-         StorageManager.shared.deleteImage(path: path) { result in
-             switch result {
-             case .success:
-                 print("Image successfully deleted from Firebase.")
-             case .failure(let error):
-                 print("Failed to delete image: \(error.localizedDescription)")
-             }
-         }
-     }
+        guard let path = uploadedImagePath else { return }
+        StorageManager.shared.deleteImage(path: path) { result in
+            switch result {
+                case .success:
+                    print("Image successfully deleted from Firebase.")
+                case .failure(let error):
+                    print("Failed to delete image: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 

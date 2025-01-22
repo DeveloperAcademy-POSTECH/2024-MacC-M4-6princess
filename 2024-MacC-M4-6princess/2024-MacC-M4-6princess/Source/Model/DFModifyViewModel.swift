@@ -31,7 +31,7 @@ class DFModifyViewModel: ObservableObject {
     @Published var frameImage: UIImage?
     
     @Published var showTextView: Bool = false
-//    @Published var showTextModifyView: Bool = false
+    //    @Published var showTextModifyView: Bool = false
     @Published var showStickerSheet: Bool = false
     
     @Published var isAlert: Bool = false
@@ -45,10 +45,10 @@ class DFModifyViewModel: ObservableObject {
     @Published var isPressedDown = false
     @Published var selectedSubject: SubjectImage? = nil
     @Published var selectedIndex: Int? = nil {
-            didSet {
-                print("이전 값: \(oldValue ?? -1), 새로운 값: \(selectedIndex ?? -1)")
-            }
+        didSet {
+            print("이전 값: \(oldValue ?? -1), 새로운 값: \(selectedIndex ?? -1)")
         }
+    }
     
     func backgroundGesture() -> some Gesture {
         
@@ -71,15 +71,15 @@ class DFModifyViewModel: ObservableObject {
                         self.dragGestureTask(subject: subject, changed: value.translation)
                     }
                 })
-                .onEnded({ value in
-                    
-                    if let subject = self.modelList.first {
+                    .onEnded({ value in
                         
-                        self.accumulatedOffSet = .zero
-                        self.modelListControl(subject: subject)
-                        subject.isTapped = true
-                    }
-                })
+                        if let subject = self.modelList.first {
+                            
+                            self.accumulatedOffSet = .zero
+                            self.modelListControl(subject: subject)
+                            subject.isTapped = true
+                        }
+                    })
             )
             .simultaneously(with: RotateGesture()
                 .onChanged({ value in
@@ -92,9 +92,9 @@ class DFModifyViewModel: ObservableObject {
                         subject.setAngle(angle: self.angle)
                     }
                 })
-                .onEnded({ value in
-                    self.current = .zero
-                })
+                    .onEnded({ value in
+                        self.current = .zero
+                    })
             )
         
     }

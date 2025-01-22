@@ -19,7 +19,7 @@ extension DFModifyView{
         for _ in 0..<steps {
             guard currentIndex > 0 else { return 0}
             guard currentIndex < imageModel.imageList.count else { return imageModel.imageList.count - 1}
-            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+//            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
             imageModel.imageList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
@@ -33,7 +33,7 @@ extension DFModifyView{
         for _ in 0..<steps {
             guard currentIndex < imageModel.imageList.count - 1 else { return imageModel.imageList.count-1}
             guard currentIndex >= 0 else { return 0}
-            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+//            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
             imageModel.imageList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
@@ -41,31 +41,27 @@ extension DFModifyView{
     }
     
     // 레이어 순서 표시 뷰(구버전)
-    fileprivate func extractedFunc() {
-        if let index = viewModel.selectedIndex{
-            viewModel.selectedIndex = moveLayerBackward(at: index, steps: 1)
-        }
-        else{
-            // 에러처리
-        }
-        withAnimation(.spring()) {
-            viewModel.isPressedUp = true
-        }
-        // 일정 시간 후 다시 false로 복구
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            withAnimation(.spring()) {
-                viewModel.isPressedUp = false
-            }
-        }
-    }
-    
     var newLayerIndicator: some View {
         HStack{
             Group{
                 VStack() {
                     
                     Button(action: {
-                        extractedFunc()
+                        if let index = viewModel.selectedIndex{
+                            viewModel.selectedIndex = moveLayerBackward(at: index, steps: 1)
+                        }
+                        else{
+                            // 에러처리
+                        }
+                        withAnimation(.spring()) {
+                            viewModel.isPressedUp = true
+                        }
+                        // 일정 시간 후 다시 false로 복구
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.spring()) {
+                                viewModel.isPressedUp = false
+                            }
+                        }
                     }) {
                         HStack {
                             Image("layer.up")
@@ -114,7 +110,7 @@ extension DFModifyView{
                         .background(.white)
                         .cornerRadius(12)
                     }
-        
+                    
                     // caption
                     Text("뒤로")
                         .font(.system(size: 12))
@@ -127,7 +123,7 @@ extension DFModifyView{
                 .background(.gray03)
                 .cornerRadius(20)
             }
-            .padding(5)
+            .padding(10)
             Spacer()
             
         }
