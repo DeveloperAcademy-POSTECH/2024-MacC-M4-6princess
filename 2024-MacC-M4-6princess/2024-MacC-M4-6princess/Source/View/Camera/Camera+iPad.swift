@@ -15,7 +15,7 @@ extension CameraBottomView {
             HStack (){
                 //프레임 불러오기 버튼
                 Button {
-//                    viewModel.isShowMFView.toggle()
+                    //                    viewModel.isShowMFView.toggle()
                     frameManager.showMFView = true
                     print("프레임 버튼 눌림")
                 } label: {
@@ -64,7 +64,9 @@ extension CameraBottomView {
                 //타이머 설정 버튼
                 CameraTimerView(viewModel: viewModel)
             }
+            .padding(.top,10)
             Spacer()
+            
         }
         .padding(.horizontal, 20)
         .frame(width: UIScreen.main.bounds.width, height: 132)

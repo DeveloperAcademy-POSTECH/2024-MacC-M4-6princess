@@ -41,6 +41,9 @@ struct DFTextModifyView: View {
                                 newImage.textStyle = style
                                 if let uuid = frameManager.textUUID, let index = imageModel.imageList.firstIndex(where: {$0.id == uuid}){
                                     imageModel.imageList[index] = newImage
+                                    modiViewModel.selectedIndex = index
+                                    modiViewModel.selectedSubject = newImage
+                                    modiViewModel.modelListControl(subject: imageModel.imageList[index])
                                 }
                                 else{
                                     /// 에러처리
