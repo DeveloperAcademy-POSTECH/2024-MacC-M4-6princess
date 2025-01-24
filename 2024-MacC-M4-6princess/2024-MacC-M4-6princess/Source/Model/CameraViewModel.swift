@@ -57,6 +57,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     let defaultImg: UIImage
     var ScreenSize:CGSize = UIScreen.main.bounds.size
     let cameraManager: CameraManager
+    let motionManager = MotionManager()
 
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
@@ -71,6 +72,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         else {
             self.currentZoomFactor = 1.0
         }
+        _ = motionManager
     }
     
     
@@ -83,14 +85,14 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     
     //무음으로 작업할때만 사용하는 함수. 지우면 슬퍼요
-    //    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-    //        print("카메라 셔터음 무음으로 변경됨")
-    //        AudioServicesDisposeSystemSoundID(1108)
-    //
-    //    }
-    //    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-    //        AudioServicesDisposeSystemSoundID(1108)
-    //    }
+        func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+            print("카메라 셔터음 무음으로 변경됨")
+            AudioServicesDisposeSystemSoundID(1108)
+    
+        }
+        func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+            AudioServicesDisposeSystemSoundID(1108)
+        }
     
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
@@ -114,7 +116,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             image = UIImage(cgImage: image.cgImage!, scale: image.scale, orientation: .leftMirrored)
         }
         
-        // 이미지의 방향을 .up으로 수정
+        // 이미지의 방향을 .up으로 수정. 이미지 프리뷰를 위함
         image = fixOrientation(image)
         
         let croppedImage = cropToAspectRatio(image: image)
@@ -126,6 +128,18 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             print("nextView:\(self.nextView)")
             print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
+        }
+    }
+    
+    // 기기 방향에 따라 이미지 회전하는 함수 추가
+    func rotateImage(_ image: UIImage, basedOn orientation: UIDeviceOrientation) -> UIImage {
+        switch orientation {
+        case .landscapeLeft:
+            return image.rotate(radians: .pi/2)  // 오른쪽으로 90도 회전
+        case .landscapeRight:
+            return image.rotate(radians: -.pi/2)  // 왼쪽으로 90도 회전
+        default:
+            return image
         }
     }
     

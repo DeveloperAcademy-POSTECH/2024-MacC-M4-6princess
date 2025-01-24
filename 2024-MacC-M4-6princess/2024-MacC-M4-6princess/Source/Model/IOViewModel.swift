@@ -21,27 +21,37 @@ class IOViewModel: ObservableObject {
     /// for 이미지 저장
     @Published var savePhoto = false
     @Published var saveAnimate = false
+    
     /// 사진 저장 함수
     @MainActor
-    func saveRenderedView<T: View>(content: T) {
+    func saveRenderedView<T: View>(content: T, motionManager: MotionManager) {
         let renderedImage = ImageRenderer(
             content: content
                 .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
         )
         // 해상도
-        renderedImage.scale = 8.0
+        renderedImage.scale = 10.0
         
-        if let uiImage = renderedImage.uiImage {
+        if var uiImage = renderedImage.uiImage {
+            // 기기 방향에 따라 이미지 회전
+            let orientation = motionManager.imageRotate()
+            if orientation != .up {
+                if let cgImage = uiImage.cgImage {
+                    uiImage = UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
+                }
+            }
+            
             self.compositeImage = uiImage
             saveImageToAlbum(uiImage: uiImage)
         } else {
             showAlert(message: "렌더링 실패: 이미지 생성에 문제가 발생했습니다.")
         }
     }
+
     
     func saveImageToAlbum(uiImage: UIImage) {
         let albumName = "Frameet"
-
+        
         func getAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
             let fetchOptions = PHFetchOptions()
             fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
@@ -89,25 +99,19 @@ class IOViewModel: ObservableObject {
                 }
             }
         }
-
+        
         getAlbum { album in
             saveImageToAlbum(album: album)
         }
     }
 
-    private func showAlert(message: String) {
-        DispatchQueue.main.async {
-            self.alertMessage = message
-            self.showAlert = true
-        }
-    }
     func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
-//        
-//        // 배경 이미지의 aspectRatio를 구함
-//        self.bgRatio = bgImg.size.height / bgImg.size.width
-//        // 아이돌 이미지의 aspectRatio를 구함
-//        self.idolRatio = idolImg.size.height / idolImg.size.width
-//        
+        //
+        //        // 배경 이미지의 aspectRatio를 구함
+        //        self.bgRatio = bgImg.size.height / bgImg.size.width
+        //        // 아이돌 이미지의 aspectRatio를 구함
+        //        self.idolRatio = idolImg.size.height / idolImg.size.width
+        //
         // IECanvasView의 프레임 크기를 구함 for 이미지 저장
         self.screenSize = bounds
         
@@ -118,7 +122,14 @@ class IOViewModel: ObservableObject {
         
         // 뷰생성시 아이돌 이미지 위치 지정
         self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
-       
         
+        
+    }
+    
+    private func showAlert(message: String) {
+        DispatchQueue.main.async {
+            self.alertMessage = message
+            self.showAlert = true
+        }
     }
 }

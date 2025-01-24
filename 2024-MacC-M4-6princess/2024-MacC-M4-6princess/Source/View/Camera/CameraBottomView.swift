@@ -51,7 +51,6 @@ struct CameraBottomView: View {
                             self.viewModel.isTakePic = true
                             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                                 viewModel.takePic()
-                                //셔터버튼 누를 때 motionManager에서 currentOrientation 받아서 넘기기
                                 viewModel.cameraManager.stopSession()
                                 Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
                             }

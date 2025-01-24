@@ -13,17 +13,18 @@ import FirebaseAnalytics
 struct IOView: View {
     var bg:UIImage
     var idol:UIImage
-    //    @StateObject var viewModel = IEViewModel()
     @StateObject var viewModel = IOViewModel()
-    @GestureState var pinchState = 1.0 // 핀치 제스쳐를 위한 State 변수
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State var isAnimating = false
     @State var isSave = false
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State private var isUploading = false
+    
     @State private var qrCodeImage: UIImage? = nil
     @State private var uploadError: String? = nil
     @State var showQRSheet = false
     @State private var uploadedImagePath: String? = nil // 업로드된 이미지의 경로
+    let motionManager: MotionManager
+    
     var body: some View {
         VStack{
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
@@ -41,7 +42,7 @@ struct IOView: View {
             canvasView
                 .onAppear{
                     isAnimating = true
-                    viewModel.saveRenderedView(content: canvasView)
+                    viewModel.saveRenderedView(content: canvasView, motionManager: motionManager)
                     viewModel.saveAnimate = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         isSave = true

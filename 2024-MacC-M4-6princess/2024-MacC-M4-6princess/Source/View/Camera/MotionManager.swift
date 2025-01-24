@@ -28,8 +28,6 @@ class MotionManager: ObservableObject {
                 if Date().timeIntervalSince(self.lastUpdate) > 0.5 {
                     self.lastUpdate = Date()
                     self.updateOrientation(attitude: attitude)
-                    print("지금 상태는 \(currentOrientation) 방향")
-//                    print("yaw: \(attitude.yaw)")
                     
                 }
             }
@@ -62,4 +60,19 @@ class MotionManager: ObservableObject {
             currentOrientation = .portraitUpsideDown //전면 카메라가 거꾸로 된 상태
         }
     }
+    
+    //기기의 회전에 따라 다른 값을 출력하는 함수
+    func imageRotate() -> UIImage.Orientation {
+        switch currentOrientation {
+        case .landscapeLeft:
+            return .left
+        case .landscapeRight:
+            return .right
+        case .portraitUpsideDown:
+            return .down
+        default:
+            return .up 
+        }
+    }
+
 }

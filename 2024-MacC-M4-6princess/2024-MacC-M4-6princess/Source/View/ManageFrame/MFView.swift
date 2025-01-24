@@ -106,10 +106,7 @@ struct MFView: View {
                 }
             }
             .onAppear {
-                // 처음 한 번만 로드
-    //            if viewModel.imageDataArray.isEmpty {
-                    viewModel.loadImages()
-    //            }
+                viewModel.loadImages()
             }
             .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
                 Button {
@@ -126,18 +123,6 @@ struct MFView: View {
             } message: {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
             }
-//            .alert(isPresented: $viewModel.isDeleteAlert) {
-//                        Alert(
-//                            title: Text("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?"),
-//                            message: Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
-//                            
-//                            primaryButton: .destructive(Text("삭제")) {
-//                                viewModel.deleteSelectedImages()
-//                                print("Deleting...")
-//                            },
-//                            secondaryButton: .cancel(Text("취소"))
-//                        )
-//                    }
         }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
