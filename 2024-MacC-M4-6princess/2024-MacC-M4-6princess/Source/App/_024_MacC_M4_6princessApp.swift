@@ -35,6 +35,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         
         return true
     }
+    func application(_ application: UIApplication,
+                     supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        //iPhone과 iPad 모두 세로만 지원
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .portrait
+        } else {
+            return .portrait
+        }
+    }
+
 }
 
 // FrameSize 모델 정의

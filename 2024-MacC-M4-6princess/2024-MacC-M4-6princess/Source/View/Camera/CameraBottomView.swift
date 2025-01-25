@@ -17,7 +17,6 @@ struct CameraBottomView: View {
     @EnvironmentObject var frameManager:FrameManager
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
-            //        if horizontalSizeClass == .regular{
             VStack{
                 Spacer()
                 HStack (){
@@ -27,21 +26,21 @@ struct CameraBottomView: View {
 //                        viewModel.isShowMFView.toggle()
                         frameManager.showMFView = true
                         viewModel.cameraManager.stopSession()
-                        print("프레임 버튼 눌림")
                     } label: {
                         VStack(alignment: .center, spacing: 4) {
-                            Image(viewModel.firstTime ? "frameLoadPink" : "frameLoad")
+                            Image("frameLoad")
                                 .resizable()
                                 .frame(width: 40, height: 40)
                                 .cornerRadius(5)
                                 .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                 .animation(.easeInOut, value: motionManager.currentOrientation)
-                            Text("불러오기")
+                            Text("최애 프레임")
                                 .font(.system(size: 13))
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
+                                .foregroundColor(.gray01)
                         }
                     }
+                    .padding(.leading, 20)
                     
                     Spacer()
                     
@@ -74,10 +73,10 @@ struct CameraBottomView: View {
                     
                     //타이머 설정 버튼
                     CameraTimerView(viewModel: viewModel)
+                        .padding(.trailing, 20)
                 }
                 Spacer()
             }
-            .padding(.horizontal, 20)
             .frame(width: UIScreen.main.bounds.width, height: 132)
             .background(.white)
         }

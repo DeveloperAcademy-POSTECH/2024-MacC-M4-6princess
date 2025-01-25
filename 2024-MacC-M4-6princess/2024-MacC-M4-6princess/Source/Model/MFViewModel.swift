@@ -68,7 +68,7 @@ class MFViewModel: ObservableObject {
                                    to: CGSize(width: UIScreen.main.bounds.width / 3,
                                               height: (UIScreen.main.bounds.width / 3) * (4 / 3)))?.jpegData(compressionQuality: 0.5)
         } catch {
-            print("Failed to fetch image: \(error)")
+            print("이미지 로딩 실패: \(error)")
             return nil
         }
     }
@@ -88,7 +88,7 @@ class MFViewModel: ObservableObject {
             selectedImageIds.removeAll()
             isEditing = false
         } catch {
-            print("Failed to delete images: \(error)")
+            print("이미지 삭제 실패: \(error)")
         }
     }
     

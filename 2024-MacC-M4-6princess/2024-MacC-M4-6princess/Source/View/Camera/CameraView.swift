@@ -180,14 +180,12 @@ struct CameraView: View {
                     .presentationDragIndicator(.visible)
                     .environmentObject(naviManager)
                     .environmentObject(frameManager)
-                    
-                
             }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
                 if let takenImg = viewModel.takenImg, let frameImg = frameManager.resultImage {
-                    IOView(bg: takenImg, idol: frameImg)
+                    IOView(bg: takenImg, idol: frameImg, motionManager: motionManager)
                 } else {
                     EmptyView()
                     .onAppear {

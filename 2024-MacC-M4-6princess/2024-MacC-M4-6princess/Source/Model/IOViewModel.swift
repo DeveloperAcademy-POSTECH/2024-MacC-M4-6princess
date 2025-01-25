@@ -21,27 +21,37 @@ class IOViewModel: ObservableObject {
     /// for 이미지 저장
     @Published var savePhoto = false
     @Published var saveAnimate = false
+    
     /// 사진 저장 함수
     @MainActor
-    func saveRenderedView<T: View>(content: T) {
+    func saveRenderedView<T: View>(content: T, motionManager: MotionManager) {
         let renderedImage = ImageRenderer(
             content: content
                 .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
         )
         // 해상도
-        renderedImage.scale = 8.0
+        renderedImage.scale = 10.0
         
-        if let uiImage = renderedImage.uiImage {
+        if var uiImage = renderedImage.uiImage {
+            // 기기 방향에 따라 이미지 회전
+            let orientation = motionManager.imageRotate()
+            if orientation != .up {
+                if let cgImage = uiImage.cgImage {
+                    uiImage = UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
+                }
+            }
+            
             self.compositeImage = uiImage
             saveImageToAlbum(uiImage: uiImage)
         } else {
             showAlert(message: "렌더링 실패: 이미지 생성에 문제가 발생했습니다.")
         }
     }
+
     
     func saveImageToAlbum(uiImage: UIImage) {
         let albumName = "Frameet"
-
+        
         func getAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
             let fetchOptions = PHFetchOptions()
             fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
@@ -89,36 +99,79 @@ class IOViewModel: ObservableObject {
                 }
             }
         }
-
+        
         getAlbum { album in
             saveImageToAlbum(album: album)
         }
     }
 
+//    func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
+//        self.screenSize = bounds
+//        
+//        // 배경 이미지의 가로가 세로보다 긴 경우
+//        if bgImg.size.width / bgImg.size.height > 1 {
+//            // 가로가 더 긴 이미지의 경우, 화면 너비를 기준으로 높이 계산
+//            self.frameBGSize = CGSize(
+//                width: screenSize.width,
+//                height: screenSize.width * (bgImg.size.height / bgImg.size.width)
+//            )
+//        } else {
+//            // 세로가 더 긴 이미지의 경우, 기존 로직 유지
+//            self.frameBGSize = CGSize(
+//                width: screenSize.width,
+//                height: screenSize.width * (bgImg.size.height / bgImg.size.width)
+//            )
+//        }
+//        
+//        // 아이돌 이미지 크기 조정
+//        self.frameIdolSize = CGSize(
+//            width: frameBGSize.width,
+//            height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)
+//        )
+//        
+//        // 뷰 생성 시 아이돌 이미지 위치 지정
+//        self.location = CGPoint(
+//            x: frameBGSize.width / 2,
+//            y: self.frameBGSize.height / 2
+//        )
+//    }
+    func canvasOnAppear(bgImg: UIImage, idolImg: UIImage, bounds: CGSize) {
+        let screenWidth = bounds.width
+        let bgImageRatio = bgImg.size.height / bgImg.size.width
+        
+        // 가로/세로 비율에 따른 동적 크기 계산
+        if bgImg.size.width > bgImg.size.height {
+            // 가로가 긴 이미지의 경우
+            self.frameBGSize = CGSize(
+                width: screenWidth,
+                height: screenWidth * bgImageRatio
+            )
+        } else {
+            // 세로가 긴 이미지의 경우 (기존 로직)
+            self.frameBGSize = CGSize(
+                width: screenWidth,
+                height: screenWidth * bgImageRatio
+            )
+        }
+        
+        // 아이돌 이미지 크기도 동일한 비율로 조정
+        self.frameIdolSize = CGSize(
+            width: frameBGSize.width,
+            height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)
+        )
+        
+        // 중앙 위치 지정
+        self.location = CGPoint(
+            x: frameBGSize.width / 2,
+            y: frameBGSize.height / 2
+        )
+    }
+
+    
     private func showAlert(message: String) {
         DispatchQueue.main.async {
             self.alertMessage = message
             self.showAlert = true
         }
-    }
-    func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
-//        
-//        // 배경 이미지의 aspectRatio를 구함
-//        self.bgRatio = bgImg.size.height / bgImg.size.width
-//        // 아이돌 이미지의 aspectRatio를 구함
-//        self.idolRatio = idolImg.size.height / idolImg.size.width
-//        
-        // IECanvasView의 프레임 크기를 구함 for 이미지 저장
-        self.screenSize = bounds
-        
-        // 배경이미지를 scaleToFit하게 만듬
-        self.frameBGSize = CGSize(width: screenSize.width, height: screenSize.width * (bgImg.size.height/bgImg.size.width))
-        
-        self.frameIdolSize = CGSize(width: frameBGSize.width, height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)) // baseWidth를 100으로 지정,세로는 계산
-        
-        // 뷰생성시 아이돌 이미지 위치 지정
-        self.location = CGPoint(x: frameBGSize.width/2, y: self.frameBGSize.height / 2)
-       
-        
     }
 }

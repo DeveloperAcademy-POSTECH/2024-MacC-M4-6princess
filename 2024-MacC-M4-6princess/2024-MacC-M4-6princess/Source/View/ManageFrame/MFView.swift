@@ -34,7 +34,6 @@ struct MFView: View {
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
-                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
                             viewModel.imageDataArray.forEach {
                                 if $0.id == viewModel.selectedImageIds.first {
                                     viewModel.selectFrame(id: $0.id)
@@ -106,15 +105,11 @@ struct MFView: View {
                 }
             }
             .onAppear {
-                // 처음 한 번만 로드
-    //            if viewModel.imageDataArray.isEmpty {
-                    viewModel.loadImages()
-    //            }
+                viewModel.loadImages()
             }
             .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
                 Button {
                     viewModel.deleteSelectedImages()
-                    print("삭제중...")
                 } label: {
                     Text("삭제")
                         .font(.system(size: 17))
@@ -126,18 +121,6 @@ struct MFView: View {
             } message: {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
             }
-//            .alert(isPresented: $viewModel.isDeleteAlert) {
-//                        Alert(
-//                            title: Text("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?"),
-//                            message: Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
-//                            
-//                            primaryButton: .destructive(Text("삭제")) {
-//                                viewModel.deleteSelectedImages()
-//                                print("Deleting...")
-//                            },
-//                            secondaryButton: .cancel(Text("취소"))
-//                        )
-//                    }
         }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
@@ -160,7 +143,7 @@ struct SheetTitleView: View {
         ZStack {
             HStack(alignment: .center) {
                 Spacer()
-                Text("프레임")
+                Text("최애 프레임")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
                     .foregroundColor(.gray01)
@@ -217,7 +200,7 @@ struct FrameGridItem: View {
                             .frame(width: 80, height: 92)
                             .padding(.top, 20)
                             .padding(.bottom, 3)
-                        Text("새로운\n프레임 만들기")
+                        Text("최애 프레임\n만들기")
                             .font(.system(size: 13, weight: .bold))
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white)

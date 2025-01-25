@@ -239,6 +239,8 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         let settings = AVCapturePhotoSettings()
         settings.flashMode = .off
         
+        //여기서 이미지의 회전이 일어난 후 output에 넣어주기?
+        
         // 메인 스레드에서 실행
         DispatchQueue.main.async {
             self.output.capturePhoto(with: settings, delegate: delegate)

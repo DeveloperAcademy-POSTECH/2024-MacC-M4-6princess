@@ -41,7 +41,7 @@ struct CameraTimerSecondsView: View {
                 if viewModel.remainingTime > 0 {
                     viewModel.remainingTime -= 1
                     viewModel.backgroundOpacity += (0.6 / viewModel.delayTime)
-                    print("-1초 : 현재 남은 시간은 \(viewModel.remainingTime)")
+//                    print("-1초 : 현재 남은 시간은 \(viewModel.remainingTime)")
                 }
                 if viewModel.remainingTime <= 0 {
                     timer?.cancel()
