@@ -20,7 +20,7 @@ extension CameraBottomView {
                     print("프레임 버튼 눌림")
                 } label: {
                     VStack(alignment: .center, spacing: 4) {
-                        Image(viewModel.firstTime ? "frameLoadPink" : "frameLoad")
+                        Image("frameLoad")
                             .resizable()
                             .frame(width: 40, height: 40)
                             .cornerRadius(5)
