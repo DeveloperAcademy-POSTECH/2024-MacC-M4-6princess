@@ -12,7 +12,7 @@ import Photos
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     //온보딩 확인용
-//    @State var firstTime = false
+//    @Published var firstTime = false
     @AppStorage("openFirstTime") var firstTime = false
     
     @Published var isTakenPhoto = false
