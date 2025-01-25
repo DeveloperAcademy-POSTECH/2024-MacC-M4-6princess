@@ -13,8 +13,10 @@ import FirebaseAnalytics
 struct IOView: View {
     var bg:UIImage
     var idol:UIImage
-    @StateObject var viewModel = IOViewModel()
+    let motionManager: MotionManager
+    
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @StateObject var viewModel = IOViewModel()
     @State var isAnimating = false
     @State var isSave = false
     @State private var isUploading = false
@@ -23,18 +25,31 @@ struct IOView: View {
     @State private var uploadError: String? = nil
     @State var showQRSheet = false
     @State private var uploadedImagePath: String? = nil // 업로드된 이미지의 경로
-    let motionManager: MotionManager
     
     var body: some View {
         GeometryReader { geometry in
             VStack{
-                Text("저장완료")
-                    .font(.system(size:17))
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.gray01)
+                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                    HStack(alignment: .center, spacing: 14) {
+                        Text("저장완료")
+                            .font(.system(size:17))
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.gray01)
+                    }
                     .padding(.top, 26)
-                Spacer()
+                }
+                else{
+                    HStack(alignment: .center, spacing: 14) {
+                        Text("저장완료")
+                            .font(.system(size:17))
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.gray01)
+                    }
+                    .padding(.top, 26)
+                }
+                
                 // 후보정 레이어 편집 뷰
                 canvasView
                     .onAppear{
@@ -44,53 +59,93 @@ struct IOView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             isSave = true
                         }
+                        print("canvasView onAppear")
                         uploadImage()
                     }
                     .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-                            original.modifier(
-                                RotatedAndScaledEffect(
-                                    angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-                                    scale: 0.75  //하드코딩 수정필요
-                                )
+                        original.modifier(
+                            RotatedAndScaledEffect(
+                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+                                scale: 0.75  //하드코딩 수정필요
                             )
-                        }
+                        )
+                    }
                     .scaledToFit()
                 Spacer()
-                VStack(alignment: .center, spacing: 8){
-                    Text("저장된 사진은 갤러리에서 확인해주세요.")
-                        .font(.system(size:12))
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.gray01)
-                    
-                    // 카메라로 이동 버튼
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Rectangle()
-                            .foregroundColor(.clear)
-                            .frame(height: 60)
-                            .background(Color.pointPink)
-                            .cornerRadius(10)
-                            .overlay(
-                                Text("카메라로 이동")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 18, weight: .bold))
-                            )
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 46)
-                    
-                }
                 
+                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                    VStack(alignment: .center, spacing: 8){
+                        Text("저장된 사진은 갤러리에서 확인해주세요.")
+                            .font(.system(size:12))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.gray01)
+                        HStack{
+                            // 카메라로 이동 버튼
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                                    .frame(height: 60)
+                                    .background(Color.pointPink)
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        Text("카메라로 이동")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 18, weight: .bold))
+                                    )
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 26)
+                        .padding(.horizontal, 20)
+                        
+                    }
+                }
+                else{
+                    VStack(alignment: .center, spacing: 8){
+                        Text("저장된 사진은 갤러리에서 확인해주세요.")
+                            .font(.system(size:12))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.gray01)
+                            .padding(5)
+                        HStack{
+                            // 카메라로 이동 버튼
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                                    .frame(height: 40)
+                                    .background(Color.pointPink)
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        Text("카메라로 이동")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 18, weight: .bold))
+                                    )
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 26)
+                        .padding(.horizontal, 20)
+                        
+                    }
+                }
             }
         }
         .onAppear{
             viewModel.bgImg = bg
             viewModel.idolImg = idol
-            //            viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
+            viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
             Analytics.logEvent("A6_사진저장", parameters: nil)
+            
+            print("body onAppear")
         }
+        //        .onDisappear {
+        //            // QR 보기를 안눌렀으면 파이어베이스에서 사진 삭제
+        //                   deleteUploadedImageIfNeeded()
+        //               }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
@@ -130,19 +185,6 @@ struct IOView: View {
                 print("Failed to delete image: \(error.localizedDescription)")
             }
         }
-    }
-    private func calculateDynamicWidth(geometry: GeometryProxy) -> CGFloat {
-        guard let bgImg = viewModel.bgImg else { return geometry.size.width }
-        
-        let imageRatio = bgImg.size.height / bgImg.size.width
-        return geometry.size.height * imageRatio
-    }
-    
-    private func calculateDynamicHeight(geometry: GeometryProxy) -> CGFloat {
-        guard let bgImg = viewModel.bgImg else { return geometry.size.height }
-        
-        let imageRatio = bgImg.size.height / bgImg.size.width
-        return geometry.size.width * imageRatio
     }
 }
 

@@ -32,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		211EE3742D3E3345005E2A1D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "2024-MacC-M4-6princess.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94ABF2CA9B66300824592 /* 2024-MacC-M4-6princessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94AC92CA9B66300824592 /* 2024-MacC-M4-6princessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,6 +89,7 @@
 				89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */,
 				898B159A2CFD8CCD00EA200A /* Frameworks */,
 				89A94AB02CA9B64C00824592 /* Products */,
+				211EE3742D3E3345005E2A1D /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -408,7 +410,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"2024-MacC-M4-6princess/Preview Content\"";
-				DEVELOPMENT_TEAM = 8D32S9PLZ6;
+				DEVELOPMENT_TEAM = KB52T46C6D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
@@ -449,7 +451,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"2024-MacC-M4-6princess/Preview Content\"";
-				DEVELOPMENT_TEAM = 8D32S9PLZ6;
+				DEVELOPMENT_TEAM = KB52T46C6D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
