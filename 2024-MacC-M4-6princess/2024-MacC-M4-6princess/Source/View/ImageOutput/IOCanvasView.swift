@@ -21,7 +21,8 @@ struct IOCanvasView: View {
             if let originalImage = viewModel.bgImg{
                 Image(uiImage: originalImage)
                     .resizable()
-                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+//                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(contentMode: .fit)
             }
             
@@ -29,8 +30,9 @@ struct IOCanvasView: View {
             if let idolImg = viewModel.idolImg {
                 Image(uiImage: idolImg)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .aspectRatio(contentMode: .fit)
+//                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
                     .scaleEffect(currentScale)
                     .position(viewModel.location)
             }
@@ -40,7 +42,6 @@ struct IOCanvasView: View {
         .onAppear {
             viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
         }
-        .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
     }
 }
 

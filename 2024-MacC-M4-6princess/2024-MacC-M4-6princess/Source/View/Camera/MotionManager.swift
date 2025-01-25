@@ -41,8 +41,22 @@ class MotionManager: ObservableObject {
             return .degrees(90)
         case .landscapeRight:
             return .degrees(-90)
-        case .portrait:
+        case .portraitUpsideDown:
+            return .degrees(180)
+        default:
             return .degrees(0)
+        }
+    }
+    
+    //canvasView 회전을 위한 함수
+    func rotationAngleCanvasView(for orientation: UIDeviceOrientation) -> Angle {
+        switch orientation {
+        case .landscapeLeft:
+            return .degrees(-90)
+        case .landscapeRight:
+            return .degrees(90)
+        case .portraitUpsideDown:
+            return .degrees(180)
         default:
             return .degrees(0)
         }

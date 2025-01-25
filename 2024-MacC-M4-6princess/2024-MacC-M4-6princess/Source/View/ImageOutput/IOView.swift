@@ -26,56 +26,42 @@ struct IOView: View {
     let motionManager: MotionManager
     
     var body: some View {
-        VStack{
-            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
-                Spacer()
-            }
-            HStack(alignment: .center, spacing: 14) {
+        GeometryReader { geometry in
+            VStack{
                 Text("저장완료")
                     .font(.system(size:17))
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray01)
-            }
-            .padding(.vertical)
-            // 후보정 레이어 편집 뷰
-            canvasView
-                .onAppear{
-                    isAnimating = true
-                    viewModel.saveRenderedView(content: canvasView, motionManager: motionManager)
-                    viewModel.saveAnimate = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        isSave = true
+                    .padding(.top, 26)
+                Spacer()
+                // 후보정 레이어 편집 뷰
+                canvasView
+                    .frame(
+                        width: geometry.size.width,
+                        height: calculateDynamicHeight(geometry: geometry)
+                    )
+                    .onAppear{
+                        isAnimating = true
+                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager)
+                        viewModel.saveAnimate = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            isSave = true
+                        }
+                        print("canvasView onAppear")
+                        uploadImage()
                     }
-                    print("canvasView onAppear")
-                    uploadImage()
-                }
-            
-            VStack{
-                Text("저장된 사진은 갤러리에서 확인해주세요.")
-                    .font(.system(size:12))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.gray01)
-                    .padding()
-                HStack(spacing: 16) {
+                //                .rotationEffect(motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation))
+                    .rotateView(angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation))
+                    .scaledToFit()
+//                    .border(.green, width: 3)
+                Spacer()
+                VStack(alignment: .center, spacing: 8){
+                    Text("저장된 사진은 갤러리에서 확인해주세요.")
+                        .font(.system(size:12))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.gray01)
                     
-//                    Button(action: {
-//                        showQRSheet = true
-//                    }) {
-//                        RoundedRectangle(cornerRadius: 10) // RoundedRectangle을 사용
-//                            .stroke(Color.pointPink, lineWidth: 1) // 테두리 추가
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 10) // 동일한 모서리 반경의 배경
-//                                    .foregroundColor(.white)
-//                            )
-//                            .frame(height: 60) // 높이 설정
-//                            .overlay(
-//                                Text("QR 보기")
-//                                    .foregroundColor(.pointPink)
-//                                    .font(.system(size: 18, weight: .bold))
-//                            )
-//                    }
-
                     // 카메라로 이동 버튼
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
@@ -91,26 +77,22 @@ struct IOView: View {
                                     .font(.system(size: 18, weight: .bold))
                             )
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 46)
+                    
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-
+                
             }
-            Spacer()
-            
         }
         .onAppear{
             viewModel.bgImg = bg
             viewModel.idolImg = idol
-            viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
+            //            viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
             Analytics.logEvent("A6_사진저장", parameters: nil)
             
             print("body onAppear")
         }
-//        .onDisappear {
-//            // QR 보기를 안눌렀으면 파이어베이스에서 사진 삭제
-//                   deleteUploadedImageIfNeeded()
-//               }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
@@ -118,39 +100,46 @@ struct IOView: View {
         // 상단 툴바
         .navigationBarBackButtonHidden()
         .sheet(isPresented: $showQRSheet) {
-                    QRCodeSheetView(qrCodeImage: qrCodeImage)
-                }
+            QRCodeSheetView(qrCodeImage: qrCodeImage)
+        }
     }
     var canvasView: some View {
         IOCanvasView(viewModel: viewModel)
     }
     private func uploadImage() {
         guard let selectedImage = viewModel.compositeImage else { return }
-            isUploading = true
-            StorageManager.shared.uploadImage(image: selectedImage) { result in
-                DispatchQueue.main.async {
-                    isUploading = false
-                    switch result {
-                    case .success(let url):
-                        self.qrCodeImage = QRCodeGenerator.shared.generateQRCode(from: url.absoluteString)
-                            self.uploadedImagePath = url.path // 업로드된 이미지 경로 저장
-                    case .failure(let error):
-                        self.uploadError = error.localizedDescription
-                    }
+        isUploading = true
+        StorageManager.shared.uploadImage(image: selectedImage) { result in
+            DispatchQueue.main.async {
+                isUploading = false
+                switch result {
+                case .success(let url):
+                    self.qrCodeImage = QRCodeGenerator.shared.generateQRCode(from: url.absoluteString)
+                    self.uploadedImagePath = url.path // 업로드된 이미지 경로 저장
+                case .failure(let error):
+                    self.uploadError = error.localizedDescription
                 }
             }
         }
+    }
     private func deleteUploadedImageIfNeeded() {
-         guard let path = uploadedImagePath else { return }
-         StorageManager.shared.deleteImage(path: path) { result in
-             switch result {
-             case .success:
-                 print("Image successfully deleted from Firebase.")
-             case .failure(let error):
-                 print("Failed to delete image: \(error.localizedDescription)")
-             }
-         }
-     }
+        guard let path = uploadedImagePath else { return }
+        StorageManager.shared.deleteImage(path: path) { result in
+            switch result {
+            case .success:
+                print("Image successfully deleted from Firebase.")
+            case .failure(let error):
+                print("Failed to delete image: \(error.localizedDescription)")
+            }
+        }
+    }
+    private func calculateDynamicHeight(geometry: GeometryProxy) -> CGFloat {
+        guard let bgImg = viewModel.bgImg else { return geometry.size.height }
+        
+        let imageRatio = bgImg.size.height / bgImg.size.width
+        return geometry.size.width * imageRatio
+    }
+
 }
 
 
