@@ -111,7 +111,6 @@ struct MFView: View {
             .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
                 Button {
                     viewModel.deleteSelectedImages()
-                    print("삭제중...")
                 } label: {
                     Text("삭제")
                         .font(.system(size: 17))

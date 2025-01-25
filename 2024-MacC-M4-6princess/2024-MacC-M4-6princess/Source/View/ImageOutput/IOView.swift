@@ -44,7 +44,6 @@ struct IOView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             isSave = true
                         }
-                        print("canvasView onAppear")
                         uploadImage()
                     }
                     .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
@@ -91,8 +90,6 @@ struct IOView: View {
             viewModel.idolImg = idol
             //            viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
             Analytics.logEvent("A6_사진저장", parameters: nil)
-            
-            print("body onAppear")
         }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
