@@ -37,10 +37,6 @@ struct IOView: View {
                 Spacer()
                 // 후보정 레이어 편집 뷰
                 canvasView
-                    .frame(
-                        width: geometry.size.width,
-                        height: calculateDynamicHeight(geometry: geometry)
-                    )
                     .onAppear{
                         isAnimating = true
                         viewModel.saveRenderedView(content: canvasView, motionManager: motionManager)
@@ -51,10 +47,15 @@ struct IOView: View {
                         print("canvasView onAppear")
                         uploadImage()
                     }
-                //                .rotationEffect(motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation))
-                    .rotateView(angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation))
+                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+                            original.modifier(
+                                RotatedAndScaledEffect(
+                                    angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+                                    scale: 0.75  //하드코딩 수정필요
+                                )
+                            )
+                        }
                     .scaledToFit()
-//                    .border(.green, width: 3)
                 Spacer()
                 VStack(alignment: .center, spacing: 8){
                     Text("저장된 사진은 갤러리에서 확인해주세요.")
@@ -133,13 +134,19 @@ struct IOView: View {
             }
         }
     }
+    private func calculateDynamicWidth(geometry: GeometryProxy) -> CGFloat {
+        guard let bgImg = viewModel.bgImg else { return geometry.size.width }
+        
+        let imageRatio = bgImg.size.height / bgImg.size.width
+        return geometry.size.height * imageRatio
+    }
+    
     private func calculateDynamicHeight(geometry: GeometryProxy) -> CGFloat {
         guard let bgImg = viewModel.bgImg else { return geometry.size.height }
         
         let imageRatio = bgImg.size.height / bgImg.size.width
         return geometry.size.width * imageRatio
     }
-
 }
 
 

@@ -27,7 +27,6 @@ struct CameraBottomView: View {
 //                        viewModel.isShowMFView.toggle()
                         frameManager.showMFView = true
                         viewModel.cameraManager.stopSession()
-                        print("프레임 버튼 눌림")
                     } label: {
                         VStack(alignment: .center, spacing: 4) {
                             Image(viewModel.firstTime ? "frameLoadPink" : "frameLoad")

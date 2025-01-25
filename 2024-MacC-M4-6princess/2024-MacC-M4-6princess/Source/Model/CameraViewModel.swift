@@ -125,8 +125,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
             self.takenImg = croppedImage
             self.nextView = true
-            print("nextView:\(self.nextView)")
-            print("이미지 사이즈: \(image.size)")
+//            print("nextView:\(self.nextView)")
+//            print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
         }
     }
@@ -153,7 +153,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         let cropRect: CGRect = CGRect(x: 0, y: (height - (width * 4/3))/2 - 3
                                       , width: width, height: width * frameRatio)
         
-        print("높이는 \((height - (width * 4/3))/2 - 3)")
+//        print("높이는 \((height - (width * 4/3))/2 - 3)")
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image
         }

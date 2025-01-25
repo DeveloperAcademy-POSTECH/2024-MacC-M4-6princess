@@ -7,34 +7,6 @@
 
 import SwiftUI
 
-//extension UIImage {
-//    func rotate(orientation: UIDeviceOrientation) -> UIImage? {
-//        var angle: CGFloat = 0.0
-//        
-//        switch orientation {
-//        case .landscapeLeft:
-//            angle = .pi / 2
-//        case .landscapeRight:
-//            angle = -.pi / 2
-//        case .portrait:
-//            angle = 0
-//        default:
-//            return self
-//        }
-//        
-//        UIGraphicsBeginImageContext(self.size)
-//        let context = UIGraphicsGetCurrentContext()
-//        context?.translateBy(x: self.size.width / 2, y: self.size.height / 2)
-//        context?.rotate(by: angle)
-//        context?.translateBy(x: -self.size.width / 2, y: -self.size.height / 2)
-//        self.draw(in: CGRect(origin: .zero, size: self.size))
-//        let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
-//        
-//        return rotatedImage
-//    }
-//}
-
 struct RotateView: ViewModifier {
     let angle: Angle
     
@@ -44,8 +16,45 @@ struct RotateView: ViewModifier {
     }
 }
 
+struct RotatedAndScaledEffect: GeometryEffect {
+    var angle: Angle
+    var scale: CGFloat
+    
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        // 뷰의 중심점 구하기
+        let centerX = size.width / 2
+        let centerY = size.height / 2
+        
+        // 중심점을 기준으로 회전 + 스케일
+        var transform = CGAffineTransform.identity
+        transform = transform.translatedBy(x: centerX, y: centerY)
+        transform = transform.rotated(by: CGFloat(angle.radians))
+        transform = transform.scaledBy(x: scale, y: scale)
+        transform = transform.translatedBy(x: -centerX, y: -centerY)
+        
+        return ProjectionTransform(transform)
+    }
+}
+
 extension View {
     func rotateView(angle: Angle) -> some View {
         self.modifier(RotateView(angle: angle))
     }
+    
+    func rotateAndScale(angle: Angle, scale: CGFloat = 1.0) -> some View {
+            self.modifier(RotatedAndScaledEffect(angle: angle, scale: scale))
+        }
+    
+    //모디파이어 적용 시 조건부적용이 가능하도록 - canvasView에서 사용중
+    @ViewBuilder
+        func applyIf<Transformed: View>(
+            _ condition: Bool,
+            transform: (Self) -> Transformed
+        ) -> some View {
+            if condition {
+                transform(self)
+            } else {
+                self
+            }
+        }
 }
