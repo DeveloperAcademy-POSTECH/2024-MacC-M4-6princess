@@ -34,7 +34,6 @@ struct MFView: View {
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
-                            //TODO: 프레임 수정 뷰로 넘어갈 때 데이터를 어떻게 넘겨줄지...
                             viewModel.imageDataArray.forEach {
                                 if $0.id == viewModel.selectedImageIds.first {
                                     viewModel.selectFrame(id: $0.id)
@@ -144,7 +143,7 @@ struct SheetTitleView: View {
         ZStack {
             HStack(alignment: .center) {
                 Spacer()
-                Text("프레임")
+                Text("최애 프레임")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
                     .foregroundColor(.gray01)
@@ -201,7 +200,7 @@ struct FrameGridItem: View {
                             .frame(width: 80, height: 92)
                             .padding(.top, 20)
                             .padding(.bottom, 3)
-                        Text("새로운\n프레임 만들기")
+                        Text("최애 프레임\n만들기")
                             .font(.system(size: 13, weight: .bold))
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white)
