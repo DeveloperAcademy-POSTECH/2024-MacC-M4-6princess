@@ -84,15 +84,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         preview.videoGravity = .resizeAspectFill
     }
     
-    //무음으로 작업할때만 사용하는 함수. 지우면 슬퍼요
-        func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-            print("카메라 셔터음 무음으로 변경됨")
-            AudioServicesDisposeSystemSoundID(1108)
-    
-        }
-        func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-            AudioServicesDisposeSystemSoundID(1108)
-        }
+//    //무음으로 작업할때만 사용하는 함수. 지우면 슬퍼요
+//        func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//            print("카메라 셔터음 무음으로 변경됨")
+//            AudioServicesDisposeSystemSoundID(1108)
+//    
+//        }
+//        func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//            AudioServicesDisposeSystemSoundID(1108)
+//        }
     
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
