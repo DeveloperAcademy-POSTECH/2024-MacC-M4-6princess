@@ -49,6 +49,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //카메라 화면전환 관련
     @Published var cameraPosition: AVCaptureDevice.Position = .back
     
+    @Published var showOrientationAlert: Bool = false
+    
     //오류 알림
     @Published var showErrorAlert = false
     @Published var errorMessage: String = ""
