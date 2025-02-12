@@ -21,7 +21,7 @@ struct IOCanvasView: View {
             if let originalImage = viewModel.bgImg{
                 Image(uiImage: originalImage)
                     .resizable()
-//                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
+                //                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(contentMode: .fit)
             }
@@ -32,7 +32,7 @@ struct IOCanvasView: View {
                     .resizable()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(contentMode: .fit)
-//                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
+                //                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
                     .scaleEffect(currentScale)
                     .position(viewModel.location)
             }
@@ -40,14 +40,15 @@ struct IOCanvasView: View {
             VStack{
                 Spacer()
                 HStack{
+                    
+                    Spacer()
                     Image("humor01")
                         .resizable() // 이미지 크기 조정 가능하도록 설정
                         .scaledToFit() // 원본 비율 유지하며 프레임 내에서 조정
                         .frame(width: 100)
                         .padding()
-
-                       
-                    Spacer()
+                    
+                    
                 }
             }
             

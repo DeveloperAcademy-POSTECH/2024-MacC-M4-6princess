@@ -17,7 +17,8 @@ struct IOView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @StateObject var viewModel = IOViewModel()
-
+    @State var isShowShareSheet = false
+    
     var body: some View {
         GeometryReader { geometry in
             VStack{
@@ -112,6 +113,20 @@ struct IOView: View {
                                             .font(.system(size: 18, weight: .bold))
                                     )
                             }
+                            Button(action: {
+                                isShowShareSheet = true
+                            }) {
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                                    .frame(height: 40)
+                                    .background(Color.pointPink)
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        Text("SNS 공유")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 18, weight: .bold))
+                                    )
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.bottom, 26)
@@ -132,6 +147,11 @@ struct IOView: View {
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
+        .sheet(isPresented: $isShowShareSheet){
+            IOSNSView()
+                .presentationDetents([.height(300)])
+        }
+        
         
         // 상단 툴바
         .navigationBarBackButtonHidden()
