@@ -37,7 +37,20 @@ struct IOCanvasView: View {
                     .position(viewModel.location)
             }
             
-               
+            VStack{
+                Spacer()
+                HStack{
+                    Image("humor01")
+                        .resizable() // 이미지 크기 조정 가능하도록 설정
+                        .scaledToFit() // 원본 비율 유지하며 프레임 내에서 조정
+                        .frame(width: 100)
+                        .padding()
+
+                       
+                    Spacer()
+                }
+            }
+            
         }
         .onAppear {
             viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)

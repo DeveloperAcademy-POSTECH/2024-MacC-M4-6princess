@@ -45,7 +45,7 @@ struct IOView: View {
                 // 후보정 레이어 편집 뷰
                 canvasView
                     .onAppear{
-                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager)
+                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")
                     }
