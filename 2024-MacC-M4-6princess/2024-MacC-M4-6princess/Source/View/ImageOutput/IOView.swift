@@ -51,26 +51,25 @@ struct IOView: View {
                 }
                 
                 // 후보정 레이어 편집 뷰
-                canvasView
-                    .onAppear{
-                        isAnimating = true
-                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager)
-                        viewModel.saveAnimate = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            isSave = true
-                        }
-                        print("canvasView onAppear")
-                        uploadImage()
-                    }
-                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-                        original.modifier(
-                            RotatedAndScaledEffect(
-                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-                                scale: 0.75  //하드코딩 수정필요
+                if let compositeImage = viewModel.compositeImage {
+                    Image(uiImage: compositeImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height * 0.8)
+                        .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+                            original.modifier(
+                                RotatedAndScaledEffect(
+                                    angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+                                    scale: 0.75  //하드코딩 수정필요
+                                )
                             )
-                        )
-                    }
-                    .scaledToFit()
+                        }
+                        .scaledToFit()
+                } else {
+                    ProgressView("이미지를 처리 중입니다...")
+                        .frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height * 0.8)
+                }
+                
                 Spacer()
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
@@ -135,6 +134,7 @@ struct IOView: View {
             }
         }
         .onAppear{
+            viewModel.combineAndSave(bgImage: bg, frameImage: idol, scaleFactor: 3.0)
             viewModel.bgImg = bg
             viewModel.idolImg = idol
             viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)

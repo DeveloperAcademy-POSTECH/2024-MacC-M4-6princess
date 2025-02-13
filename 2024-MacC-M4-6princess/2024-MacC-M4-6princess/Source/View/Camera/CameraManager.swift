@@ -95,6 +95,11 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 position: .back
             )
             
+            let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+            photoSettings.isHighResolutionPhotoEnabled = true
+            photoSettings.photoQualityPrioritization = .quality
+            
+            
             guard let device = getBestCamera(from: discoverySession.devices) else {
                 session.commitConfiguration()
                 print("사용 가능한 카메라를 찾을 수 없습니다")
