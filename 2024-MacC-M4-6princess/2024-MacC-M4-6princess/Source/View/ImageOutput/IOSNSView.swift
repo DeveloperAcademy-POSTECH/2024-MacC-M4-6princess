@@ -10,7 +10,6 @@ struct IOSNSView: View {
     @StateObject var viewModel: IOViewModel
     
     var body: some View {
-        //여기에 들어가는 시트는 인스타, 트위터(X) 텍스트로 되어있는 버튼 각각
         HStack(spacing: 20) {
             // Instagram 공유 버튼
             Button("insta") {
@@ -19,30 +18,26 @@ struct IOSNSView: View {
                 }
             }
             .buttonStyle(.bordered)
-
-            // X (구 Twitter) 공유 버튼
+            // X 공유 버튼
             Button("X") {
+                // 텍스트만 공유하는 경우
+                XSharingUtils.shareToX(text: "이 멋진 사진은 frameet으로부터 만들어져서...🍀") { success in
+                    if !success {
+                        print("X 앱을 열 수 없습니다")
+                    }
+                }
+                
+                // 이미지와 텍스트 함께 공유하는 경우
                 if let composite = viewModel.compositeImage {
-                    shareToX(image: composite)
+                    XSharingUtils.shareToXWithImage(
+                        text: "공유하고 싶은 메시지",
+                        image: composite
+                    )
                 }
             }
             .buttonStyle(.borderless)
         }
     }
-
-    // MARK: - X (구 Twitter) 공유 기능 추가
-    private func shareToX(image: UIImage) {
-        guard let imageData = image.pngData() else {
-            print("❌ 이미지 변환 실패")
-            return
-        }
-        
-        let activityVC = UIActivityViewController(activityItems: [imageData], applicationActivities: nil)
-        
-        // 현재 화면의 최상위 UIViewController를 찾아서 공유 시트 표시
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootViewController = windowScene.windows.first?.rootViewController {
-            rootViewController.present(activityVC, animated: true, completion: nil)
-        }
-    }
+    
 }
+

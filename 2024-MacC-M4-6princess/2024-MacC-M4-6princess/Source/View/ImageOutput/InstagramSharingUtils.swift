@@ -51,3 +51,38 @@ struct InstagramSharingUtils {
         UIApplication.shared.open(instagramStoriesUrl, options: [:], completionHandler: nil)
     }
 }
+// X 공유를 위한 유틸리티
+struct XSharingUtils {
+    // X 앱을 열 수 있는지 확인
+    static var canOpenX: Bool {
+        guard let url = URL(string: "twitter://") else { return false }
+        return UIApplication.shared.canOpenURL(url)
+    }
+    
+    // 기본 텍스트 공유
+    static func shareToX(text: String, completion: ((Bool) -> Void)? = nil) {
+        guard let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
+        let urlString = "twitter://post?message=\(encodedText)"
+        
+        guard let url = URL(string: urlString) else { return }
+        
+        UIApplication.shared.open(url) { success in
+            completion?(success)
+        }
+    }
+    
+    // 이미지와 텍스트 함께 공유 (웹 링크를 통해)
+    static func shareToXWithImage(text: String, image: UIImage) {
+        // 이미지를 PNG로 저장
+        guard let imageData = image.pngData(),
+              let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            return
+        }
+        
+        // X 웹 공유 URL 사용 (앱이 설치되어 있으면 앱으로 리다이렉션 됨)
+        let webUrlString = "https://x.com/intent/tweet?text=\(encodedText)"
+        guard let webUrl = URL(string: webUrlString) else { return }
+        
+        UIApplication.shared.open(webUrl)
+    }
+}

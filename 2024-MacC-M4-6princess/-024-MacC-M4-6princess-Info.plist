@@ -6,6 +6,8 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>x</string>
+		<string>twitter</string>
 		<string>instagram-stories</string>
 	</array>
 	<key>UIAppFonts</key>
