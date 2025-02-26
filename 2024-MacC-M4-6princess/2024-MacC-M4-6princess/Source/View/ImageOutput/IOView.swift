@@ -17,7 +17,7 @@ struct IOView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @StateObject var viewModel = IOViewModel()
-    @State var isShowShareSheet = false
+    
     
     var body: some View {
         GeometryReader { geometry in
@@ -84,7 +84,7 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                isShowShareSheet = true
+                                viewModel.isShowShareSheet = true
                             }) {
                                 Rectangle()
                                     .foregroundColor(.clear)
@@ -128,7 +128,7 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                isShowShareSheet = true
+                                viewModel.isShowShareSheet = true
                             }) {
                                 Rectangle()
                                     .foregroundColor(.clear)
@@ -161,7 +161,7 @@ struct IOView: View {
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
-        .sheet(isPresented: $isShowShareSheet){
+        .sheet(isPresented: $viewModel.isShowShareSheet){
             IOSNSView(viewModel: viewModel)
                 .presentationDetents([.height(300)])
         }

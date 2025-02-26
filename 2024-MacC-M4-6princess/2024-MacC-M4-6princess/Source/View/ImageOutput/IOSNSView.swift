@@ -1,14 +1,7 @@
-//
-//  IOSNSView.swift
-//  2024-MacC-M4-6princess
-//
-//  Created by ram on 2/12/25.
-//
 import SwiftUI
 
 struct IOSNSView: View {
     @StateObject var viewModel: IOViewModel
-    @State private var showingActivitySheet = false
     
     var body: some View {
         HStack(spacing: 20) {
@@ -20,55 +13,144 @@ struct IOSNSView: View {
             }
             .buttonStyle(.bordered)
             
-            // X 공유 버튼
-            Button("X") {
-                guard let composite = viewModel.compositeImage else {
-                    print("이미지가 없습니다.")
-                    return
-                }
-                
-                XSharingUtils.shareToXWithImage(
-                    text: "이 멋진 사진은 frameet으로부터 만들어졌어요! 🍀",
-                    image: composite
-                )
-            }
-            .buttonStyle(.borderless)
-            
-            // 더보기 버튼
+            // 더보기 버튼 (Share with UIActivityViewController)
             Button(action: {
-                showingActivitySheet = true
+                // If we have an image to share
+                if let image = viewModel.compositeImage {
+                    // Create share action
+                    let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+                    
+                    // Present the view controller
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let rootViewController = windowScene.windows.first?.rootViewController {
+                        rootViewController.present(activityVC, animated: true)
+                    }
+                }
             }) {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 20))
             }
             .buttonStyle(.borderless)
         }
-        .sheet(isPresented: $showingActivitySheet) {
-            if let composite = viewModel.compositeImage {
-                ActivityViewController(
-                    activityItems: [
-                        "이 멋진 사진은 frameet으로부터 만들어졌어요! 🍀",
-                        composite
-                    ],
-                    applicationActivities: nil
-                )
+    }
+}
+import SwiftUI
+import UIKit
+import LinkPresentation
+
+struct SnsTestView: View {
+    @State private var isShowingShareSheet = false
+    @State var imageName = "testFrame"
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Display the image
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 300)
+            
+            // Share button
+            Button("공유하기") {
+                isShowingShareSheet = true
             }
+            .buttonStyle(.borderedProminent)
+            .padding()
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .onAppear {
+            // Prepare any resources if needed
+        }
+        .background(
+            ShareSheet(isPresented: $isShowingShareSheet, shareData: (imageName,"title","content"))
+        )
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    var shareData: (imageName: String, title: String, content: String)
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        let controller = UIViewController()
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        if isPresented && uiViewController.presentedViewController == nil {
+            let image = UIImage(named: shareData.imageName) ?? UIImage()
+            
+//            let items = [SharePinNumberActivityItemSource(
+//                title: shareData.title,
+//                content: shareData.content,
+//                image: image
+//            )]
+            let items = [
+                SharePinNumberActivityItemSource(
+                    title: shareData.title,
+                    content: shareData.content,
+                    image: image
+                ),
+                image // 이미지도 추가
+            ]
+
+            
+            let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            
+            // Closure to handle dismissal
+            activityVC.completionWithItemsHandler = { _, _, _, _ in
+                self.isPresented = false
+            }
+            
+            // Present the activity view controller
+            uiViewController.present(activityVC, animated: true)
         }
     }
 }
 
-// UIActivityViewController를 위한 래퍼
-struct ActivityViewController: UIViewControllerRepresentable {
-    let activityItems: [Any]
-    let applicationActivities: [UIActivity]?
+// The SharePinNumberActivityItemSource class you provided
+final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
+    private var title: String
+    private var content: String
+    private var image: UIImage
     
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        let controller = UIActivityViewController(
-            activityItems: activityItems,
-            applicationActivities: applicationActivities
-        )
-        return controller
+    init(title: String, content: String, image: UIImage) {
+        self.title = title
+        self.content = content
+        self.image = image
+        
+        super.init()
     }
     
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return content
+    }
+    
+    func activityViewController(
+        _ activityViewController: UIActivityViewController,
+        itemForActivityType activityType: UIActivity.ActivityType?
+    ) -> Any? {
+        if activityType == .saveToCameraRoll || activityType == .postToFacebook || activityType == .postToTwitter {
+            return image  // 이미지만 공유할 때
+        }
+        return content  // 기본적으로 텍스트를 공유
+    }
+
+    
+    
+    func activityViewController(
+        _ activityViewController: UIActivityViewController,
+        subjectForActivityType activityType: UIActivity.ActivityType?
+    ) -> String {
+        return title
+    }
+    
+    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
+        let metaData = LPLinkMetadata()
+        metaData.title = title
+        metaData.iconProvider = NSItemProvider(object: image)
+        metaData.originalURL = URL(fileURLWithPath: content)
+        return metaData
+    }
 }
