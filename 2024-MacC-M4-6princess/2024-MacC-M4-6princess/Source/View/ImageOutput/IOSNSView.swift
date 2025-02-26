@@ -8,6 +8,7 @@ import SwiftUI
 
 struct IOSNSView: View {
     @StateObject var viewModel: IOViewModel
+    @State private var showingActivitySheet = false
     
     var body: some View {
         HStack(spacing: 20) {
@@ -18,26 +19,56 @@ struct IOSNSView: View {
                 }
             }
             .buttonStyle(.bordered)
+            
             // X 공유 버튼
             Button("X") {
-                // 텍스트만 공유하는 경우
-                XSharingUtils.shareToX(text: "이 멋진 사진은 frameet으로부터 만들어져서...🍀") { success in
-                    if !success {
-                        print("X 앱을 열 수 없습니다")
-                    }
+                guard let composite = viewModel.compositeImage else {
+                    print("이미지가 없습니다.")
+                    return
                 }
                 
-                // 이미지와 텍스트 함께 공유하는 경우
-                if let composite = viewModel.compositeImage {
-                    XSharingUtils.shareToXWithImage(
-                        text: "공유하고 싶은 메시지",
-                        image: composite
-                    )
-                }
+                XSharingUtils.shareToXWithImage(
+                    text: "이 멋진 사진은 frameet으로부터 만들어졌어요! 🍀",
+                    image: composite
+                )
+            }
+            .buttonStyle(.borderless)
+            
+            // 더보기 버튼
+            Button(action: {
+                showingActivitySheet = true
+            }) {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 20))
             }
             .buttonStyle(.borderless)
         }
+        .sheet(isPresented: $showingActivitySheet) {
+            if let composite = viewModel.compositeImage {
+                ActivityViewController(
+                    activityItems: [
+                        "이 멋진 사진은 frameet으로부터 만들어졌어요! 🍀",
+                        composite
+                    ],
+                    applicationActivities: nil
+                )
+            }
+        }
     }
-    
 }
 
+// UIActivityViewController를 위한 래퍼
+struct ActivityViewController: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]?
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
