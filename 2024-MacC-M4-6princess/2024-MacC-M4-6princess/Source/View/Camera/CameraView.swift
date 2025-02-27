@@ -24,13 +24,13 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
-            Group{
-                if let image = frameManager.resultImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                }
-            }
+//            Group{
+//                if let image = frameManager.resultImage {
+//                    Image(uiImage: image)
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fill)
+//                }
+//            }
             .allowsHitTesting(false)
         }
     }
@@ -43,21 +43,24 @@ struct CameraView: View {
                     Color.clear
                         .frame(height: 94) // TopView 높이만큼 여백 확보
                     
-                    cameraPreview
-                        .frame(width: UIScreen.main.bounds.width,
-                               height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                        .gesture(MagnificationGesture()
-                            .onChanged { val in
-                                viewModel.zoom(factor: val)
+                    ZStack{
+                        cameraPreview
+                            .frame(width: UIScreen.main.bounds.width,
+                                   height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                            .gesture(MagnificationGesture()
+                                .onChanged { val in
+                                    viewModel.zoom(factor: val)
+                                }
+                                .onEnded { _ in
+                                    viewModel.zoomInitialize()
+                                })
+                            .onAppear {
+                                if UIDevice.current.userInterfaceIdiom == .pad {
+                                    viewModel.showOrientationAlert = true
+                                }
                             }
-                            .onEnded { _ in
-                                viewModel.zoomInitialize()
-                            })
-                        .onAppear {
-                            if UIDevice.current.userInterfaceIdiom == .pad {
-                                viewModel.showOrientationAlert = true
-                            }
-                        }
+                        FilteredImageView()
+                    }
                     
                     Spacer()
                 }

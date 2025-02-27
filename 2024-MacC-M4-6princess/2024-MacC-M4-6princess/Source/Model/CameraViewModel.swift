@@ -12,7 +12,7 @@ import Photos
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
     
     //온보딩 확인용
-//    @Published var firstTime = false
+    //    @Published var firstTime = false
     @AppStorage("openFirstTime") var firstTime = false
     
     @Published var isTakenPhoto = false
@@ -60,7 +60,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     var ScreenSize:CGSize = UIScreen.main.bounds.size
     let cameraManager: CameraManager
     let motionManager = MotionManager()
-
+    
     init(cameraManager: CameraManager = CameraManager()) {
         self.cameraManager = cameraManager
         self.idolImg = UIImage(named: "Felix") ?? UIImage()
@@ -77,24 +77,20 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         _ = motionManager
     }
     
-    
-    
-    
-    
     private func setupPreviewLayer() {
         preview = AVCaptureVideoPreviewLayer(session: cameraManager.session)
         preview.videoGravity = .resizeAspectFill
     }
     
-//    //무음으로 작업할때만 사용하는 함수. 지우면 슬퍼요
-//        func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//            print("카메라 셔터음 무음으로 변경됨")
-//            AudioServicesDisposeSystemSoundID(1108)
-//    
-//        }
-//        func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//            AudioServicesDisposeSystemSoundID(1108)
-//        }
+    //    //무음으로 작업할때만 사용하는 함수. 지우면 슬퍼요
+    //        func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+    //            print("카메라 셔터음 무음으로 변경됨")
+    //            AudioServicesDisposeSystemSoundID(1108)
+    //    
+    //        }
+    //        func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+    //            AudioServicesDisposeSystemSoundID(1108)
+    //        }
     
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
@@ -127,8 +123,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             self.picData = croppedImage.jpegData(compressionQuality: 1.0) ?? Data()
             self.takenImg = croppedImage
             self.nextView = true
-//            print("nextView:\(self.nextView)")
-//            print("이미지 사이즈: \(image.size)")
+            //            print("nextView:\(self.nextView)")
+            //            print("이미지 사이즈: \(image.size)")
             print("사진이 성공적으로 처리되었습니다")
         }
     }
@@ -155,7 +151,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         let cropRect: CGRect = CGRect(x: 0, y: (height - (width * 4/3))/2 - 3
                                       , width: width, height: width * frameRatio)
         
-//        print("높이는 \((height - (width * 4/3))/2 - 3)")
+        //        print("높이는 \((height - (width * 4/3))/2 - 3)")
         guard let cgImage = image.cgImage?.cropping(to: cropRect) else {
             return image
         }
@@ -165,7 +161,14 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     //셔터가 눌리면 실행되는 함수
     func takePic() {
         // 메인 큐에서 실행
-        DispatchQueue.main.async {
+        if !self.cameraManager.session.isRunning {
+            self.cameraManager.startSession()
+            // 세션이 시작될 때까지 잠시 대기
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.cameraManager.takePicture(delegate: self)
+                self.isTakenPhoto.toggle()
+            }
+        } else {
             self.cameraManager.takePicture(delegate: self)
             self.isTakenPhoto.toggle()
         }
@@ -231,7 +234,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             }
         }
     }
-
+    
     //해당 factor로 줌을 해주는 함수
     func setZoom(factor: CGFloat) {
         guard let device = cameraManager.videoDeviceInput?.device else { return }
@@ -256,13 +259,13 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             print("줌 설정 오류: \(error.localizedDescription)")
         }
     }
-
+    
     //줌 스케일 초기화
     func zoomInitialize() {
         lastScale = 1.0  // 제스처를 위한 scale만 초기화
         print("lastScale 초기화됨")
     }
-
+    
     //기기에 따른 줌 범위 설정
     func getZoomRange(for device: AVCaptureDevice) -> ClosedRange<CGFloat> {
         if device.position == .back {
