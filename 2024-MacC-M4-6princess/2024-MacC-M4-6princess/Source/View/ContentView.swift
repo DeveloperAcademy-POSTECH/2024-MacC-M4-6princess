@@ -12,8 +12,9 @@ struct ContentView: View {
     @ObservedObject var imageModel = ImageListModel()
      
     var body: some View {
-        
-        CameraView().environmentObject(imageModel)
+        MainTabView()
+//        CameraView()
+//            .environmentObject(imageModel)
             
 //        IEDevelopView().environmentObject(layerListViewModel)
         

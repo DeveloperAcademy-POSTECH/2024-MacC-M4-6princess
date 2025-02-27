@@ -65,13 +65,14 @@ struct CameraView: View {
                     Spacer()
                 }
                 VStack {
-                    CameraTopView(viewModel: viewModel)
-                    Spacer()
+//                    CameraTopView(viewModel: viewModel)
+//                    Spacer()
                     CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-                    CameraBottomView(viewModel: viewModel)
-                        .environmentObject(naviManager)
-                        .environmentObject(frameManager)
+//                    CameraBottomView(viewModel: viewModel)
+//                        .environmentObject(naviManager)
+//                        .environmentObject(frameManager)
+//                    MainTabView()
                 }
                 //v end
                 //처음 실행했을 때 - 온보딩 합침
