@@ -84,7 +84,8 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                viewModel.isShowShareSheet = true
+//                                viewModel.ShowShare = true
+                                viewModel.showAcitivity.toggle()
                             }) {
                                 Rectangle()
                                     .foregroundColor(.clear)
@@ -128,7 +129,7 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                viewModel.isShowShareSheet = true
+                                viewModel.ShowShare = true
                             }) {
                                 Rectangle()
                                     .foregroundColor(.clear)
@@ -161,20 +162,27 @@ struct IOView: View {
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
-        .sheet(isPresented: $viewModel.isShowShareSheet){
+        .sheet(isPresented: $viewModel.ShowShare){
 //            IOSNSView(viewModel: viewModel)
 //                .presentationDetents([.height(300)])
-            if let image = viewModel.compositeImage{
-                ShareSheet(isPresented: $viewModel.isShowShareSheet, shareData: (image,"title","Frameet으로 사진 낋여왔음"))
+            Group{
+                if let photo = viewModel.compositeImage
+//                    ,viewModel.showAcitivity
+                {
+                    ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
+                }
             }
         }
-//        .background(
-//            Group{
-//                if let image = viewModel.compositeImage{
-//                    ShareSheet(isPresented: $isShowingShareSheet, shareData: (image,"title","Frameet으로 사진 낋여왔음"))
-//                }
-//            }
-//        )
+        .overlay(
+            
+            Group{
+                if let photo = viewModel.compositeImage
+                    ,viewModel.showAcitivity
+                {
+                    ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
+                }
+            }
+        )
         
         
         // 상단 툴바

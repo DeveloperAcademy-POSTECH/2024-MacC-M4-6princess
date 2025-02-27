@@ -42,7 +42,7 @@ struct IOCanvasView: View {
                 HStack{
                     
                     Spacer()
-                    Image("humor01")
+                    Image("logo.output")
                         .resizable() // 이미지 크기 조정 가능하도록 설정
                         .scaledToFit() // 원본 비율 유지하며 프레임 내에서 조정
                         .frame(width: 100)
