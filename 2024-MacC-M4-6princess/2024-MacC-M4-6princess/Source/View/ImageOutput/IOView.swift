@@ -162,9 +162,19 @@ struct IOView: View {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
         .sheet(isPresented: $viewModel.isShowShareSheet){
-            IOSNSView(viewModel: viewModel)
-                .presentationDetents([.height(300)])
+//            IOSNSView(viewModel: viewModel)
+//                .presentationDetents([.height(300)])
+            if let image = viewModel.compositeImage{
+                ShareSheet(isPresented: $viewModel.isShowShareSheet, shareData: (image,"title","Frameet으로 사진 낋여왔음"))
+            }
         }
+//        .background(
+//            Group{
+//                if let image = viewModel.compositeImage{
+//                    ShareSheet(isPresented: $isShowingShareSheet, shareData: (image,"title","Frameet으로 사진 낋여왔음"))
+//                }
+//            }
+//        )
         
         
         // 상단 툴바
