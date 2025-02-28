@@ -94,10 +94,16 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
         return image
     }
     
+//    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+//        return image
+//    }
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return image
+        // For messaging apps, you might need both text and image
+        if activityType == .airDrop{
+            return image
+        }
+        return [image, content]
     }
-    
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
         return content
     }

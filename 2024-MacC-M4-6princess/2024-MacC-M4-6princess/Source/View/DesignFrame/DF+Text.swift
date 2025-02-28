@@ -55,6 +55,36 @@ extension DFTextView{
         .frame(width: 335)
         //        .padding(.horizontal)
     }
+    var newFontSelector: some View {
+        // 폰트 선택 ScrollView
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                
+                ForEach(NewFontStyle.allCases, id: \.self) { fontStyle in
+                    Text(fontStyle.displayName) // 한글 이름 표시
+                        .font(fontStyle.oldApplyFont(size: 18)) // 매칭된 영문 폰트 적용
+                        .padding(.horizontal,15)
+                        .padding(.vertical,6)
+                        .foregroundColor(viewModel.newSelectedFont == fontStyle ? .black :.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(viewModel.newSelectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+                                )
+                        )
+                        .onTapGesture {
+                            viewModel.newSelectedFont = fontStyle
+                        }
+                }
+            }
+            .padding(.horizontal,5)
+            
+        }
+        .frame(width: 335)
+        //        .padding(.horizontal)
+    }
     var colorSelector: some View {
         // fontColor 선택
         ScrollView(.horizontal, showsIndicators: false) {
@@ -280,5 +310,25 @@ extension DFTextModifyView{
         .frame(height: 40)
         .frame(maxWidth:.infinity)
         
+    }
+}
+import SwiftUI
+
+extension NSTextAlignment {
+    init(_ alignment: TextAlignment) {
+        switch alignment {
+        case .leading:
+            self = .left
+        case .center:
+            self = .center
+        case .trailing:
+            self = .right
+        }
+    }
+}
+extension UIColor {
+    convenience init(color: Color) {
+        let components = color.cgColor?.components ?? [0, 0, 0, 1] // 기본값: 검정색
+        self.init(red: components[0], green: components[1], blue: components[2], alpha: components[3])
     }
 }
