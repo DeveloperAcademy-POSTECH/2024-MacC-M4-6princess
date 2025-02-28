@@ -129,7 +129,8 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                viewModel.ShowShare = true
+//                                viewModel.ShowShare = true
+                                viewModel.showAcitivity.toggle()
                             }) {
                                 Rectangle()
                                     .foregroundColor(.clear)
