@@ -50,7 +50,6 @@ struct ShareButton: View {
         }
     }
 }
-
 struct ShareSheet: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     var shareData: (image: UIImage, title: String, content: String)
@@ -78,7 +77,6 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 }
 
-// 공유 데이터 핸들러
 final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
     private var title: String
     private var content: String
@@ -94,16 +92,17 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
         return image
     }
     
-//    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-//        return image
-//    }
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        // For messaging apps, you might need both text and image
-        if activityType == .airDrop{
-            return image
+        // PNG 데이터로 변환
+        if let pngData = image.pngData() {
+            if activityType == .airDrop {
+                return pngData
+            }
+            return pngData
         }
-        return [image, content]
+        return image // PNG 변환이 실패할 경우 원본 이미지 반환
     }
+    
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
         return content
     }
@@ -112,12 +111,10 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
         let metaData = LPLinkMetadata()
         metaData.title = content
         metaData.iconProvider = NSItemProvider(object: image)
-        metaData.originalURL = URL(string: "https://apps.apple.com/kr/app/frameet-%ED%94%84%EB%A0%88%EC%9E%84%EB%B0%8B-%EC%B5%9C%EC%95%A0%EC%99%80-%ED%95%A8%EA%BB%98-%ED%8A%B9%EB%B3%84%ED%95%9C-%EC%9D%BC%EC%83%81/id6737822930") // URL 추가
+        metaData.originalURL = URL(string: "https://apps.apple.com/kr/app/frameet-%ED%94%84%EB%A0%88%EC%9E%84%EB%B0%8B-%EC%B5%9C%EC%95%A0%EC%99%80-%ED%95%A8%EA%BB%98-%ED%8A%B9%EB%B3%84%ED%95%9C-%EC%9D%BC%EC%83%81/id6737822930")
         return metaData
     }
 }
-
-
 
 struct SnsTestView: View {
     @State private var isShowingBottomSheet = false
