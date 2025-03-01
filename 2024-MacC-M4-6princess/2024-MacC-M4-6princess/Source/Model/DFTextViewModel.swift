@@ -10,7 +10,7 @@ import SwiftUI
 import PhotosUI
 class DFTextViewModel: ObservableObject {
     @Published var txt = ""
-//    @Published var selectedFont: FontStyle = .modern
+    //    @Published var selectedFont: FontStyle = .modern
     @Published var newSelectedFont:NewFontStyle = .modern
     @Published var fontSize: Double = 20
     @Published var fontColor: Color = ColorPreset.colorPallete[0] {
@@ -69,24 +69,7 @@ class DFTextViewModel: ObservableObject {
                 
         }
     }
-    
-//    /// DFTextView에서 사용
-//    @MainActor
-//    func renderTextImage(text: String){
-//        let tmp = ImageRenderer(
-//            content: TextRenderView(
-//                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
-//            )
-//        )
-//        //TODO: scale 계산 부분 넣기
-//        tmp.scale = 10
-//        if let uiImage = tmp.uiImage {
-//            renderedImage = uiImage
-//        }
-//        else{
-//            print("text render 실패")
-//        }
-//    }
+ 
     @MainActor
     func attributtedTextToImage() -> UIImage? {
         // 현재 attributedTxt가 비어있거나 nil이면 nil 반환
@@ -97,30 +80,59 @@ class DFTextViewModel: ObservableObject {
         // 최신 스타일을 적용하기 위해 새로운 NSMutableAttributedString 생성
         let updatedAttributedText = NSMutableAttributedString(attributedString: attributedText)
         
-        // viewModel에서 최신 스타일 가져오기 (가정: 이 메서드가 DFTextViewModel 안에 있다고 가정)
+        // viewModel에서 최신 스타일 가져오기
         let font = newSelectedFont.applyFont(size: fontSize) // 폰트와 크기 적용
         let textColor = UIColor(color: fontColor) // 텍스트 색상
         let range = NSRange(location: 0, length: updatedAttributedText.length) // 전체 텍스트 범위
         
-        // 최신 폰트와 색상 속성을 적용
+        // 최신 폰트와 색상 속성 적용
         updatedAttributedText.addAttributes([
             .font: font,
             .foregroundColor: textColor
         ], range: range)
         
-        // 텍스트 크기 계산 (최대 너비 제약 포함)
-        let maxWidth: CGFloat = 1000 // 이미지 너비가 너무 커지지 않도록 최대 너비 설정
+        // 정렬을 반영하기 위해 NSMutableParagraphStyle 사용
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = NSTextAlignment(textAlignment) // 최신 textAlignment 적용
+        updatedAttributedText.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: range
+        )
+        
+        // 가장 긴 줄의 너비 계산
+        let lines = updatedAttributedText.string.split(separator: "\n") // 텍스트를 줄 단위로 분리
+        var maxLineWidth: CGFloat = 0
+        let maxHeight: CGFloat = .greatestFiniteMagnitude
+        
+        for line in lines {
+            let lineAttributedText = NSAttributedString(
+                string: String(line),
+                attributes: [
+                    .font: font,
+                    .foregroundColor: textColor,
+                    .paragraphStyle: paragraphStyle
+                ]
+            )
+            let lineSize = lineAttributedText.boundingRect(
+                with: CGSize(width: .greatestFiniteMagnitude, height: maxHeight),
+                options: [.usesLineFragmentOrigin, .usesFontLeading],
+                context: nil
+            ).size
+            maxLineWidth = max(maxLineWidth, ceil(lineSize.width))
+        }
+        
+        // 전체 텍스트 높이 계산 (최대 너비를 가장 긴 줄에 맞춤)
         let textSize = updatedAttributedText.boundingRect(
-            with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude),
+            with: CGSize(width: maxLineWidth, height: maxHeight),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             context: nil
         ).size
         
-        
         // 패딩 추가 (양쪽 10포인트씩)
         let padding: CGFloat = 10
         let imageSize = CGSize(
-            width: ceil(textSize.width) + (padding * 2),
+            width: maxLineWidth + (padding * 2),
             height: ceil(textSize.height) + (padding * 2)
         )
         
@@ -131,22 +143,13 @@ class DFTextViewModel: ObservableObject {
         }
         
         // 안티앨리어싱 설정 (텍스트가 깔끔하게 보이도록)
-        // 그리기 전에 이 코드 추가
-               context.setShouldAntialias(true)
-               context.setAllowsAntialiasing(true)
-           
-               
+        context.setShouldAntialias(true)
+        context.setAllowsAntialiasing(true)
+        
         // 배경 설정 (투명 배경으로 설정)
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: imageSize))
-        // 정렬을 반영하기 위해 NSMutableParagraphStyle 사용
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = NSTextAlignment(textAlignment) // 최신 textAlignment 적용
-        updatedAttributedText.addAttribute(
-            .paragraphStyle,
-            value: paragraphStyle,
-            range: range
-        )
+        
         // 텍스트를 그릴 영역 설정 (패딩 고려)
         let drawingRect = CGRect(
             x: padding,
@@ -155,16 +158,13 @@ class DFTextViewModel: ObservableObject {
             height: imageSize.height - (padding * 2)
         )
         
-        
-        
-        
         // 업데이트된 속성 텍스트 그리기
         updatedAttributedText.draw(in: drawingRect)
         
         // 컨텍스트에서 이미지 생성
-              let image = UIGraphicsGetImageFromCurrentImageContext()
-              UIGraphicsEndImageContext()
-              
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
         return image
     }
     
@@ -188,182 +188,137 @@ class DFTextViewModel: ObservableObject {
     
 }
 
-// PHPickerViewController를 사용하는 SwiftUI Wrapper
-struct LayerPhotoPicker2: UIViewControllerRepresentable {
-    @Binding var layerImages: [LayerModel]
-    var screenSize: CGSize
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 0
-        config.filter = .images
-        
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: LayerPhotoPicker2
-        
-        init(_ parent: LayerPhotoPicker2) {
-            self.parent = parent
-        }
-        
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
-            
-            for result in results {
-                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
-                        if let uiImage = image as? UIImage {
-                            DispatchQueue.main.async {
-                                let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerModel(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
-                                self.parent.layerImages.append(newLayerImage)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-}
-struct DFCustomTextView: UIViewRepresentable {
-    @ObservedObject var modiViewModel: DFModifyViewModel
-    @ObservedObject var viewModel: DFTextViewModel
-    
-    private let displayScale: CGFloat
-    @EnvironmentObject var imageModel: ImageListModel
-    
-    init(modiViewModel: DFModifyViewModel,
-         viewModel: DFTextViewModel,
-         displayScale: CGFloat) {
-        self.modiViewModel = modiViewModel
-        self.viewModel = viewModel
-        self.displayScale = displayScale
-    }
-    
-    func makeUIView(context: Context) -> UITextView {
-        let textView = UITextView()
-        textView.delegate = context.coordinator
-        textView.backgroundColor = .clear
-        textView.isScrollEnabled = true
-        
-        // Center text horizontally
-        textView.textAlignment = .center
-        
-        // Center text vertically
-        textView.contentInsetAdjustmentBehavior = .automatic
-        
-        // Add keyboard notifications
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
-                                               object: nil,
-                                               queue: .main) { notification in
-            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
-        }
-        
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
-                                               object: nil,
-                                               queue: .main) { notification in
-            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
-        }
-        
-        // iOS 18.0 이상에서 적응형 이미지 글리프 지원 설정
-        if #available(iOS 18.0, *) {
-            textView.supportsAdaptiveImageGlyph = true
-        } else {
-            // Fallback on earlier versions
-        }
-        
-        updateTextViewAppearance(textView)
-        return textView
-    }
-    
-    func updateUIView(_ uiView: UITextView, context: Context) {
-        // Update text
-        uiView.text = viewModel.txt
-        
-        // Apply real-time font color, size, and font family
-        updateTextViewAppearance(uiView)
-        
-        // Center text vertically
-        let size = uiView.sizeThatFits(CGSize(width: uiView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
-        let topOffset = max(0, (uiView.bounds.height - size.height) / 2)
-        uiView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
-    }
-    
-    private func updateTextViewAppearance(_ textView: UITextView) {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = 5
-        paragraphStyle.alignment = .center
-        
-        // 기존 attributedText를 가져와서 수정
-        let mutableAttributedString = NSMutableAttributedString(attributedString: textView.attributedText ?? NSAttributedString(string: textView.text ?? ""))
-        
-        let attributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor(viewModel.fontColor),
-            .font: UIFont(name: viewModel.newSelectedFont.rawValue, size: viewModel.fontSize) ?? UIFont.systemFont(ofSize: viewModel.fontSize),
-            .paragraphStyle: paragraphStyle
-        ]
-        
-        // 기존 텍스트 전체에 속성 적용 (이미지 글리프 유지)
-        mutableAttributedString.addAttributes(attributes, range: NSRange(location: 0, length: mutableAttributedString.length))
-        
-        textView.attributedText = mutableAttributedString
-        textView.typingAttributes = attributes
-        
-        textView.bounds.size.height = UIScreen.main.bounds.height / 4
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UITextViewDelegate {
-        var parent: DFCustomTextView
-        
-        init(_ parent: DFCustomTextView) {
-            self.parent = parent
-        }
-        
-        func textViewDidChange(_ textView: UITextView) {
-            parent.viewModel.txt = textView.text
-            
-            // Recenter text vertically when content changes
-            let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
-            let topOffset = max(0, (textView.bounds.height - size.height) / 2)
-            textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
-        }
-        
-        func adjustForKeyboard(notification: Notification, textView: UITextView) {
-            guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-            
-            let keyboardScreenEndFrame = keyboardValue.cgRectValue
-            let keyboardIsShowing = notification.name == UIResponder.keyboardWillShowNotification
-            
-            if keyboardIsShowing {
-                let keyboardHeight = keyboardScreenEndFrame.height
-                textView.contentInset = UIEdgeInsets(top: (textView.bounds.height - textView.contentSize.height) / 2,
-                                                     left: 0,
-                                                     bottom: keyboardHeight,
-                                                     right: 0)
-            } else {
-                let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
-                let topOffset = max(0, (textView.bounds.height - size.height) / 2)
-                textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
-            }
-            
-            textView.scrollIndicatorInsets = textView.contentInset
-        }
-    }
-}
+
+
+//struct DFCustomTextView: UIViewRepresentable {
+//    @ObservedObject var modiViewModel: DFModifyViewModel
+//    @ObservedObject var viewModel: DFTextViewModel
+//    
+//    private let displayScale: CGFloat
+//    @EnvironmentObject var imageModel: ImageListModel
+//    
+//    init(modiViewModel: DFModifyViewModel,
+//         viewModel: DFTextViewModel,
+//         displayScale: CGFloat) {
+//        self.modiViewModel = modiViewModel
+//        self.viewModel = viewModel
+//        self.displayScale = displayScale
+//    }
+//    
+//    func makeUIView(context: Context) -> UITextView {
+//        let textView = UITextView()
+//        textView.delegate = context.coordinator
+//        textView.backgroundColor = .clear
+//        textView.isScrollEnabled = true
+//        
+//        // Center text horizontally
+//        textView.textAlignment = .center
+//        
+//        // Center text vertically
+//        textView.contentInsetAdjustmentBehavior = .automatic
+//        
+//        // Add keyboard notifications
+//        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
+//                                               object: nil,
+//                                               queue: .main) { notification in
+//            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
+//        }
+//        
+//        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
+//                                               object: nil,
+//                                               queue: .main) { notification in
+//            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
+//        }
+//        
+//        // iOS 18.0 이상에서 적응형 이미지 글리프 지원 설정
+//        if #available(iOS 18.0, *) {
+//            textView.supportsAdaptiveImageGlyph = true
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//        
+//        updateTextViewAppearance(textView)
+//        return textView
+//    }
+//    
+//    func updateUIView(_ uiView: UITextView, context: Context) {
+//        // Update text
+//        uiView.text = viewModel.txt
+//        
+//        // Apply real-time font color, size, and font family
+//        updateTextViewAppearance(uiView)
+//        
+//        // Center text vertically
+//        let size = uiView.sizeThatFits(CGSize(width: uiView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+//        let topOffset = max(0, (uiView.bounds.height - size.height) / 2)
+//        uiView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
+//    }
+//    
+//    private func updateTextViewAppearance(_ textView: UITextView) {
+//        let paragraphStyle = NSMutableParagraphStyle()
+//        paragraphStyle.lineSpacing = 5
+//        paragraphStyle.alignment = .center
+//        
+//        // 기존 attributedText를 가져와서 수정
+//        let mutableAttributedString = NSMutableAttributedString(attributedString: textView.attributedText ?? NSAttributedString(string: textView.text ?? ""))
+//        
+//        let attributes: [NSAttributedString.Key: Any] = [
+//            .foregroundColor: UIColor(viewModel.fontColor),
+//            .font: UIFont(name: viewModel.newSelectedFont.rawValue, size: viewModel.fontSize) ?? UIFont.systemFont(ofSize: viewModel.fontSize),
+//            .paragraphStyle: paragraphStyle
+//        ]
+//        
+//        // 기존 텍스트 전체에 속성 적용 (이미지 글리프 유지)
+//        mutableAttributedString.addAttributes(attributes, range: NSRange(location: 0, length: mutableAttributedString.length))
+//        
+//        textView.attributedText = mutableAttributedString
+//        textView.typingAttributes = attributes
+//        
+//        textView.bounds.size.height = UIScreen.main.bounds.height / 4
+//    }
+//    
+//    func makeCoordinator() -> Coordinator {
+//        Coordinator(self)
+//    }
+//    
+//    class Coordinator: NSObject, UITextViewDelegate {
+//        var parent: DFCustomTextView
+//        
+//        init(_ parent: DFCustomTextView) {
+//            self.parent = parent
+//        }
+//        
+//        func textViewDidChange(_ textView: UITextView) {
+//            parent.viewModel.txt = textView.text
+//            
+//            // Recenter text vertically when content changes
+//            let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+//            let topOffset = max(0, (textView.bounds.height - size.height) / 2)
+//            textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
+//        }
+//        
+//        func adjustForKeyboard(notification: Notification, textView: UITextView) {
+//            guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+//            
+//            let keyboardScreenEndFrame = keyboardValue.cgRectValue
+//            let keyboardIsShowing = notification.name == UIResponder.keyboardWillShowNotification
+//            
+//            if keyboardIsShowing {
+//                let keyboardHeight = keyboardScreenEndFrame.height
+//                textView.contentInset = UIEdgeInsets(top: (textView.bounds.height - textView.contentSize.height) / 2,
+//                                                     left: 0,
+//                                                     bottom: keyboardHeight,
+//                                                     right: 0)
+//            } else {
+//                let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+//                let topOffset = max(0, (textView.bounds.height - size.height) / 2)
+//                textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
+//            }
+//            
+//            textView.scrollIndicatorInsets = textView.contentInset
+//        }
+//    }
+//}
 extension Color {
     func toHex() -> String? {
         // UIColor 변환 시도

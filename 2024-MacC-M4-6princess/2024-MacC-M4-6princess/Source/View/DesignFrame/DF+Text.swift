@@ -254,7 +254,7 @@ extension DFTextModifyView{
                                 .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
                         )
                         .onTapGesture {
-//                            style.color = viewModel.colorChip[colorIndex]
+                            //                            style.color = viewModel.colorChip[colorIndex]
                             viewModel.fontColor = viewModel.colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
                                 viewModel.colorNum = colorIndex

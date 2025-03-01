@@ -247,10 +247,6 @@ struct DFModifyView: View {
                 viewModel.selectedSubject = imageModel.imageList.last
                 viewModel.selectedIndex = imageModel.imageList.indices.last
             }
-            //            if selectedSubject != nil {
-            //                selectedSubject?.isTapped = true
-            //            }
-            
         }
     }
 }
