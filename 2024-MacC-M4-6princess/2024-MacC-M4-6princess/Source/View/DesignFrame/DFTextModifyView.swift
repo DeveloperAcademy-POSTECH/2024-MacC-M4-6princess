@@ -18,57 +18,91 @@ struct DFTextModifyView: View {
     var body: some View {
         VStack {
             Spacer()
-            TextEditor(text: $style.rawText)
-                .padding()
-                .focused($isKeyboardVisible) // 키보드 활성 상태와 연결
-                .multilineTextAlignment(style.alignment) // 동적 텍스트 정렬
-                .foregroundColor(style.color)
-//                .font(style.font.applyFont(size: 20))
-                .lineSpacing(5)
-                .frame(height:UIScreen.main.bounds.height/4)
-                .background(Color.clear) // 배경을 투명하게 설정
-                .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
-                .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("완료") {
-                            viewModel.renderTextImage(text: style.rawText,style: style)
-                            let newImage = SubjectImage()
-                            if let image = viewModel.renderedImage {
-                                newImage.text = image
-                                newImage.originalImage = image
-                                //                                newImage.rawText = style.rawText
-                                newImage.textStyle = style
-                                if let uuid = frameManager.textUUID, let index = imageModel.imageList.firstIndex(where: {$0.id == uuid}){
-                                    imageModel.imageList[index] = newImage
-                                    modiViewModel.selectedIndex = index
-                                    modiViewModel.selectedSubject = newImage
-                                    modiViewModel.modelListControl(subject: imageModel.imageList[index])
-                                }
-                                else{
-                                    /// 에러처리
-                                    ///
-                                }
-                                ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
-                                imageModel.imageList.forEach {
-                                    if $0.isTapped {
-                                        $0.isTapped = false
-                                    }
-                                }
-                            } else {
-                                //TODO: 에러 처리 해야함
-                                print("Image not found")
-                            }
-                            frameManager.showTextModifyView = false
-                        }
+            CustomTextView(
+                modiViewModel: modiViewModel,
+                viewModel: viewModel,
+                displayScale: displayScale
+            )
+            .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("완료") {
+                        
+                        /// 텍스트를 이미지로 변환
+                        viewModel.renderedImage=viewModel.attributtedTextToImage()
+                        
+                        style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
+                        style.txt =  viewModel.txt
+                        style.font = viewModel.newSelectedFont
+                        style.alignment = viewModel.textAlignment
+                       
+//                        TextStyle(attributedString: viewModel.attributedTxt!, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
+                        /// 이미지와 메타데이터를 코어데이터에 저장
+                        imageToCoredata()
+                        
+                        /// 텍스트뷰를 닫음
+                        frameManager.showTextModifyView = false
                     }
                 }
-                .onTapGesture {
-                    isKeyboardVisible.toggle()
-                }
+            }
+            .onAppear{
+                viewModel.attributedTxt = style.attributedString
+                viewModel.txt = style.txt
+                viewModel.fontColor = style.color
+                viewModel.newSelectedFont = style.font
+                viewModel.textAlignment = style.alignment
+                print("모디텍스트:\(viewModel.txt)")
+            }
+//            TextEditor(text: $style.rawText)
+//                .padding()
+//                .focused($isKeyboardVisible) // 키보드 활성 상태와 연결
+//                .multilineTextAlignment(style.alignment) // 동적 텍스트 정렬
+//                .foregroundColor(style.color)
+//                .lineSpacing(5)
+//                .frame(height:UIScreen.main.bounds.height/4)
+//                .background(Color.clear) // 배경을 투명하게 설정
+//                .scrollContentBackground(.hidden) // 스크롤 뷰 배경 제거
+//                .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
+//                .toolbar {
+//                    ToolbarItem(placement: .navigationBarTrailing) {
+//                        Button("완료") {
+//                            viewModel.renderTextImage(text: style.rawText,style: style)
+//                            let newImage = SubjectImage()
+//                            if let image = viewModel.renderedImage {
+//                                newImage.text = image
+//                                newImage.originalImage = image
+//                                //                                newImage.rawText = style.rawText
+//                                newImage.textStyle = style
+//                                if let uuid = frameManager.textUUID, let index = imageModel.imageList.firstIndex(where: {$0.id == uuid}){
+//                                    imageModel.imageList[index] = newImage
+//                                    modiViewModel.selectedIndex = index
+//                                    modiViewModel.selectedSubject = newImage
+//                                    modiViewModel.modelListControl(subject: imageModel.imageList[index])
+//                                }
+//                                else{
+//                                    /// 에러처리
+//                                    ///
+//                                }
+//                                ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
+//                                imageModel.imageList.forEach {
+//                                    if $0.isTapped {
+//                                        $0.isTapped = false
+//                                    }
+//                                }
+//                            } else {
+//                                //TODO: 에러 처리 해야함
+//                                print("Image not found")
+//                            }
+//                            frameManager.showTextModifyView = false
+//                        }
+//                    }
+//                }
+//                .onTapGesture {
+//                    isKeyboardVisible.toggle()
+//                }
             
             if viewModel.tab == 0 {
-//                fontSelector
+                newFontSelector
                 
             } else if viewModel.tab == 1 {
                 colorSelector

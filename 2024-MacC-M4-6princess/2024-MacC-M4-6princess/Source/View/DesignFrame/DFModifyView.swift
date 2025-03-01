@@ -89,16 +89,16 @@ struct DFModifyView: View {
                 )
             }
             
-            //            VStack{
-            //                Spacer()
-            //                HStack{
-            //                    if isLongPressed{
-            //                        oldLayerIndicator
-            //                    }
-            //                    Spacer()
-            //                }
-            //                Spacer()
-            //            }
+            VStack{
+                Spacer()
+                HStack{
+                    if isLongPressed{
+                        oldLayerIndicator
+                    }
+                    Spacer()
+                }
+                Spacer()
+            }
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)
@@ -206,7 +206,7 @@ struct DFModifyView: View {
                     }
                 } else if let image = subject.text {
                     ZStack {
-                        let newText = subject.textStyle?.rawText ?? "l"
+                        let newText = subject.textStyle?.txt ?? "l"
                         
                         let newWidth = min(CGFloat(newText.count)*UIScreen.main.bounds.width/10,UIScreen.main.bounds.width)
                         let size: CGSize = .init(

@@ -22,7 +22,7 @@ struct DFTextView: View {
                     Button("완료") {
                         
                         /// 텍스트를 이미지로 변환
-                        viewModel.renderedImage=viewModel.renderTextAsImage()
+                        viewModel.renderedImage=viewModel.attributtedTextToImage()
                         
                         /// 이미지와 메타데이터를 코어데이터에 저장
                         imageToCoredata()

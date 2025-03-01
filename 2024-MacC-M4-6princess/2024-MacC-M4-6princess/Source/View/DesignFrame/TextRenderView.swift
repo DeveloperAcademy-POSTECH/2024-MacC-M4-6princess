@@ -11,7 +11,7 @@ struct TextRenderView: View {
     let style: TextStyle
     
     var body: some View {
-        Text(style.rawText)
+        Text("없어짐")
 //            .font(style.font.applyFont(size: 20))
             .foregroundColor(style.color)
             .multilineTextAlignment(style.alignment)
@@ -21,8 +21,15 @@ struct TextRenderView: View {
 }
 
 struct TextStyle {
-    var rawText: String
+    var attributedString: NSAttributedString
+    var txt:String
     var font: NewFontStyle
     var color: Color
+    {
+        didSet {
+            // 값이 변경될 때마다 프린트
+            print("스타일컬러바뀜: \(color.toHex())")
+        }
+    }
     var alignment: TextAlignment
 }

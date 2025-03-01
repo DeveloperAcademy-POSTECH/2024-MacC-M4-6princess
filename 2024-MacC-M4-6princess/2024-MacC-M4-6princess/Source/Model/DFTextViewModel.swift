@@ -13,7 +13,12 @@ class DFTextViewModel: ObservableObject {
 //    @Published var selectedFont: FontStyle = .modern
     @Published var newSelectedFont:NewFontStyle = .modern
     @Published var fontSize: Double = 20
-    @Published var fontColor: Color = ColorPreset.colorPallete[0]
+    @Published var fontColor: Color = ColorPreset.colorPallete[0] {
+        didSet {
+            // 값이 변경될 때마다 프린트
+            print("폰트컬러체인지드: \(fontColor.toHex())")
+        }
+    }
     @Published var renderedImage: UIImage?
     @Published var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     @Published var tab = 0
@@ -83,42 +88,66 @@ class DFTextViewModel: ObservableObject {
 //        }
 //    }
     @MainActor
-    
-    // Function to render attributed text as an image
-    func renderTextAsImage() -> UIImage? {
-        
+    func attributtedTextToImage() -> UIImage? {
+        // 현재 attributedTxt가 비어있거나 nil이면 nil 반환
         guard let attributedText = attributedTxt, attributedText.length > 0 else {
             return nil
         }
         
-        // Calculate the size needed for the text with maximum width constraint
-        let maxWidth: CGFloat = 1000 // Set a reasonable max width to prevent overly wide images
-        let textSize = attributedText.boundingRect(
+        // 최신 스타일을 적용하기 위해 새로운 NSMutableAttributedString 생성
+        let updatedAttributedText = NSMutableAttributedString(attributedString: attributedText)
+        
+        // viewModel에서 최신 스타일 가져오기 (가정: 이 메서드가 DFTextViewModel 안에 있다고 가정)
+        let font = newSelectedFont.applyFont(size: fontSize) // 폰트와 크기 적용
+        let textColor = UIColor(color: fontColor) // 텍스트 색상
+        let range = NSRange(location: 0, length: updatedAttributedText.length) // 전체 텍스트 범위
+        
+        // 최신 폰트와 색상 속성을 적용
+        updatedAttributedText.addAttributes([
+            .font: font,
+            .foregroundColor: textColor
+        ], range: range)
+        
+        // 텍스트 크기 계산 (최대 너비 제약 포함)
+        let maxWidth: CGFloat = 1000 // 이미지 너비가 너무 커지지 않도록 최대 너비 설정
+        let textSize = updatedAttributedText.boundingRect(
             with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             context: nil
         ).size
         
-        // Add padding (10 points on each side)
+        
+        // 패딩 추가 (양쪽 10포인트씩)
         let padding: CGFloat = 10
         let imageSize = CGSize(
             width: ceil(textSize.width) + (padding * 2),
             height: ceil(textSize.height) + (padding * 2)
         )
         
-        // Set up graphics context
+        // 그래픽 컨텍스트 설정 (이미지 렌더링 시작)
         UIGraphicsBeginImageContextWithOptions(imageSize, false, UIScreen.main.scale)
         guard let context = UIGraphicsGetCurrentContext() else {
             return nil
         }
+        
+        // 안티앨리어싱 설정 (텍스트가 깔끔하게 보이도록)
         // 그리기 전에 이 코드 추가
-        context.setShouldAntialias(true)
-        context.setAllowsAntialiasing(true)
-        // Fill background (optional - remove if you want transparent background)
+               context.setShouldAntialias(true)
+               context.setAllowsAntialiasing(true)
+           
+               
+        // 배경 설정 (투명 배경으로 설정)
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: imageSize))
-        
-        // Draw the attributed text with padding offset
+        // 정렬을 반영하기 위해 NSMutableParagraphStyle 사용
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = NSTextAlignment(textAlignment) // 최신 textAlignment 적용
+        updatedAttributedText.addAttribute(
+            .paragraphStyle,
+            value: paragraphStyle,
+            range: range
+        )
+        // 텍스트를 그릴 영역 설정 (패딩 고려)
         let drawingRect = CGRect(
             x: padding,
             y: padding,
@@ -126,14 +155,17 @@ class DFTextViewModel: ObservableObject {
             height: imageSize.height - (padding * 2)
         )
         
-        attributedText.draw(in: drawingRect)
         
-        // Get the image from context
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
         
+        
+        // 업데이트된 속성 텍스트 그리기
+        updatedAttributedText.draw(in: drawingRect)
+        
+        // 컨텍스트에서 이미지 생성
+              let image = UIGraphicsGetImageFromCurrentImageContext()
+              UIGraphicsEndImageContext()
+              
         return image
-        
     }
     
     /// DFTextModifyView에서 사용
@@ -330,5 +362,17 @@ struct DFCustomTextView: UIViewRepresentable {
             
             textView.scrollIndicatorInsets = textView.contentInset
         }
+    }
+}
+extension Color {
+    func toHex() -> String? {
+        // UIColor 변환 시도
+        guard let components = UIColor(self).cgColor.components else { return nil }
+        
+        let r = Int(components[0] * 255)
+        let g = Int(components[1] * 255)
+        let b = Int(components[2] * 255)
+        
+        return String(format: "#%02X%02X%02X", r, g, b)
     }
 }

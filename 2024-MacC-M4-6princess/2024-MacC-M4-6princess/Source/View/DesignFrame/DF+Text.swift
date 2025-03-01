@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 extension DFTextView{
-   
     
     var swipeAlignmentGesture: some Gesture {
         DragGesture()
@@ -26,35 +25,6 @@ extension DFTextView{
                 }
             }
     }
-//    var fontSelector: some View {
-//        // 폰트 선택 ScrollView
-//        ScrollView(.horizontal, showsIndicators: false) {
-//            HStack(spacing: 10) {
-//                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
-//                    Text(fontStyle.displayName) // 한글 이름 표시
-//                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
-//                        .padding(.horizontal,15)
-//                        .padding(.vertical,6)
-//                        .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
-//                        .background(
-//                            RoundedRectangle(cornerRadius: 10)
-//                                .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
-//                                .overlay(
-//                                    RoundedRectangle(cornerRadius: 10)
-//                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
-//                                )
-//                        )
-//                        .onTapGesture {
-//                            viewModel.selectedFont = fontStyle
-//                        }
-//                }
-//            }
-//            .padding(.horizontal,5)
-//            
-//        }
-//        .frame(width: 335)
-//        //        .padding(.horizontal)
-//    }
     var newFontSelector: some View {
         // 폰트 선택 ScrollView
         ScrollView(.horizontal, showsIndicators: false) {
@@ -80,10 +50,8 @@ extension DFTextView{
                 }
             }
             .padding(.horizontal,5)
-            
         }
         .frame(width: 335)
-        //        .padding(.horizontal)
     }
     var colorSelector: some View {
         // fontColor 선택
@@ -108,9 +76,8 @@ extension DFTextView{
             .padding(5)
         }
         .frame(width: 335)
-        //        .padding(.horizontal,20)
-        //        .padding(.vertical,20)
     }
+    
     var textTabBar: some View {
         ZStack {
             Rectangle()
@@ -169,7 +136,6 @@ extension DFTextView{
             }
             .padding()
         }
-        //        .padding(.horizontal,15)
         .frame(height: 40)
         .frame(maxWidth:.infinity)
         
@@ -179,7 +145,12 @@ extension DFTextView{
         if let image = viewModel.renderedImage {
             newImage.text = image
             newImage.originalImage = image
-            newImage.textStyle = TextStyle(rawText: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
+            if let att = viewModel.attributedTxt{
+                newImage.textStyle = TextStyle(attributedString: att, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
+            }
+            else{
+                
+            }
             ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
             imageModel.imageList.forEach {
                 if $0.isTapped {
@@ -197,8 +168,35 @@ extension DFTextView{
     }
 }
 extension DFTextModifyView{
-   
     
+    func imageToCoredata() {
+        let newImage = SubjectImage()
+        if let image = viewModel.renderedImage {
+            newImage.text = image
+            newImage.originalImage = image
+            //                                newImage.rawText = style.rawText
+            newImage.textStyle = style
+            if let uuid = frameManager.textUUID, let index = imageModel.imageList.firstIndex(where: {$0.id == uuid}){
+                imageModel.imageList[index] = newImage
+                modiViewModel.selectedIndex = index
+                modiViewModel.selectedSubject = newImage
+                modiViewModel.modelListControl(subject: imageModel.imageList[index])
+            }
+            else{
+                /// 에러처리
+                ///
+            }
+            ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
+            imageModel.imageList.forEach {
+                if $0.isTapped {
+                    $0.isTapped = false
+                }
+            }
+        } else {
+            //TODO: 에러 처리 해야함
+            print("Image not found")
+        }
+    }
     var swipeAlignmentGesture: some Gesture {
         DragGesture()
             .onEnded { value in
@@ -214,35 +212,35 @@ extension DFTextModifyView{
                 }
             }
     }
-//    var fontSelector: some View {
-//        // 폰트 선택 ScrollView
-//        ScrollView(.horizontal, showsIndicators: false) {
-//            HStack(spacing: 10) {
-//                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
-//                    Text(fontStyle.displayName) // 한글 이름 표시
-//                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
-//                        .padding(.horizontal,15)
-//                        .padding(.vertical,6)
-//                        .foregroundColor(style.font == fontStyle ? Color.black : Color.white)
-//                        .background(
-//                            RoundedRectangle(cornerRadius: 10)
-//                                .fill(style.font == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
-//                                .overlay(
-//                                    RoundedRectangle(cornerRadius: 10)
-//                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
-//                                )
-//                        )
-//                        .onTapGesture {
-//                            style.font = fontStyle
-//                        }
-//                }
-//            }
-//            .padding(.horizontal,5)
-//            
-//        }
-//        .frame(width: 335)
-//        //        .padding(.horizontal)
-//    }
+    
+    var newFontSelector: some View {
+        // 폰트 선택 ScrollView
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                
+                ForEach(NewFontStyle.allCases, id: \.self) { fontStyle in
+                    Text(fontStyle.displayName) // 한글 이름 표시
+                        .font(fontStyle.oldApplyFont(size: 18)) // 매칭된 영문 폰트 적용
+                        .padding(.horizontal,15)
+                        .padding(.vertical,6)
+                        .foregroundColor(viewModel.newSelectedFont == fontStyle ? .black :.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(viewModel.newSelectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+                                )
+                        )
+                        .onTapGesture {
+                            viewModel.newSelectedFont = fontStyle
+                        }
+                }
+            }
+            .padding(.horizontal,5)
+        }
+        .frame(width: 335)
+    }
     var colorSelector: some View {
         // fontColor 선택
         ScrollView(.horizontal, showsIndicators: false) {
@@ -256,7 +254,8 @@ extension DFTextModifyView{
                                 .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
                         )
                         .onTapGesture {
-                            style.color = viewModel.colorChip[colorIndex]
+//                            style.color = viewModel.colorChip[colorIndex]
+                            viewModel.fontColor = viewModel.colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
                                 viewModel.colorNum = colorIndex
                             }
@@ -266,8 +265,6 @@ extension DFTextModifyView{
             .padding(5)
         }
         .frame(width: 335)
-        //        .padding(.horizontal,20)
-        //        .padding(.vertical,20)
     }
     var textTabBar: some View {
         ZStack {
@@ -327,7 +324,6 @@ extension DFTextModifyView{
             }
             .padding()
         }
-        //        .padding(.horizontal,15)
         .frame(height: 40)
         .frame(maxWidth:.infinity)
         
@@ -338,12 +334,12 @@ import SwiftUI
 extension NSTextAlignment {
     init(_ alignment: TextAlignment) {
         switch alignment {
-        case .leading:
-            self = .left
-        case .center:
-            self = .center
-        case .trailing:
-            self = .right
+            case .leading:
+                self = .left
+            case .center:
+                self = .center
+            case .trailing:
+                self = .right
         }
     }
 }
