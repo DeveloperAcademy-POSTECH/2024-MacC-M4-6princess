@@ -88,18 +88,106 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return content
     }
-    
+    //타임아웃이였나..크기문제인가...ㅠ
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         // PNG 데이터로 변환
         if let pngData = image.pngData() {
             if activityType == .airDrop {
                 return pngData
             }
-            return pngData
+            
+            // 트위터 업로드를 위한 이미지 크기 조정
+            let maxWidth: CGFloat = 4096
+            let maxHeight: CGFloat = 4096
+            
+            // 현재 이미지 크기
+            let imageSize = image.size
+            
+            // 비율 계산
+            let aspectRatio = imageSize.width / imageSize.height
+            
+            var newWidth: CGFloat = imageSize.width
+            var newHeight: CGFloat = imageSize.height
+            
+            // 비율을 유지하면서 크기 조정
+            if imageSize.width > maxWidth || imageSize.height > maxHeight {
+                if imageSize.width > imageSize.height {
+                    newWidth = maxWidth
+                    newHeight = newWidth / aspectRatio
+                } else {
+                    newHeight = maxHeight
+                    newWidth = newHeight * aspectRatio
+                }
+            }
+            
+            // 리사이즈된 이미지 생성
+            let newSize = CGSize(width: newWidth, height: newHeight)
+            UIGraphicsBeginImageContextWithOptions(newSize, false, image.scale)
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            // 리사이즈된 이미지를 PNG로 변환
+            if let resizedImageData = resizedImage?.pngData() {
+                return resizedImageData
+            }
         }
+        
         return content
     }
-    
+
+//    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+//        // PNG 데이터로 변환
+//        // 카카오톡 & 트위터는 15MB 이하의 JPEG 변환 (압축율 조정)
+//        //        if activityType == .postToTwitter {
+//        //
+//        //            var compressionQuality: CGFloat = 0.4
+//        //            var jpegData: Data? = image.jpegData(compressionQuality: compressionQuality)
+//        //            if let data = jpegData {
+//        //                let sizeInMB = Double(data.count) / 1_048_576 // 바이트를 MB로 변환
+//        //                print("JPEG 생성 성공: \(String(format: "%.2f", sizeInMB))MB")
+//        //            } else {
+//        //                print("JPEG 생성 실패")
+//        //            }
+//        //            while let data = jpegData, data.count > 5_242_880, compressionQuality > 0.1 {
+//        //                compressionQuality -= 0.2
+//        //                jpegData = image.jpegData(compressionQuality: compressionQuality)
+//        //            }
+//        //
+//        //            return image
+//        //
+//        //        }
+//        if activityType != .airDrop{
+//            if let jpegData = image.jpegData(compressionQuality: 0.4){
+//                return jpegData
+//            }
+//        }
+//        if
+//            //            activityType == .postToWeibo ||
+//            activityType == UIActivity.ActivityType(rawValue: "com.kakao.talk.share")
+//    
+//        {
+//               var compressionQuality: CGFloat = 0.7
+//               var jpegData: Data? = image.jpegData(compressionQuality: compressionQuality)
+//
+//               while let data = jpegData, data.count > 15_728_640, compressionQuality > 0.1 {
+//                   compressionQuality -= 0.1
+//                   jpegData = image.jpegData(compressionQuality: compressionQuality)
+//               }
+//
+//               return jpegData
+//           }
+////        if let pngData = image.pngData() {
+////            if activityType == .airDrop || activityType == .postToTwitter{
+////                return pngData
+////            }
+////            return pngData
+////        }
+//        
+//
+//        return content
+//    }
+//    
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
         return title
     }

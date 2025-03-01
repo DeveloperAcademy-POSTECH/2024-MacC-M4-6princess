@@ -7,17 +7,33 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "E998153C-84A2-4F65-B182-B9A3333B70A9"
-            shouldBeEnabled = "No"
+            uuid = "EEB6D4B7-36B9-4720-A531-613E4C99B558"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "2024-MacC-M4-6princess/Source/View/DesignFrame/DFTextModifyView.swift"
+            filePath = "2024-MacC-M4-6princess/Source/View/ImageOutput/IOSNSView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "54"
-            endingLineNumber = "54"
-            landmarkName = "body"
-            landmarkType = "24">
+            startingLineNumber = "182"
+            endingLineNumber = "182"
+            landmarkName = "SharePinNumberActivityItemSource"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5F4D45B2-B6C0-49F0-979A-E0E6440689F9"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "2024-MacC-M4-6princess/Source/View/ImageOutput/IOSNSView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "SharePinNumberActivityItemSource"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
