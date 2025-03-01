@@ -8,40 +8,74 @@
 import SwiftUI
 //
 struct CameraTimerView: View {
-    @StateObject var motionManager = MotionManager()
     @ObservedObject var viewModel: CameraViewModel
+    @State private var isExpanded = false
     
     var body: some View {
-        VStack(alignment: .center, spacing: 4) {
-            Button {
-                viewModel.isPushedTimer = (viewModel.isPushedTimer + 1) % 4
+        ZStack {
+            // 배경 캡슐 - 확장 시 검정, 축소 시 흰색
+            Capsule()
+                .fill(isExpanded ? Color.black.opacity(0.7) : Color.white)
+                .frame(width: isExpanded ? 240 : 100, height: 40)
+                .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isExpanded)
+            
+            HStack(spacing: 8) {
+                // 항상 왼쪽에 고정된 타이머 아이콘
+                Image(systemName: "timer")
+                    .font(.system(size: 18))
+                    .foregroundColor(isExpanded ? .white : .black)
+                    .animation(.easeInOut(duration: 0.2), value: isExpanded)
                 
-                if let timerState = TimerState(rawValue: viewModel.isPushedTimer) {
-                    viewModel.delayTime = timerState.duration
-                }
-            } label: {
-                let currentState = TimerState(rawValue: viewModel.isPushedTimer) ?? .off
+                // 현재 선택된 타이머 설정
+                Text(viewModel.delayTime == 0 ? "Off" : "\(Int(viewModel.delayTime))초")
+                    .font(.system(size: 13))
+                    .foregroundColor(isExpanded ? .white : .black)
+                    .animation(.easeInOut(duration: 0.2), value: isExpanded)
                 
-                ZStack {
-                    Image(currentState.icon)
-                        .resizable()
-                        .frame(width: 40, height: 40)
+                if isExpanded {
+                    Spacer(minLength: 8)
                     
-                    if let text = currentState.displayText {
-                        Text(text)
-                            .font(.system(size: 17))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color.gray01)
+                    // 타이머 옵션들 (확장 시에만 표시)
+                    HStack(spacing: 12) {
+                        Button("3초") {
+                            viewModel.delayTime = 3
+                            withAnimation(.spring(response: 0.2)) {
+                                isExpanded = false
+                            }
+                        }
+                        .font(.system(size: 13, weight: viewModel.delayTime == 3 ? .bold : .regular))
+                        .foregroundColor(.white)
+                        
+                        Button("5초") {
+                            viewModel.delayTime = 5
+                            withAnimation(.spring(response: 0.2)) {
+                                isExpanded = false
+                            }
+                        }
+                        .font(.system(size: 13, weight: viewModel.delayTime == 5 ? .bold : .regular))
+                        .foregroundColor(.white)
+                        
+                        Button("7초") {
+                            viewModel.delayTime = 7
+                            withAnimation(.spring(response: 0.2)) {
+                                isExpanded = false
+                            }
+                        }
+                        .font(.system(size: 13, weight: viewModel.delayTime == 7 ? .bold : .regular))
+                        .foregroundColor(.white)
                     }
                 }
-                .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                .animation(.easeInOut, value: motionManager.currentOrientation)
             }
-            
-            Text("타이머")
-                .font(.system(size: 13))
-                .multilineTextAlignment(.center)
-                .foregroundColor(Color.gray01)
+            .padding(.horizontal, 16)
+            .frame(width: isExpanded ? 240 : 100, height: 40)
+        }
+        .contentShape(Capsule())
+        .onTapGesture {
+            if !isExpanded {
+                withAnimation(.spring(response: 0.2)) {
+                    isExpanded = true
+                }
+            }
         }
     }
 }

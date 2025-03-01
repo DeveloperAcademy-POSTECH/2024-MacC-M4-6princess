@@ -65,8 +65,8 @@ struct CameraView: View {
                     Spacer()
                 }
                 VStack {
-//                    CameraTopView(viewModel: viewModel)
-//                    Spacer()
+                    CameraTopView(viewModel: viewModel)
+                    Spacer()
                     CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
 //                    CameraBottomView(viewModel: viewModel)
@@ -74,7 +74,6 @@ struct CameraView: View {
 //                        .environmentObject(frameManager)
 //                    MainTabView()
                 }
-                //v end
                 //처음 실행했을 때 - 온보딩 합침
                 if !viewModel.firstTime {
                     BGView()
@@ -82,97 +81,6 @@ struct CameraView: View {
                     OnboardingView(viewModel: viewModel)
                     
                 }
-                //                if !viewModel.firstTime  {
-                //                    VStack {
-                //                        ZStack {
-                //                            Text("최애와 사진을 찍기 위해\n프레임 선택하기")
-                //                                .font(.system(size: 17))
-                //                                .multilineTextAlignment(.center)
-                //                                .foregroundColor(.white)
-                //                            VStack(alignment: .leading){
-                //                                Spacer()
-                //
-                //                                HStack {
-                //                                    VStack {
-                //                                        Image("handPointer")
-                //                                            .resizable()
-                //                                            .frame(width: 114, height: 114)
-                //                                            .padding(.bottom, 20)
-                //
-                //                                        if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
-                //                                            VStack {
-                //                                                ZStack {
-                //                                                    Rectangle()
-                //                                                        .cornerRadius(5)
-                //                                                        .frame(width: 40, height: 40)
-                //                                                        .foregroundColor(.pointPink)
-                //
-                //                                                    Image("frameLoadWhite")
-                //                                                        .resizable()
-                //                                                        .frame(width: 40, height: 40)
-                //                                                }
-                //                                                .padding(.bottom, 4)
-                //                                                .padding(.leading, -8)
-                //
-                //                                                Text("불러오기")
-                //                                                    .font(.system(size: 13))
-                //                                                    .multilineTextAlignment(.center)
-                //                                                    .foregroundColor(.white)
-                //                                                    .padding(.bottom, 60)
-                //                                                    .padding(.leading, -8)
-                //
-                //                                            }
-                //                                            .onTapGesture {
-                //                                                viewModel.firstTime = true
-                ////                                                viewModel.isShowMFView.toggle()
-                //                                                frameManager.showMFView = true
-                //                                            }
-                //                                        }
-                //                                        else{
-                //                                            VStack {
-                //                                                ZStack {
-                //                                                    Rectangle()
-                //                                                        .cornerRadius(5)
-                //                                                        .frame(width: 40, height: 40)
-                //                                                        .foregroundColor(.pointPink)
-                //
-                //                                                    Image("frameLoadWhite")
-                //                                                        .resizable()
-                //                                                        .frame(width: 40, height: 40)
-                //                                                }
-                //                                                .padding(.bottom, 4)
-                //                                                .padding(.leading, -8)
-                //
-                //                                                Text("불러오기")
-                //                                                    .font(.system(size: 13))
-                //                                                    .multilineTextAlignment(.center)
-                //                                                    .foregroundColor(.white)
-                //                                                    .padding(.bottom, 20)
-                //                                                    .padding(.leading, -8)
-                //
-                //                                            }
-                //                                            .onTapGesture {
-                //                                                viewModel.firstTime = true
-                ////                                                viewModel.isShowMFView.toggle()
-                //                                                frameManager.showMFView = true
-                //                                            }
-                //                                        }
-                //
-                //                                    }
-                //                                    .padding(.leading, -10)
-                //                                    Spacer()
-                //                                }
-                //                            }
-                //                        }
-                //
-                //
-                //                    }
-                //                    .ignoresSafeArea(.all)
-                //                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                //                    .background(.black)
-                //                    .opacity(0.8)
-                //
-                //                }
                 if viewModel.delayTime != 0 && viewModel.isTakePic == true {
                     CameraTimerSecondsView(viewModel: viewModel)
                         .ignoresSafeArea(.all, edges: .all)
