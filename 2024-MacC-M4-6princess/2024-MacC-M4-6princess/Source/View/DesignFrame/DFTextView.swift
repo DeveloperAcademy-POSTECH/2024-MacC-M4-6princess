@@ -6,6 +6,7 @@ struct DFTextView: View {
     @EnvironmentObject var imageModel: ImageListModel
     @FocusState var isKeyboardVisible: Bool
     @Environment(\.displayScale) var displayScale
+    
     var body: some View {
         VStack {
             Spacer()
@@ -19,31 +20,14 @@ struct DFTextView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("완료") {
-                        //TODO: 함수로 만들기
-                        // viewModel.rederedImage에 텍스트 이미지 저장
-//                        viewModel.renderTextImage(text: viewModel.txt)
-                        viewModel.renderedImage=viewModel.renderTextAsImage()
-//                        print(viewModel.txt)
-                        let newImage = SubjectImage()
-                        if let image = viewModel.renderedImage {
-                            newImage.text = image
-                            newImage.originalImage = image
-                            newImage.textStyle = TextStyle(rawText: viewModel.txt, font: viewModel.selectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
-                            ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
-                            imageModel.imageList.forEach {
-                                if $0.isTapped {
-                                    $0.isTapped = false
-                                }
-                            }
-                            imageModel.imageList.append(newImage)
-                            modiViewModel.selectedSubject = imageModel.imageList.last
-                            modiViewModel.selectedIndex = imageModel.imageList.indices.last
-                            modiViewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
-                        } else {
-                            //TODO: 에러 처리 해야함
-                            print("Image not found")
-                        }
                         
+                        /// 텍스트를 이미지로 변환
+                        viewModel.renderedImage=viewModel.renderTextAsImage()
+                        
+                        /// 이미지와 메타데이터를 코어데이터에 저장
+                        imageToCoredata()
+                        
+                        /// 텍스트뷰를 닫음
                         modiViewModel.showTextView = false
                     }
                 }

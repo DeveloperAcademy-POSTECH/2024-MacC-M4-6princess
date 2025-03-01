@@ -10,7 +10,7 @@ import SwiftUI
 import PhotosUI
 class DFTextViewModel: ObservableObject {
     @Published var txt = ""
-    @Published var selectedFont: FontStyle = .modern
+//    @Published var selectedFont: FontStyle = .modern
     @Published var newSelectedFont:NewFontStyle = .modern
     @Published var fontSize: Double = 20
     @Published var fontColor: Color = ColorPreset.colorPallete[0]
@@ -65,27 +65,28 @@ class DFTextViewModel: ObservableObject {
         }
     }
     
-    /// DFTextView에서 사용
-    @MainActor
-    func renderTextImage(text: String){
-        let tmp = ImageRenderer(
-            content: TextRenderView(
-                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
-            )
-        )
-        //TODO: scale 계산 부분 넣기
-        tmp.scale = 10
-        if let uiImage = tmp.uiImage {
-            renderedImage = uiImage
-        }
-        else{
-            print("text render 실패")
-        }
-    }
+//    /// DFTextView에서 사용
+//    @MainActor
+//    func renderTextImage(text: String){
+//        let tmp = ImageRenderer(
+//            content: TextRenderView(
+//                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
+//            )
+//        )
+//        //TODO: scale 계산 부분 넣기
+//        tmp.scale = 10
+//        if let uiImage = tmp.uiImage {
+//            renderedImage = uiImage
+//        }
+//        else{
+//            print("text render 실패")
+//        }
+//    }
     @MainActor
     
     // Function to render attributed text as an image
     func renderTextAsImage() -> UIImage? {
+        
         guard let attributedText = attributedTxt, attributedText.length > 0 else {
             return nil
         }
@@ -110,7 +111,9 @@ class DFTextViewModel: ObservableObject {
         guard let context = UIGraphicsGetCurrentContext() else {
             return nil
         }
-        
+        // 그리기 전에 이 코드 추가
+        context.setShouldAntialias(true)
+        context.setAllowsAntialiasing(true)
         // Fill background (optional - remove if you want transparent background)
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: imageSize))
@@ -152,15 +155,6 @@ class DFTextViewModel: ObservableObject {
     }
     
 }
-//MARK: ViewModel 만드는 대신 extension으로 함수만 따로 뺌
-extension DFTextView{
-    
-    
-    
-    
-    
-}
-
 
 // PHPickerViewController를 사용하는 SwiftUI Wrapper
 struct LayerPhotoPicker2: UIViewControllerRepresentable {

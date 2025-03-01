@@ -12,7 +12,7 @@ struct TextRenderView: View {
     
     var body: some View {
         Text(style.rawText)
-            .font(style.font.applyFont(size: 20))
+//            .font(style.font.applyFont(size: 20))
             .foregroundColor(style.color)
             .multilineTextAlignment(style.alignment)
             .lineSpacing(5)
@@ -22,7 +22,7 @@ struct TextRenderView: View {
 
 struct TextStyle {
     var rawText: String
-    var font: FontStyle
+    var font: NewFontStyle
     var color: Color
     var alignment: TextAlignment
 }

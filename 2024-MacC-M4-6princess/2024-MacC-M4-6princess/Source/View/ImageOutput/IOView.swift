@@ -45,6 +45,7 @@ struct IOView: View {
                 
                 // 후보정 레이어 편집 뷰
                 canvasView
+                
                     .onAppear{
                         viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
                         viewModel.saveAnimate = true
@@ -168,7 +169,6 @@ struct IOView: View {
 //                .presentationDetents([.height(300)])
             Group{
                 if let photo = viewModel.compositeImage
-//                    ,viewModel.showAcitivity
                 {
                     ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
                 }

@@ -18,44 +18,48 @@ struct IOCanvasView: View {
     var body: some View {
         ZStack {
             // 배경 이미지
-            if let originalImage = viewModel.bgImg{
+            if let originalImage = viewModel.bgImg {
                 Image(uiImage: originalImage)
                     .resizable()
-                //                    .frame(width: viewModel.frameBGSize.width, height: viewModel.frameBGSize.height)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .overlay(
+                        GeometryReader { geo in
+                            Color.clear.onAppear {
+                                viewModel.frameBGSize = geo.size // 배경 이미지의 실제 표시 크기 저장
+                            }
+                        }
+                    )
             }
             
-            // 아이돌 이미지
+            // 아이돌 이미지 (마스크 적용)
             if let idolImg = viewModel.idolImg {
                 Image(uiImage: idolImg)
                     .resizable()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(contentMode: .fit)
-                //                    .frame(width: viewModel.frameIdolSize.width, height: viewModel.frameIdolSize.height)
                     .scaleEffect(currentScale)
                     .position(viewModel.location)
+                    .mask(
+                        Rectangle()
+                            .frame(width: viewModel.frameBGSize.width,
+                                   height: viewModel.frameBGSize.height)
+                    )
             }
             
             VStack{
                 Spacer()
                 HStack{
-                    
                     Spacer()
                     Image("logo.output")
-                        .resizable() // 이미지 크기 조정 가능하도록 설정
-                        .scaledToFit() // 원본 비율 유지하며 프레임 내에서 조정
+                        .resizable()
+                        .scaledToFit()
                         .frame(width: 100)
                         .padding()
-                    
-                    
                 }
             }
-            
         }
         .onAppear {
             viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
         }
     }
 }
-

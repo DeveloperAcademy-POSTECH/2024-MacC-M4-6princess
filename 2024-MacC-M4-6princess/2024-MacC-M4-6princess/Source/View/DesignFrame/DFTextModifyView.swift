@@ -23,7 +23,7 @@ struct DFTextModifyView: View {
                 .focused($isKeyboardVisible) // 키보드 활성 상태와 연결
                 .multilineTextAlignment(style.alignment) // 동적 텍스트 정렬
                 .foregroundColor(style.color)
-                .font(style.font.applyFont(size: 20))
+//                .font(style.font.applyFont(size: 20))
                 .lineSpacing(5)
                 .frame(height:UIScreen.main.bounds.height/4)
                 .background(Color.clear) // 배경을 투명하게 설정
@@ -68,7 +68,7 @@ struct DFTextModifyView: View {
                 }
             
             if viewModel.tab == 0 {
-                fontSelector
+//                fontSelector
                 
             } else if viewModel.tab == 1 {
                 colorSelector

@@ -26,35 +26,35 @@ extension DFTextView{
                 }
             }
     }
-    var fontSelector: some View {
-        // 폰트 선택 ScrollView
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
-                    Text(fontStyle.displayName) // 한글 이름 표시
-                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
-                        .padding(.horizontal,15)
-                        .padding(.vertical,6)
-                        .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
-                                )
-                        )
-                        .onTapGesture {
-                            viewModel.selectedFont = fontStyle
-                        }
-                }
-            }
-            .padding(.horizontal,5)
-            
-        }
-        .frame(width: 335)
-        //        .padding(.horizontal)
-    }
+//    var fontSelector: some View {
+//        // 폰트 선택 ScrollView
+//        ScrollView(.horizontal, showsIndicators: false) {
+//            HStack(spacing: 10) {
+//                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
+//                    Text(fontStyle.displayName) // 한글 이름 표시
+//                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
+//                        .padding(.horizontal,15)
+//                        .padding(.vertical,6)
+//                        .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
+//                        .background(
+//                            RoundedRectangle(cornerRadius: 10)
+//                                .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+//                                .overlay(
+//                                    RoundedRectangle(cornerRadius: 10)
+//                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+//                                )
+//                        )
+//                        .onTapGesture {
+//                            viewModel.selectedFont = fontStyle
+//                        }
+//                }
+//            }
+//            .padding(.horizontal,5)
+//            
+//        }
+//        .frame(width: 335)
+//        //        .padding(.horizontal)
+//    }
     var newFontSelector: some View {
         // 폰트 선택 ScrollView
         ScrollView(.horizontal, showsIndicators: false) {
@@ -174,6 +174,27 @@ extension DFTextView{
         .frame(maxWidth:.infinity)
         
     }
+    func imageToCoredata() {
+        let newImage = SubjectImage()
+        if let image = viewModel.renderedImage {
+            newImage.text = image
+            newImage.originalImage = image
+            newImage.textStyle = TextStyle(rawText: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
+            ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
+            imageModel.imageList.forEach {
+                if $0.isTapped {
+                    $0.isTapped = false
+                }
+            }
+            imageModel.imageList.append(newImage)
+            modiViewModel.selectedSubject = imageModel.imageList.last
+            modiViewModel.selectedIndex = imageModel.imageList.indices.last
+            modiViewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+        } else {
+            //TODO: 에러 처리 해야함
+            print("Image not found")
+        }
+    }
 }
 extension DFTextModifyView{
    
@@ -193,35 +214,35 @@ extension DFTextModifyView{
                 }
             }
     }
-    var fontSelector: some View {
-        // 폰트 선택 ScrollView
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
-                    Text(fontStyle.displayName) // 한글 이름 표시
-                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
-                        .padding(.horizontal,15)
-                        .padding(.vertical,6)
-                        .foregroundColor(style.font == fontStyle ? Color.black : Color.white)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(style.font == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
-                                )
-                        )
-                        .onTapGesture {
-                            style.font = fontStyle
-                        }
-                }
-            }
-            .padding(.horizontal,5)
-            
-        }
-        .frame(width: 335)
-        //        .padding(.horizontal)
-    }
+//    var fontSelector: some View {
+//        // 폰트 선택 ScrollView
+//        ScrollView(.horizontal, showsIndicators: false) {
+//            HStack(spacing: 10) {
+//                ForEach(FontStyle.allCases, id: \.self) { fontStyle in
+//                    Text(fontStyle.displayName) // 한글 이름 표시
+//                        .font(fontStyle.applyFont(size: 18)) // 매칭된 영문 폰트 적용
+//                        .padding(.horizontal,15)
+//                        .padding(.vertical,6)
+//                        .foregroundColor(style.font == fontStyle ? Color.black : Color.white)
+//                        .background(
+//                            RoundedRectangle(cornerRadius: 10)
+//                                .fill(style.font == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+//                                .overlay(
+//                                    RoundedRectangle(cornerRadius: 10)
+//                                        .stroke(Color.white, lineWidth: 1) // 흰색 테두리
+//                                )
+//                        )
+//                        .onTapGesture {
+//                            style.font = fontStyle
+//                        }
+//                }
+//            }
+//            .padding(.horizontal,5)
+//            
+//        }
+//        .frame(width: 335)
+//        //        .padding(.horizontal)
+//    }
     var colorSelector: some View {
         // fontColor 선택
         ScrollView(.horizontal, showsIndicators: false) {

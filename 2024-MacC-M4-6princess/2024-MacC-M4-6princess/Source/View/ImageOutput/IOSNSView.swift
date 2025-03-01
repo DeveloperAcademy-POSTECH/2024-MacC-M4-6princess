@@ -5,7 +5,7 @@ import LinkPresentation
 
 struct IOSNSView: View {
     @StateObject var viewModel: IOViewModel
-//    @State private var isShowingShareSheet = false
+
     var body: some View {
         HStack(spacing: 20) {
             // Instagram 공유 버튼
@@ -18,8 +18,6 @@ struct IOSNSView: View {
             
             // 더보기 버튼 (Share with UIActivityViewController)
             Button(action: {
-//                viewModel.isShowShareSheet = false
-//                isShowingShareSheet = true
                 viewModel.showAcitivity.toggle()
             }) {
                 Image(systemName: "ellipsis")
@@ -71,7 +69,6 @@ struct ShareSheet: UIViewControllerRepresentable {
                     self.isPresented = false
                 }
             }
-            
             uiViewController.present(activityVC, animated: true, completion: nil)
         }
     }
@@ -89,7 +86,7 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
     }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return image
+        return content
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
@@ -100,11 +97,11 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
             }
             return pngData
         }
-        return image // PNG 변환이 실패할 경우 원본 이미지 반환
+        return content
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
-        return content
+        return title
     }
     
     func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
@@ -136,11 +133,6 @@ struct SnsTestView: View {
             Button("공유하기") {
                 isShowingBottomSheet = true
                 isShowingShareSheet = true
-//                if Bool.random() {
-//                    isShowingBottomSheet = true
-//                } else {
-//                    isShowingShareSheet = true
-//                }
             }
             .buttonStyle(.borderedProminent)
             .padding()
@@ -153,16 +145,6 @@ struct SnsTestView: View {
                     ShareSheet(isPresented: $isShowingShareSheet, shareData: (image, "title", "Frameet으로 사진 낄여왔음"))
                 }
             }
-//            BottomSheetView { platform in
-//                isShowingBottomSheet = false // 바텀시트 닫기
-//                //                selectedPlatform = platform
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
-//                    
-//                    isShowingShareSheet = true
-//                    
-//                }
-//            }
-//            .presentationDetents([.fraction(0.3)])
         }
         .overlay(
             Group{
@@ -171,12 +153,8 @@ struct SnsTestView: View {
                 }
             }
         )
-        //        .sheet(isPresented: $isShowingShareSheet) {
-        //            if let image = image {
-        //                ShareSheet(isPresented: $isShowingShareSheet, shareData: (image, "title", "Frameet으로 사진 낄여왔음"))
-        //            }
-        //        }
-    }
+      }
+    
 }
 
 // 바텀시트 뷰 (공유 플랫폼 선택)
