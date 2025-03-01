@@ -10,6 +10,7 @@ import SwiftUI
 struct MainTabView: View {
     @StateObject private var naviManager = NavigationManager()
     @StateObject private var frameManager = FrameManager()
+    @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedTab = 0
     
     var body: some View {
