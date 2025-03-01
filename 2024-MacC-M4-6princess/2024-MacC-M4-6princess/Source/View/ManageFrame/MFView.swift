@@ -65,7 +65,7 @@ struct MFView: View {
                         }
                         .disabled(viewModel.selectedImageIds.count > 1)
                         Button {
-
+                            
                             viewModel.isDeleteAlert = true
                         } label: {
                             ZStack {
@@ -116,7 +116,7 @@ struct MFView: View {
                         .foregroundColor(.blue)
                         .fontWeight(.semibold)
                 }
-
+                
                 Button("취소", role: .cancel) { }
             } message: {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
@@ -129,7 +129,9 @@ struct MFView: View {
         .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
             PhotosPickerView()
         }
+        .navigationBarHidden(true)
     }
+        
 }
 
 
@@ -143,7 +145,7 @@ struct SheetTitleView: View {
         ZStack {
             HStack(alignment: .center) {
                 Spacer()
-                Text("최애 프레임")
+                Text("프레임 관리")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
                     .foregroundColor(.gray01)
@@ -153,10 +155,10 @@ struct SheetTitleView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Image("xIcon")
+                    Image("chevronLeft")
                         .resizable()
-                        .frame(width: 26, height: 26)
-                        .padding(.leading, 8)
+                        .frame(width: 37, height: 40)
+                        .padding(.leading, 10)
                 }
                 Spacer()
                 if !viewModel.imageDataArray.isEmpty {
@@ -260,13 +262,13 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-            if !viewModel.isEditing {
+//            if !viewModel.isEditing {
+//                viewModel.toggleSelection(for: imageInfo.id)
+//                Analytics.logEvent("A2_프레임선택", parameters: nil)
+//                dismiss()
+//            }else {
                 viewModel.toggleSelection(for: imageInfo.id)
-                Analytics.logEvent("A2_프레임선택", parameters: nil)
-                dismiss()
-            }else {
-                viewModel.toggleSelection(for: imageInfo.id)
-            }
+//            }
         }
     }
 }
