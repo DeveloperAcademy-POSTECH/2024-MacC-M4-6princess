@@ -17,8 +17,8 @@ struct DFEditView: View {
             Color(.black)
                 .ignoresSafeArea()
             VStack {
+                Spacer()
                 ZStack {
-                    
                     inputImageWithMask
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.64))
                     
@@ -34,13 +34,21 @@ struct DFEditView: View {
                             .padding(.bottom, 20)
                         
                     }
-                    
+                    VStack {
+                        ToastMessageView()
+                            .padding(.bottom, UIScreen.main.bounds.height * 0.59)
+                            .opacity(viewModel.toastMessageOpacity)
+                            .task {
+                                viewModel.changeMessageOpacity()
+                            }
+                    }
                     Circle()
                         .stroke(.white)
                         .opacity(viewModel.isShowThick ? 1 : 0)
                         .frame(width: viewModel.thickness , height: viewModel.thickness )
                     
                     VStack {
+                        
                         HStack {
                             Spacer()
                             Button {
