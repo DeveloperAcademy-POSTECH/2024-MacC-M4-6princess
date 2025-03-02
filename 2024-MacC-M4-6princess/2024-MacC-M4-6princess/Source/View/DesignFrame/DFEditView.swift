@@ -16,6 +16,7 @@ struct DFEditView: View {
         ZStack {
             Color(.black)
                 .ignoresSafeArea()
+            
             VStack {
                 Spacer()
                 ZStack {
@@ -113,6 +114,9 @@ struct DFEditView: View {
                 
                 Spacer()
             }
+            removingLoadingView()
+                .opacity(viewModel.removingLoadingOpacity)
+                .ignoresSafeArea()
         }
         .alert(isPresented: $viewModel.isRenderFailed) {
             Alert(
@@ -309,7 +313,7 @@ private extension DFEditView {
                 .padding(.leading, UIScreen.main.bounds.width * 0.2)
             
             Button {
-                
+                viewModel.removingLoadingOpacity = 1
                 guard !viewModel.clickedButton else { return } // 이미 클릭되었는지 확인
                 viewModel.clickedButton = true
                 viewModel.createResult { success in
@@ -330,9 +334,11 @@ private extension DFEditView {
                                 }
                                 naviManager.push(screen: Screen.modifyFrame)
                                 viewModel.isRenderFailed = false
+                                viewModel.removingLoadingOpacity = 0
                             } else {
                                 print("Failed in detectSubject")
                                 viewModel.isRenderFailed = true
+                                viewModel.removingLoadingOpacity = 0
                             }
                             
                             

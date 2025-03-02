@@ -36,6 +36,7 @@ class DFEditViewModel: ObservableObject {
     @Published var isRenderFailed = false
     
     @Published var toastMessageOpacity: CGFloat = 1
+    @Published var removingLoadingOpacity: CGFloat = 0
     
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
