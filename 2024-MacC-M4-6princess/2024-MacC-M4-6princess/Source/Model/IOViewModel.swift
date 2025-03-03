@@ -24,6 +24,7 @@ class IOViewModel: ObservableObject {
     
     @Published var ShowShare = false
     @Published var showAcitivity = false
+    @Published var changeOverlay = false
     /// 사진 저장 함수
     @MainActor
     func saveRenderedView<T: View>(content: T, motionManager: MotionManager) {

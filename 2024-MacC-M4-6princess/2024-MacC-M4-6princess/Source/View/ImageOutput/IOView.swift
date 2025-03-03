@@ -19,6 +19,7 @@ struct IOView: View {
     @StateObject var viewModel = IOViewModel()
     
     
+    
     var body: some View {
         GeometryReader { geometry in
             VStack{
@@ -85,19 +86,24 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-//                                viewModel.ShowShare = true
-                                viewModel.showAcitivity.toggle()
+                                
+                                viewModel.ShowShare.toggle()
+                                //                                viewModel.showAcitivity.toggle()
                             }) {
-                                Rectangle()
-                                    .foregroundColor(.clear)
-                                    .frame(height: 60)
-                                    .background(Color.pointPink)
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        Text("SNS 공유")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 18, weight: .bold))
-                                    )
+                                Image("share.icon")
+                                    .resizable()
+                                    .frame(width:60,height: 60)
+                                   
+//                                Rectangle()
+//                                    .foregroundColor(.clear)
+//                                    .frame(height: 60)
+//                                    .background(Color.pointPink)
+//                                    .cornerRadius(10)
+//                                    .overlay(
+//                                        Text("SNS 공유")
+//                                            .foregroundColor(.white)
+//                                            .font(.system(size: 18, weight: .bold))
+//                                    )
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -123,6 +129,7 @@ struct IOView: View {
                                     .frame(height: 40)
                                     .background(Color.pointPink)
                                     .cornerRadius(10)
+//                                    .padding(.trailing)
                                     .overlay(
                                         Text("카메라로 이동")
                                             .foregroundColor(.white)
@@ -130,19 +137,24 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-//                                viewModel.ShowShare = true
-                                viewModel.showAcitivity.toggle()
-                            }) {
-                                Rectangle()
-                                    .foregroundColor(.clear)
-                                    .frame(height: 40)
-                                    .background(Color.pointPink)
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        Text("SNS 공유")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 18, weight: .bold))
-                                    )
+                                viewModel.ShowShare = true
+                                //                                viewModel.showAcitivity.toggle()
+                            }
+                            ) {
+                                Image("share.icon")
+                                    .resizable()
+                                    .frame(width:40,height: 40)
+                                    
+//                                Rectangle()
+//                                    .foregroundColor(.clear)
+//                                    .frame(height: 40)
+//                                    .background(Color.pointPink)
+//                                    .cornerRadius(10)
+//                                    .overlay(
+//                                        Text("SNS 공유")
+//                                            .foregroundColor(.white)
+//                                            .font(.system(size: 18, weight: .bold))
+//                                    )
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -152,6 +164,7 @@ struct IOView: View {
                     }
                 }
             }
+            
         }
         .onAppear{
             viewModel.bgImg = bg
@@ -164,27 +177,70 @@ struct IOView: View {
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
-        .sheet(isPresented: $viewModel.ShowShare){
-//            IOSNSView(viewModel: viewModel)
-//                .presentationDetents([.height(300)])
-            Group{
-                if let photo = viewModel.compositeImage
-                {
-                    ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
+        .sheet(isPresented: $viewModel.ShowShare) {
+            BottomSheetViewWrapper(viewModel: viewModel)
+                .presentationDetents([.height(150)])
+        }
+        .onChange(of: viewModel.ShowShare, perform: { newValue in
+            if viewModel.ShowShare == false && viewModel.showAcitivity == true{
+                print("onchange start")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
+                    if let _ = viewModel.compositeImage {
+                        viewModel.changeOverlay = true
+                        print("changeoverlay")
+                    }
                 }
+            }
+        })
+//        .onChange(of: viewModel.ShowShare) { newValue in
+//            if !newValue {
+//                DispatchQueue.main.async {
+//                    if let _ = viewModel.compositeImage {
+//                        viewModel.showAcitivity = true
+//                    }
+//                }
+//            }
+//        }
+
+//        .background(
+//            if viewModel.ShowShare{
+//                BottomSheetViewWrapper(viewModel: viewModel)
+////                    .frame(height:150)
+//            }
+//            else if viewModel.showAcitivity{
+//                Group{
+//                    if let photo = viewModel.compositeImage
+//                        ,viewModel.showAcitivity
+//                    {
+//                        ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
+//                    }
+//                    
+//                }
+//            }
+//           
+//        )
+        .overlay(
+        Group {
+//            if viewModel.ShowShare {
+//                BottomSheetViewWrapper(viewModel: viewModel)
+//                    .onDisappear {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+//                            if viewModel.showAcitivity{
+//                                viewModel.changeOverlay = true
+//                            }
+//                        }
+//                    }
+//            }
+//            else
+            if viewModel.changeOverlay, let photo = viewModel.compositeImage {
+                ShareSheet(isPresented: $viewModel.changeOverlay, shareData: (photo, "title", "Frameet으로 사진 찍어왔음"))
+                    .onAppear{
+                        print("sharesheet start")
+                    }
             }
         }
-        .overlay(
-            
-            Group{
-                if let photo = viewModel.compositeImage
-                    ,viewModel.showAcitivity
-                {
-                    ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
-                }
-            }
-        )
-        
+    )
+
         
         // 상단 툴바
         .navigationBarBackButtonHidden()
@@ -194,6 +250,55 @@ struct IOView: View {
     }
 }
 
+struct ShareSheet: UIViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    var shareData: (image: UIImage, title: String, content: String)
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        UIViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        if isPresented && uiViewController.presentedViewController == nil {
+            let items: [Any] = [
+                SharePinNumberActivityItemSource(title: shareData.title, content: shareData.content, photo: shareData.image)
+            ]
+            
+            let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            
+            
+            activityVC.completionWithItemsHandler = { _, _, _, _ in
+                DispatchQueue.main.async {
+                    self.isPresented = false
+                }
+            }
+            uiViewController.present(activityVC, animated: true, completion: nil)
+        }
+    }
+}
 
 
+//        .sheet(isPresented: $viewModel.showAcitivity){
+////            BottomSheetView()
+////                .presentationDetents([.height(300)])
+////            IOSNSView(viewModel: viewModel)
+////                .presentationDetents([.height(300)])
+//            Group{
+//                if let photo = viewModel.compositeImage
+//                {
+//                    ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
+//                        .presentationDetents([.height(300)])
+//                }
+//            }
+//        }
+import SwiftUI
 
+struct BottomSheetViewWrapper: UIViewControllerRepresentable {
+    var viewModel: IOViewModel
+
+    func makeUIViewController(context: Context) -> BottomSheetViewController {
+        return BottomSheetViewController(viewModel: viewModel)
+    }
+
+    func updateUIViewController(_ uiViewController: BottomSheetViewController, context: Context) {}
+}
