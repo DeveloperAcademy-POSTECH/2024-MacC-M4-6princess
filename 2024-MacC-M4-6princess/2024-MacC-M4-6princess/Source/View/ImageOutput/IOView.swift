@@ -15,11 +15,8 @@ struct IOView: View {
     var bg:UIImage
     var idol:UIImage
     let motionManager: MotionManager
-    
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @StateObject var viewModel = IOViewModel()
-    
-    
     
     var body: some View {
         GeometryReader { geometry in
