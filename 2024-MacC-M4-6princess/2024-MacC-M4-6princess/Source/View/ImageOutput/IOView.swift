@@ -8,7 +8,8 @@
 import SwiftUI
 import Photos
 import FirebaseAnalytics
-
+import UIKit
+import LinkPresentation
 // 이미지 편집 메인 화면
 struct IOView: View {
     var bg:UIImage
@@ -250,6 +251,9 @@ struct IOView: View {
     }
 }
 
+import UIKit
+import LinkPresentation
+
 struct ShareSheet: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     var shareData: (image: UIImage, title: String, content: String)
@@ -265,8 +269,6 @@ struct ShareSheet: UIViewControllerRepresentable {
             ]
             
             let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
-            
-            
             activityVC.completionWithItemsHandler = { _, _, _, _ in
                 DispatchQueue.main.async {
                     self.isPresented = false
@@ -277,7 +279,95 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 }
 
-
+final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
+    private var title: String
+    private var content: String
+    private var image: UIImage
+    
+    init(title: String, content: String, photo: UIImage) {
+        self.title = title
+        self.content = content
+        self.image = photo
+        super.init()
+    }
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return content
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        // PNG 데이터로 변환
+        guard let pngData = image.pngData() else { return content }
+//        
+//        if activityType == .airDrop {
+//            return pngData
+//        }
+//        
+//        // 최대 크기 설정 (Twitter: 4096x4096, Instagram: 1080x1080)
+//        let maxSize: CGFloat = 4096
+//        let instagramMaxSize: CGFloat = 1080
+//        let imageSize = image.size
+//        let aspectRatio = imageSize.width / imageSize.height
+//        
+//        var newWidth = imageSize.width
+//        var newHeight = imageSize.height
+//        
+//        // Twitter 크기 제한 적용
+//        if imageSize.width > maxSize || imageSize.height > maxSize {
+//            if imageSize.width > imageSize.height {
+//                newWidth = maxSize
+//                newHeight = newWidth / aspectRatio
+//            } else {
+//                
+//                newHeight = maxSize
+//                newWidth = newHeight * aspectRatio
+//            }
+//        }
+//        
+//        // Instagram 크기 제한 적용 (더 엄격한 조건)
+//        if newWidth > instagramMaxSize || newHeight > instagramMaxSize {
+//            if newWidth > newHeight {
+//                newWidth = instagramMaxSize
+//                newHeight = newWidth / aspectRatio
+//            } else {
+//                newHeight = instagramMaxSize
+//                newWidth = newHeight * aspectRatio
+//            }
+//        }
+//        
+//        // 리사이즈된 이미지 생성
+//        let newSize = CGSize(width: newWidth, height: newHeight)
+//        UIGraphicsBeginImageContextWithOptions(newSize, true, image.scale) // opaque를 true로 설정
+//        image.draw(in: CGRect(origin: .zero, size: newSize))
+//        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//        
+//        // 리사이즈된 이미지를 PNG로 변환 및 크기 확인
+//        if let resizedImageData = resizedImage?.pngData() {
+//            if resizedImageData.count <= 30_000_000 { // 30MB 이하
+//                return resizedImageData
+//            } else {
+//                print("Image size exceeds 30MB, resizing further might be required.")
+//                // 추가 압축 또는 크기 조정 로직을 여기에 구현 가능
+//            }
+//        }
+//        
+//        return content
+        return pngData
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        return title
+    }
+    
+    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
+        let metaData = LPLinkMetadata()
+        metaData.title = content
+        metaData.iconProvider = NSItemProvider(object: image)
+        metaData.originalURL = URL(string: "https://apps.apple.com/kr/app/frameet-%ED%94%84%EB%A0%88%EC%9E%84%EB%B0%8B-%EC%B5%9C%EC%95%A0%EC%99%80-%ED%95%A8%EA%BB%98-%ED%8A%B9%EB%B3%84%ED%95%9C-%EC%9D%BC%EC%83%81/id6737822930")
+        return metaData
+    }
+}
 //        .sheet(isPresented: $viewModel.showAcitivity){
 ////            BottomSheetView()
 ////                .presentationDetents([.height(300)])
