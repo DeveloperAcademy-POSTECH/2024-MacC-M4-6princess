@@ -78,7 +78,7 @@ struct CameraView: View {
                 if !viewModel.firstTime {
                     BGView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    OnboardingView(viewModel: viewModel)
+                    OnboardingView()
                     
                 }
                 if viewModel.delayTime != 0 && viewModel.isTakePic == true {

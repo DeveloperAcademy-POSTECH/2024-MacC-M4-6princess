@@ -191,37 +191,37 @@ struct FrameGridItem: View {
     
     var body: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-            Button {
-                naviManager.push(screen: Screen.photoPicker)
-                Analytics.logEvent("A2_새로운프레임만들기", parameters: nil)
-            } label: {
-                ZStack {
-                    VStack(alignment: .center, spacing: 4) {
-                        Image("newFrameCreateLogo")
-                            .resizable()
-                            .frame(width: 80, height: 92)
-                            .padding(.top, 20)
-                            .padding(.bottom, 3)
-                        Text("최애 프레임\n만들기")
-                            .font(.system(size: 13, weight: .bold))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.white)
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 163)
-                    .background(.pointPink)
-                    
-                    if viewModel.isEditing {
-                        Rectangle()
-                            .frame(maxWidth: .infinity)
-                            .frame(minHeight: 163)
-                            .background(.black)
-                            .opacity(0.7)
-                    }
-                }
-            }
-            .disabled(viewModel.isEditing)
+//            Button {
+//                naviManager.push(screen: Screen.photoPicker)
+//                Analytics.logEvent("A2_새로운프레임만들기", parameters: nil)
+//            } label: {
+//                ZStack {
+//                    VStack(alignment: .center, spacing: 4) {
+//                        Image("newFrameCreateLogo")
+//                            .resizable()
+//                            .frame(width: 80, height: 92)
+//                            .padding(.top, 20)
+//                            .padding(.bottom, 3)
+//                        Text("최애 프레임\n만들기")
+//                            .font(.system(size: 13, weight: .bold))
+//                            .multilineTextAlignment(.center)
+//                            .foregroundColor(.white)
+//                        Spacer()
+//                    }
+//                    .frame(maxWidth: .infinity)
+//                    .frame(minHeight: 163)
+//                    .background(.pointPink)
+//                    
+//                    if viewModel.isEditing {
+//                        Rectangle()
+//                            .frame(maxWidth: .infinity)
+//                            .frame(minHeight: 163)
+//                            .background(.black)
+//                            .opacity(0.7)
+//                    }
+//                }
+//            }
+//            .disabled(viewModel.isEditing)
             
             ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
                 GridItemView(imageInfo: imageInfo, isSelected: viewModel.selectedImageIds.contains(imageInfo.id), viewModel: viewModel)
