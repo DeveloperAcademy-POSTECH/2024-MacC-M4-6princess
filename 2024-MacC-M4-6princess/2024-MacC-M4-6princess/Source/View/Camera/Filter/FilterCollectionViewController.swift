@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import AVFoundation
+import FirebaseAnalytics
 
 class FilterCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     var frameManager: FrameManager
@@ -40,7 +41,40 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
+//        view.addSubview(shutterButton)
+//        shutterButton.center = view.center
     }
+
+//    override func viewDidLayoutSubviews() {
+//        super.viewDidLayoutSubviews()
+//        view.bringSubviewToFront(shutterButton)
+//    }
+//
+//    
+//    private lazy var shutterButton: UIButton = {
+//        let button = UIButton(type: .custom)
+//        button.setImage(UIImage(named: "shutterImage"), for: .normal)
+//        button.frame = CGRect(x: 0, y: 0, width: 80, height: 80)
+//        button.addTarget(self, action: #selector(shutterButtonTapped), for: .touchUpInside)
+//        return button
+//    }()
+//
+//    
+//    @objc private func shutterButtonTapped() {
+//        if frameManager.resultImage != nil {
+//            self.viewModel.isTakePic = true
+//            DispatchQueue.main.asyncAfter(deadline: .now() + viewModel.delayTime) {
+//                self.viewModel.takePic()
+//                self.viewModel.cameraManager.stopSession()
+//                Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+//            }
+//        } else {
+//            viewModel.isShowAlert = true
+//            // 알림 표시 로직 추가 필요
+//        }
+//    }
+
+
     
     private func setupCollectionView() {
         let layout = CustomFlowLayout()
@@ -123,6 +157,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
+    //가까운 셀을 중앙으로 위치 이동
     private func centerOnClosestCell() {
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
         guard let closestCell = collectionView.visibleCells
@@ -134,18 +169,23 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         
         if indexPath.item > 0 && indexPath.item <= filterImages.count {
-            let selectedFilter = filterImages[indexPath.item - 1]
-            self.selectedFilter?(selectedFilter.uuid)
-            currentSelectedFilter = selectedFilter.uuid
-            frameManager.selectedFrame = currentSelectedFilter
-            frameManager.isFrameLoading = true
-        } else if indexPath.item == 0 {
-            self.selectedFilter?(nil)
-            currentSelectedFilter = nil
-            frameManager.selectedFrame = nil
-            frameManager.isFrameLoading = true
-        }
+                let selectedFilter = filterImages[indexPath.item - 1]
+                self.selectedFilter?(selectedFilter.uuid)
+                currentSelectedFilter = selectedFilter.uuid
+                frameManager.selectedFrame = currentSelectedFilter
+                frameManager.isFrameLoading = true
+//                shutterButton.isHidden = false // 중앙에 필터가 왔을 때 셔터 버튼 표시
+            } else {
+                self.selectedFilter?(nil)
+                currentSelectedFilter = nil
+                frameManager.selectedFrame = nil
+                frameManager.isFrameLoading = true
+//                shutterButton.isHidden = true // 중앙에 필터가 없을 때 셔터 버튼 숨김
+            }
+        
+        updateCellSizesAndSpacing()
     }
+    
     
     private func updateCellSizesAndSpacing() {
         for cell in collectionView.visibleCells {
@@ -166,8 +206,19 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
+
+        // 현재 선택된 셀의 중앙 위치와 비교
+        if abs(cellFrame.midX - centerX) < (centerCellSize / 2) {
+            // 중앙에 있는 셀을 탭했을 경우 아무 동작도 하지 않음
+            collectionView.deselectItem(at: indexPath, animated: false)
+            return
+        }
+
         selectAndScrollToItem(at: indexPath)
     }
+
     
     private func selectAndScrollToItem(at indexPath: IndexPath) {
         if indexPath.item > 0 && indexPath.item <= filterImages.count {
@@ -183,11 +234,15 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             frameManager.isFrameLoading = true
         }
         
-        let cellWidth = cellSize(for: indexPath) + cellSpacing
-        let targetOffset = CGFloat(indexPath.item) * cellWidth - collectionView.bounds.width / 2 + cellWidth / 2
+        // 다음 셀의 인덱스를 계산 (범위를 벗어나지 않도록 주의)
+        let nextIndexPath = IndexPath(item: min(indexPath.item + 1, filterImages.count), section: indexPath.section)
+        
+        let cellWidth = cellSize(for: nextIndexPath) + cellSpacing
+        let targetOffset = CGFloat(nextIndexPath.item) * cellWidth - collectionView.bounds.width / 2 + cellWidth / 2
         let safeOffset = max(0, min(targetOffset, collectionView.contentSize.width - collectionView.bounds.width))
         
         collectionView.setContentOffset(CGPoint(x: safeOffset, y: 0), animated: true)
         updateCellSizesAndSpacing()
     }
+
 }

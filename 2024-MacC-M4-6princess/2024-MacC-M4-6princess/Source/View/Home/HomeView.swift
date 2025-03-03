@@ -22,6 +22,7 @@ struct HomeView: View {
                 HStack {
                     Image("appLogo")
                         .frame(width: 100, height: 20)
+                        .padding(.top, 18)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
