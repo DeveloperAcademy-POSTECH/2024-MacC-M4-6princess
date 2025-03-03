@@ -220,10 +220,6 @@ extension DFModifyView{
                     Image(systemName: "chevron.backward")
                         .fontWeight(.semibold)
                         .foregroundStyle(.gray01)
-                    
-                    Text("프레임 선택")
-                        .fontWeight(.regular)
-                        .foregroundStyle(.gray01)
                 }
             }
             .alert("프레임 편집을 종료하시겠습니까?", isPresented: $viewModel.isAlert) {
@@ -245,12 +241,19 @@ extension DFModifyView{
             }
             .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
             
-            Spacer(minLength: UIScreen.main.bounds.width / 20)
+//            Spacer(minLength: UIScreen.main.bounds.width / 20)
             
-            Spacer()
-                .frame(width: 150)
+            Text("프레임 꾸미기")
+                .foregroundStyle(.gray01)
+                .font(.system(size: 17))
+                .fontWeight(.bold)
+                .frame(width: UIScreen.main.bounds.width * 0.27, height: UIScreen.main.bounds.height * 0.035)
+                .padding(.leading, UIScreen.main.bounds.width * 0.1)
+                .padding(.trailing, UIScreen.main.bounds.width * 0.1)
+            
+//            Spacer()
+//                .frame(width: 150)
             Button {
-                
                 
                 
                 if let image = frameManager.resultImage {
@@ -295,10 +298,10 @@ extension DFModifyView{
             } label: {
                 Text("저장")
                     .fontWeight(.semibold)
-                    .foregroundStyle(isFirstLaunching ? .gray01 : .pointPink)
+                    .foregroundStyle(.pointPink)
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
-            .padding(.leading, 1)
+            .padding(.trailing, UIScreen.main.bounds.width * 0.1)
             .disabled(viewModel.isPushedSaveBtn)
             
         }

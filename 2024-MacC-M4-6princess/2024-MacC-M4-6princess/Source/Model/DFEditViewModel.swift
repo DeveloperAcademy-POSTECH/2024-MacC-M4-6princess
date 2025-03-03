@@ -34,10 +34,21 @@ class DFEditViewModel: ObservableObject {
     @Published var detectedObjects: Set<ImageAnalysisInteraction.Subject> = []
     @Published var clickedButton = false
     @Published var isRenderFailed = false
+    
+    @Published var toastMessageOpacity: CGFloat = 1
+    @Published var removingLoadingOpacity: CGFloat = 0
+    
     let analyzer = ImageAnalyzer()
     let interaction = ImageAnalysisInteraction()
     
     
+    func changeMessageOpacity() {
+        for i in 0..<10 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.toastMessageOpacity -= 0.1
+            }
+        }
+    }
     private func generateImageForAllSelectedObjects() async throws {
         let allSubjectsImage = try await interaction.image(for: interaction.highlightedSubjects)
         outputImage = allSubjectsImage

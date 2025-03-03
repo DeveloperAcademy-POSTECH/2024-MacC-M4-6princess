@@ -16,11 +16,12 @@ struct DFEditView: View {
         ZStack {
             Color(.black)
                 .ignoresSafeArea()
+            
             VStack {
+                Spacer()
                 ZStack {
-                    
                     inputImageWithMask
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 4/3))
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.64))
                     
                     if let image = viewModel.resultImage {
                         let scale = viewModel.scaleCompute(image)
@@ -34,14 +35,21 @@ struct DFEditView: View {
                             .padding(.bottom, 20)
                         
                     }
-                    
+                    VStack {
+                        ToastMessageView()
+                            .padding(.bottom, UIScreen.main.bounds.height * 0.59)
+                            .opacity(viewModel.toastMessageOpacity)
+                            .task {
+                                viewModel.changeMessageOpacity()
+                            }
+                    }
                     Circle()
                         .stroke(.white)
                         .opacity(viewModel.isShowThick ? 1 : 0)
                         .frame(width: viewModel.thickness , height: viewModel.thickness )
                     
                     VStack {
-                        Spacer()
+                        
                         HStack {
                             Spacer()
                             Button {
@@ -54,7 +62,6 @@ struct DFEditView: View {
                                     }
                                 }
 
-                                
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 4)
@@ -66,19 +73,50 @@ struct DFEditView: View {
                                 }
                             }
                             .padding(.trailing)
+
                         }
                         
                         thicknessControl
+                            .padding(.bottom, -10)
+                        ZStack {
+                            Rectangle()
+                                .fill(Color.background)
+                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.047)
+                            
+                            HStack {
+                                Button {
+                                    viewModel.reDo()
+                                } label: {
+                                    Image("back")
+                                        .colorMultiply(viewModel.indexOfMask > 0 ? .white : .gray01)
+                                }
+                                
+                                Button {
+                                    viewModel.unDo()
+                                } label: {
+                                    Image("front")
+                                        .colorMultiply(viewModel.indexOfMask < viewModel.maskImageList.count - 1 ? .white : .gray01)
+                                }
+                            }
+                        }
                         
                     }
+                    .padding(.top, UIScreen.main.bounds.height * 0.55)
                 }
+                
+                
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
                     brushToolSelector
                 }
                 else{
                     brushToolSelectorIpad
                 }
+                
+                Spacer()
             }
+            removingLoadingView()
+                .opacity(viewModel.removingLoadingOpacity)
+                .ignoresSafeArea()
         }
         .alert(isPresented: $viewModel.isRenderFailed) {
             Alert(
@@ -201,7 +239,7 @@ private extension DFEditView {
         ZStack {
             Rectangle()
                 .fill(Color.black.opacity(0.5))
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 20)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.05)
             Slider(
                 value: $viewModel.thickness ,
                 in: 0...50,
@@ -218,10 +256,11 @@ private extension DFEditView {
             }
             .accentColor(.pointPink)
             .frame(width: UIScreen.main.bounds.width / 1.2, height: 22)
-            .padding(.bottom, 20)
-            .padding([.leading, .trailing, .top], 10)
+//            .padding([.leading, .trailing, .top, .bottom], 10)
         }
         .onAppear() {
+            print(UIScreen.main.bounds.width)
+            print(UIScreen.main.bounds.height)
             thumbImageCustom()
         }
     }
@@ -252,7 +291,7 @@ private extension DFEditView {
         }
     }
     var toolBarButtons: some View {
-        HStack {
+        HStack(spacing: 50) {
             Button {
                 self.presentationMode.wrappedValue.dismiss()
             } label: {
@@ -261,34 +300,20 @@ private extension DFEditView {
                         .fontWeight(.semibold)
                         .foregroundStyle(.white)
                     
-                    Text("사진 선택")
-                        .fontWeight(.regular)
-                        .foregroundStyle(.white)
                 }
             }
-            .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
+            .padding(.leading, UIScreen.main.bounds.width * 0.2)
+            .padding(.trailing, UIScreen.main.bounds.width * 0.07)
+            .frame(width: UIScreen.main.bounds.width * 0.1, height: UIScreen.main.bounds.height * 0.05)
             
-            Spacer(minLength: UIScreen.main.bounds.width / 20)
-            
-            Button {
-                viewModel.reDo()
-            } label: {
-                Image("back")
-                    .colorMultiply(viewModel.indexOfMask > 0 ? .white : .gray01)
-            }
-            .padding(.trailing, 14)
+            Text("배경 제거")
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+                .frame(width: UIScreen.main.bounds.width * 0.2, height: UIScreen.main.bounds.height * 0.04)
+                .padding(.leading, UIScreen.main.bounds.width * 0.2)
             
             Button {
-                viewModel.unDo()
-            } label: {
-                Image("front")
-                    .colorMultiply(viewModel.indexOfMask < viewModel.maskImageList.count - 1 ? .white : .gray01)
-            }
-            .padding(.trailing, 60)
-            
-            Spacer()
-            Button {
-                
+                viewModel.removingLoadingOpacity = 1
                 guard !viewModel.clickedButton else { return } // 이미 클릭되었는지 확인
                 viewModel.clickedButton = true
                 viewModel.createResult { success in
@@ -309,9 +334,11 @@ private extension DFEditView {
                                 }
                                 naviManager.push(screen: Screen.modifyFrame)
                                 viewModel.isRenderFailed = false
+                                viewModel.removingLoadingOpacity = 0
                             } else {
                                 print("Failed in detectSubject")
                                 viewModel.isRenderFailed = true
+                                viewModel.removingLoadingOpacity = 0
                             }
                             
                             
@@ -327,8 +354,11 @@ private extension DFEditView {
                 Text("확인")
                     .fontWeight(.semibold)
                     .foregroundStyle(.pointPink)
+                    .padding(.leading, UIScreen.main.bounds.width * 0.04)
+                    .padding(.trailing, UIScreen.main.bounds.width * 0.01 )
                     .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
             }
+            .padding(.trailing, UIScreen.main.bounds.width * 0.051)
             .disabled(viewModel.clickedButton) // 버튼이 클릭된 동안 비활성화
             
             
@@ -350,7 +380,7 @@ private extension DFEditView {
                     Image("brush")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                         .colorMultiply(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
-                    Text("브러쉬")
+                    Text("선택 추가")
                         .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
@@ -368,14 +398,14 @@ private extension DFEditView {
                     Image("erase")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                         .colorMultiply(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
-                    Text("지우개")
+                    Text("선택 제거")
                         .foregroundStyle(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
                 }
             }
         }
-        
+        .padding(.top, 20)
         
     }
     var brushToolSelectorIpad: some View {
@@ -391,7 +421,7 @@ private extension DFEditView {
                     Image("brush")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                         .colorMultiply(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
-                    Text("브러쉬")
+                    Text("선택 추가")
                         .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
@@ -409,7 +439,7 @@ private extension DFEditView {
                     Image("erase")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                         .colorMultiply(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
-                    Text("지우개")
+                    Text("선택 제거")
                         .foregroundStyle(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
                         .offset(y: 30)
