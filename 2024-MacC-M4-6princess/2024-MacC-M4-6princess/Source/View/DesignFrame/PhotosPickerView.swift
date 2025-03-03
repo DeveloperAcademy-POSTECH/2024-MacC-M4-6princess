@@ -26,13 +26,20 @@ struct PhotosPickerView: View {
                                             .scaledToFill()
                                             .frame(width: UIScreen.main.bounds.width*0.32, height: UIScreen.main.bounds.width*0.32)
                                             .onTapGesture {
-                                                if vm.selectedIndex < 0 || vm.selectedIndex == i {
-                                                    vm.models[i].isSelected.toggle()
+                                                
+                                                if vm.selectedIndex < 0 {
+                                                    vm.selectedIndex = i
+                                                    vm.models[i].isSelected = true
+                                                    vm.selectedIndex = i
                                                     
-                                                    if vm.selectedIndex < 0 {
+                                                } else {
+                                                    if vm.selectedIndex != i {
+                                                        vm.models[vm.selectedIndex].isSelected = false
                                                         vm.selectedIndex = i
+                                                        vm.models[i].isSelected = true
                                                     } else {
                                                         vm.selectedIndex = -1
+                                                        vm.models[i].isSelected = false
                                                     }
                                                 }
                                             }
