@@ -4,6 +4,12 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>x</string>
+		<string>twitter</string>
+		<string>instagram-stories</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hakgyoansim Geurimilgi OTF R.otf</string>
