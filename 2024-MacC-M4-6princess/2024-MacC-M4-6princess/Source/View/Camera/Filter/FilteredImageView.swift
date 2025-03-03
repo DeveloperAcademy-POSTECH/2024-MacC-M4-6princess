@@ -33,6 +33,7 @@ struct FilteredImageView: View {
                     selectedFilter: $selectedFilter, viewModel: viewModel
                 )
                 .frame(height: 100)
+                .background(.black)
                 
 //                Button {
 //                    if frameManager.resultImage != nil{
