@@ -10,7 +10,7 @@ struct FilteredImageView: View {
     private var filterImages: FetchedResults<StoreImages>
     
     @State private var selectedFilter: UUID?
-    @StateObject private var viewModel = CameraViewModel()
+    @StateObject var viewModel: CameraViewModel
     
     var body: some View {
         GeometryReader { geometry in
@@ -69,7 +69,8 @@ struct FilteredImageView: View {
         .frame(height: 124)
         .onAppear {
             DispatchQueue.main.async {
-                viewModel.cameraManager.startSession()
+                //보라색 무시해주세요
+                viewModel.cameraManager.session.startRunning()
             }
         }
         .onDisappear {

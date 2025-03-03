@@ -21,7 +21,7 @@ struct CameraBottomView: View {
                 VStack{
                     Spacer()
                     ZStack {
-                        FilteredImageView()
+                        FilteredImageView(viewModel: viewModel)
                             .environmentObject(frameManager)
                         HStack {
                             //새 프레임 만들기 버튼

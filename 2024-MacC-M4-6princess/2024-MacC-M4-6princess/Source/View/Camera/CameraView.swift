@@ -109,18 +109,6 @@ struct CameraView: View {
                 
                 //                viewModel.frameImage = frameImage
             }
-            .alert("세로 화면 고정 권장", isPresented: $viewModel.showOrientationAlert) {
-                Button("확인") { }
-            } message: {
-                Text("이 앱은 세로 화면에서 더 좋은 경험을 제공합니다.\n세로 화면 고정을 활성화해주세요.")
-            }
-            .fullScreenCover(isPresented: $frameManager.showMFView) {
-                MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
-                    .environmentObject(naviManager)
-                    .environmentObject(frameManager)
-            }
             .statusBar(hidden: true)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $viewModel.nextView) {
