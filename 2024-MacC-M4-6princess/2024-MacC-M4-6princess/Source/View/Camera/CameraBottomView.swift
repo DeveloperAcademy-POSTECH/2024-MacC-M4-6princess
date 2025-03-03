@@ -19,62 +19,65 @@ struct CameraBottomView: View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             VStack{
                 Spacer()
-                HStack (){
-                    
-                    //프레임 불러오기 버튼
-                    Button {
-//                        viewModel.isShowMFView.toggle()
-                        frameManager.showMFView = true
-                        viewModel.cameraManager.stopSession()
-                    } label: {
-                        VStack(alignment: .center, spacing: 4) {
-                            Image("frameLoad")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .cornerRadius(5)
-                                .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                                .animation(.easeInOut, value: motionManager.currentOrientation)
-                            Text("최애 프레임")
-                                .font(.system(size: 13))
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(.gray01)
-                        }
-                    }
-                    .padding(.leading, 20)
-                    
-                    Spacer()
-                    
-                    //셔터 버튼
-                    Button {
-                        if frameManager.resultImage != nil{
-                            self.viewModel.isTakePic = true
-                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
-                                viewModel.takePic()
-                                viewModel.cameraManager.stopSession()
-                                Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+                ZStack {
+                    FilteredImageView()
+                        .environmentObject(frameManager)
+                    HStack {
+                        
+                        //새 프레임 만들기 버튼
+                        Button {
+    //                        viewModel.isShowMFView.toggle()
+    //                        frameManager.showMFView = true
+    //                        viewModel.cameraManager.stopSession()
+                            
+                        } label: {
+                            VStack(alignment: .center, spacing: 4) {
+                                Image("newFrameIcon")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+                                    .animation(.easeInOut, value: motionManager.currentOrientation)
+                                Text("새 프레임")
+                                    .font(.caption)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.black)
                             }
-                        } else {
-                            viewModel.isShowAlert = true
                         }
-                    } label: {
-                        Image("shutterImage")
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                            .animation(.easeInOut, value: motionManager.currentOrientation)
+                        .padding(.leading, 20)
+                        .frame(width: 80, height: 80)
+                        .background(.white)
+                        
+                        Spacer()
+                        
+                        //셔터 버튼
+    //                    Button {
+//                            if frameManager.resultImage != nil{
+//                                self.viewModel.isTakePic = true
+//                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
+//                                    viewModel.takePic()
+//                                    viewModel.cameraManager.stopSession()
+//                                    Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+//                                }
+//                            } else {
+//                                viewModel.isShowAlert = true
+//                            }
+    //                    } label: {
+    //                        Image("shutterImage")
+    //                            .resizable()
+    //                            .frame(width: 80, height: 80)
+    //                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
+    //                            .animation(.easeInOut, value: motionManager.currentOrientation)
+    //                    }
+//                        .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
+//                            Button("닫기", role: .cancel) { }
+//                        } message: {
+//                            Text("")
+//                        }
+                        
+                        
                     }
-                    .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
-                        Button("닫기", role: .cancel) { }
-                    } message: {
-                        Text("")
-                    }
-                    
-                    Spacer()
-                    
-                    //타이머 설정 버튼
-                    CameraTimerView(viewModel: viewModel)
-                        .padding(.trailing, 20)
                 }
+                
                 Spacer()
             }
             .frame(width: UIScreen.main.bounds.width, height: 132)

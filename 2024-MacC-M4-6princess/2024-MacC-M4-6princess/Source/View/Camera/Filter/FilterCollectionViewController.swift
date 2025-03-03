@@ -6,27 +6,30 @@
 //
 
 import UIKit
+import SwiftUI
 import AVFoundation
 
-class FilterCollectionViewController: UIViewController, AVCapturePhotoCaptureDelegate {
-    private let motionManager = MotionManager()
+class FilterCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+    var frameManager: FrameManager
     private let viewModel: CameraViewModel
     
     var collectionView: UICollectionView!
     let filterImages: [StoreImages]
-    private var selectedFilter: ((UUID) -> Void)?
-    private let cellId = "FilterCell"
-    var currentSelectedFilter: UUID
-    let selectedCellSize: CGFloat = 58
-    let normalCellWidth: CGFloat = 33
-    let normalCellHeight: CGFloat = 44
-    private var spacing: CGFloat = 40
+    private var selectedFilter: ((UUID?) -> Void)?
+    private let filterCellId = "FilterCell"
+    private let emptyCellId = "EmptyCell"
+    var currentSelectedFilter: UUID?
+    private let cellSpacing: CGFloat = 20
+    private let centerCellSize: CGFloat = 58
+    private let rightOfCenterCellSize: CGFloat = 50
+    private let defaultCellSize: CGFloat = 38
     
-    init(filterImages: [StoreImages], selectedFilter: @escaping (UUID) -> Void, initialFilter: UUID, viewModel: CameraViewModel) {
+    init(filterImages: [StoreImages], selectedFilter: @escaping (UUID?) -> Void, initialFilter: UUID?, viewModel: CameraViewModel, frameManager: FrameManager) {
         self.filterImages = filterImages
         self.selectedFilter = selectedFilter
         self.currentSelectedFilter = initialFilter
         self.viewModel = viewModel
+        self.frameManager = frameManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -42,8 +45,7 @@ class FilterCollectionViewController: UIViewController, AVCapturePhotoCaptureDel
     private func setupCollectionView() {
         let layout = CustomFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = spacing
-        layout.delegate = self
+        layout.minimumLineSpacing = cellSpacing
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
@@ -51,7 +53,8 @@ class FilterCollectionViewController: UIViewController, AVCapturePhotoCaptureDel
         collectionView.dataSource = self
         collectionView.decelerationRate = .fast
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(FilterCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(FilterCell.self, forCellWithReuseIdentifier: filterCellId)
+        collectionView.register(EmptyCell.self, forCellWithReuseIdentifier: emptyCellId)
         
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -62,105 +65,129 @@ class FilterCollectionViewController: UIViewController, AVCapturePhotoCaptureDel
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            let inset = self.view.bounds.width / 2 - self.normalCellWidth / 2
-            self.collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
-            self.collectionView.scrollToItem(
-                at: IndexPath(item: 0, section: 0),
-                at: .centeredHorizontally,
-                animated: false
-            )
-        }
+        let inset = (view.bounds.width - centerCellSize) / 2
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
     }
     
-    private func selectFilterAndCenter(at indexPath: IndexPath) {
-        let filter = filterImages[indexPath.item]
-        currentSelectedFilter = filter.uuid!
-        
-        // 셔터 효과 추가
-            viewModel.isTakePic = true
-            DispatchQueue.main.async {
-                // 세션이 실행 중인지 확인
-                if !self.viewModel.cameraManager.session.isRunning {
-                    self.viewModel.cameraManager.startSession()
-                    // 세션이 시작될 때까지 잠시 대기
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.viewModel.takePic() // 기존 viewModel의 takePic() 메서드 사용
-                    }
-                } else {
-                    self.viewModel.takePic() // 기존 viewModel의 takePic() 메서드 사용
-                }
-            }
-        
-        selectedFilter?(filter.uuid ?? UUID())
-        
-        collectionView.scrollToItem(
-            at: indexPath,
-            at: .centeredHorizontally,
-            animated: true
-        )
-        collectionView.reloadData()
-    }
-    
-    private func findNearestFilterIndex(to point: CGPoint) -> Int? {
-        var minDistance = CGFloat.greatestFiniteMagnitude
-        var nearestIndex: Int?
-        
-        for cell in collectionView.visibleCells {
-            guard let indexPath = collectionView.indexPath(for: cell) else { continue }
-            let cellFrame = cell.frame
-            let distance = abs(cellFrame.midX - point.x)
-            
-            if distance < minDistance {
-                minDistance = distance
-                nearestIndex = indexPath.item
-            }
-        }
-        
-        return nearestIndex
-    }
-}
-
-// MARK: - UICollectionView Delegate & DataSource
-extension FilterCollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filterImages.count
+        return filterImages.count + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! FilterCell
-        let filter = filterImages[indexPath.item]
-        if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
-            cell.configure(with: uiImage, isSelected: filter.uuid == currentSelectedFilter)
+        if indexPath.item == 0 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: emptyCellId, for: indexPath) as! EmptyCell
+            cell.configure()
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: filterCellId, for: indexPath) as! FilterCell
+            let filterIndex = indexPath.item - 1
+            if filterIndex < filterImages.count {
+                let filter = filterImages[filterIndex]
+                if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
+                    let size = cellSize(for: indexPath)
+                    let isSelected = filter.uuid == currentSelectedFilter
+                    cell.configure(with: uiImage, size: size, isSelected: isSelected)
+                }
+            }
+            return cell
         }
-        return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectFilterAndCenter(at: indexPath)
+    func cellSize(for indexPath: IndexPath) -> CGFloat {
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
+        let distance = abs(cellFrame.midX - centerX)
+        
+        if indexPath.item == 0 {
+            return defaultCellSize
+        } else if distance < (centerCellSize / 2) {
+            return centerCellSize
+        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
+            return rightOfCenterCellSize
+        } else {
+            return defaultCellSize
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateCellSizesAndSpacing()
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        centerOnClosestCell()
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            finishScrolling(scrollView)
+            centerOnClosestCell()
         }
     }
     
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        finishScrolling(scrollView)
-    }
-    
-    private func finishScrolling(_ scrollView: UIScrollView) {
-        let centerPoint = CGPoint(x: scrollView.contentOffset.x + scrollView.bounds.width / 2, y: scrollView.bounds.height / 2)
+    private func centerOnClosestCell() {
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        guard let closestCell = collectionView.visibleCells
+            .min(by: { abs($0.frame.midX - centerX) < abs($1.frame.midX - centerX) }),
+              let indexPath = collectionView.indexPath(for: closestCell) else {
+            return
+        }
         
-        if let nearestIndex = findNearestFilterIndex(to: centerPoint) {
-            selectFilterAndCenter(at: IndexPath(item: nearestIndex, section: 0))
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        
+        if indexPath.item > 0 && indexPath.item <= filterImages.count {
+            let selectedFilter = filterImages[indexPath.item - 1]
+            self.selectedFilter?(selectedFilter.uuid)
+            currentSelectedFilter = selectedFilter.uuid
+            frameManager.selectedFrame = currentSelectedFilter
+            frameManager.isFrameLoading = true
+        } else if indexPath.item == 0 {
+            self.selectedFilter?(nil)
+            currentSelectedFilter = nil
+            frameManager.selectedFrame = nil
+            frameManager.isFrameLoading = true
         }
     }
-    func reloadData() {
-        collectionView.reloadData()
+    
+    private func updateCellSizesAndSpacing() {
+        for cell in collectionView.visibleCells {
+            guard let indexPath = collectionView.indexPath(for: cell) else { continue }
+            let size = cellSize(for: indexPath)
+            if let filterCell = cell as? FilterCell {
+                let filterIndex = indexPath.item - 1
+                if filterIndex < filterImages.count {
+                    let filter = filterImages[filterIndex]
+                    if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
+                        let isSelected = filter.uuid == currentSelectedFilter
+                        filterCell.configure(with: uiImage, size: size, isSelected: isSelected)
+                    }
+                }
+            }
+        }
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        selectAndScrollToItem(at: indexPath)
+    }
+    
+    private func selectAndScrollToItem(at indexPath: IndexPath) {
+        if indexPath.item > 0 && indexPath.item <= filterImages.count {
+            let selectedFilter = filterImages[indexPath.item - 1]
+            self.selectedFilter?(selectedFilter.uuid)
+            currentSelectedFilter = selectedFilter.uuid
+            frameManager.selectedFrame = currentSelectedFilter
+            frameManager.isFrameLoading = true
+        } else if indexPath.item == 0 {
+            self.selectedFilter?(nil)
+            currentSelectedFilter = nil
+            frameManager.selectedFrame = nil
+            frameManager.isFrameLoading = true
+        }
+        
+        let cellWidth = cellSize(for: indexPath) + cellSpacing
+        let targetOffset = CGFloat(indexPath.item) * cellWidth - collectionView.bounds.width / 2 + cellWidth / 2
+        let safeOffset = max(0, min(targetOffset, collectionView.contentSize.width - collectionView.bounds.width))
+        
+        collectionView.setContentOffset(CGPoint(x: safeOffset, y: 0), animated: true)
+        updateCellSizesAndSpacing()
     }
 }
-
-

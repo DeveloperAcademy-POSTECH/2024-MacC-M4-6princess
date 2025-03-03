@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject private var naviManager = NavigationManager()
-    @StateObject private var frameManager = FrameManager()
+    @EnvironmentObject private var naviManager: NavigationManager
+    @EnvironmentObject private var frameManager: FrameManager
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var selectedTab = 0
+    @State private var selectedTab = 1
     
     var body: some View {
         ZStack(alignment: .bottom) {

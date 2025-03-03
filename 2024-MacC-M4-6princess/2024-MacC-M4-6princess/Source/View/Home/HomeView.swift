@@ -14,8 +14,10 @@ struct HomeView: View {
     @EnvironmentObject var frameManager: FrameManager
     @StateObject private var viewModel = HomeViewModel(context: PersistenceController.shared.container.viewContext)
     
+    @State private var isFullScreenPresented = false
+    
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $naviManager.route) {
             VStack {
                 HStack {
                     Image("appLogo")
@@ -31,6 +33,7 @@ struct HomeView: View {
                 
                 Button {
                     // 프레임 만들기 페이지로 이동
+                    isFullScreenPresented = true
                 } label: {
                     HStack(alignment: .center) {
                         Text("프레임만들기")
@@ -89,6 +92,9 @@ struct HomeView: View {
                 }
                 
                 Spacer()
+            }
+            .fullScreenCover(isPresented: $isFullScreenPresented) {
+                PhotosPickerView() // 풀스크린으로 표시할 뷰
             }
             .onAppear {
                 viewModel.loadImages()

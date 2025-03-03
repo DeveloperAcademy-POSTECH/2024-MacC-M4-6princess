@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var frameManager: FrameManager
     @ObservedObject var layerListViewModel = LayerListViewModel()
     @ObservedObject var imageModel = ImageListModel()
      
     var body: some View {
         MainTabView()
+            .environmentObject(frameManager)
 //        CameraView()
 //            .environmentObject(imageModel)
             

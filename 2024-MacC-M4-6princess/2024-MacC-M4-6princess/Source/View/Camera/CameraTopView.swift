@@ -22,7 +22,7 @@ struct CameraTopView: View {
                 } label: {
                     Image("cameraReverseIcon")
                         .resizable()
-                        .frame(width: 40, height: 40)
+                        .frame(width: 30, height: 30)
                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
                     

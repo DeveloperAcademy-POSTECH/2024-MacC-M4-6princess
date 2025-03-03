@@ -24,13 +24,13 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
-//            Group{
-//                if let image = frameManager.resultImage {
-//                    Image(uiImage: image)
-//                        .resizable()
-//                        .aspectRatio(contentMode: .fill)
-//                }
-//            }
+            Group{
+                if let image = frameManager.resultImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+            }
             .allowsHitTesting(false)
         }
     }
@@ -59,7 +59,7 @@ struct CameraView: View {
                                     viewModel.showOrientationAlert = true
                                 }
                             }
-                        FilteredImageView()
+//                        FilteredImageView()
                     }
                     
                     Spacer()
@@ -69,9 +69,9 @@ struct CameraView: View {
                     Spacer()
                     CamZoomButtonView(viewModel: viewModel, motionManager: motionManager)
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-//                    CameraBottomView(viewModel: viewModel)
-//                        .environmentObject(naviManager)
-//                        .environmentObject(frameManager)
+                    CameraBottomView(viewModel: viewModel)
+                        .environmentObject(naviManager)
+                        .environmentObject(frameManager)
 //                    MainTabView()
                 }
                 //처음 실행했을 때 - 온보딩 합침
@@ -89,7 +89,10 @@ struct CameraView: View {
             .onChange(of: frameManager.isFrameLoading) { newValue in
                 if newValue {
                     loadSelectedFrame()
+                    print("isFrameLoading: \(frameManager.isFrameLoading)")
                     frameManager.isFrameLoading = false
+                    print("지금의 isFrameLoading: \(frameManager.isFrameLoading)")
+                    
                 }
             }
             .alert("세로 고정 권장", isPresented: $viewModel.showOrientationAlert) {

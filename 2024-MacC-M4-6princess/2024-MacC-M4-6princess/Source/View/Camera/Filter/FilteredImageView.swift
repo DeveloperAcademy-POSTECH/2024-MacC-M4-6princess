@@ -1,8 +1,10 @@
 import SwiftUI
 import UIKit
+import FirebaseAnalytics
 
 struct FilteredImageView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var frameManager: FrameManager
     @FetchRequest(entity: StoreImages.entity(),
                   sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)])
     private var filterImages: FetchedResults<StoreImages>
@@ -11,26 +13,56 @@ struct FilteredImageView: View {
     @StateObject private var viewModel = CameraViewModel()
     
     var body: some View {
-        VStack {
-            if let selectedFilter = selectedFilter,
-               let filterImage = filterImages.first(where: { $0.uuid == selectedFilter }),
-               let uiImage = UIImage(data: (filterImage.image)!) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 300)
-                    .padding()
-            }else {
-                Color.pointPink
-                    .frame(height: 300)
+        GeometryReader { geometry in
+            ZStack {
+                //            if let selectedFilter = selectedFilter,
+                //               let filterImage = filterImages.first(where: { $0.uuid == selectedFilter }),
+                //               let uiImage = UIImage(data: (filterImage.image)!) {
+                //                Image(uiImage: uiImage)
+                //                    .resizable()
+                //                    .scaledToFit()
+                //                    .frame(height: 300)
+                //                    .padding()
+                //            }else {
+                //                Color.pointPink
+                //                    .frame(height: 300)
+                //            }
+                
+                FilterCollectionViewRepresentable(
+                    filterImages: Array(filterImages),
+                    selectedFilter: $selectedFilter, viewModel: viewModel
+                )
+                .frame(height: 100)
+                
+//                Button {
+//                    if frameManager.resultImage != nil{
+//                        self.viewModel.isTakePic = true
+//                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
+//                            viewModel.takePic()
+//                            viewModel.cameraManager.stopSession()
+//                            Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+//                        }
+//                    } else {
+//                        viewModel.isShowAlert = true
+//                    }
+//                } label: {
+//                    Image("shutterImage")
+//                        .resizable()
+//    //                    .renderingMode(.original) // 원본 이미지를 사용
+//                        .frame(width: 80, height: 80)
+//                        .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
+//                }
+//                .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
+//                    Button("닫기", role: .cancel) { }
+//                } message: {
+//                    Text("")
+//                }
+//                .allowsHitTesting(false)
+
+
             }
-            
-            FilterCollectionViewRepresentable(
-                filterImages: Array(filterImages),
-                selectedFilter: $selectedFilter, viewModel: viewModel
-            )
-            .frame(height: 100)
         }
+        .frame(height: 124)
         .onAppear {
             DispatchQueue.main.async {
                 viewModel.cameraManager.startSession()
