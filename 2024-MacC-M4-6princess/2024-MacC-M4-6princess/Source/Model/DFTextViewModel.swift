@@ -71,7 +71,7 @@ class DFTextViewModel: ObservableObject {
     }
  
     @MainActor
-    func attributtedTextToImage() -> UIImage? {
+    func attributedTextToImage() -> UIImage? {
         // 현재 attributedTxt가 비어있거나 nil이면 nil 반환
         guard let attributedText = attributedTxt, attributedText.length > 0 else {
             return nil
@@ -80,7 +80,7 @@ class DFTextViewModel: ObservableObject {
         // 최신 스타일을 적용하기 위해 새로운 NSMutableAttributedString 생성
         let updatedAttributedText = NSMutableAttributedString(attributedString: attributedText)
         
-        // viewModel에서 최신 스타일 가져오기
+        // viewModel에서 폰트,색상,사이즈 적용
         let font = newSelectedFont.applyFont(size: fontSize) // 폰트와 크기 적용
         let textColor = UIColor(color: fontColor) // 텍스트 색상
         let range = NSRange(location: 0, length: updatedAttributedText.length) // 전체 텍스트 범위
@@ -99,26 +99,42 @@ class DFTextViewModel: ObservableObject {
             value: paragraphStyle,
             range: range
         )
+        paragraphStyle.lineBreakMode = .byWordWrapping
         
         // 가장 긴 줄의 너비 계산
         let lines = updatedAttributedText.string.split(separator: "\n") // 텍스트를 줄 단위로 분리
         var maxLineWidth: CGFloat = 0
         let maxHeight: CGFloat = .greatestFiniteMagnitude
         
+        // 텍스트를 줄 단위로 분리한 `lines` 배열을 순회합니다.
         for line in lines {
+            // 현재 줄의 문자열을 기반으로 새로운 NSAttributedString을 생성
+            // `String(line)`은 Substring을 String으로 변환하여 사용합니다.
             let lineAttributedText = NSAttributedString(
-                string: String(line),
-                attributes: [
-                    .font: font,
-                    .foregroundColor: textColor,
-                    .paragraphStyle: paragraphStyle
+                string: String(line), // 현재 줄의 텍스트를 문자열로 변환
+                attributes: [ // 텍스트에 적용할 속성들을 딕셔너리 형태로 정의
+                    .font: font, // 텍스트에 적용할 폰트 (예: 시스템 폰트, 커스텀 폰트 등)
+                    .foregroundColor: textColor, // 텍스트 색상 (UIColor 객체로 지정)
+                    .paragraphStyle: paragraphStyle // 단락 스타일 (정렬, 줄바꿈 모드 등이 포함됨)
                 ]
             )
+            print("lineAttributedText: \(lineAttributedText.string)")
+            // 현재 줄의 크기(너비와 높이)를 계산합니다.
             let lineSize = lineAttributedText.boundingRect(
-                with: CGSize(width: .greatestFiniteMagnitude, height: maxHeight),
-                options: [.usesLineFragmentOrigin, .usesFontLeading],
-                context: nil
-            ).size
+                with: CGSize(
+                    width: .greatestFiniteMagnitude, // 최대 너비를 무제한으로 설정하여 줄이 쌓이지 않고 한 줄로 계산되게 함
+                    height: maxHeight // 최대 높이를 제한하여 텍스트가 수직으로 너무 커지지 않도록 설정
+                ),
+                options: [.usesLineFragmentOrigin
+//                          , .usesFontLeading
+                         ], // 렌더링 옵션
+                // .usesLineFragmentOrigin: 줄 단위로 크기를 계산하도록 설정 (줄바꿈 반영)
+                // .usesFontLeading: 폰트의 행간(leading)을 포함하여 크기를 계산
+                context: nil // 추가적인 문자열 렌더링 컨텍스트 (여기서는 필요 없음)
+            ).size // boundingRect 결과에서 크기만 추출
+            
+            // 모든 줄 중 가장 긴 너비를 추적합니다.
+            // `ceil`을 사용하여 소수점 이하를 올림 처리하며, 픽셀 단위 정밀도를 맞춤
             maxLineWidth = max(maxLineWidth, ceil(lineSize.width))
         }
         
@@ -130,7 +146,7 @@ class DFTextViewModel: ObservableObject {
         ).size
         
         // 패딩 추가 (양쪽 10포인트씩)
-        let padding: CGFloat = 10
+        let padding: CGFloat = 20
         let imageSize = CGSize(
             width: maxLineWidth + (padding * 2),
             height: ceil(textSize.height) + (padding * 2)
@@ -143,8 +159,8 @@ class DFTextViewModel: ObservableObject {
         }
         
         // 안티앨리어싱 설정 (텍스트가 깔끔하게 보이도록)
-        context.setShouldAntialias(true)
-        context.setAllowsAntialiasing(true)
+//        context.setShouldAntialias(true)
+//        context.setAllowsAntialiasing(true)
         
         // 배경 설정 (투명 배경으로 설정)
         UIColor.clear.setFill()

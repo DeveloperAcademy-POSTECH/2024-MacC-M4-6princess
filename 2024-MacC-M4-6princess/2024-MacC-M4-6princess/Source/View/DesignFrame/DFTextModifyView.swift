@@ -29,7 +29,7 @@ struct DFTextModifyView: View {
                     Button("완료") {
                         
                         /// 텍스트를 이미지로 변환
-                        viewModel.renderedImage=viewModel.attributtedTextToImage()
+                        viewModel.renderedImage=viewModel.attributedTextToImage()
                         
                         style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
                         style.txt =  viewModel.txt
