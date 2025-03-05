@@ -266,7 +266,7 @@ extension DFModifyView{
                     viewModel.isPushedSaveBtn = true
                     
                     if let _  = frameManager.selectedFrame {
-                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext) {
+                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
                             
                             viewModel.btnOpacity = 0
                             viewModel.showCamera = true
@@ -276,7 +276,7 @@ extension DFModifyView{
                         }
                     } else {
                         
-                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext) {
+                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
                             
                             viewModel.btnOpacity = 0
                             viewModel.showCamera = true
