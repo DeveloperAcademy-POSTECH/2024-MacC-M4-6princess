@@ -35,17 +35,17 @@ extension DFTextView{
                         .font(fontStyle.oldApplyFont(size: 18)) // 매칭된 영문 폰트 적용
                         .padding(.horizontal,15)
                         .padding(.vertical,6)
-                        .foregroundColor(viewModel.newSelectedFont == fontStyle ? .black :.white)
+                        .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.newSelectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.white, lineWidth: 1) // 흰색 테두리
                                 )
                         )
                         .onTapGesture {
-                            viewModel.newSelectedFont = fontStyle
+                            viewModel.selectedFont = fontStyle
                         }
                 }
             }
@@ -66,7 +66,7 @@ extension DFTextView{
                                 .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
                         )
                         .onTapGesture {
-                            viewModel.fontColor = viewModel.colorChip[colorIndex]
+                            viewModel.selectedColor = viewModel.colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
                                 viewModel.colorNum = colorIndex
                             }
@@ -146,7 +146,7 @@ extension DFTextView{
             newImage.text = image
             newImage.originalImage = image
             if let att = viewModel.attributedTxt{
-                newImage.textStyle = TextStyle(attributedString: att, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
+                newImage.textStyle = TextStyle(attributedString: att, txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
             }
             else{
                 
@@ -223,17 +223,17 @@ extension DFTextModifyView{
                         .font(fontStyle.oldApplyFont(size: 18)) // 매칭된 영문 폰트 적용
                         .padding(.horizontal,15)
                         .padding(.vertical,6)
-                        .foregroundColor(viewModel.newSelectedFont == fontStyle ? .black :.white)
+                        .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.newSelectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.white, lineWidth: 1) // 흰색 테두리
                                 )
                         )
                         .onTapGesture {
-                            viewModel.newSelectedFont = fontStyle
+                            viewModel.selectedFont = fontStyle
                         }
                 }
             }
@@ -255,7 +255,7 @@ extension DFTextModifyView{
                         )
                         .onTapGesture {
                             //                            style.color = viewModel.colorChip[colorIndex]
-                            viewModel.fontColor = viewModel.colorChip[colorIndex]
+                            viewModel.selectedColor = viewModel.colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
                                 viewModel.colorNum = colorIndex
                             }

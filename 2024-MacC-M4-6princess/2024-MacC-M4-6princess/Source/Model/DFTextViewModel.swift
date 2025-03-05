@@ -11,12 +11,12 @@ import PhotosUI
 class DFTextViewModel: ObservableObject {
     @Published var txt = ""
     //    @Published var selectedFont: FontStyle = .modern
-    @Published var newSelectedFont:NewFontStyle = .modern
+    @Published var selectedFont:NewFontStyle = .modern
     @Published var fontSize: Double = 20
-    @Published var fontColor: Color = ColorPreset.colorPallete[0] {
+    @Published var selectedColor: Color = ColorPreset.colorPallete[0] {
         didSet {
             // 값이 변경될 때마다 프린트
-            print("폰트컬러체인지드: \(fontColor.toHex())")
+            print("폰트컬러체인지드: \(selectedColor.toHex())")
         }
     }
     @Published var renderedImage: UIImage?
@@ -26,6 +26,9 @@ class DFTextViewModel: ObservableObject {
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
     @Published var attributedTxt: NSAttributedString?
+    
+    // 캡처 크기를 저장할 변수 추가
+    @Published var captureSize: CGSize = .zero // 캡처할 크기 (너비, 높이)
     // 정렬 방향 정의
     enum SwipeDirection {
         case left, right
@@ -69,99 +72,165 @@ class DFTextViewModel: ObservableObject {
                 
         }
     }
- 
     @MainActor
-    func attributtedTextToImage() -> UIImage? {
+    func captureTextContent(from textView: UITextView) -> UIImage? {
+        // 텍스트뷰의 attributedText가 nil이거나 길이가 0이면 nil 반환
+        guard let attributedText = textView.attributedText, attributedText.length > 0 else {
+            print("Debug: attributedText is nil or empty")
+            return nil
+        }
+        
+        // 디버깅: attributedText 속성 확인
+        print("Debug: Full attributedText: \(attributedText.string)")
+        attributedText.enumerateAttributes(in: NSRange(location: 0, length: attributedText.length)) { attrs, range, _ in
+            print("Debug: Attributes at \(range): \(attrs)")
+            if let attachment = attrs[.attachment] as? NSTextAttachment {
+                print("Debug: Found NSTextAttachment - bounds: \(attachment.bounds), image: \(String(describing: attachment.image))")
+            }
+        }
+        
+        // viewModel.captureSize를 사용해 콘텐츠 크기 가져오기
+        let captureSize = captureSize
+        guard captureSize != .zero else {
+            print("Debug: captureSize is zero, falling back to default calculation")
+            return nil // 또는 기존 방식으로 계산
+        }
+        
+        // 요청된 패딩 10 추가
+        let padding: CGFloat = 0
+        let contentSize = CGSize(
+            width: captureSize.width + (padding * 2),
+            height: captureSize.height + (padding * 2)
+        )
+        
+        // 그래픽 컨텍스트 설정
+        UIGraphicsBeginImageContextWithOptions(contentSize, false, UIScreen.main.scale)
+        guard let context = UIGraphicsGetCurrentContext() else {
+            print("Debug: Failed to get graphics context")
+            UIGraphicsEndImageContext()
+            return nil
+        }
+        
+        // 배경 투명 설정
+        UIColor.clear.setFill()
+        context.fill(CGRect(origin: .zero, size: contentSize))
+        
+        // 텍스트와 이미지 글리프 그리기 (패딩 고려)
+        let drawingRect = CGRect(
+            x: padding,
+            y: padding,
+            width: captureSize.width,
+            height: captureSize.height
+        )
+        print("Debug: Drawing rect: \(drawingRect)")
+        attributedText.draw(in: drawingRect)
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        // 디버깅: 생성된 이미지 크기 확인
+        if let image = image {
+            if let imageData = image.pngData() {
+                let debugPath = NSTemporaryDirectory() + "capturedText.png"
+                try? imageData.write(to: URL(fileURLWithPath: debugPath))
+            }
+        } else {
+            print("Debug: Failed to capture image")
+        }
+        
+        return image
+    }
+    
+    @MainActor
+    func attributedTextToImage() -> UIImage? {
         // 현재 attributedTxt가 비어있거나 nil이면 nil 반환
         guard let attributedText = attributedTxt, attributedText.length > 0 else {
             return nil
         }
+        print("attributedText: \(attributedText.string)")
         
         // 최신 스타일을 적용하기 위해 새로운 NSMutableAttributedString 생성
         let updatedAttributedText = NSMutableAttributedString(attributedString: attributedText)
         
-        // viewModel에서 최신 스타일 가져오기
-        let font = newSelectedFont.applyFont(size: fontSize) // 폰트와 크기 적용
-        let textColor = UIColor(color: fontColor) // 텍스트 색상
-        let range = NSRange(location: 0, length: updatedAttributedText.length) // 전체 텍스트 범위
+        // viewModel에서 폰트, 색상, 사이즈 적용
+        let font = selectedFont.applyFont(size: fontSize)
+        let textColor = UIColor(color: selectedColor)
+        let range = NSRange(location: 0, length: updatedAttributedText.length)
         
-        // 최신 폰트와 색상 속성 적용
-        updatedAttributedText.addAttributes([
-            .font: font,
-            .foregroundColor: textColor
-        ], range: range)
-        
-        // 정렬을 반영하기 위해 NSMutableParagraphStyle 사용
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = NSTextAlignment(textAlignment) // 최신 textAlignment 적용
-        updatedAttributedText.addAttribute(
-            .paragraphStyle,
-            value: paragraphStyle,
-            range: range
-        )
-        
-        // 가장 긴 줄의 너비 계산
-        let lines = updatedAttributedText.string.split(separator: "\n") // 텍스트를 줄 단위로 분리
-        var maxLineWidth: CGFloat = 0
-        let maxHeight: CGFloat = .greatestFiniteMagnitude
-        
-        for line in lines {
-            let lineAttributedText = NSAttributedString(
-                string: String(line),
-                attributes: [
-                    .font: font,
-                    .foregroundColor: textColor,
-                    .paragraphStyle: paragraphStyle
-                ]
-            )
-            let lineSize = lineAttributedText.boundingRect(
-                with: CGSize(width: .greatestFiniteMagnitude, height: maxHeight),
-                options: [.usesLineFragmentOrigin, .usesFontLeading],
-                context: nil
-            ).size
-            maxLineWidth = max(maxLineWidth, ceil(lineSize.width))
+        // 기존 속성 유지하며 폰트와 색상만 추가 (이미지 글리프 손실 방지)
+        updatedAttributedText.enumerateAttributes(in: range, options: []) { attrs, range, _ in
+            var newAttrs = attrs
+            // NSTextAttachment가 없는 경우에만 폰트와 색상 적용
+            if newAttrs[.attachment] == nil {
+                newAttrs[.font] = font
+                newAttrs[.foregroundColor] = textColor
+            }
+            updatedAttributedText.setAttributes(newAttrs, range: range)
         }
         
-        // 전체 텍스트 높이 계산 (최대 너비를 가장 긴 줄에 맞춤)
-        let textSize = updatedAttributedText.boundingRect(
-            with: CGSize(width: maxLineWidth, height: maxHeight),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            context: nil
-        ).size
+        // 정렬과 줄바꿈 설정
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = NSTextAlignment(textAlignment)
+        paragraphStyle.lineBreakMode = .byClipping // 줄바꿈 억제
+        updatedAttributedText.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+        print("updatedAttributedText: \(updatedAttributedText.string)")
         
-        // 패딩 추가 (양쪽 10포인트씩)
-        let padding: CGFloat = 10
+        // 이미지 글리프 확인 (디버깅용)
+        updatedAttributedText.enumerateAttribute(.attachment, in: range) { value, range, _ in
+            if let attachment = value as? NSTextAttachment {
+                print("이미지 글리프 발견: \(attachment.bounds), 이미지: \(String(describing: attachment.image))")
+            }
+        }
+        
+        // NSLayoutManager를 사용해 정확한 레이아웃 계산
+        let textStorage = NSTextStorage(attributedString: updatedAttributedText)
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+        textContainer.lineFragmentPadding = 0
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        // 전체 텍스트와 이미지 글리프의 크기 계산
+        let glyphRange = layoutManager.glyphRange(for: textContainer)
+        let usedRect = layoutManager.usedRect(for: textContainer)
+        let maxLineWidth = ceil(usedRect.width)
+        let totalHeight = ceil(usedRect.height)
+        
+        // 패딩 추가
+        let padding: CGFloat = 20
         let imageSize = CGSize(
             width: maxLineWidth + (padding * 2),
-            height: ceil(textSize.height) + (padding * 2)
+            height: totalHeight + (padding * 2)
         )
+        print("imageSize: \(imageSize)")
         
-        // 그래픽 컨텍스트 설정 (이미지 렌더링 시작)
+        // 그래픽 컨텍스트 설정
         UIGraphicsBeginImageContextWithOptions(imageSize, false, UIScreen.main.scale)
         guard let context = UIGraphicsGetCurrentContext() else {
+            UIGraphicsEndImageContext()
             return nil
         }
         
-        // 안티앨리어싱 설정 (텍스트가 깔끔하게 보이도록)
+        // 안티앨리어싱 설정
         context.setShouldAntialias(true)
         context.setAllowsAntialiasing(true)
         
-        // 배경 설정 (투명 배경으로 설정)
+        // 배경 설정 (투명)
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: imageSize))
         
-        // 텍스트를 그릴 영역 설정 (패딩 고려)
+        // 텍스트와 이미지 글리프를 그릴 영역 설정
         let drawingRect = CGRect(
             x: padding,
             y: padding,
-            width: imageSize.width - (padding * 2),
-            height: imageSize.height - (padding * 2)
+            width: maxLineWidth,
+            height: totalHeight
         )
         
-        // 업데이트된 속성 텍스트 그리기
+        // 전체 텍스트와 이미지 글리프 그리기
         updatedAttributedText.draw(in: drawingRect)
         
-        // 컨텍스트에서 이미지 생성
+        // 이미지 생성
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         

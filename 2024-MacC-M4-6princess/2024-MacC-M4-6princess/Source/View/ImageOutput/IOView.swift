@@ -91,17 +91,17 @@ struct IOView: View {
                                 Image("share.icon")
                                     .resizable()
                                     .frame(width:60,height: 60)
-                                   
-//                                Rectangle()
-//                                    .foregroundColor(.clear)
-//                                    .frame(height: 60)
-//                                    .background(Color.pointPink)
-//                                    .cornerRadius(10)
-//                                    .overlay(
-//                                        Text("SNS 공유")
-//                                            .foregroundColor(.white)
-//                                            .font(.system(size: 18, weight: .bold))
-//                                    )
+                                
+                                //                                Rectangle()
+                                //                                    .foregroundColor(.clear)
+                                //                                    .frame(height: 60)
+                                //                                    .background(Color.pointPink)
+                                //                                    .cornerRadius(10)
+                                //                                    .overlay(
+                                //                                        Text("SNS 공유")
+                                //                                            .foregroundColor(.white)
+                                //                                            .font(.system(size: 18, weight: .bold))
+                                //                                    )
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -127,7 +127,7 @@ struct IOView: View {
                                     .frame(height: 40)
                                     .background(Color.pointPink)
                                     .cornerRadius(10)
-//                                    .padding(.trailing)
+                                //                                    .padding(.trailing)
                                     .overlay(
                                         Text("카메라로 이동")
                                             .foregroundColor(.white)
@@ -142,17 +142,17 @@ struct IOView: View {
                                 Image("share.icon")
                                     .resizable()
                                     .frame(width:40,height: 40)
-                                    
-//                                Rectangle()
-//                                    .foregroundColor(.clear)
-//                                    .frame(height: 40)
-//                                    .background(Color.pointPink)
-//                                    .cornerRadius(10)
-//                                    .overlay(
-//                                        Text("SNS 공유")
-//                                            .foregroundColor(.white)
-//                                            .font(.system(size: 18, weight: .bold))
-//                                    )
+                                
+                                //                                Rectangle()
+                                //                                    .foregroundColor(.clear)
+                                //                                    .frame(height: 40)
+                                //                                    .background(Color.pointPink)
+                                //                                    .cornerRadius(10)
+                                //                                    .overlay(
+                                //                                        Text("SNS 공유")
+                                //                                            .foregroundColor(.white)
+                                //                                            .font(.system(size: 18, weight: .bold))
+                                //                                    )
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -190,55 +190,55 @@ struct IOView: View {
                 }
             }
         })
-//        .onChange(of: viewModel.ShowShare) { newValue in
-//            if !newValue {
-//                DispatchQueue.main.async {
-//                    if let _ = viewModel.compositeImage {
-//                        viewModel.showAcitivity = true
-//                    }
-//                }
-//            }
-//        }
-
-//        .background(
-//            if viewModel.ShowShare{
-//                BottomSheetViewWrapper(viewModel: viewModel)
-////                    .frame(height:150)
-//            }
-//            else if viewModel.showAcitivity{
-//                Group{
-//                    if let photo = viewModel.compositeImage
-//                        ,viewModel.showAcitivity
-//                    {
-//                        ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
-//                    }
-//                    
-//                }
-//            }
-//           
-//        )
+        //        .onChange(of: viewModel.ShowShare) { newValue in
+        //            if !newValue {
+        //                DispatchQueue.main.async {
+        //                    if let _ = viewModel.compositeImage {
+        //                        viewModel.showAcitivity = true
+        //                    }
+        //                }
+        //            }
+        //        }
+        
+        //        .background(
+        //            if viewModel.ShowShare{
+        //                BottomSheetViewWrapper(viewModel: viewModel)
+        ////                    .frame(height:150)
+        //            }
+        //            else if viewModel.showAcitivity{
+        //                Group{
+        //                    if let photo = viewModel.compositeImage
+        //                        ,viewModel.showAcitivity
+        //                    {
+        //                        ShareSheet(isPresented: $viewModel.showAcitivity, shareData: (photo,"title","Frameet으로 사진 낋여왔음"))
+        //                    }
+        //                    
+        //                }
+        //            }
+        //           
+        //        )
         .overlay(
-        Group {
-//            if viewModel.ShowShare {
-//                BottomSheetViewWrapper(viewModel: viewModel)
-//                    .onDisappear {
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-//                            if viewModel.showAcitivity{
-//                                viewModel.changeOverlay = true
-//                            }
-//                        }
-//                    }
-//            }
-//            else
-            if viewModel.changeOverlay, let photo = viewModel.compositeImage {
-                ShareSheet(isPresented: $viewModel.changeOverlay, shareData: (photo, "title", "Frameet으로 사진 찍어왔음"))
-                    .onAppear{
-                        print("sharesheet start")
-                    }
+            Group {
+                //            if viewModel.ShowShare {
+                //                BottomSheetViewWrapper(viewModel: viewModel)
+                //                    .onDisappear {
+                //                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                //                            if viewModel.showAcitivity{
+                //                                viewModel.changeOverlay = true
+                //                            }
+                //                        }
+                //                    }
+                //            }
+                //            else
+                if viewModel.changeOverlay, let photo = viewModel.compositeImage {
+                    ShareSheet(isPresented: $viewModel.changeOverlay, shareData: (photo, "title", "Frameet으로 사진 찍어왔음"))
+                        .onAppear{
+                            print("sharesheet start")
+                        }
+                }
             }
-        }
-    )
-
+        )
+        
         
         // 상단 툴바
         .navigationBarBackButtonHidden()
@@ -295,62 +295,62 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         // PNG 데이터로 변환
         guard let pngData = image.pngData() else { return content }
-//        
-//        if activityType == .airDrop {
-//            return pngData
-//        }
-//        
-//        // 최대 크기 설정 (Twitter: 4096x4096, Instagram: 1080x1080)
-//        let maxSize: CGFloat = 4096
-//        let instagramMaxSize: CGFloat = 1080
-//        let imageSize = image.size
-//        let aspectRatio = imageSize.width / imageSize.height
-//        
-//        var newWidth = imageSize.width
-//        var newHeight = imageSize.height
-//        
-//        // Twitter 크기 제한 적용
-//        if imageSize.width > maxSize || imageSize.height > maxSize {
-//            if imageSize.width > imageSize.height {
-//                newWidth = maxSize
-//                newHeight = newWidth / aspectRatio
-//            } else {
-//                
-//                newHeight = maxSize
-//                newWidth = newHeight * aspectRatio
-//            }
-//        }
-//        
-//        // Instagram 크기 제한 적용 (더 엄격한 조건)
-//        if newWidth > instagramMaxSize || newHeight > instagramMaxSize {
-//            if newWidth > newHeight {
-//                newWidth = instagramMaxSize
-//                newHeight = newWidth / aspectRatio
-//            } else {
-//                newHeight = instagramMaxSize
-//                newWidth = newHeight * aspectRatio
-//            }
-//        }
-//        
-//        // 리사이즈된 이미지 생성
-//        let newSize = CGSize(width: newWidth, height: newHeight)
-//        UIGraphicsBeginImageContextWithOptions(newSize, true, image.scale) // opaque를 true로 설정
-//        image.draw(in: CGRect(origin: .zero, size: newSize))
-//        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
-//        
-//        // 리사이즈된 이미지를 PNG로 변환 및 크기 확인
-//        if let resizedImageData = resizedImage?.pngData() {
-//            if resizedImageData.count <= 30_000_000 { // 30MB 이하
-//                return resizedImageData
-//            } else {
-//                print("Image size exceeds 30MB, resizing further might be required.")
-//                // 추가 압축 또는 크기 조정 로직을 여기에 구현 가능
-//            }
-//        }
-//        
-//        return content
-        return pngData
+                
+//                if activityType == .airDrop {
+//                    return pngData
+//                }
+                
+                // 최대 크기 설정 (Twitter: 4096x4096, Instagram: 1080x1080)
+                let maxSize: CGFloat = 2096
+                let instagramMaxSize: CGFloat = 1080
+                let imageSize = image.size
+                let aspectRatio = imageSize.width / imageSize.height
+                
+                var newWidth = imageSize.width
+                var newHeight = imageSize.height
+                
+                // Twitter 크기 제한 적용
+                if imageSize.width > maxSize || imageSize.height > maxSize {
+                    if imageSize.width > imageSize.height {
+                        newWidth = maxSize
+                        newHeight = newWidth / aspectRatio
+                    } else {
+                        
+                        newHeight = maxSize
+                        newWidth = newHeight * aspectRatio
+                    }
+                }
+                
+                // Instagram 크기 제한 적용 (더 엄격한 조건)
+                if newWidth > instagramMaxSize || newHeight > instagramMaxSize {
+                    if newWidth > newHeight {
+                        newWidth = instagramMaxSize
+                        newHeight = newWidth / aspectRatio
+                    } else {
+                        newHeight = instagramMaxSize
+                        newWidth = newHeight * aspectRatio
+                    }
+                }
+                
+                // 리사이즈된 이미지 생성
+                let newSize = CGSize(width: newWidth, height: newHeight)
+                UIGraphicsBeginImageContextWithOptions(newSize, true, image.scale) // opaque를 true로 설정
+                image.draw(in: CGRect(origin: .zero, size: newSize))
+                let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                
+                // 리사이즈된 이미지를 PNG로 변환 및 크기 확인
+                if let resizedImageData = resizedImage?.pngData() {
+                    if resizedImageData.count <= 30_000_000 { // 30MB 이하
+                        return resizedImageData
+                    } else {
+                        print("Image size exceeds 30MB, resizing further might be required.")
+                        // 추가 압축 또는 크기 조정 로직을 여기에 구현 가능
+                    }
+                }
+                
+                return content
+        
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
@@ -382,10 +382,10 @@ import SwiftUI
 
 struct BottomSheetViewWrapper: UIViewControllerRepresentable {
     var viewModel: IOViewModel
-
+    
     func makeUIViewController(context: Context) -> BottomSheetViewController {
         return BottomSheetViewController(viewModel: viewModel)
     }
-
+    
     func updateUIViewController(_ uiViewController: BottomSheetViewController, context: Context) {}
 }
