@@ -112,17 +112,36 @@ struct CustomTextView: UIViewRepresentable {
         init(_ parent: CustomTextView) {
             self.parent = parent
         }
-        
-        // 텍스트가 변경될 때 호출 (사용자가 입력하거나 삭제할 때)
         func textViewDidChange(_ textView: UITextView) {
-            DispatchQueue.main.async { // UI 업데이트는 메인 스레드에서 실행
-                self.parent.viewModel.txt = textView.text // 일반 텍스트 저장
-                self.parent.viewModel.attributedTxt = textView.attributedText // 속성 텍스트 저장
-                textView.textColor = UIColor(color: self.parent.viewModel.fontColor) 
-                self.centerTextVertically(in: textView) // 텍스트 수직 중앙 정렬
+            DispatchQueue.main.async { // UI 업데이트는 메인 스레드에서
+                // 일반 텍스트와 속성 텍스트 저장
+                self.parent.viewModel.txt = textView.text
+                self.parent.viewModel.attributedTxt = textView.attributedText
                 
+                // 텍스트 색상 적용
+                textView.textColor = UIColor(color: self.parent.viewModel.fontColor)
+                
+                // 텍스트 수직 중앙 정렬
+                self.centerTextVertically(in: textView)
+                
+                // 캡처할 크기 계산 및 저장
+                let contentSize = textView.sizeThatFits(CGSize(
+                    width: textView.bounds.width, // 현재 텍스트뷰 너비 기준
+                    height: CGFloat.greatestFiniteMagnitude // 최대 높이로 계산
+                ))
+                self.parent.viewModel.captureSize = contentSize // viewModel에 저장
             }
         }
+//        // 텍스트가 변경될 때 호출 (사용자가 입력하거나 삭제할 때)
+//        func textViewDidChange(_ textView: UITextView) {
+//            DispatchQueue.main.async { // UI 업데이트는 메인 스레드에서 실행
+//                self.parent.viewModel.txt = textView.text // 일반 텍스트 저장
+//                self.parent.viewModel.attributedTxt = textView.attributedText // 속성 텍스트 저장
+//                textView.textColor = UIColor(color: self.parent.viewModel.fontColor) 
+//                self.centerTextVertically(in: textView) // 텍스트 수직 중앙 정렬
+//                
+//            }
+//        }
         
         // 편집 시작 시 호출 (텍스트뷰에 포커스가 갈 때)
         func textViewDidBeginEditing(_ textView: UITextView) {
