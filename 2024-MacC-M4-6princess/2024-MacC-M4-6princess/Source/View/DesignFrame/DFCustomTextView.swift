@@ -13,31 +13,23 @@ import SwiftUI
 struct CustomTextView: UIViewRepresentable {
     // 키보드가 보이는지 여부를 추적하는 상태 변수 (SwiftUI의 @FocusState 사용)
     @FocusState var isKeyboardVisible: Bool
-    
-    // 텍스트 수정 관련 데이터를 관리하는 뷰모델 (실시간 변화를 감지하기 위해 @ObservedObject 사용)
-    @ObservedObject var modiViewModel: DFModifyViewModel
-    
     // 텍스트뷰의 데이터를 관리하는 뷰모델 (폰트, 색상, 텍스트 등을 포함)
     @ObservedObject var viewModel: DFTextViewModel
-    
     // 디스플레이 스케일 (화면 해상도에 맞게 크기를 조정하기 위한 값)
     private let displayScale: CGFloat
-    
     // 텍스트의 폰트 크기 (기본값 20으로 설정 가능)
     let fontSize: CGFloat
-    
     // 이미지 데이터를 관리하는 환경 객체 (SwiftUI의 @EnvironmentObject로 주입)
     @EnvironmentObject var imageModel: ImageListModel
     
     // 초기화 메서드: 필요한 뷰모델과 설정값을 전달받아 인스턴스 생성
-    init(modiViewModel: DFModifyViewModel,
-         viewModel: DFTextViewModel,
-         displayScale: CGFloat, fontSize: CGFloat = 20) {
-        self.modiViewModel = modiViewModel
-        self.viewModel = viewModel
-        self.displayScale = displayScale
-        self.fontSize = fontSize
-    }
+    init(
+        viewModel: DFTextViewModel,
+        displayScale: CGFloat, fontSize: CGFloat = 20) {
+            self.viewModel = viewModel
+            self.displayScale = displayScale
+            self.fontSize = fontSize
+        }
     
     // UIKit의 UITextView를 처음 생성하는 메서드 (SwiftUI에서 호출됨)
     func makeUIView(context: Context) -> UITextView {
@@ -48,12 +40,12 @@ struct CustomTextView: UIViewRepresentable {
         textView.attributedText = viewModel.attributedTxt
         
         // 폰트 설정: viewModel에서 선택된 폰트를 지정된 크기로 적용
-        let font = viewModel.newSelectedFont.applyFont(size: fontSize)
+        let font = viewModel.selectedFont.applyFont(size: fontSize)
         textView.font = font
         
         // 텍스트 정렬과 색상 설정
         textView.textAlignment = NSTextAlignment(viewModel.textAlignment) // 텍스트 정렬 (왼쪽, 가운데, 오른쪽 등)
-        textView.textColor = UIColor(color: viewModel.fontColor) // 텍스트 색상
+        textView.textColor = UIColor(color: viewModel.selectedColor) // 텍스트 색상
         textView.backgroundColor = .clear // 배경 투명하게 설정
         textView.delegate = context.coordinator // 텍스트뷰의 이벤트를 Coordinator에서 처리하도록 설정
         textView.isScrollEnabled = true // 텍스트가 길어지면 스크롤 가능
@@ -94,10 +86,10 @@ struct CustomTextView: UIViewRepresentable {
         }
         
         // 폰트, 정렬, 색상 속성 업데이트
-        let font = viewModel.newSelectedFont.applyFont(size: fontSize)
+        let font = viewModel.selectedFont.applyFont(size: fontSize)
         uiView.font = font // 폰트 설정
         uiView.textAlignment = NSTextAlignment(viewModel.textAlignment) // 텍스트 정렬
-        uiView.textColor = UIColor(color: viewModel.fontColor) // 텍스트 색상
+        uiView.textColor = UIColor(color: viewModel.selectedColor) // 텍스트 색상
     }
     
     // Coordinator 객체 생성 (UITextView와 SwiftUI 간의 상호작용 관리)
@@ -119,7 +111,7 @@ struct CustomTextView: UIViewRepresentable {
                 self.parent.viewModel.attributedTxt = textView.attributedText
                 
                 // 텍스트 색상 적용
-                textView.textColor = UIColor(color: self.parent.viewModel.fontColor)
+                textView.textColor = UIColor(color: self.parent.viewModel.selectedColor)
                 
                 // 텍스트 수직 중앙 정렬
                 self.centerTextVertically(in: textView)
@@ -132,16 +124,7 @@ struct CustomTextView: UIViewRepresentable {
                 self.parent.viewModel.captureSize = contentSize // viewModel에 저장
             }
         }
-//        // 텍스트가 변경될 때 호출 (사용자가 입력하거나 삭제할 때)
-//        func textViewDidChange(_ textView: UITextView) {
-//            DispatchQueue.main.async { // UI 업데이트는 메인 스레드에서 실행
-//                self.parent.viewModel.txt = textView.text // 일반 텍스트 저장
-//                self.parent.viewModel.attributedTxt = textView.attributedText // 속성 텍스트 저장
-//                textView.textColor = UIColor(color: self.parent.viewModel.fontColor) 
-//                self.centerTextVertically(in: textView) // 텍스트 수직 중앙 정렬
-//                
-//            }
-//        }
+        
         
         // 편집 시작 시 호출 (텍스트뷰에 포커스가 갈 때)
         func textViewDidBeginEditing(_ textView: UITextView) {

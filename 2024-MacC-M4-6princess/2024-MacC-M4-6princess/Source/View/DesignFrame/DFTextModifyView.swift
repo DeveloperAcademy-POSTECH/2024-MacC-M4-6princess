@@ -19,7 +19,7 @@ struct DFTextModifyView: View {
         VStack {
             Spacer()
             CustomTextView(
-                modiViewModel: modiViewModel,
+                //                modiViewModel: modiViewModel,
                 viewModel: viewModel,
                 displayScale: displayScale
             )
@@ -29,27 +29,30 @@ struct DFTextModifyView: View {
                     Button("완료") {
                         
                         /// 텍스트를 이미지로 변환
-                        viewModel.renderedImage=viewModel.attributedTextToImage()
+                        if let textView = UIApplication.shared.windows.first?.allSubviews.compactMap({ $0 as? UITextView }).first(where: { $0.isFirstResponder }) {
+                            viewModel.renderedImage=viewModel.captureTextContent(from: textView)
+                            style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
+                            style.txt =  viewModel.txt
+                            style.color = viewModel.selectedColor
+                            style.font = viewModel.selectedFont
+                            style.alignment = viewModel.textAlignment
+                            
+                            //                        TextStyle(attributedString: viewModel.attributedTxt!, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
+                            /// 이미지와 메타데이터를 코어데이터에 저장
+                            imageToCoredata()
+                            
+                            /// 텍스트뷰를 닫음
+                            frameManager.showTextModifyView = false
+                        }
                         
-                        style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
-                        style.txt =  viewModel.txt
-                        style.font = viewModel.newSelectedFont
-                        style.alignment = viewModel.textAlignment
-                        
-                        //                        TextStyle(attributedString: viewModel.attributedTxt!, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
-                        /// 이미지와 메타데이터를 코어데이터에 저장
-                        imageToCoredata()
-                        
-                        /// 텍스트뷰를 닫음
-                        frameManager.showTextModifyView = false
                     }
                 }
             }
             .onAppear{
                 viewModel.attributedTxt = style.attributedString
                 viewModel.txt = style.txt
-                viewModel.fontColor = style.color
-                viewModel.newSelectedFont = style.font
+                viewModel.selectedColor = style.color
+                viewModel.selectedFont = style.font
                 viewModel.textAlignment = style.alignment
                 print("모디텍스트:\(viewModel.txt)")
             }
