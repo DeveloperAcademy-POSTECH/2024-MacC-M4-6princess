@@ -22,7 +22,7 @@ class IOViewModel: ObservableObject {
     @Published var savePhoto = false
     @Published var saveAnimate = false
     
-    @Published var ShowShare = false
+    @Published var showShareButton = false
     @Published var showAcitivity = false
     @Published var changeOverlay = false
     /// 사진 저장 함수
@@ -33,7 +33,7 @@ class IOViewModel: ObservableObject {
                 .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
         )
         // 해상도
-        renderedImage.scale = 10.0
+        renderedImage.scale = 1
         
         if var uiImage = renderedImage.uiImage {
             // 기기 방향에 따라 이미지 회전
