@@ -14,7 +14,7 @@ struct CameraTopView: View {
     
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
-            HStack(alignment: .center) {
+            HStack() {
                 Spacer()
                 CameraTimerView(viewModel: viewModel)
                 Button {

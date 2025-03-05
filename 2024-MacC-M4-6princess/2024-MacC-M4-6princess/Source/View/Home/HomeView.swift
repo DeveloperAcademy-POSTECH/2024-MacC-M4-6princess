@@ -32,9 +32,28 @@ struct HomeView: View {
                     .resizable()
                     .scaledToFill()
                 
-                Button {
-                    // 프레임 만들기 페이지로 이동
-                    isFullScreenPresented = true
+                //                Button {
+                //                    // 프레임 만들기 페이지로 이동
+                //                    isFullScreenPresented = true
+                //                } label: {
+                //                    HStack(alignment: .center) {
+                //                        Text("프레임만들기")
+                //                            .padding(.vertical, 20)
+                //                            .foregroundStyle(Color.pointPink)
+                //                            .font(.system(size: 16, weight: .semibold))
+                //                    }
+                //                    .frame(height: 60, alignment: .center)
+                //                    .frame(maxWidth: .infinity)
+                //                    .background(Color.pointPinkBG)
+                //                    .cornerRadius(8)
+                //                }
+                //                .padding(.top, 20)
+                //                .padding(.bottom, 37)
+                //                .padding(.horizontal, 20)
+                
+                NavigationLink {
+                    PhotosPickerView()
+                    
                 } label: {
                     HStack(alignment: .center) {
                         Text("프레임만들기")
@@ -94,9 +113,9 @@ struct HomeView: View {
                 
                 Spacer()
             }
-            .fullScreenCover(isPresented: $isFullScreenPresented) {
-                PhotosPickerView() // 풀스크린으로 표시할 뷰
-            }
+            //            .fullScreenCover(isPresented: $isFullScreenPresented) {
+            //                PhotosPickerView() // 풀스크린으로 표시할 뷰
+            //            }
             .onAppear {
                 viewModel.loadImages()
             }

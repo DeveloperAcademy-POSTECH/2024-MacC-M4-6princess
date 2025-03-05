@@ -27,14 +27,13 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-        // collectionView의 reloadData() 호출
         uiViewController.collectionView.reloadData()
         
         // 선택된 필터를 스크롤로 중앙에 위치시키기
         if let selectedFilter = selectedFilter,
            let index = uiViewController.filterImages.firstIndex(where: { $0.uuid == selectedFilter }) {
             uiViewController.collectionView.scrollToItem(
-                at: IndexPath(item: index, section: 0),
+                at: IndexPath(item: index + 1, section: 0),
                 at: .centeredHorizontally,
                 animated: true
             )

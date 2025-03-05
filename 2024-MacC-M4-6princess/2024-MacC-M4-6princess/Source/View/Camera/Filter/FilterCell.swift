@@ -75,12 +75,9 @@ class EmptyCell: UICollectionViewCell {
         self.clipsToBounds = false
     }
     
-    func configure() {
-        // 추가적인 설정이 필요한 경우 여기에 구현
-    }
+    func configure() {}
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        // 필요한 경우 재사용 준비 로직 추가
     }
 }

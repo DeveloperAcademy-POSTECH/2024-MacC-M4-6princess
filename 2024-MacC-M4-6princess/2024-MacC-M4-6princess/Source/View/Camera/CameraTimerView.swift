@@ -16,7 +16,13 @@ struct CameraTimerView: View {
             // 배경 캡슐 - 확장 시 검정, 축소 시 흰색
             Capsule()
                 .fill(isExpanded ? Color.black : Color.white)
-                .frame(width: isExpanded ? 200 : 100, height: 30)
+                .frame(width: isExpanded ? 200 : 60, height: 30)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 50)
+                        .inset(by: 0.5)
+                        .stroke(isExpanded ? Color.clear : Color.gray01, lineWidth: 1)
+                    
+                )
                 .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isExpanded)
             
             if isExpanded {
@@ -74,10 +80,11 @@ struct CameraTimerView: View {
                         .font(.system(size: 13))
                         .foregroundColor(.black)
                 }
-                .padding(.horizontal, 16)
+                //                .padding(.horizontal, 16)
             }
         }
         .frame(width: isExpanded ? 200 : 100, height: 30)
+        
         .contentShape(Capsule())
         .onTapGesture {
             if !isExpanded {
