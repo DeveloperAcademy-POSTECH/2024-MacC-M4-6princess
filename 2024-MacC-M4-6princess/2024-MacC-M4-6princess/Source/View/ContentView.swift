@@ -18,10 +18,6 @@ struct ContentView: View {
 //        CameraView()
 //            .environmentObject(imageModel)
             
-//        IEDevelopView().environmentObject(layerListViewModel)
-        
-        //        CMView()
-        //        IEProgressView()
     }
 }
 

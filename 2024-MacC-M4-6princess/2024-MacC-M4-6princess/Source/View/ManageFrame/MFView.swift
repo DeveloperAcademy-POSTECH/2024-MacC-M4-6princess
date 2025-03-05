@@ -37,19 +37,15 @@ struct MFView: View {
                             viewModel.imageDataArray.forEach {
                                 if $0.id == viewModel.selectedImageIds.first {
                                     viewModel.selectFrame(id: $0.id)
-                                    loadSelectedFrame()
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        
-                                        let newImage = SubjectImage()
-                                        if let image = frameManager.resultImage {
-                                            newImage.image = image
-                                            newImage.originalImage = newImage.image
-                                            imageModel.imageList.append(newImage)
+                                    Task {
+                                        loadSelectedFrame() {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                                                naviManager.push(screen: Screen.modifyFrame)
+                                            })
                                         }
                                     }
                                 }
                             }
-                            naviManager.push(screen: Screen.modifyFrame)
                         } label: {
                             ZStack {
                                 Rectangle()

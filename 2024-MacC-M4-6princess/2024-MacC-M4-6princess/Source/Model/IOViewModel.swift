@@ -22,6 +22,9 @@ class IOViewModel: ObservableObject {
     @Published var savePhoto = false
     @Published var saveAnimate = false
     
+    @Published var ShowShare = false
+    @Published var showAcitivity = false
+    @Published var changeOverlay = false
     /// 사진 저장 함수
     @MainActor
     func saveRenderedView<T: View>(content: T, motionManager: MotionManager) {
@@ -47,7 +50,7 @@ class IOViewModel: ObservableObject {
             showAlert(message: "렌더링 실패: 이미지 생성에 문제가 발생했습니다.")
         }
     }
-
+    
     
     func saveImageToAlbum(uiImage: UIImage) {
         let albumName = "Frameet"
@@ -104,37 +107,7 @@ class IOViewModel: ObservableObject {
             saveImageToAlbum(album: album)
         }
     }
-
-//    func canvasOnAppear(bgImg:UIImage,idolImg:UIImage,bounds:CGSize){
-//        self.screenSize = bounds
-//        
-//        // 배경 이미지의 가로가 세로보다 긴 경우
-//        if bgImg.size.width / bgImg.size.height > 1 {
-//            // 가로가 더 긴 이미지의 경우, 화면 너비를 기준으로 높이 계산
-//            self.frameBGSize = CGSize(
-//                width: screenSize.width,
-//                height: screenSize.width * (bgImg.size.height / bgImg.size.width)
-//            )
-//        } else {
-//            // 세로가 더 긴 이미지의 경우, 기존 로직 유지
-//            self.frameBGSize = CGSize(
-//                width: screenSize.width,
-//                height: screenSize.width * (bgImg.size.height / bgImg.size.width)
-//            )
-//        }
-//        
-//        // 아이돌 이미지 크기 조정
-//        self.frameIdolSize = CGSize(
-//            width: frameBGSize.width,
-//            height: frameBGSize.width * (idolImg.size.height / idolImg.size.width)
-//        )
-//        
-//        // 뷰 생성 시 아이돌 이미지 위치 지정
-//        self.location = CGPoint(
-//            x: frameBGSize.width / 2,
-//            y: self.frameBGSize.height / 2
-//        )
-//    }
+    
     func canvasOnAppear(bgImg: UIImage, idolImg: UIImage, bounds: CGSize) {
         let screenWidth = bounds.width
         let bgImageRatio = bgImg.size.height / bgImg.size.width
@@ -166,7 +139,7 @@ class IOViewModel: ObservableObject {
             y: frameBGSize.height / 2
         )
     }
-
+    
     
     private func showAlert(message: String) {
         DispatchQueue.main.async {

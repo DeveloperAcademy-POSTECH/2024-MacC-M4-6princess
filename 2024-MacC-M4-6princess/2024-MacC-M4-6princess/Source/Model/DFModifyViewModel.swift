@@ -148,7 +148,7 @@ class DFModifyViewModel: ObservableObject {
     }
     
     
-    func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
+    func saveImage(view: some View, inputImage: UIImage, context: NSManagedObjectContext, imageModel: ImageListModel, completionHandler: @escaping () -> Void) {
         
         btnOpacity = 1
         
@@ -158,7 +158,7 @@ class DFModifyViewModel: ObservableObject {
             //            render.scale = scaleCompute(inputImage)
             render.scale = UIScreen.main.scale
             frameImage = render.uiImage
-            addImage(albumImageData: frameImage?.pngData(), context: context)
+            addImage(albumImageData: frameImage?.pngData(), context: context, subjects: imageModel)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -167,7 +167,7 @@ class DFModifyViewModel: ObservableObject {
         
     }
     
-    func updateImage(view: some View, frameManager: FrameManager, viewContext: NSManagedObjectContext, completionHandler: @escaping () -> Void) {
+    func updateImage(view: some View, frameManager: FrameManager, viewContext: NSManagedObjectContext, imageModel: ImageListModel, completionHandler: @escaping () -> Void) {
         
         guard let frameId = frameManager.selectedFrame else {
             frameManager.resultImage = nil
@@ -191,6 +191,38 @@ class DFModifyViewModel: ObservableObject {
                 let results = try viewContext.fetch(fetchRequest)
                 if let storedImage = results.first {
                     storedImage.image = frameImage?.pngData()
+                    
+                    if let subjects = storedImage.subjects?.allObjects as? [Subject] {
+                        for i in subjects {
+                            storedImage.removeFromSubjects(i)
+                        }
+                    }
+                    
+                    for i in imageModel.imageList {
+                        
+                        let newSubject = Subject(context: viewContext)
+                        
+                        if let image = i.image, let originImage = i.originalImage {
+                            newSubject.subImage = image.pngData()
+                            newSubject.originalImage = originImage.pngData()
+                            print("이미지 저장됨")
+                        } else if let text = i.text, let originText = i.textStyle?.txt {
+                            newSubject.text = text.pngData()
+                            newSubject.originalText = originText
+                            print("텍스트 저장됨")
+                        } else if let sticker = i.sticker {
+                            newSubject.sticker = sticker.pngData()
+                            print("스티커 저장됨")
+                        }
+                        newSubject.angle = i.angle.degrees
+                        newSubject.scale = i.scale
+                        newSubject.x = i.offset.width
+                        newSubject.y = i.offset.height
+                        newSubject.uuid = UUID()
+                        
+                        storedImage.addToSubjects(newSubject)
+                        
+                    }
                 }
                 saveContext(context: viewContext)
                 
@@ -212,14 +244,38 @@ class DFModifyViewModel: ObservableObject {
             print("Error saving managed object context: \(error)")
         }
     }
-    func addImage(albumImageData: Data?, context: NSManagedObjectContext) {
+    func addImage(albumImageData: Data?, context: NSManagedObjectContext, subjects: ImageListModel) {
+         
         
         let newImage = StoreImages(context: context)
-        
         newImage.image = albumImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
         
+        for i in subjects.imageList {
+            let newSubject = Subject(context: context)
+            
+            if let image = i.image, let originImage = i.originalImage {
+                newSubject.subImage = image.pngData()
+                newSubject.originalImage = originImage.pngData()
+                print("이미지 저장됨")
+            } else if let text = i.text, let originText = i.textStyle?.txt {
+                newSubject.text = text.pngData()
+                newSubject.originalText = originText
+                print("텍스트 저장됨")
+            } else if let sticker = i.sticker {
+                newSubject.sticker = sticker.pngData()
+                print("스티커 저장됨")
+            }
+            newSubject.angle = i.angle.degrees
+            newSubject.scale = i.scale
+            newSubject.x = i.offset.width
+            newSubject.y = i.offset.height
+            newSubject.uuid = UUID()
+            
+            newImage.addToSubjects(newSubject)
+            
+        }
         saveContext(context: context)
     }
     

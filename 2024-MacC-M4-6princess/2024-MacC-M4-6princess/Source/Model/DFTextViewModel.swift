@@ -10,16 +10,25 @@ import SwiftUI
 import PhotosUI
 class DFTextViewModel: ObservableObject {
     @Published var txt = ""
-    @Published var selectedFont: FontStyle = .modern
+    //    @Published var selectedFont: FontStyle = .modern
+    @Published var selectedFont:NewFontStyle = .modern
     @Published var fontSize: Double = 20
-    @Published var fontColor: Color = ColorPreset.colorPallete[0]
+    @Published var selectedColor: Color = ColorPreset.colorPallete[0] {
+        didSet {
+            // 값이 변경될 때마다 프린트
+            print("폰트컬러체인지드: \(selectedColor.toHex())")
+        }
+    }
     @Published var renderedImage: UIImage?
     @Published var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     @Published var tab = 0
     @Published var colorNum = 0
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
+    @Published var attributedTxt: NSAttributedString?
     
+    // 캡처 크기를 저장할 변수 추가
+    @Published var captureSize: CGSize = .zero // 캡처할 크기 (너비, 높이)
     // 정렬 방향 정의
     enum SwipeDirection {
         case left, right
@@ -40,13 +49,13 @@ class DFTextViewModel: ObservableObject {
     /// 정렬 이미지명을 String으로 출력
     func imageForAlignment(_ alignment: TextAlignment) -> String {
         switch alignment {
-        case .leading:
-            return "df.alignment.leading"
-        case .center:
-            return "df.alignment.center"
-        case .trailing:
-            return "df.alignment.trailing"
-
+            case .leading:
+                return "df.alignment.leading"
+            case .center:
+                return "df.alignment.center"
+            case .trailing:
+                return "df.alignment.trailing"
+                
         }
     }
     
@@ -54,32 +63,178 @@ class DFTextViewModel: ObservableObject {
     /// 누를 때마다 정렬이 바뀜
     func toggleTextAlignment() {
         switch textAlignment {
-        case .leading:
+            case .leading:
                 textAlignment = .center
-        case .center:
+            case .center:
                 textAlignment = .trailing
-        case .trailing:
+            case .trailing:
                 textAlignment = .leading
-      
+                
         }
     }
-    
-    /// DFTextView에서 사용
     @MainActor
-    func renderTextImage(text: String){
-        let tmp = ImageRenderer(
-            content: TextRenderView(
-                style: TextStyle(rawText: text, font: selectedFont, color: fontColor, alignment: textAlignment)
-            )
+    func captureTextContent(from textView: UITextView) -> UIImage? {
+        // 텍스트뷰의 attributedText가 nil이거나 길이가 0이면 nil 반환
+        guard let attributedText = textView.attributedText, attributedText.length > 0 else {
+            print("Debug: attributedText is nil or empty")
+            return nil
+        }
+        
+        // 디버깅: attributedText 속성 확인
+        print("Debug: Full attributedText: \(attributedText.string)")
+        attributedText.enumerateAttributes(in: NSRange(location: 0, length: attributedText.length)) { attrs, range, _ in
+            print("Debug: Attributes at \(range): \(attrs)")
+            if let attachment = attrs[.attachment] as? NSTextAttachment {
+                print("Debug: Found NSTextAttachment - bounds: \(attachment.bounds), image: \(String(describing: attachment.image))")
+            }
+        }
+        
+        // viewModel.captureSize를 사용해 콘텐츠 크기 가져오기
+        let captureSize = captureSize
+        guard captureSize != .zero else {
+            print("Debug: captureSize is zero, falling back to default calculation")
+            return nil // 또는 기존 방식으로 계산
+        }
+        
+        // 요청된 패딩 10 추가
+        let padding: CGFloat = 0
+        let contentSize = CGSize(
+            width: captureSize.width + (padding * 2),
+            height: captureSize.height + (padding * 2)
         )
-        //TODO: scale 계산 부분 넣기
-        tmp.scale = 10
-        if let uiImage = tmp.uiImage {
-            renderedImage = uiImage
+        
+        // 그래픽 컨텍스트 설정
+        UIGraphicsBeginImageContextWithOptions(contentSize, false, UIScreen.main.scale)
+        guard let context = UIGraphicsGetCurrentContext() else {
+            print("Debug: Failed to get graphics context")
+            UIGraphicsEndImageContext()
+            return nil
         }
-        else{
-            print("text render 실패")
+        
+        // 배경 투명 설정
+        UIColor.clear.setFill()
+        context.fill(CGRect(origin: .zero, size: contentSize))
+        
+        // 텍스트와 이미지 글리프 그리기 (패딩 고려)
+        let drawingRect = CGRect(
+            x: padding,
+            y: padding,
+            width: captureSize.width,
+            height: captureSize.height
+        )
+        print("Debug: Drawing rect: \(drawingRect)")
+        attributedText.draw(in: drawingRect)
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        // 디버깅: 생성된 이미지 크기 확인
+        if let image = image {
+            if let imageData = image.pngData() {
+                let debugPath = NSTemporaryDirectory() + "capturedText.png"
+                try? imageData.write(to: URL(fileURLWithPath: debugPath))
+            }
+        } else {
+            print("Debug: Failed to capture image")
         }
+        
+        return image
+    }
+    
+    @MainActor
+    func attributedTextToImage() -> UIImage? {
+        // 현재 attributedTxt가 비어있거나 nil이면 nil 반환
+        guard let attributedText = attributedTxt, attributedText.length > 0 else {
+            return nil
+        }
+        print("attributedText: \(attributedText.string)")
+        
+        // 최신 스타일을 적용하기 위해 새로운 NSMutableAttributedString 생성
+        let updatedAttributedText = NSMutableAttributedString(attributedString: attributedText)
+        
+        // viewModel에서 폰트, 색상, 사이즈 적용
+        let font = selectedFont.applyFont(size: fontSize)
+        let textColor = UIColor(color: selectedColor)
+        let range = NSRange(location: 0, length: updatedAttributedText.length)
+        
+        // 기존 속성 유지하며 폰트와 색상만 추가 (이미지 글리프 손실 방지)
+        updatedAttributedText.enumerateAttributes(in: range, options: []) { attrs, range, _ in
+            var newAttrs = attrs
+            // NSTextAttachment가 없는 경우에만 폰트와 색상 적용
+            if newAttrs[.attachment] == nil {
+                newAttrs[.font] = font
+                newAttrs[.foregroundColor] = textColor
+            }
+            updatedAttributedText.setAttributes(newAttrs, range: range)
+        }
+        
+        // 정렬과 줄바꿈 설정
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = NSTextAlignment(textAlignment)
+        paragraphStyle.lineBreakMode = .byClipping // 줄바꿈 억제
+        updatedAttributedText.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+        print("updatedAttributedText: \(updatedAttributedText.string)")
+        
+        // 이미지 글리프 확인 (디버깅용)
+        updatedAttributedText.enumerateAttribute(.attachment, in: range) { value, range, _ in
+            if let attachment = value as? NSTextAttachment {
+                print("이미지 글리프 발견: \(attachment.bounds), 이미지: \(String(describing: attachment.image))")
+            }
+        }
+        
+        // NSLayoutManager를 사용해 정확한 레이아웃 계산
+        let textStorage = NSTextStorage(attributedString: updatedAttributedText)
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+        textContainer.lineFragmentPadding = 0
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        // 전체 텍스트와 이미지 글리프의 크기 계산
+        let glyphRange = layoutManager.glyphRange(for: textContainer)
+        let usedRect = layoutManager.usedRect(for: textContainer)
+        let maxLineWidth = ceil(usedRect.width)
+        let totalHeight = ceil(usedRect.height)
+        
+        // 패딩 추가
+        let padding: CGFloat = 20
+        let imageSize = CGSize(
+            width: maxLineWidth + (padding * 2),
+            height: totalHeight + (padding * 2)
+        )
+        print("imageSize: \(imageSize)")
+        
+        // 그래픽 컨텍스트 설정
+        UIGraphicsBeginImageContextWithOptions(imageSize, false, UIScreen.main.scale)
+        guard let context = UIGraphicsGetCurrentContext() else {
+            UIGraphicsEndImageContext()
+            return nil
+        }
+        
+        // 안티앨리어싱 설정
+        context.setShouldAntialias(true)
+        context.setAllowsAntialiasing(true)
+        
+        // 배경 설정 (투명)
+        UIColor.clear.setFill()
+        context.fill(CGRect(origin: .zero, size: imageSize))
+        
+        // 텍스트와 이미지 글리프를 그릴 영역 설정
+        let drawingRect = CGRect(
+            x: padding,
+            y: padding,
+            width: maxLineWidth,
+            height: totalHeight
+        )
+        
+        // 전체 텍스트와 이미지 글리프 그리기
+        updatedAttributedText.draw(in: drawingRect)
+        
+        // 이미지 생성
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
     }
     
     /// DFTextModifyView에서 사용
@@ -101,60 +256,147 @@ class DFTextViewModel: ObservableObject {
     }
     
 }
-//MARK: ViewModel 만드는 대신 extension으로 함수만 따로 뺌
-extension DFTextView{
-    
-    
-    
-    
-    
-}
 
 
-// PHPickerViewController를 사용하는 SwiftUI Wrapper
-struct LayerPhotoPicker2: UIViewControllerRepresentable {
-    @Binding var layerImages: [LayerModel]
-    var screenSize: CGSize
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 0
-        config.filter = .images
+
+//struct DFCustomTextView: UIViewRepresentable {
+//    @ObservedObject var modiViewModel: DFModifyViewModel
+//    @ObservedObject var viewModel: DFTextViewModel
+//    
+//    private let displayScale: CGFloat
+//    @EnvironmentObject var imageModel: ImageListModel
+//    
+//    init(modiViewModel: DFModifyViewModel,
+//         viewModel: DFTextViewModel,
+//         displayScale: CGFloat) {
+//        self.modiViewModel = modiViewModel
+//        self.viewModel = viewModel
+//        self.displayScale = displayScale
+//    }
+//    
+//    func makeUIView(context: Context) -> UITextView {
+//        let textView = UITextView()
+//        textView.delegate = context.coordinator
+//        textView.backgroundColor = .clear
+//        textView.isScrollEnabled = true
+//        
+//        // Center text horizontally
+//        textView.textAlignment = .center
+//        
+//        // Center text vertically
+//        textView.contentInsetAdjustmentBehavior = .automatic
+//        
+//        // Add keyboard notifications
+//        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
+//                                               object: nil,
+//                                               queue: .main) { notification in
+//            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
+//        }
+//        
+//        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
+//                                               object: nil,
+//                                               queue: .main) { notification in
+//            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
+//        }
+//        
+//        // iOS 18.0 이상에서 적응형 이미지 글리프 지원 설정
+//        if #available(iOS 18.0, *) {
+//            textView.supportsAdaptiveImageGlyph = true
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//        
+//        updateTextViewAppearance(textView)
+//        return textView
+//    }
+//    
+//    func updateUIView(_ uiView: UITextView, context: Context) {
+//        // Update text
+//        uiView.text = viewModel.txt
+//        
+//        // Apply real-time font color, size, and font family
+//        updateTextViewAppearance(uiView)
+//        
+//        // Center text vertically
+//        let size = uiView.sizeThatFits(CGSize(width: uiView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+//        let topOffset = max(0, (uiView.bounds.height - size.height) / 2)
+//        uiView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
+//    }
+//    
+//    private func updateTextViewAppearance(_ textView: UITextView) {
+//        let paragraphStyle = NSMutableParagraphStyle()
+//        paragraphStyle.lineSpacing = 5
+//        paragraphStyle.alignment = .center
+//        
+//        // 기존 attributedText를 가져와서 수정
+//        let mutableAttributedString = NSMutableAttributedString(attributedString: textView.attributedText ?? NSAttributedString(string: textView.text ?? ""))
+//        
+//        let attributes: [NSAttributedString.Key: Any] = [
+//            .foregroundColor: UIColor(viewModel.fontColor),
+//            .font: UIFont(name: viewModel.newSelectedFont.rawValue, size: viewModel.fontSize) ?? UIFont.systemFont(ofSize: viewModel.fontSize),
+//            .paragraphStyle: paragraphStyle
+//        ]
+//        
+//        // 기존 텍스트 전체에 속성 적용 (이미지 글리프 유지)
+//        mutableAttributedString.addAttributes(attributes, range: NSRange(location: 0, length: mutableAttributedString.length))
+//        
+//        textView.attributedText = mutableAttributedString
+//        textView.typingAttributes = attributes
+//        
+//        textView.bounds.size.height = UIScreen.main.bounds.height / 4
+//    }
+//    
+//    func makeCoordinator() -> Coordinator {
+//        Coordinator(self)
+//    }
+//    
+//    class Coordinator: NSObject, UITextViewDelegate {
+//        var parent: DFCustomTextView
+//        
+//        init(_ parent: DFCustomTextView) {
+//            self.parent = parent
+//        }
+//        
+//        func textViewDidChange(_ textView: UITextView) {
+//            parent.viewModel.txt = textView.text
+//            
+//            // Recenter text vertically when content changes
+//            let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+//            let topOffset = max(0, (textView.bounds.height - size.height) / 2)
+//            textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
+//        }
+//        
+//        func adjustForKeyboard(notification: Notification, textView: UITextView) {
+//            guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+//            
+//            let keyboardScreenEndFrame = keyboardValue.cgRectValue
+//            let keyboardIsShowing = notification.name == UIResponder.keyboardWillShowNotification
+//            
+//            if keyboardIsShowing {
+//                let keyboardHeight = keyboardScreenEndFrame.height
+//                textView.contentInset = UIEdgeInsets(top: (textView.bounds.height - textView.contentSize.height) / 2,
+//                                                     left: 0,
+//                                                     bottom: keyboardHeight,
+//                                                     right: 0)
+//            } else {
+//                let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
+//                let topOffset = max(0, (textView.bounds.height - size.height) / 2)
+//                textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
+//            }
+//            
+//            textView.scrollIndicatorInsets = textView.contentInset
+//        }
+//    }
+//}
+extension Color {
+    func toHex() -> String? {
+        // UIColor 변환 시도
+        guard let components = UIColor(self).cgColor.components else { return nil }
         
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: LayerPhotoPicker2
+        let r = Int(components[0] * 255)
+        let g = Int(components[1] * 255)
+        let b = Int(components[2] * 255)
         
-        init(_ parent: LayerPhotoPicker2) {
-            self.parent = parent
-        }
-        
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
-            
-            for result in results {
-                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
-                        if let uiImage = image as? UIImage {
-                            DispatchQueue.main.async {
-                                let newOrder = self.parent.layerImages.count + 1
-                                let newLayerImage = LayerModel(image: uiImage, order: newOrder, position: CGPoint(x: self.parent.screenSize.width/2, y: self.parent.screenSize.height/3))
-                                self.parent.layerImages.append(newLayerImage)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        return String(format: "#%02X%02X%02X", r, g, b)
     }
-    
 }
