@@ -295,62 +295,62 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         // PNG 데이터로 변환
         guard let pngData = image.pngData() else { return content }
-        //        
-        //        if activityType == .airDrop {
-        //            return pngData
-        //        }
-        //        
-        //        // 최대 크기 설정 (Twitter: 4096x4096, Instagram: 1080x1080)
-        //        let maxSize: CGFloat = 4096
-        //        let instagramMaxSize: CGFloat = 1080
-        //        let imageSize = image.size
-        //        let aspectRatio = imageSize.width / imageSize.height
-        //        
-        //        var newWidth = imageSize.width
-        //        var newHeight = imageSize.height
-        //        
-        //        // Twitter 크기 제한 적용
-        //        if imageSize.width > maxSize || imageSize.height > maxSize {
-        //            if imageSize.width > imageSize.height {
-        //                newWidth = maxSize
-        //                newHeight = newWidth / aspectRatio
-        //            } else {
-        //                
-        //                newHeight = maxSize
-        //                newWidth = newHeight * aspectRatio
-        //            }
-        //        }
-        //        
-        //        // Instagram 크기 제한 적용 (더 엄격한 조건)
-        //        if newWidth > instagramMaxSize || newHeight > instagramMaxSize {
-        //            if newWidth > newHeight {
-        //                newWidth = instagramMaxSize
-        //                newHeight = newWidth / aspectRatio
-        //            } else {
-        //                newHeight = instagramMaxSize
-        //                newWidth = newHeight * aspectRatio
-        //            }
-        //        }
-        //        
-        //        // 리사이즈된 이미지 생성
-        //        let newSize = CGSize(width: newWidth, height: newHeight)
-        //        UIGraphicsBeginImageContextWithOptions(newSize, true, image.scale) // opaque를 true로 설정
-        //        image.draw(in: CGRect(origin: .zero, size: newSize))
-        //        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        //        UIGraphicsEndImageContext()
-        //        
-        //        // 리사이즈된 이미지를 PNG로 변환 및 크기 확인
-        //        if let resizedImageData = resizedImage?.pngData() {
-        //            if resizedImageData.count <= 30_000_000 { // 30MB 이하
-        //                return resizedImageData
-        //            } else {
-        //                print("Image size exceeds 30MB, resizing further might be required.")
-        //                // 추가 압축 또는 크기 조정 로직을 여기에 구현 가능
-        //            }
-        //        }
-        //        
-        //        return content
-        return pngData
+                
+//                if activityType == .airDrop {
+//                    return pngData
+//                }
+                
+                // 최대 크기 설정 (Twitter: 4096x4096, Instagram: 1080x1080)
+                let maxSize: CGFloat = 2096
+                let instagramMaxSize: CGFloat = 1080
+                let imageSize = image.size
+                let aspectRatio = imageSize.width / imageSize.height
+                
+                var newWidth = imageSize.width
+                var newHeight = imageSize.height
+                
+                // Twitter 크기 제한 적용
+                if imageSize.width > maxSize || imageSize.height > maxSize {
+                    if imageSize.width > imageSize.height {
+                        newWidth = maxSize
+                        newHeight = newWidth / aspectRatio
+                    } else {
+                        
+                        newHeight = maxSize
+                        newWidth = newHeight * aspectRatio
+                    }
+                }
+                
+                // Instagram 크기 제한 적용 (더 엄격한 조건)
+                if newWidth > instagramMaxSize || newHeight > instagramMaxSize {
+                    if newWidth > newHeight {
+                        newWidth = instagramMaxSize
+                        newHeight = newWidth / aspectRatio
+                    } else {
+                        newHeight = instagramMaxSize
+                        newWidth = newHeight * aspectRatio
+                    }
+                }
+                
+                // 리사이즈된 이미지 생성
+                let newSize = CGSize(width: newWidth, height: newHeight)
+                UIGraphicsBeginImageContextWithOptions(newSize, true, image.scale) // opaque를 true로 설정
+                image.draw(in: CGRect(origin: .zero, size: newSize))
+                let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                
+                // 리사이즈된 이미지를 PNG로 변환 및 크기 확인
+                if let resizedImageData = resizedImage?.pngData() {
+                    if resizedImageData.count <= 30_000_000 { // 30MB 이하
+                        return resizedImageData
+                    } else {
+                        print("Image size exceeds 30MB, resizing further might be required.")
+                        // 추가 압축 또는 크기 조정 로직을 여기에 구현 가능
+                    }
+                }
+                
+                return content
+        
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
