@@ -41,7 +41,6 @@ struct DFOverlayBoxView: View {
                 }
                 .offset(viewModel.OffsetCompute(x: -size.width/2, y: -size.height/2, subject: model))
             }
-            
             if let textStyle = model.textStyle {
                 
                 Button {
