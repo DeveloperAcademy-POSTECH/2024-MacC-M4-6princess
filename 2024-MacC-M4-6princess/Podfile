@@ -1,0 +1,5 @@
+platform :ios, '13.0'  # iOS 최소 버전 설정
+target '2024-MacC-M4-6princess' do  # 프로젝트 이름으로 변경
+  use_frameworks!
+  pod 'Google-Mobile-Ads-SDK'  # AdMob SDK 추가
+end

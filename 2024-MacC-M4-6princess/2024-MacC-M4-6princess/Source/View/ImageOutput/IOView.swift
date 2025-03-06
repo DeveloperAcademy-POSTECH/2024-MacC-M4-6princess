@@ -10,6 +10,7 @@ import Photos
 import FirebaseAnalytics
 import UIKit
 import LinkPresentation
+import GoogleMobileAds
 // 이미지 편집 메인 화면
 struct IOView: View {
     var bg:UIImage
@@ -44,7 +45,7 @@ struct IOView: View {
                 
                 // 후보정 레이어 편집 뷰
                 canvasView
-                
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     .onAppear{
                         viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
                         viewModel.saveAnimate = true
@@ -95,8 +96,12 @@ struct IOView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.bottom, 26)
+//                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
+                       
+                        BannerViewContainer(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
+                            
+                        
                         
                     }
                 }
@@ -133,8 +138,10 @@ struct IOView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.bottom, 26)
+//                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
+                        BannerViewContainer(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
+                         
                         
                     }
                 }

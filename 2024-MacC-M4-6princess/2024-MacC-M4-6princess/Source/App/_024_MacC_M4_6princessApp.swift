@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Firebase
+import GoogleMobileAds
+
 
 @main
 struct _024_MacC_M4_6princessApp: App {
@@ -16,6 +18,7 @@ struct _024_MacC_M4_6princessApp: App {
     @StateObject private var naviManager = NavigationManager()
     let persistenceController = PersistenceController.shared
     
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -32,9 +35,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
+        MobileAds.shared.start(completionHandler: nil)
         
         return true
     }
+ 
     func application(_ application: UIApplication,
                      supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         //iPhone과 iPad 모두 세로만 지원
