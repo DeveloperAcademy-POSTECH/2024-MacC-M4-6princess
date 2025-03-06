@@ -30,7 +30,7 @@ struct HomeView: View {
                 
                 Image("homeViewBanner")
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                 
                 //                Button {
                 //                    // 프레임 만들기 페이지로 이동

@@ -29,7 +29,7 @@ struct CameraTopView: View {
                 }
                 .padding(.trailing, 20)
             }
-            .frame(width: UIScreen.main.bounds.width, height: 94)
+            .frame(width: UIScreen.main.bounds.width, height: 46)
             .background(.white)
         }
         else{

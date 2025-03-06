@@ -41,7 +41,7 @@ struct CameraView: View {
             ZStack{
                 VStack(spacing: 0) {
                     Color.clear
-                        .frame(height: 94) // TopView 높이만큼 여백 확보
+                        .frame(height: 46) // TopView 높이만큼 여백 확보
                     
                     ZStack{
                         cameraPreview
