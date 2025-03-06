@@ -104,7 +104,7 @@ struct HomeView: View {
                         ],
                         spacing: 8 // 행 간격
                     ) {
-                        ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
+                        ForEach(viewModel.imageDataArray.reversed().prefix(6), id: \.id) { imageInfo in
                             HomeGridView(imageInfo: imageInfo,
                                          viewModel: viewModel)
                             .id(imageInfo.id)
