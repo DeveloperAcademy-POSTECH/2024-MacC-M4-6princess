@@ -8,17 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject var frameManager = FrameManager()
+    @StateObject var naviManager = NavigationManager()
     @ObservedObject var layerListViewModel = LayerListViewModel()
     @ObservedObject var imageModel = ImageListModel()
+//    @EnvironmentObject var imageModel: ImageListModel
+//    @EnvironmentObject var layerListViewModel: LayerListViewModel
      
     var body: some View {
-        
-        CameraView().environmentObject(imageModel)
-//        SnsTestView()
-//        IEDevelopView().environmentObject(layerListViewModel)
-        
-        //        CMView()
-        //        IEProgressView()
+        MainTabView()
+            .environmentObject(frameManager)
+            .environmentObject(naviManager)
+            .environmentObject(imageModel)
+            .environmentObject(layerListViewModel)
     }
 }
 
