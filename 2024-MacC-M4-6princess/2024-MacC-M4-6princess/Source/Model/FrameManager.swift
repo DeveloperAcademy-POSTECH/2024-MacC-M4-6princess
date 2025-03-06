@@ -9,6 +9,10 @@ import Foundation
 import SwiftUI
 
 public final class FrameManager: ObservableObject {
+    //온보딩 확인용
+    //    @Published var firstTime = false
+    @AppStorage("openFirstTime") var firstTime = false
+    
     // 뷰 간 데이터를 공유하기 위한 변수들
     @Published var pickedImage: UIImage? = nil // PhotosPickerView에서 선택된 이미지
     @Published var resultImage: UIImage? = nil // DFFrameEditView에서 편집된 결과 이미지

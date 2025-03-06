@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @EnvironmentObject var naviManager: NavigationManager
     @State var isScreenUp: Bool = false
     var body: some View {
         VStack {
@@ -23,7 +24,8 @@ struct OnboardingView: View {
                 .padding(.bottom, 28)
             
             Button {
-                isScreenUp = true
+                naviManager.push(screen: Screen.photoPicker)
+                
             } label: {
                 Text("시작하기")
                     .font(.body)
@@ -35,14 +37,8 @@ struct OnboardingView: View {
             .cornerRadius(10)
             
         }
-        .fullScreenCover(isPresented: $isScreenUp) {
-            PhotosPickerView()
-        }
         
     }
     
 }
 
-#Preview {
-    OnboardingView(isScreenUp: false)
-}

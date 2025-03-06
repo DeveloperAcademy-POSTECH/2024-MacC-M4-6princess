@@ -10,10 +10,7 @@ import AVFoundation
 import Photos
 
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
-    
-    //온보딩 확인용
-    //    @Published var firstTime = false
-    @AppStorage("openFirstTime") var firstTime = false
+
     
     @Published var isTakenPhoto = false
     @Published var isAllTakenPhoto = false

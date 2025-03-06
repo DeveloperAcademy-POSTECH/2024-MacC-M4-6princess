@@ -77,13 +77,6 @@ struct CameraView: View {
                     .environmentObject(imageModel)
                     .environmentObject(layerListViewModel)
             }
-            //처음 실행했을 때 - 온보딩 합침
-            if !viewModel.firstTime {
-                BGView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                OnboardingView()
-                
-            }
             if viewModel.delayTime != 0 && viewModel.isTakePic == true {
                 CameraTimerSecondsView(viewModel: viewModel)
                     .ignoresSafeArea(.all, edges: .all)
@@ -146,9 +139,5 @@ struct CameraView: View {
         return longerSide > 1000
     }
     
-    struct BGView: View {
-        var body: some View {
-            Color.bgGray
-        }
-    }
+    
 }

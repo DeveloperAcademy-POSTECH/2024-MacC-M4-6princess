@@ -294,7 +294,9 @@ extension DFModifyView{
                         viewModel.btnOpacity = 0
                     }
                 }
-                
+                if !frameManager.firstTime {
+                    frameManager.firstTime = true
+                }
             } label: {
                 Text("저장")
                     .fontWeight(.semibold)

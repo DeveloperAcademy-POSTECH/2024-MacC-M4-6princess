@@ -15,6 +15,7 @@ struct MainTabView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedTab = 1
     var tabBarHeight: CGFloat = 76
+    @ObservedObject var viewModel = CameraViewModel()
     
     var body: some View {
         NavigationStack(path: $naviManager.route) {
@@ -34,12 +35,25 @@ struct MainTabView: View {
                 .environmentObject(layerListViewModel)
                 
                 CustomTabBar(selectedTab: $selectedTab)
+                //처음 실행했을 때 - 온보딩 합침
+                if !frameManager.firstTime {
+                    ZStack {
+                        BGView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        OnboardingView()
+                    }
+                }
             }
             .navigationDestination(for: Screen.self) { screen in
                 FeatureView(type: screen)
             }
         }
         
+    }
+    struct BGView: View {
+        var body: some View {
+            Color.white
+        }
     }
 }
 

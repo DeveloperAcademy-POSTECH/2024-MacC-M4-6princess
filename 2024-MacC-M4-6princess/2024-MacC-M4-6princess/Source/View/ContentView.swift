@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var frameManager: FrameManager
-    @EnvironmentObject var naviManager: NavigationManager
+    @StateObject var frameManager = FrameManager()
+    @StateObject var naviManager = NavigationManager()
     @ObservedObject var layerListViewModel = LayerListViewModel()
     @ObservedObject var imageModel = ImageListModel()
 //    @EnvironmentObject var imageModel: ImageListModel
