@@ -11,7 +11,7 @@ struct DFTextView: View {
         VStack {
             Spacer()
             
-            CustomTextView(
+            DFCustomTextView(
                 viewModel: viewModel,
                 displayScale: displayScale
             )

@@ -1,47 +1,97 @@
-////
-////  CameraTimerView.swift
-////  2024-MacC-M4-6princess
-////
-////  Created by 김이예은 on 10/4/24.
-////
 //
+//  CameraTimerView.swift
+//  2024-MacC-M4-6princess
+//
+//  Created by 김이예은 on 10/4/24.
+//
+
 import SwiftUI
-//
+
 struct CameraTimerView: View {
-    @StateObject var motionManager = MotionManager()
     @ObservedObject var viewModel: CameraViewModel
+    @State private var isExpanded = false
     
     var body: some View {
-        VStack(alignment: .center, spacing: 4) {
-            Button {
-                viewModel.isPushedTimer = (viewModel.isPushedTimer + 1) % 4
-                
-                if let timerState = TimerState(rawValue: viewModel.isPushedTimer) {
-                    viewModel.delayTime = timerState.duration
-                }
-            } label: {
-                let currentState = TimerState(rawValue: viewModel.isPushedTimer) ?? .off
-                
-                ZStack {
-                    Image(currentState.icon)
-                        .resizable()
-                        .frame(width: 40, height: 40)
+        ZStack {
+            // 배경 캡슐 - 확장 시 검정, 축소 시 흰색
+            Capsule()
+                .fill(isExpanded ? Color.black : Color.white)
+                .frame(width: isExpanded ? 200 : 60, height: 30)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 50)
+                        .inset(by: 0.5)
+                        .stroke(isExpanded ? Color.clear : Color.gray01, lineWidth: 1)
                     
-                    if let text = currentState.displayText {
-                        Text(text)
-                            .font(.system(size: 17))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color.gray01)
-                    }
-                }
-                .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                .animation(.easeInOut, value: motionManager.currentOrientation)
-            }
+                )
+                .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isExpanded)
             
-            Text("타이머")
-                .font(.system(size: 13))
-                .multilineTextAlignment(.center)
-                .foregroundColor(Color.gray01)
+            if isExpanded {
+                // 확장 시 타이머 옵션들
+                HStack(spacing: 16) {
+                    Image("timerWhite")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                    
+                    Button("Off") {
+                        viewModel.delayTime = 0
+                        withAnimation(.spring(response: 0.2)) {
+                            isExpanded = false
+                        }
+                    }
+                    .font(.system(size: 13, weight: viewModel.delayTime == 0 ? .bold : .regular))
+                    .foregroundColor(.white)
+                    
+                    Button("3초") {
+                        viewModel.delayTime = 3
+                        withAnimation(.spring(response: 0.2)) {
+                            isExpanded = false
+                        }
+                    }
+                    .font(.system(size: 13, weight: viewModel.delayTime == 3 ? .bold : .regular))
+                    .foregroundColor(.white)
+                    
+                    Button("5초") {
+                        viewModel.delayTime = 5
+                        withAnimation(.spring(response: 0.2)) {
+                            isExpanded = false
+                        }
+                    }
+                    .font(.system(size: 13, weight: viewModel.delayTime == 5 ? .bold : .regular))
+                    .foregroundColor(.white)
+                    
+                    Button("7초") {
+                        viewModel.delayTime = 7
+                        withAnimation(.spring(response: 0.2)) {
+                            isExpanded = false
+                        }
+                    }
+                    .font(.system(size: 13, weight: viewModel.delayTime == 7 ? .bold : .regular))
+                    .foregroundColor(.white)
+                }
+                .padding(.horizontal, 16)
+            } else {
+                // 축소 시 기본 뷰
+                HStack(spacing: 8) {
+                    Image("timerBlack")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                    
+                    Text(viewModel.delayTime == 0 ? "Off" : "\(Int(viewModel.delayTime))초")
+                        .font(.system(size: 13))
+                        .foregroundColor(.black)
+                }
+                //                .padding(.horizontal, 16)
+            }
+        }
+        .frame(width: isExpanded ? 200 : 100, height: 30)
+        
+        .contentShape(Capsule())
+        .onTapGesture {
+            if !isExpanded {
+                withAnimation(.spring(response: 0.2)) {
+                    isExpanded = true
+                }
+            }
         }
     }
 }

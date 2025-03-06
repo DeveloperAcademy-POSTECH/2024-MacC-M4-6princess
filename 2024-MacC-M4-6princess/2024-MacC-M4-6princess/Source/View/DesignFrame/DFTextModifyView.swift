@@ -18,7 +18,7 @@ struct DFTextModifyView: View {
     var body: some View {
         VStack {
             Spacer()
-            CustomTextView(
+            DFCustomTextView(
                 //                modiViewModel: modiViewModel,
                 viewModel: viewModel,
                 displayScale: displayScale

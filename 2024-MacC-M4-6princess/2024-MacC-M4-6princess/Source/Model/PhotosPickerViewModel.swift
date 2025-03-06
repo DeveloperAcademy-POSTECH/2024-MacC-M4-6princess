@@ -63,7 +63,7 @@ class PhotosPickerViewModel: ObservableObject {
             if let image = result {
                 DispatchQueue.main.async {
                     self.saveImageArray(index: index, image: image)
-                    print(image.size)
+//                    print(image.size)
                 }
             }
         }

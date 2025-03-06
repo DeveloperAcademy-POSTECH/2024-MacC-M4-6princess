@@ -41,3 +41,46 @@ struct QRCodeSheetView: View {
         }
     }
 }
+struct SnsTestView: View {
+    @State private var isShowingBottomSheet = false
+    @State private var isShowingShareSheet = false
+    //    @State private var selectedPlatform: String? = nil
+    @State var image: UIImage? = UIImage(named: "testFrame")
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Display the image
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 300)
+            }
+            
+            // Share button
+            Button("공유하기") {
+                isShowingBottomSheet = true
+                isShowingShareSheet = true
+            }
+            .buttonStyle(.borderedProminent)
+            .padding()
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .sheet(isPresented: $isShowingBottomSheet) {
+            Group{
+                if let image = image {
+                    IOShareSheet(isPresented: $isShowingShareSheet, shareData: (image, "title", "Frameet으로 사진 낄여왔음"))
+                }
+            }
+        }
+        .overlay(
+            Group{
+                if let image = image {
+                    IOShareSheet(isPresented: $isShowingShareSheet, shareData: (image, "title", "Frameet으로 사진 낄여왔음"))
+                }
+            }
+        )
+      }
+    
+}
