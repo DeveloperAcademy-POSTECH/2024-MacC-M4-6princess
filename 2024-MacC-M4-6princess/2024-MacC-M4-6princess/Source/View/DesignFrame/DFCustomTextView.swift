@@ -10,7 +10,7 @@ import UIKit
 import SwiftUI
 
 // SwiftUI에서 UIKit의 UITextView를 사용하기 위한 래퍼 구조체 (UIViewRepresentable 프로토콜 사용)
-struct CustomTextView: UIViewRepresentable {
+struct DFCustomTextView: UIViewRepresentable {
     // 키보드가 보이는지 여부를 추적하는 상태 변수 (SwiftUI의 @FocusState 사용)
     @FocusState var isKeyboardVisible: Bool
     // 텍스트뷰의 데이터를 관리하는 뷰모델 (폰트, 색상, 텍스트 등을 포함)
@@ -80,11 +80,12 @@ struct CustomTextView: UIViewRepresentable {
     // 뷰가 업데이트될 때 호출되는 메서드 (SwiftUI 상태 변화 반영)
     func updateUIView(_ uiView: UITextView, context: Context) {
         // attributedText가 변경되었는지 확인 후 업데이트
-        if uiView.attributedText != viewModel.attributedTxt {
-            uiView.attributedText = viewModel.attributedTxt // 최신 속성 텍스트 적용
-            context.coordinator.centerTextVertically(in: uiView) // 텍스트 수직 중앙 정렬
-        }
-        
+//        if uiView.attributedText != viewModel.attributedTxt {
+//            uiView.attributedText = viewModel.attributedTxt // 최신 속성 텍스트 적용
+//            context.coordinator.centerTextVertically(in: uiView) // 텍스트 수직 중앙 정렬
+//        }
+        uiView.attributedText = viewModel.attributedTxt // 최신 속성 텍스트 적용
+        context.coordinator.centerTextVertically(in: uiView) // 텍스트 수직 중앙 정렬
         // 폰트, 정렬, 색상 속성 업데이트
         let font = viewModel.selectedFont.applyFont(size: fontSize)
         uiView.font = font // 폰트 설정
@@ -99,9 +100,9 @@ struct CustomTextView: UIViewRepresentable {
     
     // Coordinator 클래스: UITextView의 이벤트와 동작을 처리
     class Coordinator: NSObject, UITextViewDelegate {
-        var parent: CustomTextView // 부모 CustomTextView 참조
+        var parent: DFCustomTextView // 부모 CustomTextView 참조
         
-        init(_ parent: CustomTextView) {
+        init(_ parent: DFCustomTextView) {
             self.parent = parent
         }
         func textViewDidChange(_ textView: UITextView) {
@@ -177,7 +178,7 @@ struct CustomTextView: UIViewRepresentable {
 }
 
 // CustomTextView 확장: 추가 유틸리티 메서드
-extension CustomTextView {
+extension DFCustomTextView {
     // 현재 포커스된 UITextView를 찾는 메서드
     func focusedTextView() -> UITextView? {
         UIApplication.shared.windows.first?.allSubviews.compactMap { $0 as? UITextView }.first { $0.isFirstResponder }
