@@ -33,7 +33,8 @@ class IOViewModel: ObservableObject {
                 .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
         )
         // 해상도
-        renderedImage.scale = 1
+        renderedImage.scale = UIScreen.main.scale + 1
+        print("UIScreen.main.scale:\(UIScreen.main.scale)")
         
         if var uiImage = renderedImage.uiImage {
             // 기기 방향에 따라 이미지 회전

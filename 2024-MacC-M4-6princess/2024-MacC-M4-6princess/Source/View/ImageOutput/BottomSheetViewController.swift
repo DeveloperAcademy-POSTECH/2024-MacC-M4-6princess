@@ -60,14 +60,17 @@ class BottomSheetViewController: UIViewController {
         }
         
         let kakaoButton = createShareButton(icon: "kakao.icon", text: "카카오톡") { [weak self] in
+            self?.viewModel.showShareButton = false
             self?.viewModel.showAcitivity.toggle()
         }
         
         let messageButton = createShareButton(icon: "message.icon", text: "메시지") { [weak self] in
+            self?.viewModel.showShareButton = false
             self?.viewModel.showAcitivity.toggle()
         }
         
         let moreButton = createShareButton(icon: "more.icon", text: "더보기") { [weak self] in
+            self?.viewModel.showShareButton = false
             self?.viewModel.showAcitivity.toggle()
         }
         

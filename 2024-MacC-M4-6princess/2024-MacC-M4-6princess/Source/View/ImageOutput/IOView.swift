@@ -167,10 +167,10 @@ struct IOView: View {
             if viewModel.showShareButton == false && viewModel.showAcitivity == true{
                 print("onchange start")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                    if let _ = viewModel.compositeImage {
+                    
                         viewModel.changeOverlay = true
                         print("changeoverlay")
-                    }
+                    
                 }
             }
         })
