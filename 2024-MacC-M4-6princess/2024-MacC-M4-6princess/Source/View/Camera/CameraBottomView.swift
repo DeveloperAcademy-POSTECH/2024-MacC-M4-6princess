@@ -11,21 +11,24 @@ import FirebaseAnalytics
 //메인뷰 하단 뷰(셔터버튼, 기타 버튼 등)
 struct CameraBottomView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    @EnvironmentObject var naviManager:NavigationManager
-    @EnvironmentObject var frameManager:FrameManager
+    @EnvironmentObject var naviManager: NavigationManager
+    @EnvironmentObject var frameManager: FrameManager
+    @EnvironmentObject var imageModel: ImageListModel
     @ObservedObject var viewModel: CameraViewModel
     @StateObject var motionManager = MotionManager()
+    
     var body: some View {
-        NavigationStack(path: $naviManager.route) {
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
                 VStack{
                     Spacer()
                     ZStack {
                         FilteredImageView(viewModel: viewModel)
                             .environmentObject(frameManager)
+                            .environmentObject(imageModel)
                         HStack {
                             //새 프레임 만들기 버튼
                             Button {
+                                print("Button tapped")
                                 naviManager.push(screen: Screen.photoPicker)
                                 
                             } label: {
@@ -85,6 +88,5 @@ struct CameraBottomView: View {
                 cameraIPadBottomView
             }
         }
-    }
 }
 

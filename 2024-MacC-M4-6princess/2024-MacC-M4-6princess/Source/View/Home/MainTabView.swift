@@ -10,27 +10,36 @@ import SwiftUI
 struct MainTabView: View {
     @EnvironmentObject private var naviManager: NavigationManager
     @EnvironmentObject private var frameManager: FrameManager
+    @EnvironmentObject var imageModel: ImageListModel
+    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedTab = 1
     var tabBarHeight: CGFloat = 76
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // 선택된 탭에 따라 뷰 전환
-            if selectedTab == 0 {
-                HomeView()
-                    .padding(.bottom, tabBarHeight)
-            } else {
-                CameraView()
-                    .environmentObject(frameManager)
-                    .environmentObject(naviManager)
-                    .padding(.bottom, tabBarHeight)
+        NavigationStack(path: $naviManager.route) {
+            ZStack(alignment: .bottom) {
+                // 선택된 탭에 따라 뷰 전환
+                Group {
+                    if selectedTab == 0 {
+                        HomeView()
+                    } else {
+                        CameraView()
+                    }
+                }
+                .padding(.bottom, tabBarHeight)
+                .environmentObject(naviManager)
+                .environmentObject(frameManager)
+                .environmentObject(imageModel)
+                .environmentObject(layerListViewModel)
+                
+                CustomTabBar(selectedTab: $selectedTab)
             }
-            
-            CustomTabBar(selectedTab: $selectedTab)
+            .navigationDestination(for: Screen.self) { screen in
+                FeatureView(type: screen)
+            }
         }
-        .environmentObject(frameManager)
-        .environmentObject(naviManager)
+        
     }
 }
 

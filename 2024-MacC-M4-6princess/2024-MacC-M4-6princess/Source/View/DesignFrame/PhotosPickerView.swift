@@ -3,6 +3,7 @@ import Photos
 import FirebaseAnalytics
 
 struct PhotosPickerView: View {
+    @Environment(\.dismiss) var dismiss
     
     @StateObject private var vm: PhotosPickerViewModel = PhotosPickerViewModel()
     @State private var isPresented: Bool = false
@@ -117,13 +118,13 @@ extension PhotosPickerView {
 }
 
 extension PhotosPickerView {
-    
     var toolbarButton: some View {
         
         HStack {
             
             Button {
                 naviManager.pop()
+//                dismiss()
             } label: {
                 Image(systemName: "xmark")
                     .resizable()

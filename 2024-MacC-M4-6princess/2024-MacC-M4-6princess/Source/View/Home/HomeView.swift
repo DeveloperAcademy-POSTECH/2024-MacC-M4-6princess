@@ -12,12 +12,13 @@ struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
+    @EnvironmentObject var imageModel: ImageListModel
+    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject private var viewModel = HomeViewModel(context: PersistenceController.shared.container.viewContext)
     
     @State private var isFullScreenPresented = false
     
     var body: some View {
-        NavigationStack(path: $naviManager.route) {
             VStack {
                 HStack {
                     Image("appLogo")
@@ -51,8 +52,9 @@ struct HomeView: View {
                 //                .padding(.bottom, 37)
                 //                .padding(.horizontal, 20)
                 
-                NavigationLink {
-                    PhotosPickerView()
+                Button {
+//                    PhotosPickerView()
+                    naviManager.push(screen: Screen.photoPicker)
                     
                 } label: {
                     HStack(alignment: .center) {
@@ -121,7 +123,6 @@ struct HomeView: View {
             }
         }
     }
-}
 
 struct HomeGridView: View { // 기존 GridItemView에서 이름 변경
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
