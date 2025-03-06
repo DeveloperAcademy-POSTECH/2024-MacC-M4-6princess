@@ -297,6 +297,7 @@ extension DFModifyView{
                 if !frameManager.firstTime {
                     frameManager.firstTime = true
                 }
+                frameManager.isFrameLoading = true
             } label: {
                 Text("저장")
                     .fontWeight(.semibold)
