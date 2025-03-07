@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		214C39752D7A1CE300668407 /* ExInstagramShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 214C396B2D7A1CE300668407 /* ExInstagramShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		21A7806F2D78B5000052FD7A /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 21A7806E2D78B5000052FD7A /* GoogleMobileAds */; };
 		898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F72CFD5F5800EA200A /* FirebaseAnalytics */; };
 		898B14FA2CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F92CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport */; };
@@ -16,6 +17,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		214C39732D7A1CE300668407 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89A94AA72CA9B64C00824592 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 214C396A2D7A1CE300668407;
+			remoteInfo = ExInstagramShareExtension;
+		};
 		89A94AC02CA9B66300824592 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 89A94AA72CA9B64C00824592 /* Project object */;
@@ -32,13 +40,46 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		214C397A2D7A1CE300668407 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				214C39752D7A1CE300668407 /* ExInstagramShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		214C396B2D7A1CE300668407 /* ExInstagramShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ExInstagramShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "2024-MacC-M4-6princess.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94ABF2CA9B66300824592 /* 2024-MacC-M4-6princessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94AC92CA9B66300824592 /* 2024-MacC-M4-6princessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		214C39762D7A1CE300668407 /* Exceptions for "ExInstagramShareExtension" folder in "ExInstagramShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 214C396A2D7A1CE300668407 /* ExInstagramShareExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		214C396C2D7A1CE300668407 /* ExInstagramShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				214C39762D7A1CE300668407 /* Exceptions for "ExInstagramShareExtension" folder in "ExInstagramShareExtension" target */,
+			);
+			path = ExInstagramShareExtension;
+			sourceTree = "<group>";
+		};
 		89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "2024-MacC-M4-6princess";
@@ -47,6 +88,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		214C39682D7A1CE300668407 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		89A94AAC2CA9B64C00824592 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -88,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */,
+				214C396C2D7A1CE300668407 /* ExInstagramShareExtension */,
 				898B159A2CFD8CCD00EA200A /* Frameworks */,
 				89A94AB02CA9B64C00824592 /* Products */,
 			);
@@ -99,6 +148,7 @@
 				89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */,
 				89A94ABF2CA9B66300824592 /* 2024-MacC-M4-6princessTests.xctest */,
 				89A94AC92CA9B66300824592 /* 2024-MacC-M4-6princessUITests.xctest */,
+				214C396B2D7A1CE300668407 /* ExInstagramShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -106,6 +156,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		214C396A2D7A1CE300668407 /* ExInstagramShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 214C39772D7A1CE300668407 /* Build configuration list for PBXNativeTarget "ExInstagramShareExtension" */;
+			buildPhases = (
+				214C39672D7A1CE300668407 /* Sources */,
+				214C39682D7A1CE300668407 /* Frameworks */,
+				214C39692D7A1CE300668407 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				214C396C2D7A1CE300668407 /* ExInstagramShareExtension */,
+			);
+			name = ExInstagramShareExtension;
+			packageProductDependencies = (
+			);
+			productName = ExInstagramShareExtension;
+			productReference = 214C396B2D7A1CE300668407 /* ExInstagramShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		89A94AAE2CA9B64C00824592 /* 2024-MacC-M4-6princess */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 89A94AD32CA9B66300824592 /* Build configuration list for PBXNativeTarget "2024-MacC-M4-6princess" */;
@@ -113,10 +185,12 @@
 				89A94AAB2CA9B64C00824592 /* Sources */,
 				89A94AAC2CA9B64C00824592 /* Frameworks */,
 				89A94AAD2CA9B64C00824592 /* Resources */,
+				214C397A2D7A1CE300668407 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				214C39742D7A1CE300668407 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */,
@@ -184,6 +258,9 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					214C396A2D7A1CE300668407 = {
+						CreatedOnToolsVersion = 16.0;
+					};
 					89A94AAE2CA9B64C00824592 = {
 						CreatedOnToolsVersion = 16.0;
 					};
@@ -218,11 +295,19 @@
 				89A94AAE2CA9B64C00824592 /* 2024-MacC-M4-6princess */,
 				89A94ABE2CA9B66300824592 /* 2024-MacC-M4-6princessTests */,
 				89A94AC82CA9B66300824592 /* 2024-MacC-M4-6princessUITests */,
+				214C396A2D7A1CE300668407 /* ExInstagramShareExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		214C39692D7A1CE300668407 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		89A94AAD2CA9B64C00824592 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -247,6 +332,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		214C39672D7A1CE300668407 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		89A94AAB2CA9B64C00824592 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -271,6 +363,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		214C39742D7A1CE300668407 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 214C396A2D7A1CE300668407 /* ExInstagramShareExtension */;
+			targetProxy = 214C39732D7A1CE300668407 /* PBXContainerItemProxy */;
+		};
 		89A94AC12CA9B66300824592 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 89A94AAE2CA9B64C00824592 /* 2024-MacC-M4-6princess */;
@@ -284,6 +381,60 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		214C39782D7A1CE300668407 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ExInstagramShareExtension/ExInstagramShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KB52T46C6D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ExInstagramShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ExInstagramShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sixPrincess.release.com.ExInstagramShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		214C39792D7A1CE300668407 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ExInstagramShareExtension/ExInstagramShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KB52T46C6D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ExInstagramShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ExInstagramShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sixPrincess.release.com.ExInstagramShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		89A94AD12CA9B66300824592 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -579,6 +730,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		214C39772D7A1CE300668407 /* Build configuration list for PBXNativeTarget "ExInstagramShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				214C39782D7A1CE300668407 /* Debug */,
+				214C39792D7A1CE300668407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		89A94AAA2CA9B64C00824592 /* Build configuration list for PBXProject "2024-MacC-M4-6princess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
