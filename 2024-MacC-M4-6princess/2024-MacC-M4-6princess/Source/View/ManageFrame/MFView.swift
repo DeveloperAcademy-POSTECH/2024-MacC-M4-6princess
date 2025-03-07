@@ -19,7 +19,6 @@ struct MFView: View {
     @EnvironmentObject var imageModel: ImageListModel
     
     var body: some View {
-        NavigationStack(path: $naviManager.route) {
             ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     SheetTitleView(viewModel: viewModel)
@@ -27,9 +26,6 @@ struct MFView: View {
                         FrameGridItem(viewModel: viewModel)
                     }
                     
-                }
-                .navigationDestination(for: Screen.self) { type in
-                    FeatureView(type: type)
                 }
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
@@ -117,14 +113,13 @@ struct MFView: View {
             } message: {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
             }
-        }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
         }
         
-        .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
-            PhotosPickerView()
-        }
+//        .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
+//            PhotosPickerView()
+//        }
         .navigationBarHidden(true)
     }
         
