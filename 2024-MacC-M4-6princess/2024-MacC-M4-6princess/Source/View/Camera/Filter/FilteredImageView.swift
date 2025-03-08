@@ -37,7 +37,7 @@ struct FilteredImageView: View {
                 // 투명한 탭 영역
                 Color.clear
                     .frame(width: 100, height: 100)
-                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 
                 Button {
                     if frameManager.resultImage != nil {
@@ -55,7 +55,7 @@ struct FilteredImageView: View {
                         .resizable()
                         .frame(width: 80, height: 80)
                 }
-                .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 .allowsHitTesting(true)
                 .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
                     Button("닫기", role: .cancel) { }

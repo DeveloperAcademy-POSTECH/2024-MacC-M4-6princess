@@ -15,7 +15,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     private let viewModel: CameraViewModel
     
     var collectionView: UICollectionView!
-    let filterImages: [StoreImages]
+    var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
     private let filterCellId = "FilterCell"
     private let emptyCellId = "EmptyCell"
@@ -198,6 +198,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             self.selectedFilter?(nil)
             currentSelectedFilter = nil
             frameManager.selectedFrame = nil
+            frameManager.resultImage = nil
         } else {
             let filterIndex = indexPath.item - 1
             if filterIndex >= 0 && filterIndex < filterImages.count {
@@ -211,6 +212,31 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         frameManager.isFrameLoading = true
         updateCellSizesAndSpacing()
     }
+    
+    // 필터 추가 함수
+    func addNewFilter(_ newFilter: StoreImages) {
+        filterImages.append(newFilter)
+        
+        // collectionView의 데이터 소스를 갱신
+        collectionView.reloadData()
+        
+        // collectionView의 레이아웃을 갱신
+        collectionView.collectionViewLayout.invalidateLayout()
+        
+        // 가장 최근에 추가된 필터를 중앙에 위치시키기
+        scrollToNewestFilter()
+    }
+
+    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
+    private func scrollToNewestFilter() {
+        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
+        
+        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
+        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
+        
+        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
+    }
+
 
 
 }

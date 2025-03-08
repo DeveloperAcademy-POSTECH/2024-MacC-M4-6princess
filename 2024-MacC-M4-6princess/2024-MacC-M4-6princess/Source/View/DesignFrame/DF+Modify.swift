@@ -282,6 +282,7 @@ extension DFModifyView{
                             viewModel.showCamera = true
                             imageModel.imageList.removeAll()
                             frameManager.resultImage = viewModel.frameImage
+                            frameManager.selectedFrame = nil
                         }
                     }
                     

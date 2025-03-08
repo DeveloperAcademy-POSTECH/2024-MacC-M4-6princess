@@ -128,6 +128,7 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
+            viewModel.isTakePic = false
             Analytics.logEvent("A1_카메라", parameters: nil)
         }
         
