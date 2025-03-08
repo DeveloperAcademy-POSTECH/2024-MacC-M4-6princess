@@ -25,7 +25,11 @@ class DFTextViewModel: ObservableObject {
     @Published var colorNum = 0
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
-    @Published var attributedTxt: NSAttributedString?
+    @Published var attributedTxt: NSAttributedString?{
+        didSet{
+            print("텍스트변경:\(attributedTxt?.string)")
+        }
+    }
     
     // 캡처 크기를 저장할 변수 추가
     @Published var captureSize: CGSize = .zero // 캡처할 크기 (너비, 높이)
@@ -79,44 +83,43 @@ class DFTextViewModel: ObservableObject {
             return nil
         }
         
-        // viewModel.captureSize를 사용해 콘텐츠 크기 가져오기
+        // 텍스트뷰의 inset을 제거하고 실제 텍스트 크기 가져오기
         textView.textContainerInset = .zero
-        let captureSize = textView.contentSize
-//        let captureSize = captureSize
-        guard captureSize != .zero else {
-            return nil // 또는 기존 방식으로 계산
+        let textSize = attributedText.size() // 실제 텍스트 크기 사용
+        guard textSize != .zero else {
+            return nil
         }
         
-        // 요청된 패딩 10 추가
+        // 요청된 패딩 추가 (필요 시 조정)
         let padding: CGFloat = 0
         let contentSize = CGSize(
-            width: captureSize.width + (padding * 2),
-            height: captureSize.height + (padding * 2)
+            width: textSize.width + (padding * 2),
+            height: textSize.height + (padding * 2)
         )
         
-        // 고해상도 스케일 설정 (예: 3.0)
-        let highQualityScale: CGFloat = 5.0 // 필요에 따라 2.0, 4.0 등으로 조정
+        // 고해상도 스케일 설정
+        let highQualityScale: CGFloat = 5.0 // 필요에 따라 조정
         UIGraphicsBeginImageContextWithOptions(contentSize, false, highQualityScale)
         guard let context = UIGraphicsGetCurrentContext() else {
             UIGraphicsEndImageContext()
             return nil
         }
         
-        // 배경 투명 설정 (필요 시 opaque: true와 함께 배경색 지정 가능)
+        // 배경 투명 설정
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: contentSize))
         
         // 렌더링 품질 향상 설정
-        context.setShouldAntialias(true) // 안티앨리어싱 활성화
-        context.interpolationQuality = .high // 보간 품질 높임
-        context.setRenderingIntent(.perceptual) // 색상 렌더링 품질 개선
+        context.setShouldAntialias(true)
+        context.interpolationQuality = .high
+        context.setRenderingIntent(.perceptual)
         
-        // 텍스트와 이미지 글리프 그리기 (패딩 고려)
+        // 텍스트를 정확한 크기로 그리기
         let drawingRect = CGRect(
             x: padding,
             y: padding,
-            width: captureSize.width,
-            height: captureSize.height
+            width: textSize.width,
+            height: textSize.height
         )
         attributedText.draw(in: drawingRect)
         
