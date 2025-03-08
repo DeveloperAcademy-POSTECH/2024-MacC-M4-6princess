@@ -10,7 +10,11 @@ class SubjectImage: Identifiable {
     var textStyle: TextStyle?
     var angle: Angle = .degrees(0)
     var offset: CGSize = .zero
-    var scale: CGFloat = 1.0
+    var scale: CGFloat = 1.0{
+        didSet{
+            print("scale 변경:\(scale)")
+        }
+    }
     var originalText: String = ""
     
     var isTapped: Bool = true
@@ -52,7 +56,7 @@ class SubjectImage: Identifiable {
     }
     
     func getScale() -> CGFloat {
-        return scale
+        return max(scale,0.1)
     }
     
     func getAngle() -> Angle {

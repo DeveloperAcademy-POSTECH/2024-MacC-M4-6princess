@@ -51,14 +51,14 @@ struct IOView: View {
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")
                     }
-                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-                        original.modifier(
-                            RotatedAndScaledEffect(
-                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-                                scale: 0.75  //하드코딩 수정필요
-                            )
-                        )
-                    }
+//                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+//                        original.modifier(
+//                            RotatedAndScaledEffect(
+//                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+//                                scale: 0.75  //하드코딩 수정필요
+//                            )
+//                        )
+//                    }
                     .scaledToFit()
                 Spacer()
                 

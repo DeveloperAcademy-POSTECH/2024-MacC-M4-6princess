@@ -20,7 +20,7 @@ struct DFTextView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("완료") {
                         if let textView = UIApplication.shared.windows.first?.allSubviews.compactMap({ $0 as? UITextView }).first(where: { $0.isFirstResponder }) {
-                            viewModel.renderedImage = viewModel.captureTextContent(from: textView)
+                            viewModel.renderedImage = viewModel.captureTextView(from: textView)
                             /// 이미지와 메타데이터를 코어데이터에 저장
                             imageToCoredata()
                             

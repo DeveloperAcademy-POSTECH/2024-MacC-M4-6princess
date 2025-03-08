@@ -73,26 +73,17 @@ class DFTextViewModel: ObservableObject {
         }
     }
     @MainActor
-    func captureTextContent(from textView: UITextView) -> UIImage? {
+    func captureTextView(from textView: UITextView) -> UIImage? {
         // 텍스트뷰의 attributedText가 nil이거나 길이가 0이면 nil 반환
         guard let attributedText = textView.attributedText, attributedText.length > 0 else {
-            print("Debug: attributedText is nil or empty")
             return nil
         }
         
-        // 디버깅: attributedText 속성 확인
-        print("Debug: Full attributedText: \(attributedText.string)")
-        attributedText.enumerateAttributes(in: NSRange(location: 0, length: attributedText.length)) { attrs, range, _ in
-            print("Debug: Attributes at \(range): \(attrs)")
-            if let attachment = attrs[.attachment] as? NSTextAttachment {
-                print("Debug: Found NSTextAttachment - bounds: \(attachment.bounds), image: \(String(describing: attachment.image))")
-            }
-        }
-        
         // viewModel.captureSize를 사용해 콘텐츠 크기 가져오기
-        let captureSize = captureSize
+        textView.textContainerInset = .zero
+        let captureSize = textView.contentSize
+//        let captureSize = captureSize
         guard captureSize != .zero else {
-            print("Debug: captureSize is zero, falling back to default calculation")
             return nil // 또는 기존 방식으로 계산
         }
         
@@ -103,17 +94,22 @@ class DFTextViewModel: ObservableObject {
             height: captureSize.height + (padding * 2)
         )
         
-        // 그래픽 컨텍스트 설정
-        UIGraphicsBeginImageContextWithOptions(contentSize, false, UIScreen.main.scale)
+        // 고해상도 스케일 설정 (예: 3.0)
+        let highQualityScale: CGFloat = 5.0 // 필요에 따라 2.0, 4.0 등으로 조정
+        UIGraphicsBeginImageContextWithOptions(contentSize, false, highQualityScale)
         guard let context = UIGraphicsGetCurrentContext() else {
-            print("Debug: Failed to get graphics context")
             UIGraphicsEndImageContext()
             return nil
         }
         
-        // 배경 투명 설정
+        // 배경 투명 설정 (필요 시 opaque: true와 함께 배경색 지정 가능)
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: contentSize))
+        
+        // 렌더링 품질 향상 설정
+        context.setShouldAntialias(true) // 안티앨리어싱 활성화
+        context.interpolationQuality = .high // 보간 품질 높임
+        context.setRenderingIntent(.perceptual) // 색상 렌더링 품질 개선
         
         // 텍스트와 이미지 글리프 그리기 (패딩 고려)
         let drawingRect = CGRect(
@@ -122,21 +118,10 @@ class DFTextViewModel: ObservableObject {
             width: captureSize.width,
             height: captureSize.height
         )
-        print("Debug: Drawing rect: \(drawingRect)")
         attributedText.draw(in: drawingRect)
         
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
-        // 디버깅: 생성된 이미지 크기 확인
-        if let image = image {
-            if let imageData = image.pngData() {
-                let debugPath = NSTemporaryDirectory() + "capturedText.png"
-                try? imageData.write(to: URL(fileURLWithPath: debugPath))
-            }
-        } else {
-            print("Debug: Failed to capture image")
-        }
         
         return image
     }
