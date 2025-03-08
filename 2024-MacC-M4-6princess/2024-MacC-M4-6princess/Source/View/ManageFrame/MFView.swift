@@ -116,10 +116,6 @@ struct MFView: View {
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
         }
-        
-//        .fullScreenCover(isPresented: $viewModel.isShowPhotosPicker) {
-//            PhotosPickerView()
-//        }
         .navigationBarHidden(true)
     }
         
