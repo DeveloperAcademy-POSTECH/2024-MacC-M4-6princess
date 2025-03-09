@@ -23,6 +23,7 @@ struct DFTextView: View {
                             viewModel.renderedImage = viewModel.captureTextView(from: textView)
                             /// 이미지와 메타데이터를 코어데이터에 저장
                             imageToCoredata()
+                            modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
                             
                             /// 텍스트뷰를 닫음
                             modiViewModel.showTextView = false

@@ -175,7 +175,7 @@ extension DFTextModifyView{
             newImage.text = image
             newImage.originalImage = image
             //                                newImage.rawText = style.rawText
-            newImage.textStyle = style
+            newImage.textStyle = modiViewModel.style
             if let uuid = frameManager.textUUID, let index = imageModel.imageList.firstIndex(where: {$0.id == uuid}){
                 imageModel.imageList[index] = newImage
                 modiViewModel.selectedIndex = index
@@ -203,11 +203,11 @@ extension DFTextModifyView{
                 // 스와이프 감지
                 if value.translation.width < 0 { // 왼쪽 스와이프
                     withAnimation {
-                        style.alignment = viewModel.computeNextAlignment(for: style.alignment, direction: .left)
+                        modiViewModel.style.alignment = viewModel.computeNextAlignment(for: modiViewModel.style.alignment, direction: .left)
                     }
                 } else if value.translation.width > 0 { // 오른쪽 스와이프
                     withAnimation {
-                        style.alignment = viewModel.computeNextAlignment(for: style.alignment, direction: .right)
+                        modiViewModel.style.alignment = viewModel.computeNextAlignment(for: modiViewModel.style.alignment, direction: .right)
                     }
                 }
             }
@@ -306,7 +306,7 @@ extension DFTextModifyView{
                 .frame(width: 105, height: 30)
                 
                 Group {
-                    Image(viewModel.imageForAlignment(style.alignment))
+                    Image(viewModel.imageForAlignment(modiViewModel.style.alignment))
                         .resizable()
                         .scaledToFit()
                         .frame(width: 105, height: 30)

@@ -79,13 +79,8 @@ struct DFModifyView: View {
             }
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
                 DFTextModifyView(
-                    modiViewModel: viewModel,
-                    style: Binding(
-                        get: { textStyle },
-                        set: { newValue in
-                            frameManager.selectedTextStyle = newValue
-                        }
-                    )
+                    modiViewModel: viewModel
+                    
                 )
             }
             

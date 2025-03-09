@@ -24,7 +24,7 @@ struct TextRenderView: View {
 struct TextStyle {
     var attributedString: NSAttributedString{
         didSet{
-            print("TextStyle:\(attributedString.string)")
+            print("TextStyle:\(attributedString)")
         }
     }
     var txt:String
