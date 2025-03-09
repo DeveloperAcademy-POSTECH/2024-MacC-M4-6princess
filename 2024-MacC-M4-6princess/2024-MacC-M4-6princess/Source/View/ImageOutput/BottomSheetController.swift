@@ -9,16 +9,16 @@ import SwiftUI
 import UIKit
 import LinkPresentation
 
-struct BottomSheetViewWrapper: UIViewControllerRepresentable {
+struct BottomSheetWrapper: UIViewControllerRepresentable {
     var viewModel: IOViewModel
     
-    func makeUIViewController(context: Context) -> BottomSheetViewController {
-        return BottomSheetViewController(viewModel: viewModel)
+    func makeUIViewController(context: Context) -> BottomSheetController {
+        return BottomSheetController(viewModel: viewModel)
     }
     
-    func updateUIViewController(_ uiViewController: BottomSheetViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: BottomSheetController, context: Context) {}
 }
-class BottomSheetViewController: UIViewController {
+class BottomSheetController: UIViewController {
     var viewModel: IOViewModel
     
     init(viewModel: IOViewModel) {

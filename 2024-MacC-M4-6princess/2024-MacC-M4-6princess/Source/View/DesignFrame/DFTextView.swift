@@ -53,9 +53,9 @@ struct DFTextView: View {
             Color.black.opacity(0.5) // 반투명 검정색
         )
         .ignoresSafeArea(.keyboard)
-        .onAppear {
-            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
-        }
+//        .onAppear {
+//            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
+//        }
         
     }
     
