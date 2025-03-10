@@ -46,21 +46,41 @@ struct CameraView: View {
                     .frame(height: 46) // TopView 높이만큼 여백 확보
                 
                 ZStack{
-                    cameraPreview
-                        .frame(width: UIScreen.main.bounds.width,
-                               height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                        .gesture(MagnificationGesture()
-                            .onChanged { val in
-                                viewModel.zoom(factor: val)
+                    if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                        cameraPreview
+                            .frame(width: UIScreen.main.bounds.width,
+                                   height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                            .gesture(MagnificationGesture()
+                                .onChanged { val in
+                                    viewModel.zoom(factor: val)
+                                }
+                                .onEnded { _ in
+                                    viewModel.zoomInitialize()
+                                })
+                            .onAppear {
+                                if UIDevice.current.userInterfaceIdiom == .pad {
+                                    viewModel.showOrientationAlert = true
+                                }
                             }
-                            .onEnded { _ in
-                                viewModel.zoomInitialize()
-                            })
-                        .onAppear {
-                            if UIDevice.current.userInterfaceIdiom == .pad {
-                                viewModel.showOrientationAlert = true
+                    }
+                    else{
+                        cameraPreview
+                            .frame(width: (UIScreen.main.bounds.height - 200) / viewModel.frameRatio,
+                                    height: (UIScreen.main.bounds.height - 200) )
+                            .gesture(MagnificationGesture()
+                                .onChanged { val in
+                                    viewModel.zoom(factor: val)
+                                }
+                                .onEnded { _ in
+                                    viewModel.zoomInitialize()
+                                })
+                            .onAppear {
+                                if UIDevice.current.userInterfaceIdiom == .pad {
+                                    viewModel.showOrientationAlert = true
+                                }
                             }
-                        }
+                    }
+                       
                     //                        FilteredImageView()
                 }
                 

@@ -35,7 +35,10 @@ struct DFCustomTextView: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextView {
         // UITextView 객체 생성 (텍스트를 입력하고 표시할 수 있는 UIKit 컴포넌트)
         let textView = UITextView()
-        
+        // 키보드가 바로 올라오도록 설정
+            DispatchQueue.main.async {
+                textView.becomeFirstResponder()
+            }
         // viewModel.attributedTxt로 초기화 (속성 텍스트: 폰트, 색상 등이 포함된 텍스트)
         textView.attributedText = viewModel.attributedTxt
         

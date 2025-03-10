@@ -35,7 +35,7 @@ struct DFModifyView: View {
                 }
             
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
-                VStack {
+                let extractedExpr: VStack<TupleView<(some View, some View)>> = VStack {
                     ZStack {
                         Image("checkBox")
                             .resizable()
@@ -55,7 +55,7 @@ struct DFModifyView: View {
                             .opacity(viewModel.btnOpacity)
                             .frame(width: 175, height: 38)
                             .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                        if let selected = viewModel.selectedSubject,selected.isTapped{
+                        if let selected = viewModel.selectedSubject,selected.isTapped,imageModel.imageList.count > 1{
                             newLayerIndicator
                         }
                     }
@@ -70,6 +70,7 @@ struct DFModifyView: View {
                     DFImageDecoView(viewModel: viewModel)
                         .padding(.top, 58)
                 }
+                extractedExpr
             }
             else{
                 modifyIpad
@@ -79,13 +80,8 @@ struct DFModifyView: View {
             }
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
                 DFTextModifyView(
-                    modiViewModel: viewModel,
-                    style: Binding(
-                        get: { textStyle },
-                        set: { newValue in
-                            frameManager.selectedTextStyle = newValue
-                        }
-                    )
+                    modiViewModel: viewModel
+                    
                 )
             }
             

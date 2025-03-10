@@ -20,9 +20,10 @@ struct DFTextView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("완료") {
                         if let textView = UIApplication.shared.windows.first?.allSubviews.compactMap({ $0 as? UITextView }).first(where: { $0.isFirstResponder }) {
-                            viewModel.renderedImage = viewModel.captureTextContent(from: textView)
+                            viewModel.renderedImage = viewModel.captureTextView(from: textView)
                             /// 이미지와 메타데이터를 코어데이터에 저장
                             imageToCoredata()
+                            modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
                             
                             /// 텍스트뷰를 닫음
                             modiViewModel.showTextView = false
@@ -52,9 +53,9 @@ struct DFTextView: View {
             Color.black.opacity(0.5) // 반투명 검정색
         )
         .ignoresSafeArea(.keyboard)
-        .onAppear {
-            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
-        }
+//        .onAppear {
+//            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
+//        }
         
     }
     

@@ -44,11 +44,9 @@ class DFModifyViewModel: ObservableObject {
     @Published var isPressedUp = false
     @Published var isPressedDown = false
     @Published var selectedSubject: SubjectImage? = nil
-    @Published var selectedIndex: Int? = nil {
-        didSet {
-            print("이전 값: \(oldValue ?? -1), 새로운 값: \(selectedIndex ?? -1)")
-        }
-    }
+    @Published var selectedIndex: Int? = nil
+    
+    @Published var style:TextStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: "", font: .modern, color: ColorPreset.colorPallete[0], alignment: .center )
     
     func backgroundGesture() -> some Gesture {
         

@@ -25,7 +25,11 @@ class DFTextViewModel: ObservableObject {
     @Published var colorNum = 0
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
-    @Published var attributedTxt: NSAttributedString?
+    @Published var attributedTxt: NSAttributedString?{
+        didSet{
+            print("텍스트변경:\(attributedTxt?.string)")
+        }
+    }
     
     // 캡처 크기를 저장할 변수 추가
     @Published var captureSize: CGSize = .zero // 캡처할 크기 (너비, 높이)
@@ -73,40 +77,30 @@ class DFTextViewModel: ObservableObject {
         }
     }
     @MainActor
-    func captureTextContent(from textView: UITextView) -> UIImage? {
+    func captureTextView(from textView: UITextView) -> UIImage? {
         // 텍스트뷰의 attributedText가 nil이거나 길이가 0이면 nil 반환
         guard let attributedText = textView.attributedText, attributedText.length > 0 else {
-            print("Debug: attributedText is nil or empty")
             return nil
         }
         
-        // 디버깅: attributedText 속성 확인
-        print("Debug: Full attributedText: \(attributedText.string)")
-        attributedText.enumerateAttributes(in: NSRange(location: 0, length: attributedText.length)) { attrs, range, _ in
-            print("Debug: Attributes at \(range): \(attrs)")
-            if let attachment = attrs[.attachment] as? NSTextAttachment {
-                print("Debug: Found NSTextAttachment - bounds: \(attachment.bounds), image: \(String(describing: attachment.image))")
-            }
+        // 텍스트뷰의 inset을 제거하고 실제 텍스트 크기 가져오기
+        textView.textContainerInset = .zero
+        let textSize = attributedText.size() // 실제 텍스트 크기 사용
+        guard textSize != .zero else {
+            return nil
         }
         
-        // viewModel.captureSize를 사용해 콘텐츠 크기 가져오기
-        let captureSize = captureSize
-        guard captureSize != .zero else {
-            print("Debug: captureSize is zero, falling back to default calculation")
-            return nil // 또는 기존 방식으로 계산
-        }
-        
-        // 요청된 패딩 10 추가
+        // 요청된 패딩 추가 (필요 시 조정)
         let padding: CGFloat = 0
         let contentSize = CGSize(
-            width: captureSize.width + (padding * 2),
-            height: captureSize.height + (padding * 2)
+            width: textSize.width + (padding * 2),
+            height: textSize.height + (padding * 2)
         )
         
-        // 그래픽 컨텍스트 설정
-        UIGraphicsBeginImageContextWithOptions(contentSize, false, UIScreen.main.scale)
+        // 고해상도 스케일 설정
+        let highQualityScale: CGFloat = 5.0 // 필요에 따라 조정
+        UIGraphicsBeginImageContextWithOptions(contentSize, false, highQualityScale)
         guard let context = UIGraphicsGetCurrentContext() else {
-            print("Debug: Failed to get graphics context")
             UIGraphicsEndImageContext()
             return nil
         }
@@ -115,28 +109,22 @@ class DFTextViewModel: ObservableObject {
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: contentSize))
         
-        // 텍스트와 이미지 글리프 그리기 (패딩 고려)
+        // 렌더링 품질 향상 설정
+        context.setShouldAntialias(true)
+        context.interpolationQuality = .high
+        context.setRenderingIntent(.perceptual)
+        
+        // 텍스트를 정확한 크기로 그리기
         let drawingRect = CGRect(
             x: padding,
             y: padding,
-            width: captureSize.width,
-            height: captureSize.height
+            width: textSize.width,
+            height: textSize.height
         )
-        print("Debug: Drawing rect: \(drawingRect)")
         attributedText.draw(in: drawingRect)
         
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
-        // 디버깅: 생성된 이미지 크기 확인
-        if let image = image {
-            if let imageData = image.pngData() {
-                let debugPath = NSTemporaryDirectory() + "capturedText.png"
-                try? imageData.write(to: URL(fileURLWithPath: debugPath))
-            }
-        } else {
-            print("Debug: Failed to capture image")
-        }
         
         return image
     }
