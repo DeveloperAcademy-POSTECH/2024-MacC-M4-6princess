@@ -22,7 +22,11 @@ struct TextRenderView: View {
 }
 
 struct TextStyle {
-    var attributedString: NSAttributedString
+    var attributedString: NSAttributedString{
+        didSet{
+            print("TextStyle:\(attributedString)")
+        }
+    }
     var txt:String
     var font: NewFontStyle
     var color: Color

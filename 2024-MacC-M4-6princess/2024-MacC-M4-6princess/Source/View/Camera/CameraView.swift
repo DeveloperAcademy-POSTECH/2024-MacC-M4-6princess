@@ -18,7 +18,7 @@ struct CameraView: View {
     @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-//    @StateObject var frameManager = FrameManager()
+    //    @StateObject var frameManager = FrameManager()
     
     private var cameraPreview: some View  {
         GeometryReader { geo in
@@ -27,14 +27,19 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
-            Group{
-                if let image = frameManager.resultImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                }
+            //            Group{
+            //                if let image = frameManager.resultImage {
+            //                    Image(uiImage: image)
+            //                        .resizable()
+            //                        .aspectRatio(contentMode: .fill)
+            //                }
+            //            }
+            if let selectedFilterID = frameManager.selectedFrame {
+                FilteredCoreDataImageView(filterID: selectedFilterID)
+                    .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                    .allowsHitTesting(false)
             }
-            .allowsHitTesting(false)
+            
         }
     }
     
@@ -46,21 +51,41 @@ struct CameraView: View {
                     .frame(height: 46) // TopView 높이만큼 여백 확보
                 
                 ZStack{
-                    cameraPreview
-                        .frame(width: UIScreen.main.bounds.width,
-                               height: UIScreen.main.bounds.width * viewModel.frameRatio)
-                        .gesture(MagnificationGesture()
-                            .onChanged { val in
-                                viewModel.zoom(factor: val)
+                    if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
+                        cameraPreview
+                            .frame(width: UIScreen.main.bounds.width,
+                                   height: UIScreen.main.bounds.width * viewModel.frameRatio)
+                            .gesture(MagnificationGesture()
+                                .onChanged { val in
+                                    viewModel.zoom(factor: val)
+                                }
+                                .onEnded { _ in
+                                    viewModel.zoomInitialize()
+                                })
+                            .onAppear {
+                                if UIDevice.current.userInterfaceIdiom == .pad {
+                                    viewModel.showOrientationAlert = true
+                                }
                             }
-                            .onEnded { _ in
-                                viewModel.zoomInitialize()
-                            })
-                        .onAppear {
-                            if UIDevice.current.userInterfaceIdiom == .pad {
-                                viewModel.showOrientationAlert = true
+                    }
+                    else{
+                        cameraPreview
+                            .frame(width: (UIScreen.main.bounds.height - 200) / viewModel.frameRatio,
+                                    height: (UIScreen.main.bounds.height - 200) )
+                            .gesture(MagnificationGesture()
+                                .onChanged { val in
+                                    viewModel.zoom(factor: val)
+                                }
+                                .onEnded { _ in
+                                    viewModel.zoomInitialize()
+                                })
+                            .onAppear {
+                                if UIDevice.current.userInterfaceIdiom == .pad {
+                                    viewModel.showOrientationAlert = true
+                                }
                             }
-                        }
+                    }
+                       
                     //                        FilteredImageView()
                 }
                 
@@ -85,9 +110,7 @@ struct CameraView: View {
         .onChange(of: frameManager.isFrameLoading) { newValue in
             if newValue {
                 loadSelectedFrame()
-                print("isFrameLoading: \(frameManager.isFrameLoading)")
                 frameManager.isFrameLoading = false
-                print("지금의 isFrameLoading: \(frameManager.isFrameLoading)")
                 
             }
         }
@@ -128,6 +151,8 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
+            viewModel.isTakePic = false
+            frameManager.selectedFrame = nil
             Analytics.logEvent("A1_카메라", parameters: nil)
         }
         

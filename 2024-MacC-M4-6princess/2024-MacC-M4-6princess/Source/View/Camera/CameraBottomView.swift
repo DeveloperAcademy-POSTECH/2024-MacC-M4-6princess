@@ -28,7 +28,6 @@ struct CameraBottomView: View {
                         HStack {
                             //새 프레임 만들기 버튼
                             Button {
-                                print("Button tapped")
                                 naviManager.push(screen: Screen.photoPicker)
                                 
                             } label: {
