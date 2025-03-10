@@ -114,7 +114,7 @@ struct DFEditView: View {
                 
                 Spacer()
             }
-            removingLoadingView()
+            RemovingLoadingView()
                 .opacity(viewModel.removingLoadingOpacity)
                 .ignoresSafeArea()
         }
@@ -130,7 +130,7 @@ struct DFEditView: View {
             Analytics.logEvent("A4_누끼따기", parameters: nil)
         }
         .onDisappear{ // ✅
-            frameManager.resultImage = viewModel.resultImage
+            frameManager.removedImage = viewModel.resultImage
         }
         //        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
         //            DFFrameModifyView()

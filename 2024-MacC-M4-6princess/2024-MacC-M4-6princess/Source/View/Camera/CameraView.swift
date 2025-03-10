@@ -18,7 +18,7 @@ struct CameraView: View {
     @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
-//    @StateObject var frameManager = FrameManager()
+    //    @StateObject var frameManager = FrameManager()
     
     private var cameraPreview: some View  {
         GeometryReader { geo in
@@ -27,14 +27,19 @@ struct CameraView: View {
                 .onAppear {
                     viewModel.frameSize.size = CGSize(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
                 }
-            Group{
-                if let image = frameManager.resultImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                }
+            //            Group{
+            //                if let image = frameManager.resultImage {
+            //                    Image(uiImage: image)
+            //                        .resizable()
+            //                        .aspectRatio(contentMode: .fill)
+            //                }
+            //            }
+            if let selectedFilterID = frameManager.selectedFrame {
+                FilteredCoreDataImageView(filterID: selectedFilterID)
+                    .frame(width: geo.size.width, height: geo.size.width * viewModel.frameRatio)
+                    .allowsHitTesting(false)
             }
-            .allowsHitTesting(false)
+            
         }
     }
     
@@ -105,9 +110,7 @@ struct CameraView: View {
         .onChange(of: frameManager.isFrameLoading) { newValue in
             if newValue {
                 loadSelectedFrame()
-                print("isFrameLoading: \(frameManager.isFrameLoading)")
                 frameManager.isFrameLoading = false
-                print("지금의 isFrameLoading: \(frameManager.isFrameLoading)")
                 
             }
         }
@@ -148,6 +151,8 @@ struct CameraView: View {
             // 프레임 크기 설정
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
+            viewModel.isTakePic = false
+            frameManager.selectedFrame = nil
             Analytics.logEvent("A1_카메라", parameters: nil)
         }
         

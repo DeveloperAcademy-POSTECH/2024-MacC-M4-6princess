@@ -31,7 +31,7 @@ struct HomeView: View {
                 
                 Image("homeViewBanner")
                     .resizable()
-                    .scaledToFit()
+                    .aspectRatio(contentMode: .fit)
                 
                 //                Button {
                 //                    // 프레임 만들기 페이지로 이동
