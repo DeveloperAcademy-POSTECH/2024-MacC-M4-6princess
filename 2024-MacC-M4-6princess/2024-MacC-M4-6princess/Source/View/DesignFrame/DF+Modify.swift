@@ -231,7 +231,7 @@ extension DFModifyView{
                 
                 Button {
                     imageModel.imageList.removeAll()
-                    naviManager.popToRoot()
+                    naviManager.pop(depth: 3)
                 } label: {
                     Text("나가기")
                 }
