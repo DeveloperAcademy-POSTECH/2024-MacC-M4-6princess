@@ -114,7 +114,7 @@ struct DFEditView: View {
                 
                 Spacer()
             }
-            removingLoadingView()
+            RemovingLoadingView()
                 .opacity(viewModel.removingLoadingOpacity)
                 .ignoresSafeArea()
         }

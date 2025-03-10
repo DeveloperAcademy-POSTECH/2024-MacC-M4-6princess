@@ -28,6 +28,7 @@ struct PhotosPickerView: View {
                                             .frame(width: UIScreen.main.bounds.width*0.32, height: UIScreen.main.bounds.width*0.32)
                                             .onTapGesture {
                                                 
+                                                
                                                 if vm.selectedIndex < 0 {
                                                     vm.selectedIndex = i
                                                     vm.models[i].isSelected = true
@@ -41,6 +42,18 @@ struct PhotosPickerView: View {
                                                     } else {
                                                         vm.selectedIndex = -1
                                                         vm.models[i].isSelected = false
+                                                    }
+                                                }
+                                                vm.getImage(for: vm.album[vm.selectedIndex]) {
+                                                    
+                                                    if let image = vm.outputImage {
+                                                        frameManager.pickedImage = image
+                                                    }
+                                                    
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                        if frameManager.pickedImage != nil {
+                                                            naviManager.push(screen: Screen.frameEdit)
+                                                        }
                                                     }
                                                 }
                                             }
@@ -131,36 +144,16 @@ extension PhotosPickerView {
                     .foregroundStyle(.black)
                     .frame(width: 15, height: 15)
             }
-            .padding(.leading, UIScreen.main.bounds.width * 0.06)
+            .padding(.leading, UIScreen.main.bounds.width * 0.09)
             Spacer()
             
             Text("사진선택")
                 .fontWeight(.bold)
                 .foregroundStyle(.gray01)
                 .padding(.leading, UIScreen.main.bounds.width * 0.04)
+                .padding(.trailing, UIScreen.main.bounds.height * 0.075)
             
             Spacer()
-            Button {
-                vm.getImage(for: vm.album[vm.selectedIndex]) {
-                    
-                    if let image = vm.outputImage {
-                        frameManager.pickedImage = image
-                    }
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        if frameManager.pickedImage != nil {
-                            naviManager.push(screen: Screen.frameEdit)
-                        }
-                    }
-                }
-                
-                
-            } label: {
-                Text("선택")
-                    .foregroundStyle(vm.selectedIndex >= 0 ? .pointPink : .gray03)
-            }
-            .disabled(vm.selectedIndex < 0)
-            .padding(.trailing, UIScreen.main.bounds.width * 0.06)
             
             
         }

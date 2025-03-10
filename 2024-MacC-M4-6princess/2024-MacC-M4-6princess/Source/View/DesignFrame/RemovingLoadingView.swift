@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct removingLoadingView: View {
+struct RemovingLoadingView: View {
     var body: some View {
         ZStack {
             Rectangle()
@@ -22,6 +22,6 @@ struct removingLoadingView: View {
 }
 
 #Preview {
-    removingLoadingView()
+    RemovingLoadingView()
 }
 
