@@ -94,21 +94,53 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
+//    func cellSize(for indexPath: IndexPath) -> CGFloat {
+//        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+//        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
+//        let distance = abs(cellFrame.midX - centerX)
+//        
+//        if indexPath.item == 0 {
+//            return defaultCellSize
+//        } else if distance < (centerCellSize / 2) {
+//            return centerCellSize
+//        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
+//            return rightOfCenterCellSize
+//        } else {
+//            return defaultCellSize
+//        }
+//    }
+    
     func cellSize(for indexPath: IndexPath) -> CGFloat {
+        // 화면 중앙 위치 계산
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
-        let distance = abs(cellFrame.midX - centerX)
         
-        if indexPath.item == 0 {
-            return defaultCellSize
-        } else if distance < (centerCellSize / 2) {
-            return centerCellSize
-        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
-            return rightOfCenterCellSize
-        } else {
+        // 현재 화면에 보이는 모든 셀 중 가장 중앙에 가까운 셀 찾기
+        let visibleCells = collectionView.visibleCells
+        var closestCell: UICollectionViewCell?
+        var minDistance: CGFloat = .greatestFiniteMagnitude
+        
+        for cell in visibleCells {
+            let distance = abs(cell.frame.midX - centerX)
+            if distance < minDistance {
+                minDistance = distance
+                closestCell = cell
+            }
+        }
+        
+        guard let closestIndexPath = closestCell.flatMap({ collectionView.indexPath(for: $0) }) else {
             return defaultCellSize
         }
+        
+        // 이제 인덱스를 기준으로 고정된 크기 반환
+        if indexPath == closestIndexPath {
+            return centerCellSize // 중앙 셀 (58)
+        } else if indexPath.item == closestIndexPath.item + 1 {
+            return rightOfCenterCellSize // 중앙 바로 오른쪽 셀 (50)
+        } else {
+            return defaultCellSize // 나머지 모든 셀들 (38)
+        }
     }
+
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateCellSizesAndSpacing()

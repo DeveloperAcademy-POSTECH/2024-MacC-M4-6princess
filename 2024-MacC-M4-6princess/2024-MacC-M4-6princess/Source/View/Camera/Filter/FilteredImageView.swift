@@ -71,12 +71,13 @@ struct FilteredImageView: View {
             DispatchQueue.main.async {
                 //보라색 무시해주세요
                 viewModel.cameraManager.session.startRunning()
+                reloadFilterImages()
             }
         }
         .onDisappear {
             viewModel.cameraManager.stopSession()
         }
-        .onChange(of: filterImages.count) { _ in
+        .onChange(of: frameManager.resultImage) { _ in
             reloadFilterImages()
         }
     }
