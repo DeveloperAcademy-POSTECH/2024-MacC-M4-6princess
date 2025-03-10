@@ -198,6 +198,7 @@ extension PhotosPickerView {
                     .foregroundStyle(.black)
                     .frame(width: 15, height: 15)
             }
+            .disabled(vm.models.isEmpty ? true : false)
             .padding(.leading, UIScreen.main.bounds.width * 0.09)
             Spacer()
             
