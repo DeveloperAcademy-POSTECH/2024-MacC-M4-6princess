@@ -29,12 +29,14 @@ struct PhotosPickerView: View {
             
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
-                    DispatchQueue.main.async {
+//                    DispatchQueue.main.async {
                         vm.fetchAlbum()
+                        print(vm.album.count)
                         for i in 0..<vm.album.count {
+                            print("모델 삽입 실행됨")
                             vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
                         }
-                    }
+//                    }
                 }
             }
             vm.changeOpacity()
@@ -82,7 +84,7 @@ extension PhotosPickerView {
             scrollObservableView
             LazyVGrid(columns: columns, alignment: .center, spacing: 5) {
                 if vm.models.count != 0 {
-                    ForEach(0..<vm.fetchedAlbum, id: \.self) { i in
+                    ForEach(0..<vm.models.count, id: \.self) { i in
                         ZStack {
                             if let image = vm.models[i].image {
                                 Image(uiImage: image)
@@ -90,7 +92,6 @@ extension PhotosPickerView {
                                     .scaledToFill()
                                     .frame(width: UIScreen.main.bounds.width*0.32, height: UIScreen.main.bounds.width*0.32)
                                     .onTapGesture {
-                                        
                                         
                                         if vm.selectedIndex < 0 {
                                             vm.selectedIndex = i
@@ -138,10 +139,9 @@ extension PhotosPickerView {
                 
             }
             .onReadSize() {
+                
                 vm.setViewSize($0)
-            }
-            .onPreferenceChange(SizePreferenceKey.self) {
-                vm.setViewSize($0)
+                print("전체 뷰 사이즈 : \(vm.viewSize.height)")
             }
         }
         .onPreferenceChange(ScrollOffsetKey.self) {
@@ -149,11 +149,19 @@ extension PhotosPickerView {
             Task {
                 if vm.offset < vm.viewSize.height * -0.65 {
                     
-                    if vm.album.count - vm.fetchedAlbum > 60 {
-                        print("바뀌는중")
+                    if vm.album.count - vm.currentIndex >= 60 {
+                        vm.currentIndex += 60
                         vm.fetchedAlbum += 60
+                        
                     } else {
-                        vm.fetchedAlbum = vm.album.count
+                        vm.currentIndex = vm.album.count
+                    }
+                    
+                    vm.fetchAlbum()
+                    print(vm.album.count)
+                    for i in vm.currentIndex..<vm.album.count {
+                        print("모델 삽입 실행됨")
+                        vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
                     }
                 }
             }
@@ -198,6 +206,7 @@ extension PhotosPickerView {
                     .foregroundStyle(.black)
                     .frame(width: 15, height: 15)
             }
+            .disabled(vm.models.isEmpty ? true : false)
             .padding(.leading, UIScreen.main.bounds.width * 0.09)
             Spacer()
             
