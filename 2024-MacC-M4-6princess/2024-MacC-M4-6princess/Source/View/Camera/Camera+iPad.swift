@@ -86,7 +86,7 @@ extension FilteredImageView{
                     filterImages: Array(filterImages),
                     selectedFilter: $selectedFilter, viewModel: viewModel
                 )
-                .frame(height: 100)
+                .frame(height: 50)
                 
                 // 투명한 탭 영역
                 Color.clear

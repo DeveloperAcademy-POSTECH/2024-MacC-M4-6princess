@@ -44,13 +44,26 @@ struct IOView: View {
                 }
                 
                 // 후보정 레이어 편집 뷰
-                canvasView
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
-                    .onAppear{
-                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
-                        viewModel.saveAnimate = true
-                        print("canvasView onAppear")
-                    }
+                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                    canvasView
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
+                        .onAppear{
+                            viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
+                            viewModel.saveAnimate = true
+                            print("canvasView onAppear")
+                        }
+                        .scaledToFit()
+                }
+                else{
+                    canvasView
+                        .frame(width: (UIScreen.main.bounds.height - 240) * 3/4, height: (UIScreen.main.bounds.height - 240))
+                        .onAppear{
+                            viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
+                            viewModel.saveAnimate = true
+                            print("canvasView onAppear")
+                        }
+                        .scaledToFit()
+                }
 //                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
 //                        original.modifier(
 //                            RotatedAndScaledEffect(
@@ -59,7 +72,7 @@ struct IOView: View {
 //                            )
 //                        )
 //                    }
-                    .scaledToFit()
+                   
                 Spacer()
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
