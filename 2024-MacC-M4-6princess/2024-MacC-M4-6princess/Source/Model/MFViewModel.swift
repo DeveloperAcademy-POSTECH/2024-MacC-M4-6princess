@@ -135,7 +135,7 @@ class MFViewModel: ObservableObject {
             if let imageData = loadImageData(for: id),
                let uiImage = UIImage(data: imageData) {
                 DispatchQueue.main.async {
-                    self.frameManager.selectedFrame = id
+                    self.frameManager.updateFrame = id
                     self.frameManager.pickedImage = uiImage
                     self.frameManager.isFrameLoading = true
                 }

@@ -7,7 +7,7 @@ extension MFView {
         
         imageModel.imageList.removeAll()
         
-        guard let frameId = frameManager.selectedFrame else {
+        guard let frameId = frameManager.updateFrame else {
             frameManager.resultImage = nil
             return
         }

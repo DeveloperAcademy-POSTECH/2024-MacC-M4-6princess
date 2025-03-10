@@ -16,54 +16,8 @@ struct PhotosPickerView: View {
             VStack {
                 toolbarButton
                 Spacer()
-                ScrollView() {
-                    LazyVGrid(columns: columns, alignment: .center, spacing: 5) {
-                        if vm.models.count != 0 {
-                            ForEach(0..<vm.models.count, id: \.self) { i in
-                                ZStack {
-                                    if let image = vm.models[i].image {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: UIScreen.main.bounds.width*0.32, height: UIScreen.main.bounds.width*0.32)
-                                            .onTapGesture {
-                                                
-                                                if vm.selectedIndex < 0 {
-                                                    vm.selectedIndex = i
-                                                    vm.models[i].isSelected = true
-                                                    vm.selectedIndex = i
-                                                    
-                                                } else {
-                                                    if vm.selectedIndex != i {
-                                                        vm.models[vm.selectedIndex].isSelected = false
-                                                        vm.selectedIndex = i
-                                                        vm.models[i].isSelected = true
-                                                    } else {
-                                                        vm.selectedIndex = -1
-                                                        vm.models[i].isSelected = false
-                                                    }
-                                                }
-                                            }
-                                        VStack {
-                                            HStack {
-                                                Spacer()
-                                                Image("frameCheckIcon")
-                                                    .resizable()
-                                                    .frame(width:20, height: 20)
-                                                    .padding([.trailing, .top], 5)
-                                                    .opacity(vm.models[i].isSelected ? 1 : 0)
-                                            }
-                                            Spacer()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                    }
-                    
-                }
-                .padding(.top, UIScreen.main.bounds.height*0.05)
+                ScrollViewWithOffset
+                    .padding(.top, UIScreen.main.bounds.height*0.05)
             }
             VStack {
                 toastMessage
@@ -94,6 +48,119 @@ struct PhotosPickerView: View {
         }
     }
 }
+
+struct ScrollOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = .zero
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value += nextValue()
+    }
+}
+
+extension PhotosPickerView {
+    
+    private var scrollObservableView: some View {
+        GeometryReader { proxy in
+            let offsetY = proxy.frame(in: .global).origin.y
+            Color.clear
+                .preference(
+                    key: ScrollOffsetKey.self,
+                    value: offsetY
+                )
+                .onAppear { // 나타날때 뷰의 최초위치를 저장하는 로직
+                    vm.setOriginOffset(offsetY)
+                }
+        }
+        .frame(height: 0)
+    }
+}
+
+extension PhotosPickerView {
+    
+    var ScrollViewWithOffset: some View {
+        
+        ScrollView() {
+            scrollObservableView
+            LazyVGrid(columns: columns, alignment: .center, spacing: 5) {
+                if vm.models.count != 0 {
+                    ForEach(0..<vm.fetchedAlbum, id: \.self) { i in
+                        ZStack {
+                            if let image = vm.models[i].image {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: UIScreen.main.bounds.width*0.32, height: UIScreen.main.bounds.width*0.32)
+                                    .onTapGesture {
+                                        
+                                        
+                                        if vm.selectedIndex < 0 {
+                                            vm.selectedIndex = i
+                                            vm.models[i].isSelected = true
+                                            vm.selectedIndex = i
+                                            
+                                        } else {
+                                            if vm.selectedIndex != i {
+                                                vm.models[vm.selectedIndex].isSelected = false
+                                                vm.selectedIndex = i
+                                                vm.models[i].isSelected = true
+                                            } else {
+                                                vm.selectedIndex = -1
+                                                vm.models[i].isSelected = false
+                                            }
+                                        }
+                                        vm.getImage(for: vm.album[vm.selectedIndex]) {
+                                            
+                                            if let image = vm.outputImage {
+                                                frameManager.pickedImage = image
+                                            }
+                                            
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                if frameManager.pickedImage != nil {
+                                                    naviManager.push(screen: Screen.frameEdit)
+                                                }
+                                            }
+                                        }
+                                    }
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        Image("frameCheckIcon")
+                                            .resizable()
+                                            .frame(width:20, height: 20)
+                                            .padding([.trailing, .top], 5)
+                                            .opacity(vm.models[i].isSelected ? 1 : 0)
+                                    }
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            .onReadSize() {
+                vm.setViewSize($0)
+            }
+            .onPreferenceChange(SizePreferenceKey.self) {
+                vm.setViewSize($0)
+            }
+        }
+        .onPreferenceChange(ScrollOffsetKey.self) {
+            vm.setOffset($0)
+            Task {
+                if vm.offset < vm.viewSize.height * -0.65 {
+                    
+                    if vm.album.count - vm.fetchedAlbum > 60 {
+                        print("바뀌는중")
+                        vm.fetchedAlbum += 60
+                    } else {
+                        vm.fetchedAlbum = vm.album.count
+                    }
+                }
+            }
+        }
+    }
+}
+
 extension PhotosPickerView {
     var toastMessage: some View {
         ZStack {
@@ -131,36 +198,16 @@ extension PhotosPickerView {
                     .foregroundStyle(.black)
                     .frame(width: 15, height: 15)
             }
-            .padding(.leading, UIScreen.main.bounds.width * 0.06)
+            .padding(.leading, UIScreen.main.bounds.width * 0.09)
             Spacer()
             
             Text("사진선택")
                 .fontWeight(.bold)
                 .foregroundStyle(.gray01)
                 .padding(.leading, UIScreen.main.bounds.width * 0.04)
+                .padding(.trailing, UIScreen.main.bounds.height * 0.075)
             
             Spacer()
-            Button {
-                vm.getImage(for: vm.album[vm.selectedIndex]) {
-                    
-                    if let image = vm.outputImage {
-                        frameManager.pickedImage = image
-                    }
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        if frameManager.pickedImage != nil {
-                            naviManager.push(screen: Screen.frameEdit)
-                        }
-                    }
-                }
-                
-                
-            } label: {
-                Text("선택")
-                    .foregroundStyle(vm.selectedIndex >= 0 ? .pointPink : .gray03)
-            }
-            .disabled(vm.selectedIndex < 0)
-            .padding(.trailing, UIScreen.main.bounds.width * 0.06)
             
             
         }
