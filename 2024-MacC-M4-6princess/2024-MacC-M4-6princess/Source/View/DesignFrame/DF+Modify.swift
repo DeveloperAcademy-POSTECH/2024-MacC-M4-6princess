@@ -255,8 +255,7 @@ extension DFModifyView{
 //                .frame(width: 150)
             Button {
                 
-                
-                if let image = frameManager.resultImage {
+                if let image = frameManager.removedImage {
                     
                     imageModel.imageList.forEach {
                         $0.isTapped = false
@@ -265,28 +264,38 @@ extension DFModifyView{
                     viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     
-                    if let _  = frameManager.selectedFrame {
-                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
-                            
-                            viewModel.btnOpacity = 0
-                            viewModel.showCamera = true
-                            imageModel.imageList.removeAll()
-                            frameManager.resultImage = viewModel.frameImage
-                            frameManager.selectedFrame = nil
-                        }
-                    } else {
+                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
                         
-                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
-                            
-                            viewModel.btnOpacity = 0
-                            viewModel.showCamera = true
-                            imageModel.imageList.removeAll()
-                            frameManager.resultImage = viewModel.frameImage
-                        }
+                        viewModel.btnOpacity = 0
+                        viewModel.showCamera = true
+                        imageModel.imageList.removeAll()
+                        frameManager.resultImage = viewModel.frameImage
                     }
                     
                     
+//                    if let _  = frameManager.selectedFrame {
+//                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
+//                            
+//                            viewModel.btnOpacity = 0
+//                            viewModel.showCamera = true
+//                            imageModel.imageList.removeAll()
+//                            frameManager.resultImage = viewModel.frameImage
+//                            frameManager.selectedFrame = nil
+//                        }
+//                    } else {
+//                        
+//                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
+//                            
+//                            viewModel.btnOpacity = 0
+//                            viewModel.showCamera = true
+//                            imageModel.imageList.removeAll()
+//                            frameManager.resultImage = viewModel.frameImage
+//                        }
+//                    }
+                    
+                    
                 } else {
+                    
                     viewModel.saveStateText = "저장할 이미지가 없습니다."
                     Task {
                         viewModel.btnOpacity = 1
