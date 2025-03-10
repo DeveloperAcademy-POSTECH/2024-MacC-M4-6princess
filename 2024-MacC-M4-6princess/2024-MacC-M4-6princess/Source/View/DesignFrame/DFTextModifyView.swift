@@ -8,8 +8,8 @@ import SwiftUI
 
 struct DFTextModifyView: View {
     @ObservedObject var modiViewModel: DFModifyViewModel
-    @Binding var style: TextStyle // viewModel로 전달을 해야할까?
-    @StateObject var viewModel = DFTextViewModel()
+//    @Binding var style: TextStyle // viewModel로 전달을 해야할까?
+    @ObservedObject var viewModel = DFTextViewModel()
     @Environment(\.displayScale) var displayScale
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var frameManager: FrameManager
@@ -30,13 +30,14 @@ struct DFTextModifyView: View {
                         
                         /// 텍스트를 이미지로 변환
                         if let textView = UIApplication.shared.windows.first?.allSubviews.compactMap({ $0 as? UITextView }).first(where: { $0.isFirstResponder }) {
-                            viewModel.renderedImage=viewModel.captureTextContent(from: textView)
-                            style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
-                            style.txt =  viewModel.txt
-                            style.color = viewModel.selectedColor
-                            style.font = viewModel.selectedFont
-                            style.alignment = viewModel.textAlignment
-                            
+                            viewModel.renderedImage=viewModel.captureTextView(from: textView)
+//                            modiViewModel.style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
+//                            modiViewModel.style.txt =  viewModel.txt
+//                            modiViewModel.style.color = viewModel.selectedColor
+//                            modiViewModel.style.font = viewModel.selectedFont
+//                            modiViewModel.style.alignment = viewModel.textAlignment
+//
+                            modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
                             //                        TextStyle(attributedString: viewModel.attributedTxt!, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
                             /// 이미지와 메타데이터를 코어데이터에 저장
                             imageToCoredata()
@@ -48,14 +49,14 @@ struct DFTextModifyView: View {
                     }
                 }
             }
-            .onAppear{
-                viewModel.attributedTxt = style.attributedString
-                viewModel.txt = style.txt
-                viewModel.selectedColor = style.color
-                viewModel.selectedFont = style.font
-                viewModel.textAlignment = style.alignment
-                print("모디텍스트:\(viewModel.txt)")
-            }
+//            .onAppear{
+//                viewModel.attributedTxt = style.attributedString
+//                viewModel.txt = style.txt
+//                viewModel.selectedColor = style.color
+//                viewModel.selectedFont = style.font
+//                viewModel.textAlignment = style.alignment
+//                print("모디텍스트:\(viewModel.txt)")
+//            }
             if viewModel.tab == 0 {
                 newFontSelector
                 
@@ -74,6 +75,11 @@ struct DFTextModifyView: View {
         )
         .ignoresSafeArea(.keyboard)
         .onAppear {
+            viewModel.attributedTxt = modiViewModel.style.attributedString
+            viewModel.txt = modiViewModel.style.txt
+            viewModel.selectedColor = modiViewModel.style.color
+            viewModel.selectedFont = modiViewModel.style.font
+            viewModel.textAlignment = modiViewModel.style.alignment
             isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
         }
         

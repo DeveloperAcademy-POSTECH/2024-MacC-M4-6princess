@@ -51,14 +51,14 @@ struct IOView: View {
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")
                     }
-                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-                        original.modifier(
-                            RotatedAndScaledEffect(
-                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-                                scale: 0.75  //하드코딩 수정필요
-                            )
-                        )
-                    }
+//                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+//                        original.modifier(
+//                            RotatedAndScaledEffect(
+//                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+//                                scale: 0.75  //하드코딩 수정필요
+//                            )
+//                        )
+//                    }
                     .scaledToFit()
                 Spacer()
                 
@@ -99,7 +99,7 @@ struct IOView: View {
 //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                        
-                        BannerViewContainer(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
+                        IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                             
                         
                         
@@ -140,7 +140,7 @@ struct IOView: View {
                         .frame(maxWidth: .infinity)
 //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
-                        BannerViewContainer(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
+                        IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                          
                         
                     }
@@ -160,7 +160,7 @@ struct IOView: View {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
         }
         .sheet(isPresented: $viewModel.showShareButton) {
-            BottomSheetViewWrapper(viewModel: viewModel)
+            BottomSheetWrapper(viewModel: viewModel)
                 .presentationDetents([.height(150)])
         }
         .onChange(of: viewModel.showShareButton, perform: { newValue in

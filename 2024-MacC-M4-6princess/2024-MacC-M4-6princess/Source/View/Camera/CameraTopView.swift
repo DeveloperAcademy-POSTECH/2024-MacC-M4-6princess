@@ -33,7 +33,7 @@ struct CameraTopView: View {
             .background(.white)
         }
         else{
-            cameraIPadBottomView
+            cameraIPadTopView
         }
     }
 }

@@ -7,10 +7,10 @@
 
 import SwiftUI
 import GoogleMobileAds
-struct BannerViewContainer: UIViewRepresentable {
+struct IOBottomBannerAdMob: UIViewRepresentable {
     let adSize: AdSize
     let testUnitID: String = "ca-app-pub-3940256099942544/2435281174"
-    let trueUnitId: String = "ca-app-pub-4729766298899130/4801686952"
+    let trueUnitID: String = "ca-app-pub-4729766298899130/4801686952"
     init(_ adSize: AdSize) {
         self.adSize = adSize
     }
@@ -41,9 +41,9 @@ struct BannerViewContainer: UIViewRepresentable {
             return banner
         }()
         
-        let parent: BannerViewContainer
+        let parent: IOBottomBannerAdMob
         
-        init(_ parent: BannerViewContainer) {
+        init(_ parent: IOBottomBannerAdMob) {
             self.parent = parent
         }
     }
