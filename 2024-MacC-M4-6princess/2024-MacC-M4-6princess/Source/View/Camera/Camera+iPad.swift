@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-
+import FirebaseAnalytics
 extension CameraTopView{
     var cameraIPadTopView: some View {
         HStack() {
@@ -27,26 +27,7 @@ extension CameraTopView{
         }
         .frame(width: UIScreen.main.bounds.width, height: 46)
         .background(.white)
-//        HStack(alignment: .center) {
-//            Spacer()
-//            VStack {
-//                Spacer()
-//                Button {
-//                    viewModel.changeCamera()
-//                } label: {
-//                    Image("cameraReverseIcon")
-//                        .resizable()
-//                        .frame(width: 40, height: 40)
-//                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-//                        .animation(.easeInOut, value: motionManager.currentOrientation)
-//                    
-//                }
-//                .padding(.trailing, 20)
-//                //                    Spacer()
-//            }
-//        }
-//        .frame(width: UIScreen.main.bounds.width, height: 46)
-//        .background(.white)
+        
     }
 }
 
@@ -60,6 +41,7 @@ extension CameraBottomView {
                 FilteredImageView(viewModel: viewModel)
                     .environmentObject(frameManager)
                     .environmentObject(imageModel)
+                    .padding(.bottom)
                 HStack {
                     //새 프레임 만들기 버튼
                     Button {
@@ -70,7 +52,7 @@ extension CameraBottomView {
                         VStack(alignment: .center, spacing: 4) {
                             Image("newFrameIcon")
                                 .resizable()
-                                .frame(width: 50, height: 50)
+                                .frame(width: 40, height: 40)
                                 .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                                 .animation(.easeInOut, value: motionManager.currentOrientation)
                             Text("새 프레임")
@@ -80,105 +62,76 @@ extension CameraBottomView {
                         }
                     }
                     .padding(.leading, 20)
-                    .frame(width: 70, height: 70)
+//                    .frame(width: 70, height: 70)
                     .background(.white)
                     
                     Spacer()
-                    
-                    //셔터 버튼
-//                    Button {
-//                            if frameManager.resultImage != nil{
-//                                self.viewModel.isTakePic = true
-//                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
-//                                    viewModel.takePic()
-//                                    viewModel.cameraManager.stopSession()
-//                                    Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
-//                                }
-//                            } else {
-//                                viewModel.isShowAlert = true
-//                            }
-//                    } label: {
-//                        Image("shutterImage")
-//                            .resizable()
-//                            .frame(width: 80, height: 80)
-//                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-//                            .animation(.easeInOut, value: motionManager.currentOrientation)
-//                    }
-//                        .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
-//                            Button("닫기", role: .cancel) { }
-//                        } message: {
-//                            Text("")
-//                        }
-                    
-                    
                 }
             }
-            
             Spacer()
         }
-        .frame(width: UIScreen.main.bounds.width, height: 80)
+        .frame(width: UIScreen.main.bounds.width, height: 60)
         .background(.white)
-//        VStack{
-        
-//            HStack (){
-//                //프레임 불러오기 버튼
-//                Button {
-//                    //                    viewModel.isShowMFView.toggle()
-//                    frameManager.showMFView = true
-//                    print("프레임 버튼 눌림")
-//                } label: {
-//                    VStack(alignment: .center, spacing: 4) {
-//                        Image("frameLoad")
-//                            .resizable()
-//                            .frame(width: 40, height: 40)
-//                            .cornerRadius(5)
-//                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-//                            .animation(.easeInOut, value: motionManager.currentOrientation)
-//                        Text("불러오기")
-//                            .font(.system(size: 13))
-//                            .multilineTextAlignment(.center)
-//                            .foregroundColor(Color(red: 0.38, green: 0.38, blue: 0.38))
-//                    }
-//                }
-//
-//                Spacer()
-//
-//                //셔터 버튼
-//                Button {
-//                    if frameManager.resultImage != nil{
-//                        self.viewModel.isTakePic = true
-//                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
-//                            viewModel.takePic()
-//                            viewModel.cameraManager.stopSession()
-//                        }
-//                    } else {
-//                        viewModel.isShowAlert = true
-//                    }
-//                } label: {
-//                    Image("shutterImage")
-//                        .resizable()
-//                        .frame(width: 80, height: 80)
-//                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-//                        .animation(.easeInOut, value: motionManager.currentOrientation)
-//                }
-//                .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
-//                    Button("닫기", role: .cancel) { }
-//                } message: {
-//                    Text("")
-//                }
-//
-//                Spacer()
-//
-//                //타이머 설정 버튼
-//                CameraTimerView(viewModel: viewModel)
-//            }
-//            .padding(.top,10)
-//            Spacer()
-//
-//        }
-//        .padding(.horizontal, 20)
-//        .frame(width: UIScreen.main.bounds.width, height: 80)
-//        .background(.white)
     }
     
+}
+
+extension FilteredImageView{
+    var filteredIPad: some View {
+        GeometryReader { geometry in
+            
+            ZStack {
+                
+                FilterCollectionViewRepresentable(
+                    filterImages: Array(filterImages),
+                    selectedFilter: $selectedFilter, viewModel: viewModel
+                )
+                .frame(height: 100)
+                
+                // 투명한 탭 영역
+                Color.clear
+                    .frame(width: 100, height: 100)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
+                
+                Button {
+                    if frameManager.resultImage != nil {
+                        self.viewModel.isTakePic = true
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
+                            viewModel.takePic()
+                            viewModel.cameraManager.stopSession()
+                            Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+                        }
+                    } else {
+                        viewModel.isShowAlert = true
+                    }
+                } label: {
+                    Image("shutterImage")
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                }
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
+                .allowsHitTesting(true)
+                .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
+                    Button("닫기", role: .cancel) { }
+                } message: {
+                    Text("")
+                }
+                
+                
+            }
+        }
+        .frame(height: 124)
+        .onAppear {
+            DispatchQueue.main.async {
+                //보라색 무시해주세요
+                viewModel.cameraManager.session.startRunning()
+            }
+        }
+        .onDisappear {
+            viewModel.cameraManager.stopSession()
+        }
+        .onChange(of: filterImages.count) { _ in
+            reloadFilterImages()
+        }
+    }
 }
