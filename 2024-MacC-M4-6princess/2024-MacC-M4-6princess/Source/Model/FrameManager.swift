@@ -21,6 +21,7 @@ public final class FrameManager: ObservableObject {
     // 데이터를 가지고 있으면 의존성이 생김 따른 환경변수 생성 고려
     @Published var changedSubject: SubjectImage? = nil
     
+    @Published var updateFrame: UUID? = nil
     @Published var selectedFrame: UUID? = nil //CoreData에서 선택한 프레임 id 받아옴
     @Published var isFrameLoading: Bool = false
     

@@ -241,7 +241,6 @@ extension DFModifyView{
             }
             .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
             
-//            Spacer(minLength: UIScreen.main.bounds.width / 20)
             
             Text("프레임 꾸미기")
                 .foregroundStyle(.gray01)
@@ -251,11 +250,19 @@ extension DFModifyView{
                 .padding(.leading, UIScreen.main.bounds.width * 0.1)
                 .padding(.trailing, UIScreen.main.bounds.width * 0.1)
             
-//            Spacer()
-//                .frame(width: 150)
             Button {
-                
-                if let image = frameManager.removedImage {
+                if let _  = frameManager.updateFrame {
+                    
+                    viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
+                        
+                        viewModel.btnOpacity = 0
+                        viewModel.showCamera = true
+                        imageModel.imageList.removeAll()
+                        frameManager.resultImage = viewModel.frameImage
+                        frameManager.selectedFrame = nil
+                    }
+                    
+                } else if let image = frameManager.removedImage {
                     
                     imageModel.imageList.forEach {
                         $0.isTapped = false
@@ -270,6 +277,7 @@ extension DFModifyView{
                         viewModel.showCamera = true
                         imageModel.imageList.removeAll()
                         frameManager.resultImage = viewModel.frameImage
+                        frameManager.removedImage = nil
                     }
                     
                     
