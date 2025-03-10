@@ -8,9 +8,30 @@ class PhotosPickerViewModel: ObservableObject {
     @Published var image: [UIImage] = []
     @Published var outputImage: UIImage?
     @Published var messageOpacity: Double = 1
+//    @Published var currentIndex: Int = 0
+    @Published var fetchedAlbum: Int = 60
+    
     
     private let imageManager = PHCachingImageManager()
     var album: PHFetchResult<PHAsset> = PHFetchResult<PHAsset>()
+    var viewSize: CGSize = .zero
+    var offset: CGFloat = 0
+    var originOffset: CGFloat = 0
+    var isCheckedOriginOffset: Bool = false
+    
+    func setViewSize(_ size: CGSize) {
+        self.viewSize = size
+    }
+    
+    func setOriginOffset(_ offset: CGFloat) {
+        guard !isCheckedOriginOffset else { return }
+        self.originOffset = offset
+        isCheckedOriginOffset = true
+    }
+    
+    func setOffset(_ offset: CGFloat) {
+        self.offset = offset
+    }
     
     func changeOpacity() {
         for i in 0..<10 {
