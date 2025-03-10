@@ -8,7 +8,7 @@ class PhotosPickerViewModel: ObservableObject {
     @Published var image: [UIImage] = []
     @Published var outputImage: UIImage?
     @Published var messageOpacity: Double = 1
-//    @Published var currentIndex: Int = 0
+    @Published var currentIndex: Int = 0
     @Published var fetchedAlbum: Int = 60
     
     
@@ -46,6 +46,7 @@ class PhotosPickerViewModel: ObservableObject {
     
     func fetchAlbum() {
         let options = PHFetchOptions()
+        options.fetchLimit = fetchedAlbum
         options.includeHiddenAssets = false
         options.includeAssetSourceTypes = [.typeUserLibrary]
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
