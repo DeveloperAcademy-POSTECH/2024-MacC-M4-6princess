@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		21A7806F2D78B5000052FD7A /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 21A7806E2D78B5000052FD7A /* GoogleMobileAds */; };
 		898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F72CFD5F5800EA200A /* FirebaseAnalytics */; };
 		898B14FA2CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F92CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		898B159C2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 898B159B2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion */; };
+		89938ADD2D7EC5F800EAD63B /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 89938ADC2D7EC5F800EAD63B /* GoogleMobileAds */; };
 		89DC209F2D324E0D00C1BD4E /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 89DC209E2D324E0D00C1BD4E /* FirebaseAppCheck */; };
 		89DC20A12D324E2D00C1BD4E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 89DC20A02D324E2D00C1BD4E /* FirebaseStorage */; };
 /* End PBXBuildFile section */
@@ -51,7 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21A7806F2D78B5000052FD7A /* GoogleMobileAds in Frameworks */,
+				89938ADD2D7EC5F800EAD63B /* GoogleMobileAds in Frameworks */,
 				89DC209F2D324E0D00C1BD4E /* FirebaseAppCheck in Frameworks */,
 				898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */,
 				898B159C2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
@@ -128,7 +128,7 @@
 				898B159B2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion */,
 				89DC209E2D324E0D00C1BD4E /* FirebaseAppCheck */,
 				89DC20A02D324E2D00C1BD4E /* FirebaseStorage */,
-				21A7806E2D78B5000052FD7A /* GoogleMobileAds */,
+				89938ADC2D7EC5F800EAD63B /* GoogleMobileAds */,
 			);
 			productName = "2024-MacC-M4-6princess";
 			productReference = 89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */;
@@ -208,7 +208,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				21A7806D2D78B5000052FD7A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				89938ADB2D7EC5F800EAD63B /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 89A94AB02CA9B64C00824592 /* Products */;
@@ -420,7 +420,6 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "최애와 사진을 찍기 위해 촬영 권한을 허용해 주세요.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "최애와 같이 찍은 사진을 저장하기 위해 앨범 권한을 허용해 주세요.";
-				INFOPLIST_KEY_NSUserTrackingUsageDescription = "맞춤광고를 위해 타사 광고 추적목적으로 사용됨. ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -461,7 +460,6 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "최애와 사진을 찍기 위해 촬영 권한을 허용해 주세요.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "최애와 같이 찍은 사진을 저장하기 위해 앨범 권한을 허용해 주세요.";
-				INFOPLIST_KEY_NSUserTrackingUsageDescription = "맞춤광고를 위해 타사 광고 추적목적으로 사용됨. ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -618,14 +616,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		21A7806D2D78B5000052FD7A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.1.0;
-			};
-		};
 		898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -634,14 +624,17 @@
 				minimumVersion = 11.5.0;
 			};
 		};
+		89938ADB2D7EC5F800EAD63B /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		21A7806E2D78B5000052FD7A /* GoogleMobileAds */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 21A7806D2D78B5000052FD7A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
-			productName = GoogleMobileAds;
-		};
 		898B14F72CFD5F5800EA200A /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -656,6 +649,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalyticsOnDeviceConversion;
+		};
+		89938ADC2D7EC5F800EAD63B /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 89938ADB2D7EC5F800EAD63B /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
 		};
 		89DC209E2D324E0D00C1BD4E /* FirebaseAppCheck */ = {
 			isa = XCSwiftPackageProductDependency;

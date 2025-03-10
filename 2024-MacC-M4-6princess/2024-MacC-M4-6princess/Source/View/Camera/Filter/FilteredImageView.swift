@@ -15,21 +15,7 @@ struct FilteredImageView: View {
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             GeometryReader { geometry in
-                
                 ZStack {
-                    //            if let selectedFilter = selectedFilter,
-                    //               let filterImage = filterImages.first(where: { $0.uuid == selectedFilter }),
-                    //               let uiImage = UIImage(data: (filterImage.image)!) {
-                    //                Image(uiImage: uiImage)
-                    //                    .resizable()
-                    //                    .scaledToFit()
-                    //                    .frame(height: 300)
-                    //                    .padding()
-                    //            }else {
-                    //                Color.pointPink
-                    //                    .frame(height: 300)
-                    //            }
-                    
                     FilterCollectionViewRepresentable(
                         filterImages: Array(filterImages),
                         selectedFilter: $selectedFilter, viewModel: viewModel
@@ -73,23 +59,24 @@ struct FilteredImageView: View {
                 DispatchQueue.main.async {
                     //보라색 무시해주세요
                     viewModel.cameraManager.session.startRunning()
+                    reloadFilterImages()
                 }
             }
             .onDisappear {
                 viewModel.cameraManager.stopSession()
             }
-            .onChange(of: filterImages.count) { _ in
+            .onChange(of: frameManager.resultImage) { _ in
                 reloadFilterImages()
             }
         }
-        else{
-            filteredIPad
+            else{
+                filteredIPad
+            }
+        }
+        func reloadFilterImages() {
+            // FetchRequest 갱신
+            for image in filterImages {
+                viewContext.refresh(image, mergeChanges: true)
+            }
         }
     }
-    func reloadFilterImages() {
-        // FetchRequest 갱신
-        for image in filterImages {
-            viewContext.refresh(image, mergeChanges: true)
-        }
-    }
-}

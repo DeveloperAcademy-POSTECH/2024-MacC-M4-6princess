@@ -15,7 +15,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     private let viewModel: CameraViewModel
     
     var collectionView: UICollectionView!
-    let filterImages: [StoreImages]
+    var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
     private let filterCellId = "FilterCell"
     private let emptyCellId = "EmptyCell"
@@ -94,21 +94,53 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
+//    func cellSize(for indexPath: IndexPath) -> CGFloat {
+//        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+//        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
+//        let distance = abs(cellFrame.midX - centerX)
+//        
+//        if indexPath.item == 0 {
+//            return defaultCellSize
+//        } else if distance < (centerCellSize / 2) {
+//            return centerCellSize
+//        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
+//            return rightOfCenterCellSize
+//        } else {
+//            return defaultCellSize
+//        }
+//    }
+    
     func cellSize(for indexPath: IndexPath) -> CGFloat {
+        // 화면 중앙 위치 계산
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
-        let distance = abs(cellFrame.midX - centerX)
         
-        if indexPath.item == 0 {
-            return defaultCellSize
-        } else if distance < (centerCellSize / 2) {
-            return centerCellSize
-        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
-            return rightOfCenterCellSize
-        } else {
+        // 현재 화면에 보이는 모든 셀 중 가장 중앙에 가까운 셀 찾기
+        let visibleCells = collectionView.visibleCells
+        var closestCell: UICollectionViewCell?
+        var minDistance: CGFloat = .greatestFiniteMagnitude
+        
+        for cell in visibleCells {
+            let distance = abs(cell.frame.midX - centerX)
+            if distance < minDistance {
+                minDistance = distance
+                closestCell = cell
+            }
+        }
+        
+        guard let closestIndexPath = closestCell.flatMap({ collectionView.indexPath(for: $0) }) else {
             return defaultCellSize
         }
+        
+        // 이제 인덱스를 기준으로 고정된 크기 반환
+        if indexPath == closestIndexPath {
+            return centerCellSize // 중앙 셀 (58)
+        } else if indexPath.item == closestIndexPath.item + 1 {
+            return rightOfCenterCellSize // 중앙 바로 오른쪽 셀 (50)
+        } else {
+            return defaultCellSize // 나머지 모든 셀들 (38)
+        }
     }
+
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateCellSizesAndSpacing()
@@ -198,6 +230,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             self.selectedFilter?(nil)
             currentSelectedFilter = nil
             frameManager.selectedFrame = nil
+            frameManager.resultImage = nil
         } else {
             let filterIndex = indexPath.item - 1
             if filterIndex >= 0 && filterIndex < filterImages.count {
@@ -211,6 +244,31 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         frameManager.isFrameLoading = true
         updateCellSizesAndSpacing()
     }
+    
+    // 필터 추가 함수
+    func addNewFilter(_ newFilter: StoreImages) {
+        filterImages.append(newFilter)
+        
+        // collectionView의 데이터 소스를 갱신
+        collectionView.reloadData()
+        
+        // collectionView의 레이아웃을 갱신
+        collectionView.collectionViewLayout.invalidateLayout()
+        
+        // 가장 최근에 추가된 필터를 중앙에 위치시키기
+        scrollToNewestFilter()
+    }
+
+    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
+    private func scrollToNewestFilter() {
+        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
+        
+        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
+        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
+        
+        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
+    }
+
 
 
 }

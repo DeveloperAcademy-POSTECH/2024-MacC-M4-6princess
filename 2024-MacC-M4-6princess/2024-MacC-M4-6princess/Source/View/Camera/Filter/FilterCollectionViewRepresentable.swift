@@ -19,6 +19,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
             filterImages: filterImages,
             selectedFilter: { uuid in
                 selectedFilter = uuid
+                frameManager.selectedFrame = uuid
             },
             initialFilter: selectedFilter ?? filterImages.first?.uuid ?? UUID(),
             viewModel: viewModel,

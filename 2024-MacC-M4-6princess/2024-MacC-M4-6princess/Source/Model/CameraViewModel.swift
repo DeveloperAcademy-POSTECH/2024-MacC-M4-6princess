@@ -279,5 +279,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             return 1.0...3.0
         }
     }
+    
+
 }
 
