@@ -14,6 +14,7 @@ public final class FrameManager: ObservableObject {
     @AppStorage("openFirstTime") var firstTime = false
     
     // 뷰 간 데이터를 공유하기 위한 변수들
+    @Published var maskImage: UIImage? = nil
     @Published var pickedImage: UIImage? = nil // PhotosPickerView에서 선택된 이미지
     @Published var removedImage: UIImage? = nil// DFFrameEditView에서 편집된 결과 이미지
     @Published var resultImage: UIImage? = nil // 최종 만들어지는 프레임 이미지
@@ -29,4 +30,26 @@ public final class FrameManager: ObservableObject {
     @Published var selectedTextStyle:TextStyle?
     @Published var showTextModifyView: Bool = false
     @Published var textUUID: UUID?
+}
+
+extension FrameManager {
+    func toggleSelection(for id: UUID, in viewModel: MFViewModel) {
+        if viewModel.isEditing {
+            if viewModel.selectedImageIds.contains(id) {
+                viewModel.selectedImageIds.remove(id)
+            } else {
+                viewModel.selectedImageIds.insert(id)
+            }
+        } else {
+            updateFrame(withId: id, imageData: viewModel.loadOriginalImageData(for: id))
+        }
+    }
+
+
+    func updateFrame(withId id: UUID, imageData: Data?) {
+        guard let data = imageData, let uiImage = UIImage(data: data) else { return }
+        self.updateFrame = id
+        self.pickedImage = uiImage
+        self.isFrameLoading = true
+    }
 }

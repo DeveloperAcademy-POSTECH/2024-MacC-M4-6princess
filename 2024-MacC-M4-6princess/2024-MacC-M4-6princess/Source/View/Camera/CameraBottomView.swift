@@ -17,14 +17,20 @@ struct CameraBottomView: View {
     @ObservedObject var viewModel: CameraViewModel
     @StateObject var motionManager = MotionManager()
     
+    // ✅ 여기서 미리 생성해두고 재사용하기!
+        private var filteredImageView : some View {
+            FilteredImageView(viewModel: viewModel)
+                .environmentObject(frameManager)
+                .environmentObject(imageModel)
+        }
+    
     var body: some View {
+        
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
                 VStack{
                     Spacer()
                     ZStack {
-                        FilteredImageView(viewModel: viewModel)
-                            .environmentObject(frameManager)
-                            .environmentObject(imageModel)
+                        filteredImageView
                         HStack {
                             //새 프레임 만들기 버튼
                             Button {
@@ -48,33 +54,6 @@ struct CameraBottomView: View {
                             .background(.white)
                             
                             Spacer()
-                            
-                            //셔터 버튼
-        //                    Button {
-    //                            if frameManager.resultImage != nil{
-    //                                self.viewModel.isTakePic = true
-    //                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
-    //                                    viewModel.takePic()
-    //                                    viewModel.cameraManager.stopSession()
-    //                                    Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
-    //                                }
-    //                            } else {
-    //                                viewModel.isShowAlert = true
-    //                            }
-        //                    } label: {
-        //                        Image("shutterImage")
-        //                            .resizable()
-        //                            .frame(width: 80, height: 80)
-        //                            .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-        //                            .animation(.easeInOut, value: motionManager.currentOrientation)
-        //                    }
-    //                        .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
-    //                            Button("닫기", role: .cancel) { }
-    //                        } message: {
-    //                            Text("")
-    //                        }
-                            
-                            
                         }
                     }
                     

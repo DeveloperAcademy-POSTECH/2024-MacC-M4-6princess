@@ -152,7 +152,7 @@ struct CameraView: View {
             viewModel.cameraManager.checkVideoAuthorizaion()
             viewModel.cameraManager.startSession()
             viewModel.isTakePic = false
-            frameManager.selectedFrame = nil
+//            frameManager.selectedFrame = nil
             Analytics.logEvent("A1_카메라", parameters: nil)
         }
         

@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SwiftUI
 import AVFoundation
 import FirebaseAnalytics
 
@@ -17,9 +16,13 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     var collectionView: UICollectionView!
     var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
+    var currentSelectedFilter: UUID? {
+        didSet {
+            scrollToSelectedFilter(animated: true)
+        }
+    }
     private let filterCellId = "FilterCell"
     private let emptyCellId = "EmptyCell"
-    var currentSelectedFilter: UUID?
     private let cellSpacing: CGFloat = 20
     private let centerCellSize: CGFloat = 58
     private let rightOfCenterCellSize: CGFloat = 50
@@ -41,6 +44,19 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        scrollToSelectedFilter(animated: false)
+    }
+    
+    func scrollToSelectedFilter(animated: Bool) {
+        guard let selectedUUID = currentSelectedFilter,
+              let index = filterImages.firstIndex(where: { $0.uuid == selectedUUID }) else { return }
+        
+        let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
     }
     
     private func setupCollectionView() {
@@ -94,21 +110,21 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
-//    func cellSize(for indexPath: IndexPath) -> CGFloat {
-//        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-//        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
-//        let distance = abs(cellFrame.midX - centerX)
-//        
-//        if indexPath.item == 0 {
-//            return defaultCellSize
-//        } else if distance < (centerCellSize / 2) {
-//            return centerCellSize
-//        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
-//            return rightOfCenterCellSize
-//        } else {
-//            return defaultCellSize
-//        }
-//    }
+    //    func cellSize(for indexPath: IndexPath) -> CGFloat {
+    //        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+    //        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
+    //        let distance = abs(cellFrame.midX - centerX)
+    //        
+    //        if indexPath.item == 0 {
+    //            return defaultCellSize
+    //        } else if distance < (centerCellSize / 2) {
+    //            return centerCellSize
+    //        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
+    //            return rightOfCenterCellSize
+    //        } else {
+    //            return defaultCellSize
+    //        }
+    //    }
     
     func cellSize(for indexPath: IndexPath) -> CGFloat {
         // 화면 중앙 위치 계산
@@ -140,7 +156,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             return defaultCellSize // 나머지 모든 셀들 (38)
         }
     }
-
+    
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateCellSizesAndSpacing()
@@ -166,25 +182,25 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
         
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-    
+        
         if indexPath.item == 0 {
-                // EmptyCell 선택 시
-                self.selectedFilter?(nil)
-                currentSelectedFilter = nil
-                frameManager.selectedFrame = nil
-            } else {
-                // FilterCell 선택 시
-                let filterIndex = indexPath.item - 1
-                if filterIndex >= 0 && filterIndex < filterImages.count {
-                    let selectedFilter = filterImages[filterIndex]
-                    self.selectedFilter?(selectedFilter.uuid)
-                    currentSelectedFilter = selectedFilter.uuid
-                    frameManager.selectedFrame = currentSelectedFilter
-                }
+            // EmptyCell 선택 시
+            self.selectedFilter?(nil)
+            currentSelectedFilter = nil
+            frameManager.selectedFrame = nil
+        } else {
+            // FilterCell 선택 시
+            let filterIndex = indexPath.item - 1
+            if filterIndex >= 0 && filterIndex < filterImages.count {
+                let selectedFilter = filterImages[filterIndex]
+                self.selectedFilter?(selectedFilter.uuid)
+                currentSelectedFilter = selectedFilter.uuid
+                frameManager.selectedFrame = currentSelectedFilter
             }
+        }
         frameManager.isFrameLoading = true
         updateCellSizesAndSpacing()
-//        print("현재 셀의 인덱스: \(filterImages[indexPath.item])")
+        //        print("현재 셀의 인덱스: \(filterImages[indexPath.item])")
     }
     
     
@@ -205,24 +221,24 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
         collectionView.collectionViewLayout.invalidateLayout()
     }
-
+    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
         let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
-
+        
         // 현재 선택된 셀의 중앙 위치와 비교
         if abs(cellFrame.midX - centerX) < (centerCellSize / 2) {
             // 중앙지점 탭했을 경우 반응 안함
             collectionView.deselectItem(at: indexPath, animated: false)
             return
         }
-
+        
         selectAndScrollToItem(at: indexPath)
     }
     
     private func selectAndScrollToItem(at indexPath: IndexPath) {
-
+        
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         
         // EmptyCell 처리
@@ -245,7 +261,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         updateCellSizesAndSpacing()
     }
     
-    // 필터 추가 함수
+    // 필터 추가 함수 - 삭제 예정
     func addNewFilter(_ newFilter: StoreImages) {
         filterImages.append(newFilter)
         
@@ -258,17 +274,24 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         // 가장 최근에 추가된 필터를 중앙에 위치시키기
         scrollToNewestFilter()
     }
-
-    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
+    
+    //    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
+    //    private func scrollToNewestFilter() {
+    //        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
+    //        
+    //        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
+    //        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
+    //        
+    //        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
+    //    }
     private func scrollToNewestFilter() {
-        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
-        
-        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
-        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
-        
-        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
+        // 역순 정렬된 배열에서는 가장 최근 필터가 인덱스 0에 위치
+        // EmptyCell을 고려하여 인덱스 1로 설정
+        let newestIndexPath = IndexPath(item: 1, section: 0)
+        collectionView.scrollToItem(at: newestIndexPath, at: .centeredHorizontally, animated: true)
     }
 
-
-
+    
+    
+    
 }
