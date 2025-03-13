@@ -257,6 +257,13 @@ extension DFModifyView{
             Button {
                 if let _  = frameManager.updateFrame {
                     
+                    imageModel.imageList.forEach {
+                        $0.isTapped = false
+                    }
+                    
+                    viewModel.saveStateText = "저장 중입니다..."
+                    viewModel.isPushedSaveBtn = true
+                    
                     viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
                         
                         viewModel.btnOpacity = 0
