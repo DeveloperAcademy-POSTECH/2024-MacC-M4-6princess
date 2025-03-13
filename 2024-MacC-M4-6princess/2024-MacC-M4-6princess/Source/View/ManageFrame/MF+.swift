@@ -43,9 +43,10 @@ extension MFView {
                 
                 let newImage = SubjectImage()
                 
-                if let image = subject.subImage, let originImage = subject.originalImage {
+                if let image = subject.subImage, let originImage = subject.originalImage, let mask = subject.maskImage {
                     newImage.image = UIImage(data: image)
                     newImage.originalImage = UIImage(data: originImage)
+                    newImage.maskImage = UIImage(data: mask)
                 } else if let text = subject.text, let originText = subject.originalText {
                     newImage.text = UIImage(data: text)
                     newImage.textStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: originText, font: .modern, color: ColorPreset.colorPallete[0], alignment: .center)

@@ -96,7 +96,6 @@ extension PhotosPickerView {
                                         if vm.selectedIndex < 0 {
                                             vm.selectedIndex = i
                                             vm.models[i].isSelected = true
-                                            vm.selectedIndex = i
                                             
                                         } else {
                                             if vm.selectedIndex != i {
@@ -108,15 +107,18 @@ extension PhotosPickerView {
                                                 vm.models[i].isSelected = false
                                             }
                                         }
-                                        vm.getImage(for: vm.album[vm.selectedIndex]) {
-                                            
-                                            if let image = vm.outputImage {
-                                                frameManager.pickedImage = image
-                                            }
-                                            
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                if frameManager.pickedImage != nil {
-                                                    naviManager.push(screen: Screen.frameEdit)
+                                        
+                                        if vm.selectedIndex >= 0 {
+                                            vm.getImage(for: vm.album[vm.selectedIndex]) {
+                                                
+                                                if let image = vm.outputImage {
+                                                    frameManager.pickedImage = image
+                                                }
+                                                
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                    if frameManager.pickedImage != nil  && vm.models[i].isSelected {
+                                                        naviManager.push(screen: Screen.frameEdit)
+                                                    }
                                                 }
                                             }
                                         }

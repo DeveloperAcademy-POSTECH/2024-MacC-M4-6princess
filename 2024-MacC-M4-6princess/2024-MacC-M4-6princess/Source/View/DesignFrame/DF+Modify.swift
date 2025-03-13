@@ -231,7 +231,11 @@ extension DFModifyView{
                 
                 Button {
                     imageModel.imageList.removeAll()
-                    naviManager.pop(depth: 3)
+                    if naviManager.route.count > 3 {
+                        naviManager.pop(depth: naviManager.route.count - 1)
+                    } else {
+                        naviManager.pop()
+                    }
                 } label: {
                     Text("나가기")
                 }
@@ -253,12 +257,20 @@ extension DFModifyView{
             Button {
                 if let _  = frameManager.updateFrame {
                     
+                    imageModel.imageList.forEach {
+                        $0.isTapped = false
+                    }
+                    
+                    viewModel.saveStateText = "저장 중입니다..."
+                    viewModel.isPushedSaveBtn = true
+                    
                     viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
                         
                         viewModel.btnOpacity = 0
                         viewModel.showCamera = true
                         imageModel.imageList.removeAll()
                         frameManager.resultImage = viewModel.frameImage
+                        frameManager.updateFrame = nil
                         frameManager.selectedFrame = nil
                     }
                     
@@ -279,28 +291,6 @@ extension DFModifyView{
                         frameManager.resultImage = viewModel.frameImage
                         frameManager.removedImage = nil
                     }
-                    
-                    
-//                    if let _  = frameManager.selectedFrame {
-//                        viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
-//                            
-//                            viewModel.btnOpacity = 0
-//                            viewModel.showCamera = true
-//                            imageModel.imageList.removeAll()
-//                            frameManager.resultImage = viewModel.frameImage
-//                            frameManager.selectedFrame = nil
-//                        }
-//                    } else {
-//                        
-//                        viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
-//                            
-//                            viewModel.btnOpacity = 0
-//                            viewModel.showCamera = true
-//                            imageModel.imageList.removeAll()
-//                            frameManager.resultImage = viewModel.frameImage
-//                        }
-//                    }
-                    
                     
                 } else {
                     

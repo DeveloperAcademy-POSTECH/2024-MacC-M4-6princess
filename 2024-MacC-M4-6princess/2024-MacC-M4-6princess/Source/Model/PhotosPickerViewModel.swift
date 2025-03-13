@@ -76,6 +76,8 @@ class PhotosPickerViewModel: ObservableObject {
     func loadImage(for asset: PHAsset, size: CGSize, index: Int) {
 
         let requestOptions = PHImageRequestOptions()
+        
+        requestOptions.isSynchronous = true
         requestOptions.deliveryMode = .highQualityFormat
         requestOptions.resizeMode = .exact
 //        requestOptions.version = .original

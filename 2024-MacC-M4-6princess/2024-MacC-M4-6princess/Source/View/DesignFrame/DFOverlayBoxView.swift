@@ -21,11 +21,12 @@ struct DFOverlayBoxView: View {
                 .rotationEffect(model.getAngle())
                 .offset(model.getOffset())
             
-            if let _ = model.image, let realImage = model.originalImage {
+            if let _ = model.image, let realImage = model.originalImage, let mask = model.maskImage {
                 
                 Button {
                     
                     frameManager.pickedImage = realImage
+                    frameManager.maskImage = mask
                     frameManager.changedSubject = model
                     naviManager.push(screen: Screen.frameEdit)
                     
