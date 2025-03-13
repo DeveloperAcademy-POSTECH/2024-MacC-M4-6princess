@@ -200,9 +200,11 @@ class DFModifyViewModel: ObservableObject {
                         
                         let newSubject = Subject(context: viewContext)
                         
-                        if let image = i.image, let originImage = i.originalImage {
+                        if let image = i.image, let originImage = i.originalImage, let mask = i.maskImage {
                             newSubject.subImage = image.pngData()
                             newSubject.originalImage = originImage.pngData()
+                            newSubject.maskImage = mask.pngData()
+                            
                             print("이미지 저장됨")
                         } else if let text = i.text, let originText = i.textStyle?.txt {
                             newSubject.text = text.pngData()
@@ -253,9 +255,11 @@ class DFModifyViewModel: ObservableObject {
         for i in subjects.imageList {
             let newSubject = Subject(context: context)
             
-            if let image = i.image, let originImage = i.originalImage {
+            if let image = i.image, let originImage = i.originalImage, let mask = i.maskImage {
                 newSubject.subImage = image.pngData()
                 newSubject.originalImage = originImage.pngData()
+                newSubject.maskImage = mask.pngData()
+                
                 print("이미지 저장됨")
             } else if let text = i.text, let originText = i.textStyle?.txt {
                 newSubject.text = text.pngData()

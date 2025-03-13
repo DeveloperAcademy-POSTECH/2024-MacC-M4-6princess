@@ -14,6 +14,7 @@ public final class FrameManager: ObservableObject {
     @AppStorage("openFirstTime") var firstTime = false
     
     // 뷰 간 데이터를 공유하기 위한 변수들
+    @Published var maskImage: UIImage? = nil
     @Published var pickedImage: UIImage? = nil // PhotosPickerView에서 선택된 이미지
     @Published var removedImage: UIImage? = nil// DFFrameEditView에서 편집된 결과 이미지
     @Published var resultImage: UIImage? = nil // 최종 만들어지는 프레임 이미지
