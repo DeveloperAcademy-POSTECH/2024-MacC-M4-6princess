@@ -12,9 +12,9 @@ class IOViewModel: ObservableObject {
     @Published var showAlert: Bool = false
     @Published var alertMessage: String = ""
     @Published var frameBGSize: CGSize = .zero // 프레임상의 축소된 배경 이미지 크기
-    @Published var compositeImage:UIImage?
-    @Published var bgImg: UIImage?
-    @Published var idolImg: UIImage?
+    var compositeImage:UIImage?
+    var bgImg: UIImage?
+    var idolImg: UIImage?
     @Published var frameIdolSize: CGSize = .zero // 프레임상 아이돌 이미지 크기
     @Published var location: CGPoint = CGPoint(x: 100, y: 100)
     @Published var screenSize: CGSize = .zero
@@ -25,9 +25,10 @@ class IOViewModel: ObservableObject {
     @Published var showShareButton = false
     @Published var showAcitivity = false
     @Published var changeOverlay = false
+    var currentOrientation:UIDeviceOrientation = .portrait
     /// 사진 저장 함수
     @MainActor
-    func saveRenderedView<T: View>(content: T, motionManager: MotionManager) {
+    func saveRenderedView<T: View>(content: T, motionManager: MotionManager,orientation:UIDeviceOrientation) {
         let renderedImage = ImageRenderer(
             content: content
                 .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
