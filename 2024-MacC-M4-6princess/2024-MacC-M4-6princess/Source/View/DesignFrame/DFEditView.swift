@@ -199,7 +199,7 @@ private extension DFEditView {
             }
             .onEnded { value in
                 
-                viewModel.setScaleValue(minimum: 1.0, maximum: 4.0)
+                viewModel.setScaleValue(minimum: 1.0, maximum: 8.0)
             }
     }
     
