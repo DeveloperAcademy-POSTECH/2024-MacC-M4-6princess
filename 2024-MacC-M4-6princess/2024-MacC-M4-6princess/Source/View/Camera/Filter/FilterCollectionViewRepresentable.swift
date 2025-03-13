@@ -11,33 +11,45 @@ import SwiftUI
 struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @EnvironmentObject var frameManager: FrameManager
     let filterImages: [StoreImages]
-    @Binding var selectedFilter: UUID?
     let viewModel: CameraViewModel
-
+    
     func makeUIViewController(context: Context) -> FilterCollectionViewController {
-        return FilterCollectionViewController(
-            filterImages: filterImages,
-            selectedFilter: { uuid in
-                selectedFilter = uuid
-                frameManager.selectedFrame = uuid
-            },
-            initialFilter: selectedFilter ?? filterImages.first?.uuid ?? UUID(),
-            viewModel: viewModel,
-            frameManager: frameManager
-        )
-    }
-
-    func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-        uiViewController.collectionView.reloadData()
-        
-        // 선택된 필터를 스크롤로 중앙에 위치시키기
-        if let selectedFilter = selectedFilter,
-           let index = uiViewController.filterImages.firstIndex(where: { $0.uuid == selectedFilter }) {
-            uiViewController.collectionView.scrollToItem(
-                at: IndexPath(item: index + 1, section: 0),
-                at: .centeredHorizontally,
-                animated: true
+            return FilterCollectionViewController(
+                filterImages: filterImages,
+                selectedFilter: { uuid in
+                    frameManager.selectedFrame = uuid
+                },
+                initialFilter: frameManager.selectedFrame,
+                viewModel: viewModel,
+                frameManager: frameManager
             )
         }
-    }
+
+//    func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
+//        uiViewController.collectionView.reloadData()
+//        
+//        // 선택된 필터를 스크롤로 중앙에 위치시키기
+//        if let selectedFilter = frameManager.selectedFrame,
+//           let index = uiViewController.filterImages.firstIndex(where: { $0.uuid == selectedFilter }) {
+//            uiViewController.collectionView.scrollToItem(
+//                at: IndexPath(item: index + 1, section: 0),
+//                at: .centeredHorizontally,
+//                animated: true
+//            )
+//        }
+//    }
+    func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
+            // 데이터 변경 시 업데이트
+            if uiViewController.filterImages != filterImages {
+                uiViewController.filterImages = filterImages
+                uiViewController.collectionView.reloadData()
+            }
+
+            // 선택된 필터 변경됐을 때만 업데이트
+            if uiViewController.currentSelectedFilter != frameManager.selectedFrame {
+                uiViewController.currentSelectedFilter = frameManager.selectedFrame
+                // 스크롤만 수행
+                uiViewController.scrollToSelectedFilter(animated: false)
+            }
+        }
 }

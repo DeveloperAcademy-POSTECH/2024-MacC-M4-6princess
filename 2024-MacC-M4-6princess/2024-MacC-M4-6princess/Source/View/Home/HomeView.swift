@@ -78,10 +78,11 @@ struct HomeView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.gray01)
                         Spacer()
-                        NavigationLink {
-                            MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
-                                .presentationDetents([.large])
-                                .presentationDragIndicator(.visible)
+                        Button {
+                            naviManager.push(screen: Screen.manageFrame)
+//                            MFView(viewModel: MFViewModel(context: viewContext, frameManager: frameManager))
+//                                .presentationDetents([.large])
+//                                .presentationDragIndicator(.visible)
                         } label: {
                             HStack {
                                 Text("전체보기")

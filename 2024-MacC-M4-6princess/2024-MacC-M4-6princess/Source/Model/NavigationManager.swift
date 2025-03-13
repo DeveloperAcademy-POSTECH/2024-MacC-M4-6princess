@@ -62,6 +62,8 @@ public enum Screen: Hashable {
     case frameEdit   // DFFrameEditView 화면
     case modifyFrame // DFModifyFrame 화면
     case testFrame
+    case manageFrame
+    case manageDetailFrame
 }
 
 // MARK: - FeatureView
@@ -80,6 +82,10 @@ struct FeatureView: View {
                 DFModifyView()
             case .testFrame:
                 DFTestFrameView()
+        case .manageFrame:
+            MFView()
+        case .manageDetailFrame:
+            MFDetailView()
                 
         }
     }

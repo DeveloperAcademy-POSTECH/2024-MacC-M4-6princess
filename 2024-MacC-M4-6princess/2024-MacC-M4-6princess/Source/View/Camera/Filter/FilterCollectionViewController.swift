@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SwiftUI
 import AVFoundation
 import FirebaseAnalytics
 
@@ -17,16 +16,20 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     var collectionView: UICollectionView!
     var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
+    var currentSelectedFilter: UUID? {
+            didSet {
+                scrollToSelectedFilter(animated: true)
+            }
+        }
     private let filterCellId = "FilterCell"
     private let emptyCellId = "EmptyCell"
-    var currentSelectedFilter: UUID?
     private let cellSpacing: CGFloat = 20
     private let centerCellSize: CGFloat = 58
     private let rightOfCenterCellSize: CGFloat = 50
     private let defaultCellSize: CGFloat = 38
     
     init(filterImages: [StoreImages], selectedFilter: @escaping (UUID?) -> Void, initialFilter: UUID?, viewModel: CameraViewModel, frameManager: FrameManager) {
-        self.filterImages = filterImages
+        self.filterImages = filterImages.reversed()
         self.selectedFilter = selectedFilter
         self.currentSelectedFilter = initialFilter
         self.viewModel = viewModel
@@ -42,6 +45,19 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         super.viewDidLoad()
         setupCollectionView()
     }
+    
+    override func viewDidLayoutSubviews() {
+           super.viewDidLayoutSubviews()
+           scrollToSelectedFilter(animated: false)
+       }
+    
+    func scrollToSelectedFilter(animated: Bool) {
+            guard let selectedUUID = currentSelectedFilter,
+                  let index = filterImages.firstIndex(where: { $0.uuid == selectedUUID }) else { return }
+
+            let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+        }
     
     private func setupCollectionView() {
         let layout = CustomFlowLayout()
@@ -245,7 +261,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         updateCellSizesAndSpacing()
     }
     
-    // 필터 추가 함수
+    // 필터 추가 함수 - 삭제 예정
     func addNewFilter(_ newFilter: StoreImages) {
         filterImages.append(newFilter)
         

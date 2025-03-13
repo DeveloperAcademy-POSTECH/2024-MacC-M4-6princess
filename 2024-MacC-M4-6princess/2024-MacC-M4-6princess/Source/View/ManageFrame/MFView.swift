@@ -11,9 +11,9 @@ import CoreData
 import FirebaseAnalytics
 
 struct MFView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) var viewContext
-    @StateObject var viewModel: MFViewModel
+    @StateObject var viewModel: MFViewModel = MFViewModel()
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
@@ -112,6 +112,9 @@ struct MFView: View {
                 Button("취소", role: .cancel) { }
             } message: {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+            }
+            .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
+                MFDetailView(viewModel: viewModel)
             }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
@@ -226,6 +229,7 @@ struct GridItemView: View {
     let isSelected: Bool
     @ObservedObject var viewModel: MFViewModel
     @EnvironmentObject var frameManager: FrameManager
+    @EnvironmentObject var naviManager: NavigationManager
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -249,14 +253,18 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-//            if !viewModel.isEditing {
-//                viewModel.toggleSelection(for: imageInfo.id)
-//                Analytics.logEvent("A2_프레임선택", parameters: nil)
-//                dismiss()
-//            }else {
+            if !viewModel.isEditing {
+                //MFDetailView로 이동
                 viewModel.toggleSelection(for: imageInfo.id)
-//            }
+                viewModel.isShowMFDetailView = true
+                naviManager.push(screen: Screen.manageDetailFrame)
+                Analytics.logEvent("A2_프레임선택", parameters: nil)
+//                dismiss()
+            }else {
+                viewModel.toggleSelection(for: imageInfo.id)
+            }
         }
+        
     }
 }
 

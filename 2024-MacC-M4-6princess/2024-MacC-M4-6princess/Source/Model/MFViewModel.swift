@@ -9,21 +9,24 @@ import SwiftUI
 import CoreData
 
 class MFViewModel: ObservableObject {
+    @EnvironmentObject var frameManager: FrameManager
+    @Environment(\.managedObjectContext) var viewContext
     @Published var imageDataArray: [(id: UUID, data: Data, isLoaded: Bool)] = []
     @Published var isShowPhotosPicker: Bool = false
     @Published var isEditing: Bool = false
     @Published var selectedImageIds: Set<UUID> = []
     @Published var isDeleteAlert: Bool = false
+    @Published var isShowMFDetailView: Bool = false
     
-    private var viewContext: NSManagedObjectContext
+//    private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
-    private var frameManager: FrameManager
     
-    init(context: NSManagedObjectContext, frameManager: FrameManager) {
-        self.viewContext = context
-        self.frameManager = frameManager
-    }
     
+//    init(context: NSManagedObjectContext, frameManager: FrameManager) {
+//        self.viewContext = context
+//        self.frameManager = frameManager
+//    }
+//    
     
     ///코어데이터에서 이미지 id를 가져옴
     func loadImages() {
@@ -141,5 +144,6 @@ class MFViewModel: ObservableObject {
                 }
             }
         }
+    
     
 }
