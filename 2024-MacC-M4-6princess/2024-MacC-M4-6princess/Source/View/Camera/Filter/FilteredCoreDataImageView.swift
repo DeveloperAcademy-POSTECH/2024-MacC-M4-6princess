@@ -12,9 +12,9 @@ import CoreData
 struct FilteredCoreDataImageView: View {
     @Environment(\.managedObjectContext) private var viewContext
     let filterID: UUID
-
+    
     @FetchRequest private var fetchedImages: FetchedResults<StoreImages>
-
+    
     init(filterID: UUID) {
         self.filterID = filterID
         _fetchedImages = FetchRequest(
@@ -24,7 +24,7 @@ struct FilteredCoreDataImageView: View {
             animation: .default
         )
     }
-
+    
     var body: some View {
         Group {
             if let imageData = fetchedImages.first?.image,

@@ -31,3 +31,25 @@ public final class FrameManager: ObservableObject {
     @Published var showTextModifyView: Bool = false
     @Published var textUUID: UUID?
 }
+
+extension FrameManager {
+    func toggleSelection(for id: UUID, in viewModel: MFViewModel) {
+        if viewModel.isEditing {
+            if viewModel.selectedImageIds.contains(id) {
+                viewModel.selectedImageIds.remove(id)
+            } else {
+                viewModel.selectedImageIds.insert(id)
+            }
+        } else {
+            updateFrame(withId: id, imageData: viewModel.loadOriginalImageData(for: id))
+        }
+    }
+
+
+    func updateFrame(withId id: UUID, imageData: Data?) {
+        guard let data = imageData, let uiImage = UIImage(data: data) else { return }
+        self.updateFrame = id
+        self.pickedImage = uiImage
+        self.isFrameLoading = true
+    }
+}

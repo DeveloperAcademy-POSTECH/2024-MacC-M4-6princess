@@ -30,7 +30,7 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         
         return attributes
     }
-
+    
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return true
     }

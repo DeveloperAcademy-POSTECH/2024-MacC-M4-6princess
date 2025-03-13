@@ -9,7 +9,8 @@ struct FilteredImageView: View {
                   sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)])
     var filterImages: FetchedResults<StoreImages>
     
-    @State var selectedFilter: UUID?
+//    @State var selectedFilter: UUID?
+    
     @StateObject var viewModel: CameraViewModel
     
     var body: some View {
@@ -18,7 +19,7 @@ struct FilteredImageView: View {
                 ZStack {
                     FilterCollectionViewRepresentable(
                         filterImages: Array(filterImages),
-                        selectedFilter: $selectedFilter, viewModel: viewModel
+                        viewModel: viewModel
                     )
                     .frame(height: 100)
                     
@@ -65,7 +66,7 @@ struct FilteredImageView: View {
             .onDisappear {
                 viewModel.cameraManager.stopSession()
             }
-            .onChange(of: frameManager.resultImage) { _ in
+            .onChange(of: frameManager.resultImage, initial: true) { oldValue, newValue in
                 reloadFilterImages()
             }
         }

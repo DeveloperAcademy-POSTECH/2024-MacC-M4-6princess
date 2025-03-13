@@ -84,7 +84,7 @@ extension FilteredImageView{
                 
                 FilterCollectionViewRepresentable(
                     filterImages: Array(filterImages),
-                    selectedFilter: $selectedFilter, viewModel: viewModel
+                    viewModel: viewModel
                 )
                 .frame(height: 100)
                 
