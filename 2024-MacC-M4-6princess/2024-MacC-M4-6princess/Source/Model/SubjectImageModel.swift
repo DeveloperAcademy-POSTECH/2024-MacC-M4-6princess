@@ -5,6 +5,7 @@ class SubjectImage: Identifiable {
     
     var image: UIImage?
     var originalImage: UIImage?
+    var maskImage: UIImage?
     var sticker: UIImage?
     var text: UIImage?
     var textStyle: TextStyle?

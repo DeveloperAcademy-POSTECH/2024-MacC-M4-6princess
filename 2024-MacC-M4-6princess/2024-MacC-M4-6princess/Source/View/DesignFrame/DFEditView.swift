@@ -23,6 +23,19 @@ struct DFEditView: View {
                     inputImageWithMask
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.64))
                     
+                    if let image = viewModel.inputImage {
+                        
+                        let scale = viewModel.scaleCompute(image)
+                        
+                        canvas
+                            .offset(y: -10)
+                            .opacity(viewModel.showPreview ? 0 : 1)
+                            .frame(width: image.size.width / scale, height: image.size.height / scale)
+                            .scaleEffect(viewModel.magnifyScale)
+                            .offset(viewModel.draggedOffSet)
+                            .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.64))
+                    }
+                    
                     if let image = viewModel.resultImage {
                         let scale = viewModel.scaleCompute(image)
                         
@@ -223,12 +236,12 @@ private extension DFEditView {
                     .offset(viewModel.draggedOffSet)
                 
                 
-                canvas
-                    .offset(y: -10)
-                    .opacity(viewModel.showPreview ? 0 : 1)
-                    .frame(width: image.size.width / scale, height: image.size.height / scale)
-                    .scaleEffect(viewModel.magnifyScale)
-                    .offset(viewModel.draggedOffSet)
+//                canvas
+//                    .offset(y: -10)
+//                    .opacity(viewModel.showPreview ? 0 : 1)
+//                    .frame(width: image.size.width / scale, height: image.size.height / scale)
+//                    .scaleEffect(viewModel.magnifyScale)
+//                    .offset(viewModel.draggedOffSet)
             }
             
         }
@@ -269,7 +282,9 @@ private extension DFEditView {
         
         Canvas { context, size in
             
-            if let image = viewModel.maskImage {
+            if let image = frameManager.maskImage {
+                context.draw(Image(uiImage: image).resizable(), in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+            } else if let image = viewModel.maskImage {
                 context.draw(Image(uiImage: image).resizable(), in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             }
             
@@ -330,6 +345,7 @@ private extension DFEditView {
                                     let newImage = SubjectImage()
                                     newImage.image = image
                                     newImage.originalImage = frameManager.pickedImage
+                                    newImage.maskImage = viewModel.maskImage
                                     imageModel.imageList.append(newImage)
                                 }
                                 naviManager.push(screen: Screen.modifyFrame)
