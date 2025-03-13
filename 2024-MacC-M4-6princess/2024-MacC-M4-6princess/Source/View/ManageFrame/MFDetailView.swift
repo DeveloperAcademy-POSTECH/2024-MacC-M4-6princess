@@ -83,6 +83,8 @@ struct MFDetailView: View {
                             .frame(width: 40, height: 40)
                     }
                     Text("수정")
+                        .font(.caption)
+                        .foregroundStyle(.gray01)
                 }
                 VStack {
                     Button {
@@ -94,6 +96,8 @@ struct MFDetailView: View {
                             .frame(width: 40, height: 40)
                     }
                     Text("삭제")
+                        .font(.caption)
+                        .foregroundStyle(.gray01)
                 }
             }
             .frame(height: 102)
