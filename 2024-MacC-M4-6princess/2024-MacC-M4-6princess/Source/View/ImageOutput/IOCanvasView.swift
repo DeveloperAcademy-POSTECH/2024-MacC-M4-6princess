@@ -46,20 +46,79 @@ struct IOCanvasView: View {
                     )
             }
             
-            VStack{
-                Spacer()
-                HStack{
-                    Spacer()
-                    Image("logo.output")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100)
-                        .padding()
+            
+            // Portrait 또는 PortraitUpsideDown일 때
+            if viewModel.initialOrientation == .portrait || viewModel.initialOrientation == .portraitUpsideDown  {
+                VStack{
+                    Spacer() // 상단 여백
+                    HStack {
+                        Spacer() // 좌측 여백
+                        Image("logo.output")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100)
+                            .padding()
+                    }
                 }
             }
+            // Landscape일 때
+            else if viewModel.initialOrientation == .landscapeLeft {
+                VStack{
+                    Spacer() // 상단 여백
+                    HStack {
+                        
+                        Image("logo.right")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 100)
+                            .padding()
+                        Spacer() // 좌측 여백
+                    }
+                }
+                
+            }
+            // Landscape일 때
+            else if  viewModel.initialOrientation == .landscapeRight {
+                
+                HStack {
+                    Spacer()
+                    VStack {
+                        Image("logo.left")
+                            .resizable()
+                            .scaledToFit()
+                        //                                .rotationEffect(rotationAngle(for: viewModel.initialOrientation))
+                            .frame(height:100)
+                            .padding()
+                        Spacer()
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            
+            
         }
         .onAppear {
             viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
+        }
+    }
+    // initialOrientation에 따른 회전 각도를 계산하는 헬퍼 함수
+    private func rotationAngle(for orientation: UIDeviceOrientation) -> Angle {
+        switch orientation {
+            case .portrait:
+                return .degrees(0) // 기본 방향
+            case .portraitUpsideDown:
+                return .degrees(180) // 180도 회전
+            case .landscapeLeft:
+                return .degrees(90) // 반시계 방향 90도
+            case .landscapeRight:
+                return .degrees(-90) // 시계 방향 90도
+            case .faceUp, .faceDown, .unknown:
+                return .degrees(0) // 기본값
+            @unknown default:
+                return .degrees(0)
         }
     }
 }

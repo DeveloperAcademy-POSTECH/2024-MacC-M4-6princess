@@ -25,6 +25,7 @@ class IOViewModel: ObservableObject {
     @Published var showShareButton = false
     @Published var showAcitivity = false
     @Published var changeOverlay = false
+    @Published var initialOrientation:UIDeviceOrientation = .portrait
     /// 사진 저장 함수
     @MainActor
     func saveRenderedView<T: View>(content: T, motionManager: MotionManager) {
@@ -37,19 +38,35 @@ class IOViewModel: ObservableObject {
         print("UIScreen.main.scale:\(UIScreen.main.scale)")
         
         if var uiImage = renderedImage.uiImage {
-            // 기기 방향에 따라 이미지 회전
-            let orientation = motionManager.imageRotate()
-            if orientation != .up {
-                if let cgImage = uiImage.cgImage {
-                    uiImage = UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
-                }
-            }
+            // 방향만 변경된 이미지 생성
+            let orientedImage = applyOrientation(to: uiImage)
             
-            self.compositeImage = uiImage
-            saveImageToAlbum(uiImage: uiImage)
+            self.compositeImage = orientedImage
+            saveImageToAlbum(uiImage: orientedImage)
         } else {
             showAlert(message: "렌더링 실패: 이미지 생성에 문제가 발생했습니다.")
         }
+    }
+    // 방향만 변경하는 헬퍼 함수
+    private func applyOrientation(to uiImage: UIImage) -> UIImage {
+        // initialOrientation을 기반으로 새로운 방향 설정
+        let newOrientation: UIImage.Orientation
+        switch initialOrientation {
+        case .portrait:
+            newOrientation = .up // 기본 Portrait 방향
+        case .landscapeLeft:
+                newOrientation = .left // 반시계 방향 90도
+        case .landscapeRight:
+                newOrientation = .right // 시계 방향 90도
+            case .faceUp, .faceDown, .unknown,.portraitUpsideDown:
+            newOrientation = .up // 기본값으로 Portrait
+        @unknown default:
+            newOrientation = .up // 미래의 알 수 없는 값에 대비
+        }
+        
+        // 새로운 방향으로 이미지 재생성
+        guard let cgImage = uiImage.cgImage else { return uiImage }
+        return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: newOrientation)
     }
     
     

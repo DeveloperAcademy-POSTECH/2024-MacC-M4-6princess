@@ -79,9 +79,9 @@ class MotionManager: ObservableObject {
     func imageRotate() -> UIImage.Orientation {
         switch currentOrientation {
         case .landscapeLeft:
-            return .left
+                return .right
         case .landscapeRight:
-            return .right
+                return .left
         case .portraitUpsideDown:
             return .down
         default:

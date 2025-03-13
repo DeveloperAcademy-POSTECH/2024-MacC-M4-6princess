@@ -48,11 +48,21 @@ struct IOView: View {
                     canvasView
                         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                         .onAppear{
+                            viewModel.initialOrientation = motionManager.currentOrientation
+                            print("캔버스 방향:\(viewModel.initialOrientation)")
+                            
                             viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
                             viewModel.saveAnimate = true
-                            print("canvasView onAppear")
                         }
                         .scaledToFit()
+                        .applyIf(viewModel.initialOrientation != .portrait && viewModel.initialOrientation != .portraitUpsideDown) { original in
+                            original.modifier(
+                                RotatedAndScaledEffect(
+                                    angle: motionManager.rotationAngleCanvasView(for: viewModel.initialOrientation),
+                                    scale: 0.75  //하드코딩 수정필요
+                                )
+                            )
+                        }
                 }
                 else{
                     canvasView
@@ -63,15 +73,16 @@ struct IOView: View {
                             print("canvasView onAppear")
                         }
                         .scaledToFit()
+                        .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+                            original.modifier(
+                                RotatedAndScaledEffect(
+                                    angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+                                    scale: 0.75  //하드코딩 수정필요
+                                )
+                            )
+                        }
                 }
-//                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-//                        original.modifier(
-//                            RotatedAndScaledEffect(
-//                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-//                                scale: 0.75  //하드코딩 수정필요
-//                            )
-//                        )
-//                    }
+                   
                    
                 Spacer()
                 
