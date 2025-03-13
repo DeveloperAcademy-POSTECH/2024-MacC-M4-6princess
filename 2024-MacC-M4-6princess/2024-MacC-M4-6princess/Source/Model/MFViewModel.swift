@@ -9,53 +9,56 @@ import SwiftUI
 import CoreData
 
 class MFViewModel: ObservableObject {
-    @EnvironmentObject var frameManager: FrameManager
-    @Environment(\.managedObjectContext) var viewContext
     @Published var imageDataArray: [(id: UUID, data: Data, isLoaded: Bool)] = []
     @Published var isShowPhotosPicker: Bool = false
     @Published var isEditing: Bool = false
     @Published var selectedImageIds: Set<UUID> = []
     @Published var isDeleteAlert: Bool = false
+    @Published var isDeleteAlertDetail: Bool = false
     @Published var isShowMFDetailView: Bool = false
     
-//    private var viewContext: NSManagedObjectContext
+    //    private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
+    private var viewContext: NSManagedObjectContext
     
+    init(context: NSManagedObjectContext) {
+        self.viewContext = context
+    }
     
-//    init(context: NSManagedObjectContext, frameManager: FrameManager) {
-//        self.viewContext = context
-//        self.frameManager = frameManager
-//    }
-//    
+    //    init(context: NSManagedObjectContext, frameManager: FrameManager) {
+    //        self.viewContext = context
+    //        self.frameManager = frameManager
+    //    }
+    //
     
     ///코어데이터에서 이미지 id를 가져옴
     func loadImages() {
-            let request = StoreImages.fetchRequest()
-            request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
-            
-            do {
-                let storedImages = try viewContext.fetch(request)
-                imageDataArray = storedImages.compactMap { storeImage in
-                    guard let id = storeImage.uuid else { return nil }
-                    return (id: id, data: Data(), isLoaded: false)
-                }
-            } catch {
-                print("이미지 로드 실패: \(error)")
+        let request = StoreImages.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+        
+        do {
+            let storedImages = try viewContext.fetch(request)
+            imageDataArray = storedImages.compactMap { storeImage in
+                guard let id = storeImage.uuid else { return nil }
+                return (id: id, data: Data(), isLoaded: false)
             }
+        } catch {
+            print("이미지 로드 실패: \(error)")
         }
+    }
     
     ///특정 이미지가 필요할 때 로드(해당 Id가 없을 때만 로드)
     func loadImageIfNeeded(for id: UUID) -> Data? {
-            if let cached = imageCache[id] {
-                return cached
-            }
-            
-            if let imageData = loadImageData(for: id) {
-                imageCache[id] = imageData
-                return imageData
-            }
-            return nil
+        if let cached = imageCache[id] {
+            return cached
         }
+        
+        if let imageData = loadImageData(for: id) {
+            imageCache[id] = imageData
+            return imageData
+        }
+        return nil
+    }
     
     ///특정 이미지 데이터를 가져옴
     func loadImageData(for id: UUID) -> Data? {
@@ -75,6 +78,22 @@ class MFViewModel: ObservableObject {
             return nil
         }
     }
+    
+    // 원본 이미지 데이터를 가져오는 함수 추가
+    func loadOriginalImageData(for id: UUID) -> Data? {
+        let request = StoreImages.fetchRequest()
+        request.predicate = NSPredicate(format: "uuid == %@", id as CVarArg)
+        
+        do {
+            guard let storeImage = try viewContext.fetch(request).first,
+                  let imageData = storeImage.image else { return nil }
+            return imageData // 다운샘플링 없이 원본 그대로 반환
+        } catch {
+            print("원본 이미지 로딩 실패:", error)
+            return nil
+        }
+    }
+    
     
     ///선택된 이미지들을 코어데이터에서 삭제
     func deleteSelectedImages() {
@@ -118,32 +137,15 @@ class MFViewModel: ObservableObject {
         return UIImage(cgImage: downsampledImage)
     }
     
-    ///이미지 선택 토글 함수
-    func toggleSelection(for id: UUID) {
-        if isEditing {
-            DispatchQueue.main.async {
-                if self.selectedImageIds.contains(id) {
-                    self.selectedImageIds.remove(id)
-                } else {
-                    self.selectedImageIds.insert(id)
-                }
-            }
-        }
-        else {
-            selectFrame(id: id)
-        }
+    /// 선택된 이미지의 인덱스를 반환
+    func indexOfSelectedImage() -> Int? {
+        guard let selectedId = selectedImageIds.first else { return nil }
+        return imageDataArray.firstIndex(where: { $0.id == selectedId })?.advanced(by: 1)
     }
     
-    func selectFrame(id: UUID) {
-            if let imageData = loadImageData(for: id),
-               let uiImage = UIImage(data: imageData) {
-                DispatchQueue.main.async {
-                    self.frameManager.updateFrame = id
-                    self.frameManager.pickedImage = uiImage
-                    self.frameManager.isFrameLoading = true
-                }
-            }
-        }
-    
+    /// Core Data에 저장된 총 이미지 개수를 반환
+    func totalImageCount() -> Int {
+        return imageDataArray.count
+    }
     
 }

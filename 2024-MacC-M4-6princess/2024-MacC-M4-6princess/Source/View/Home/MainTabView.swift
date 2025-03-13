@@ -13,7 +13,7 @@ struct MainTabView: View {
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var layerListViewModel: LayerListViewModel
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var selectedTab = 1
+    @State var selectedTab = 1
     var tabBarHeight: CGFloat = 76
     @ObservedObject var viewModel = CameraViewModel()
     
@@ -46,6 +46,9 @@ struct MainTabView: View {
             }
             .navigationDestination(for: Screen.self) { screen in
                 FeatureView(type: screen)
+            }
+            .onChange(of: frameManager.selectedFrame) { oldFrame,newFrame in
+                selectedTab = 1
             }
         }
         

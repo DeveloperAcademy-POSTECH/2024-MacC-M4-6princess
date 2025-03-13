@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    let persistenceController = PersistenceController.shared
     @StateObject var frameManager = FrameManager()
     @StateObject var naviManager = NavigationManager()
     @ObservedObject var layerListViewModel = LayerListViewModel()
@@ -17,6 +18,7 @@ struct ContentView: View {
      
     var body: some View {
         MainTabView()
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .environmentObject(frameManager)
             .environmentObject(naviManager)
             .environmentObject(imageModel)

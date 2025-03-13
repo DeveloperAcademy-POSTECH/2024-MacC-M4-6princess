@@ -14,11 +14,10 @@ struct MFDetailView: View {
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var naviManager: NavigationManager
-    @ObservedObject var viewModel: MFViewModel = MFViewModel()
+    @ObservedObject var viewModel: MFViewModel
     
     var topBar : some View {
         ZStack{
-            VStack {
                 HStack{
                     Button {
                         dismiss()
@@ -31,80 +30,104 @@ struct MFDetailView: View {
 
                     Spacer()
                 }
+            HStack(alignment: .center) {
                 Spacer()
-                Text("1/22") //CoreData랑 연결 예정
+                Text("\(viewModel.indexOfSelectedImage() ?? 0)/\(viewModel.totalImageCount())")
                     .font(.body)
                     .fontWeight(.bold)
                     .foregroundStyle(.gray01)
                 Spacer()
             }
-            
         }
+        .navigationBarBackButtonHidden()
     }
     
     var bottomBar : some View {
-        HStack(spacing: 57) {
-            VStack {
-                Button {
-                    //카메라뷰로 이동
-                    naviManager.popToRoot()
-                } label: {
-                    Image("ToolIconCamera")
-                        .resizable()
-                        .frame(width: 40, height: 40)
+        VStack {
+            HStack(spacing: 57) {
+                VStack {
+                    Button {
+                        //카메라뷰로 이동
+                        frameManager.selectedFrame = viewModel.selectedImageIds.first
+                        dismiss()
+                        naviManager.pop()
+                        //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
+                    } label: {
+                        Image("ToolIconCamera")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                    }
+                    Text("사진촬영")
+                        .font(.caption)
+                        .foregroundStyle(.gray01)
                 }
-                Text("사진촬영")
-                    .font(.caption)
-                    .foregroundStyle(.gray01)
-            }
-            VStack {
-                Button {
-                    //수정뷰로 이동
-                    viewModel.imageDataArray.forEach {
-                        if $0.id == viewModel.selectedImageIds.first {
-                            viewModel.selectFrame(id: $0.id)
-                            Task {
-                                loadSelectedFrame() {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                                        naviManager.push(screen: Screen.modifyFrame)
-                                    })
+                VStack {
+                    Button {
+                        //수정뷰로 이동
+                        viewModel.imageDataArray.forEach {
+                            if $0.id == viewModel.selectedImageIds.first {
+//                                frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
+                                Task {
+                                    loadSelectedFrame() {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                                            naviManager.push(screen: Screen.modifyFrame)
+                                        })
+                                    }
                                 }
                             }
                         }
+                        dismiss()
+                    } label: {
+                        Image("ToolIconModify")
+                            .resizable()
+                            .frame(width: 40, height: 40)
                     }
-                } label: {
-                    Image("ToolIconModify")
-                        .resizable()
-                        .frame(width: 40, height: 40)
+                    Text("수정")
                 }
-                Text("수정")
+                VStack {
+                    Button {
+                        //삭제 함수
+                        viewModel.isDeleteAlertDetail = true
+                    } label: {
+                        Image("ToolIconDelete")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                    }
+                    Text("삭제")
+                }
             }
-            VStack {
-                Button {
-                    //삭제 함수
-                } label: {
-                    Image("ToolIconDelete")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                }
-                Text("삭제")
+            .frame(height: 102)
+            .padding(.top, 20)
+        }
+    }
+    
+    var bodyContentView: some View {
+            if let selectedId = viewModel.selectedImageIds.first,
+               let data = viewModel.loadOriginalImageData(for: selectedId),
+               let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(.white)
+            } else {
+                Image(systemName: "heart")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(.white)
             }
         }
-        .padding(.top, 20)
-    }
     
     
     var body: some View {
         VStack  {
             topBar
-            Image("full04") //CoreData랑 연결 예정. 프레임 들어갈 자리
-                .resizable()
-                .frame(width: 100, height: 120)
+            bodyContentView
             bottomBar
         }
-        .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
+        .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
                 viewModel.deleteSelectedImages()
+                dismiss()
             } label: {
                 Text("삭제")
                     .font(.system(size: 17))

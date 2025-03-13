@@ -11,19 +11,30 @@ import CoreData
 import FirebaseAnalytics
 
 struct MFView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) var viewContext
-    @StateObject var viewModel: MFViewModel = MFViewModel()
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
+    @EnvironmentObject var layerListViewModel: LayerListViewModel
+    @StateObject var viewModel: MFViewModel
+    
+    init() {
+            _viewModel = StateObject(wrappedValue: MFViewModel(context: PersistenceController.shared.container.viewContext))
+        }
     
     var body: some View {
             ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     SheetTitleView(viewModel: viewModel)
+                        .environmentObject(frameManager)
+                        .environmentObject(naviManager)
+                        .environmentObject(layerListViewModel)
                     ScrollView {
                         FrameGridItem(viewModel: viewModel)
+                            .environmentObject(frameManager)
+                            .environmentObject(naviManager)
+                            .environmentObject(layerListViewModel)
                     }
                     
                 }
@@ -32,7 +43,7 @@ struct MFView: View {
                         Button {
                             viewModel.imageDataArray.forEach {
                                 if $0.id == viewModel.selectedImageIds.first {
-                                    viewModel.selectFrame(id: $0.id)
+                                    frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
                                     Task {
                                         loadSelectedFrame() {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
@@ -57,7 +68,6 @@ struct MFView: View {
                         }
                         .disabled(viewModel.selectedImageIds.count > 1)
                         Button {
-                            
                             viewModel.isDeleteAlert = true
                         } label: {
                             ZStack {
@@ -121,7 +131,6 @@ struct MFView: View {
         }
         .navigationBarHidden(true)
     }
-        
 }
 
 
@@ -181,40 +190,10 @@ struct FrameGridItem: View {
     
     var body: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-//            Button {
-//                naviManager.push(screen: Screen.photoPicker)
-//                Analytics.logEvent("A2_새로운프레임만들기", parameters: nil)
-//            } label: {
-//                ZStack {
-//                    VStack(alignment: .center, spacing: 4) {
-//                        Image("newFrameCreateLogo")
-//                            .resizable()
-//                            .frame(width: 80, height: 92)
-//                            .padding(.top, 20)
-//                            .padding(.bottom, 3)
-//                        Text("최애 프레임\n만들기")
-//                            .font(.system(size: 13, weight: .bold))
-//                            .multilineTextAlignment(.center)
-//                            .foregroundColor(.white)
-//                        Spacer()
-//                    }
-//                    .frame(maxWidth: .infinity)
-//                    .frame(minHeight: 163)
-//                    .background(.pointPink)
-//                    
-//                    if viewModel.isEditing {
-//                        Rectangle()
-//                            .frame(maxWidth: .infinity)
-//                            .frame(minHeight: 163)
-//                            .background(.black)
-//                            .opacity(0.7)
-//                    }
-//                }
-//            }
-//            .disabled(viewModel.isEditing)
-            
             ForEach(viewModel.imageDataArray.reversed(), id: \.id) { imageInfo in
                 GridItemView(imageInfo: imageInfo, isSelected: viewModel.selectedImageIds.contains(imageInfo.id), viewModel: viewModel)
+                    .environmentObject(frameManager)
+                    .environmentObject(naviManager)
                     .id(imageInfo.id)
             }
         }
@@ -253,17 +232,26 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
+            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
             if !viewModel.isEditing {
-                //MFDetailView로 이동
-                viewModel.toggleSelection(for: imageInfo.id)
+                viewModel.selectedImageIds = [imageInfo.id]
                 viewModel.isShowMFDetailView = true
-                naviManager.push(screen: Screen.manageDetailFrame)
+//                naviManager.push(screen: Screen.manageDetailFrame)
                 Analytics.logEvent("A2_프레임선택", parameters: nil)
-//                dismiss()
-            }else {
-                viewModel.toggleSelection(for: imageInfo.id)
             }
         }
+//        .onTapGesture {
+//            if !viewModel.isEditing {
+//                //MFDetailView로 이동
+//                MFView().toggleSelection(for: imageInfo.id)
+//                viewModel.isShowMFDetailView = true
+//                naviManager.push(screen: Screen.manageDetailFrame)
+//                Analytics.logEvent("A2_프레임선택", parameters: nil)
+////                dismiss()
+//            }else {
+//                MFView().toggleSelection(for: imageInfo.id)
+//            }
+//        }
         
     }
 }
