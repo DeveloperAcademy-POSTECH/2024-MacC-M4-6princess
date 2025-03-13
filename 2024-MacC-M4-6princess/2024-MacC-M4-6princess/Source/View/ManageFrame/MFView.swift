@@ -41,33 +41,6 @@ struct MFView: View {
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
                         Button {
-                            viewModel.imageDataArray.forEach {
-                                if $0.id == viewModel.selectedImageIds.first {
-                                    frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
-                                    Task {
-                                        loadSelectedFrame() {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                                                naviManager.push(screen: Screen.modifyFrame)
-                                            })
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            ZStack {
-                                Rectangle()
-                                    .foregroundColor(.clear)
-                                    .frame(width: 164, height: 60)
-                                    .background(viewModel.selectedImageIds.count > 1 ? .gray03 : .pointPink)
-                                    .cornerRadius(10)
-                                Text("수정하기")
-                                    .font(.system(size: 17))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        .disabled(viewModel.selectedImageIds.count > 1)
-                        Button {
                             viewModel.isDeleteAlert = true
                         } label: {
                             ZStack {
