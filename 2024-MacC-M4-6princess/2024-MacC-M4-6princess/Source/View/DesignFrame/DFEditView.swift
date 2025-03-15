@@ -18,9 +18,9 @@ struct DFEditView: View {
                 .ignoresSafeArea()
             
             VStack {
-//                Spacer()
                 toolBarButtons
-                    .padding(.top, 10)
+                    .padding(.top, 30)
+                
                 ZStack {
                     inputImageWithMask
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.64))
@@ -52,7 +52,7 @@ struct DFEditView: View {
                     }
                     VStack {
                         ToastMessageView()
-                            .padding(.bottom, UIScreen.main.bounds.height * 0.59)
+                            .padding(.bottom, UIScreen.main.bounds.height * 0.55)
                             .opacity(viewModel.toastMessageOpacity)
                             .task {
                                 viewModel.changeMessageOpacity()
@@ -119,13 +119,15 @@ struct DFEditView: View {
                     }
                     .padding(.top, UIScreen.main.bounds.height * 0.55)
                 }
-                .padding(.top, 20)
+                .padding(.bottom, 5)
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
                     brushToolSelector
+                        .padding(.bottom, 60)
                 }
                 else{
                     brushToolSelectorIpad
+                        .padding(.bottom, 60)
                 }
                 
                 Spacer()
@@ -330,6 +332,7 @@ private extension DFEditView {
                 .foregroundStyle(.white)
                 .frame(width: UIScreen.main.bounds.width * 0.2, height: UIScreen.main.bounds.height * 0.04)
                 .padding(.leading, UIScreen.main.bounds.width * 0.2)
+                .padding(.trailing, 10)
             
             Button {
                 viewModel.removingLoadingOpacity = 1

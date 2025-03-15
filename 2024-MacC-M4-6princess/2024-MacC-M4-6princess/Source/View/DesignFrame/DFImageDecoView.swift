@@ -7,7 +7,7 @@ struct DFImageDecoView: View {
     
     var body: some View {
             
-        HStack(spacing: 40){
+        HStack(spacing: 56){
             
             appendImageView
             
@@ -42,7 +42,6 @@ extension DFImageDecoView {
                 .font(.caption)
                 .foregroundStyle(.gray01)
         }
-        .padding(.trailing, 56)
     }
     
     var stickerView: some View {
@@ -66,7 +65,6 @@ extension DFImageDecoView {
                 .font(.caption)
                 .foregroundStyle(.gray01)
         }
-        .padding(.trailing, 56)
     }
     
     var textView: some View {

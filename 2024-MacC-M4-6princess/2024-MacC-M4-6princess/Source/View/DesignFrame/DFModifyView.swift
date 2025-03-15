@@ -66,6 +66,7 @@ struct DFModifyView: View {
                                 newLayerIndicator
                             }
                         }
+                        .padding(.bottom, 30)
                         .gesture(viewModel.backgroundGesture())
                         .onTapGesture {
                             viewModel.isTappedImage = false
@@ -73,9 +74,9 @@ struct DFModifyView: View {
                                 $0.isTapped = viewModel.isTappedImage
                             }
                         }
-                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3).padding(.bottom, 30))
                         DFImageDecoView(viewModel: viewModel)
-                            .padding(.top, 58)
+                            .padding(.bottom, 50)
                     }
                     extractedExpr
                 }
