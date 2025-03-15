@@ -65,7 +65,7 @@ struct HomeView: View {
                     Text("프레임만들기")
                         .padding(.vertical, 20)
                         .foregroundStyle(Color.pointPink)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 16, weight: .bold))
                 }
                 .frame(height: 60, alignment: .center)
                 .frame(maxWidth: .infinity)
@@ -79,7 +79,7 @@ struct HomeView: View {
             VStack {
                 HStack {
                     Text("내가 만든 프레임")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(Color.gray01)
                     Spacer()
                     Button {
@@ -90,6 +90,7 @@ struct HomeView: View {
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(Color.gray01)
                             Image("chevronRight")
+                            // 이미지 확인해서 테두리 여백 확인하기
                                 .resizable()
                                 .frame(width: 18, height: 18)
                         }
