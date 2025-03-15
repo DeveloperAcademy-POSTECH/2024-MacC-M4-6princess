@@ -10,6 +10,7 @@ import CoreData
 
 class HomeViewModel: ObservableObject {
     @Published var imageDataArray: [(id: UUID, data: Data, isLoaded: Bool)] = []
+    @Published var isShowMFDetailView: Bool = false
     private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
 

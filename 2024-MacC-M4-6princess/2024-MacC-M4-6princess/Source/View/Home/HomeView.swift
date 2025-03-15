@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 
 struct HomeView: View {
     @Environment(\.dismiss) private var dismiss
@@ -109,6 +110,12 @@ struct HomeView: View {
                         HomeGridView(imageInfo: imageInfo,
                                      viewModel: viewModel)
                         .id(imageInfo.id)
+                        .onTapGesture {
+                            frameManager.selectedFrameIdForDetail = imageInfo.id // 선택한 이미지 ID 저장
+                            print("이미지 아이디를 frameManager에 저장했어요")
+                            naviManager.push(screen: Screen.detailFrame) // MFDetailView로 이동
+                            print("디테일뷰를 푸시했어요")
+                        }
                     }
                 }
                 .padding([.horizontal, .bottom], 20)
@@ -122,13 +129,23 @@ struct HomeView: View {
         .onAppear {
             viewModel.loadImages()
         }
+//        .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
+//            if let selectedFrameId = frameManager.selectedFrame {
+//                MFDetailView(viewModel: MFDetailViewModel(context: viewContext, selectedId: selectedFrameId))
+//                    .environmentObject(frameManager)
+//                    .environmentObject(imageModel)
+//                    .environmentObject(naviManager)
+//            }
+//        }
     }
     
 }
 
-struct HomeGridView: View { // 기존 GridItemView에서 이름 변경
+struct HomeGridView: View {
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
     @ObservedObject var viewModel: HomeViewModel
+    @EnvironmentObject var frameManager: FrameManager
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -141,5 +158,9 @@ struct HomeGridView: View { // 기존 GridItemView에서 이름 변경
                     .clipped()
             }
         }
+//        .onTapGesture {
+//            frameManager.selectedFrame = imageInfo.id
+//            viewModel.isShowMFDetailView = true
+//        }
     }
 }

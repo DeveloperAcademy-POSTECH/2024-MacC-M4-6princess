@@ -9,27 +9,27 @@ import SwiftUI
 import CoreData
 
 struct MFDetailView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var naviManager: NavigationManager
-    @ObservedObject var viewModel: MFViewModel
+    @ObservedObject private var viewModel: MFDetailViewModel = MFDetailViewModel()
     
     var topBar : some View {
         ZStack{
-                HStack{
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image("chevronLeft")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .padding(.leading, 10)
-                    }
-
-                    Spacer()
+            HStack{
+                Button {
+                    frameManager.selectedFrameIdForDetail = nil
+                    naviManager.pop()
+                } label: {
+                    Image("chevronLeft")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .padding(.leading, 10)
                 }
+                
+                Spacer()
+            }
             HStack(alignment: .center) {
                 Spacer()
                 Text("\(viewModel.indexOfSelectedImage() ?? 0)/\(viewModel.totalImageCount())")
@@ -48,8 +48,8 @@ struct MFDetailView: View {
                 VStack {
                     Button {
                         //카메라뷰로 이동
-                        frameManager.selectedFrame = viewModel.selectedImageIds.first
-                        dismiss()
+                        frameManager.selectedFrame = viewModel.selectedImageId
+//                        dismiss()
                         naviManager.pop()
                         //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
                     } label: {
@@ -62,21 +62,32 @@ struct MFDetailView: View {
                         .foregroundStyle(.gray01)
                 }
                 VStack {
+                    //                    Button {
+                    //                        //수정뷰로 이동
+                    //                        viewModel.imageDataArray.forEach {
+                    //                            if $0.id == viewModel.selectedImageIds.first {
+                    ////                                frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
+                    //                                Task {
+                    //                                    loadSelectedFrame() {
+                    //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                    //                                            naviManager.push(screen: Screen.modifyFrame)
+                    //                                        })
+                    //                                    }
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                        dismiss()
+                    //                    } label: {
+                    //                        Image("ToolIconModify")
+                    //                            .resizable()
+                    //                            .frame(width: 40, height: 40)
+                    //                    }
                     Button {
-                        //수정뷰로 이동
-                        viewModel.imageDataArray.forEach {
-                            if $0.id == viewModel.selectedImageIds.first {
-//                                frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
-                                Task {
-                                    loadSelectedFrame() {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                                            naviManager.push(screen: Screen.modifyFrame)
-                                        })
-                                    }
-                                }
-                            }
+                        frameManager.selectedFrame = viewModel.selectedImageId
+//                        dismiss()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            naviManager.push(screen: Screen.modifyFrame)
                         }
-                        dismiss()
                     } label: {
                         Image("ToolIconModify")
                             .resizable()
@@ -105,10 +116,23 @@ struct MFDetailView: View {
         }
     }
     
+    //    var bodyContentView: some View {
+    //        if let selectedId = viewModel.selectedImageIds.first,
+    //           let data = viewModel.loadOriginalImageData(for: selectedId),
+    //           let uiImage = UIImage(data: data) {
+    //            Image(uiImage: uiImage)
+    //                .resizable()
+    //                .aspectRatio(contentMode: .fit)
+    //                .foregroundStyle(.white)
+    //        } else {
+    //            Image(systemName: "heart")
+    //                .resizable()
+    //                .aspectRatio(contentMode: .fit)
+    //                .foregroundStyle(.white)
+    //        }
+    //    }
     var bodyContentView: some View {
-            if let selectedId = viewModel.selectedImageIds.first,
-               let data = viewModel.loadOriginalImageData(for: selectedId),
-               let uiImage = UIImage(data: data) {
+            if let data = viewModel.loadOriginalImageData(), let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -130,8 +154,10 @@ struct MFDetailView: View {
         }
         .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
-                viewModel.deleteSelectedImages()
-                dismiss()
+                viewModel.deleteSelectedImage()
+                {
+//                    dismiss()
+                }
             } label: {
                 Text("삭제")
                     .font(.system(size: 17))
@@ -142,6 +168,9 @@ struct MFDetailView: View {
             Button("취소", role: .cancel) { }
         } message: {
             Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+        }
+        .onAppear {
+            viewModel.configure(context: viewContext, selectedId: frameManager.selectedFrameIdForDetail)
         }
     }
 }

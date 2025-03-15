@@ -97,7 +97,8 @@ struct MFView: View {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
             }
             .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
-                MFDetailView(viewModel: viewModel)
+                MFDetailView()
+                    .environmentObject(frameManager)
             }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
@@ -205,7 +206,8 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
+//            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
+            frameManager.selectedFrameIdForDetail = imageInfo.id
             if !viewModel.isEditing {
                 viewModel.selectedImageIds = [imageInfo.id]
                 viewModel.isShowMFDetailView = true
