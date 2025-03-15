@@ -18,7 +18,9 @@ struct DFEditView: View {
                 .ignoresSafeArea()
             
             VStack {
-                Spacer()
+//                Spacer()
+                toolBarButtons
+                    .padding(.top, 10)
                 ZStack {
                     inputImageWithMask
                         .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.64))
@@ -85,7 +87,8 @@ struct DFEditView: View {
                                         .foregroundStyle(viewModel.showPreview ? Color.gray03 : Color.gray02)
                                 }
                             }
-                            .padding(.trailing)
+                            .padding(.trailing, 20)
+                            .padding(.bottom, 2)
 
                         }
                         
@@ -116,7 +119,7 @@ struct DFEditView: View {
                     }
                     .padding(.top, UIScreen.main.bounds.height * 0.55)
                 }
-                
+                .padding(.top, 20)
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
                     brushToolSelector
@@ -149,9 +152,9 @@ struct DFEditView: View {
         //            DFFrameModifyView()
         //        })
         .navigationBarBackButtonHidden()
-        .toolbar {
-            toolBarButtons
-        }
+//        .toolbar {
+//            toolBarButtons
+//        }
         .simultaneousGesture(moveImage)
         .simultaneousGesture(magnification)
     }
@@ -306,6 +309,7 @@ private extension DFEditView {
         }
     }
     var toolBarButtons: some View {
+        
         HStack(spacing: 50) {
             Button {
                 self.presentationMode.wrappedValue.dismiss()
@@ -395,11 +399,11 @@ private extension DFEditView {
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                     Image("brush")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                        .colorMultiply(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
+                        .colorMultiply(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.gray01))
                     Text("선택 추가")
                         .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
-                        .offset(y: 30)
+                        .offset(y: 38)
                 }
             }
             
@@ -413,11 +417,11 @@ private extension DFEditView {
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
                     Image("erase")
                         .frame(width: UIScreen.main.bounds.height / 20, height: UIScreen.main.bounds.height / 20)
-                        .colorMultiply(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
+                        .colorMultiply(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.gray01))
                     Text("선택 제거")
                         .foregroundStyle(viewModel.selectionModeIndex == 1 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
-                        .offset(y: 30)
+                        .offset(y: 38)
                 }
             }
         }
@@ -491,6 +495,7 @@ private extension DFEditView {
         UISlider.appearance().setThumbImage(thumbImage, for: .normal)
     }
 }
-//#Preview {
-//    DFEditView()
-//}
+
+#Preview {
+    DFEditView()
+}

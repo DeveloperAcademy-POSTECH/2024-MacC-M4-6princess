@@ -42,6 +42,7 @@ extension DFImageDecoView {
                 .font(.caption)
                 .foregroundStyle(.gray01)
         }
+        .padding(.trailing, 56)
     }
     
     var stickerView: some View {
@@ -65,6 +66,7 @@ extension DFImageDecoView {
                 .font(.caption)
                 .foregroundStyle(.gray01)
         }
+        .padding(.trailing, 56)
     }
     
     var textView: some View {

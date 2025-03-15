@@ -15,18 +15,19 @@ struct PhotosPickerView: View {
         ZStack {
             VStack {
                 toolbarButton
-                Spacer()
+//                Spacer()
                 ScrollViewWithOffset
-                    .padding(.top, UIScreen.main.bounds.height*0.05)
+                    .padding(.top, 20)
             }
             VStack {
                 toastMessage
-                    .padding(.bottom, UIScreen.main.bounds.height * 0.67)
+                    .padding(.bottom, UIScreen.main.bounds.height * 0.63)
                     .opacity(vm.messageOpacity)
             }
         }
         .onAppear {
-            
+            print("w: \(UIScreen.main.bounds.width)")
+            print("h: \(UIScreen.main.bounds.height)")
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
 //                    DispatchQueue.main.async {
@@ -222,6 +223,7 @@ extension PhotosPickerView {
             
             
         }
+        .padding(.top, 20)
     }
 }
 
