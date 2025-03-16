@@ -14,7 +14,7 @@ struct IOCanvasView: View {
     @GestureState var startLocation: CGPoint? = nil
     @State var currentScale: CGFloat = 1.0
     @GestureState var zoomFactor: CGFloat = 1.0
-    
+    var widthSize:CGFloat = 80
     var body: some View {
         ZStack {
             // 배경 이미지
@@ -56,7 +56,7 @@ struct IOCanvasView: View {
                                    Image("logo.output")
                                        .resizable()
                                        .scaledToFit()
-                                       .frame(width: 100)
+                                       .frame(width: widthSize)
                                        .padding()
                                }
                            }
@@ -70,7 +70,7 @@ struct IOCanvasView: View {
                                    Image("logo.right")
                                        .resizable()
                                        .scaledToFit()
-                                       .frame(height: 100)
+                                       .frame(height: widthSize)
                                        .padding()
                                    Spacer() // 좌측 여백
                                }
@@ -87,7 +87,7 @@ struct IOCanvasView: View {
                                        .resizable()
                                        .scaledToFit()
                                    //                                .rotationEffect(rotationAngle(for: viewModel.initialOrientation))
-                                       .frame(height:100)
+                                       .frame(height:widthSize)
                                        .padding()
                                    Spacer()
                                    

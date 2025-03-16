@@ -17,25 +17,31 @@ struct DFStickerView: View {
     
     var body: some View {
         VStack {
+            
             Text("스티커")
                 .font(.system(size: 17, weight: .bold))
                 .frame(maxWidth: .infinity) // 부모 뷰의 가로 폭을 채우기
                 .multilineTextAlignment(.center) // 텍스트 중앙 정렬
                 .padding(.top)
+                .padding(.vertical,8)
+            
             Divider()
             // 탭 선택 버튼
-            HStack(spacing: 20) {
+            HStack() {
+                
                 ForEach(StickerTab.allCases, id: \.self) { tab in
+                    Spacer()
                     Text(tab.displayName)
-                        .font(.system(size: 13, weight: selectedTab == tab ? .bold : .medium))
+                        .font(.system(size: 15, weight: selectedTab == tab ? .bold : .medium))
                         .foregroundColor(selectedTab == tab ? .pointPink : .gray02)
                         .onTapGesture {
                             selectedTab = tab
                         }
+                    Spacer()
                 }
-                Spacer()
+                
             }
-            .padding(.horizontal)
+//            .padding(.horizontal)
             .padding(.vertical, 6)
             Divider()
             // 이미지 스크롤 뷰

@@ -172,9 +172,14 @@ struct DFModifyView: View {
                     }
                 } else if let image = subject.sticker {
                     ZStack {
+//                        let size: CGSize = .init(
+//                            width: UIScreen.main.bounds.width / 2,
+//                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+//                        )
+//
                         let size: CGSize = .init(
-                            width: UIScreen.main.bounds.width / 2,
-                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+                            width: image.size.width / viewModel.scaleCompute(image),
+                            height: image.size.height / viewModel.scaleCompute(image)
                         )
                         
                         DFOverlayBoxView(model: subject, size: size)

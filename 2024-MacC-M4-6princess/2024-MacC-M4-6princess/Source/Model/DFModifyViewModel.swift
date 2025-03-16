@@ -154,7 +154,7 @@ class DFModifyViewModel: ObservableObject {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
             //            render.scale = scaleCompute(inputImage)
-            render.scale = UIScreen.main.scale
+            render.scale = UIScreen.main.scale + 1
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context, subjects: imageModel)
         }

@@ -22,19 +22,20 @@ struct IOView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack{
+                Spacer()
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                     HStack(alignment: .center, spacing: 14) {
-                        Text("저장완료")
+                        Text("갤러리에 저장되었습니다")
                             .font(.system(size:17))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray01)
                     }
-                    .padding(.top, 26)
+                 
                 }
                 else{
                     HStack(alignment: .center, spacing: 14) {
-                        Text("저장완료")
+                        Text("갤러리에 저장되었습니다")
                             .font(.system(size:17))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
@@ -42,7 +43,7 @@ struct IOView: View {
                     }
                     .padding(.top, 26)
                 }
-                
+                Spacer()
                 // 후보정 레이어 편집 뷰
                 canvasView
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
@@ -66,10 +67,13 @@ struct IOView: View {
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                     VStack(alignment: .center, spacing: 8){
-                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-                            .font(.system(size:12))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.gray01)
+//                        Spacer()
+//                        Text("저장된 사진은 갤러리에서 확인해주세요.")
+//                            .font(.system(size:12))
+//                            .multilineTextAlignment(.center)
+//                            .foregroundColor(.gray01)
+//                            .padding(.top,5)
+                        Spacer()
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -100,8 +104,9 @@ struct IOView: View {
                         .frame(maxWidth: .infinity)
 //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
-                       
+                        Spacer()
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
+                            .ignoresSafeArea(.all)
                             
                         
                         
