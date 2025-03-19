@@ -168,7 +168,7 @@ struct IOView: View {
         }
         .sheet(isPresented: $viewModel.showShareButton) {
             BottomSheetWrapper(viewModel: viewModel)
-                .presentationDetents([.height(150)])
+                .presentationDetents([.height(200)])
         }
         .onChange(of: viewModel.showShareButton, perform: { newValue in
             if viewModel.showShareButton == false && viewModel.showAcitivity == true{
