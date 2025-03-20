@@ -45,17 +45,20 @@ struct MFView: View {
                         } label: {
                             ZStack {
                                 Rectangle()
-                                    .foregroundColor(.white)
-                                    .frame(width: 164, height: 60)
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .inset(by: 1)
-                                            .stroke(.pointPink, lineWidth: 2)
-                                    )
-                                Text("삭제하기")
-                                    .font(.system(size: 17))
                                     .foregroundColor(.pointPink)
+                                    .frame(height: 60)
+                                    .frame(maxWidth: .infinity)
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 20)
+                                    
+//                                    .overlay(
+//                                        RoundedRectangle(cornerRadius: 10)
+//                                            .inset(by: 1)
+//                                            .stroke(.pointPink, lineWidth: 2)
+//                                    )
+                                Text("프레임 삭제")
+                                    .font(.system(size: 17))
+                                    .foregroundColor(.white)
                                     .fontWeight(.bold)
                             }
                         }
@@ -117,13 +120,13 @@ struct SheetTitleView: View {
     var body: some View {
         ZStack {
             HStack(alignment: .center) {
-                Spacer()
                 Text("프레임 관리")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
                     .foregroundColor(.gray01)
-                Spacer()
             }
+            .frame(height: 80)
+            
             HStack(alignment: .center) {
                 Button {
                     dismiss()
@@ -142,13 +145,13 @@ struct SheetTitleView: View {
                             .font(.system(size: 17))
                             .fontWeight(.bold)
                             .foregroundColor(.gray01)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10.49618)
+                            .padding(.trailing, 20)
                     }
                 }
             }
-            .padding(.vertical, 20)
+            .frame(height: 80)
         }
+        
         
     }
 }
