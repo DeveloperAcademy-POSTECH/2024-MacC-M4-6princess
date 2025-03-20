@@ -172,11 +172,25 @@ struct DFModifyView: View {
                     }
                 } else if let image = subject.sticker {
                     ZStack {
-                        let size: CGSize = .init(
-                            width: UIScreen.main.bounds.width / 2,
-                            height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
-                        )
-                        
+                        var size: CGSize {
+                            if subject.isFullSticker{
+                                return CGSize(width: image.size.width / viewModel.scaleCompute(image), height: image.size.height / viewModel.scaleCompute(image))
+                            }
+                            else if image.size.height > image.size.width {
+                                return CGSize(
+                                    width: UIScreen.main.bounds.height / 3 * (image.size.width / image.size.height),
+                                    height: UIScreen.main.bounds.height / 3
+                                )
+                            } else {
+                                return CGSize(
+                                    width: UIScreen.main.bounds.width / 2,
+                                    height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
+                                )
+                            }
+                        }
+
+
+
                         DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
                             .zIndex(1)

@@ -46,6 +46,9 @@ class DFModifyViewModel: ObservableObject {
     @Published var selectedSubject: SubjectImage? = nil
     @Published var selectedIndex: Int? = nil
     
+    /// 스티커 변수
+    var selectedStickerTab = StickerTab.bubble
+    
     @Published var style:TextStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: "", font: .modern, color: ColorPreset.colorPallete[0], alignment: .center )
     
     func backgroundGesture() -> some Gesture {
@@ -154,7 +157,7 @@ class DFModifyViewModel: ObservableObject {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
             //            render.scale = scaleCompute(inputImage)
-            render.scale = UIScreen.main.scale
+            render.scale = UIScreen.main.scale + 1
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context, subjects: imageModel)
         }
@@ -245,7 +248,7 @@ class DFModifyViewModel: ObservableObject {
         }
     }
     func addImage(albumImageData: Data?, context: NSManagedObjectContext, subjects: ImageListModel) {
-         
+        
         
         let newImage = StoreImages(context: context)
         newImage.image = albumImageData

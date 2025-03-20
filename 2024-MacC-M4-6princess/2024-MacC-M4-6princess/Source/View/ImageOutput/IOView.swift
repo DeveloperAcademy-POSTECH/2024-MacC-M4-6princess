@@ -22,19 +22,20 @@ struct IOView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack{
+                Spacer()
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                     HStack(alignment: .center, spacing: 14) {
-                        Text("저장완료")
+                        Text("갤러리에 저장되었습니다")
                             .font(.system(size:17))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray01)
                     }
-                    .padding(.top, 26)
+                    
                 }
                 else{
                     HStack(alignment: .center, spacing: 14) {
-                        Text("저장완료")
+                        Text("갤러리에 저장되었습니다")
                             .font(.system(size:17))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
@@ -42,32 +43,37 @@ struct IOView: View {
                     }
                     .padding(.top, 26)
                 }
-                
+                Spacer()
                 // 후보정 레이어 편집 뷰
                 canvasView
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     .onAppear{
-                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager) // 사진을 그리면서 동시에 저장
+                        viewModel.currentOrientation = motionManager.currentOrientation
+                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager, orientation: viewModel.currentOrientation) // 사진을 그리면서 동시에 저장
+                        motionManager.stopDeviceMotionUpdates()
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")
                     }
-//                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-//                        original.modifier(
-//                            RotatedAndScaledEffect(
-//                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-//                                scale: 0.75  //하드코딩 수정필요
-//                            )
-//                        )
-//                    }
+                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+                        original.modifier(
+                            RotatedAndScaledEffect(
+                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+                                scale: 0.75  //하드코딩 수정필요
+                            )
+                        )
+                    }
                     .scaledToFit()
                 Spacer()
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                     VStack(alignment: .center, spacing: 8){
-                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-                            .font(.system(size:12))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.gray01)
+                        //                        Spacer()
+                        //                        Text("저장된 사진은 갤러리에서 확인해주세요.")
+                        //                            .font(.system(size:12))
+                        //                            .multilineTextAlignment(.center)
+                        //                            .foregroundColor(.gray01)
+                        //                            .padding(.top,5)
+                        Spacer()
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -86,21 +92,23 @@ struct IOView: View {
                             }
                             Button(action: {
                                 
-                                viewModel.showShareButton.toggle()
+                                //                                viewModel.showShareButton.toggle()
+                                viewModel.changeOverlay = true
                             }) {
                                 Image("share.icon")
                                     .resizable()
                                     .frame(width:60,height: 60)
                                 
-
+                                
                             }
                         }
                         .frame(maxWidth: .infinity)
-//                        .padding(.bottom, 26)
+                        //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
-                       
+                        Spacer()
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
-                            
+                            .ignoresSafeArea(.all)
+                        
                         
                         
                     }
@@ -138,10 +146,10 @@ struct IOView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-//                        .padding(.bottom, 26)
+                        //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
-                         
+                        
                         
                     }
                 }
@@ -161,22 +169,22 @@ struct IOView: View {
         }
         .sheet(isPresented: $viewModel.showShareButton) {
             BottomSheetWrapper(viewModel: viewModel)
-                .presentationDetents([.height(150)])
+                .presentationDetents([.height(200)])
         }
         .onChange(of: viewModel.showShareButton, perform: { newValue in
             if viewModel.showShareButton == false && viewModel.showAcitivity == true{
                 print("onchange start")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
                     
-                        viewModel.changeOverlay = true
-                        print("changeoverlay")
+                    viewModel.changeOverlay = true
+                    print("changeoverlay")
                     
                 }
             }
         })
         .overlay(
             Group {
-
+                
                 if viewModel.changeOverlay, let photo = viewModel.compositeImage {
                     IOShareSheet(isPresented: $viewModel.changeOverlay, shareData: (photo, "title", "Frameet으로 사진 찍어왔음"))
                         .onAppear{
