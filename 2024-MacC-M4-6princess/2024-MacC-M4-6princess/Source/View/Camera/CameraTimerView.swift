@@ -1,3 +1,10 @@
+//
+//  CameraTimerView.swift
+//  2024-MacC-M4-6princess
+//
+//  Created by 김이예은 on 10/4/24.
+//
+
 import SwiftUI
 
 struct CameraTimerView: View {
@@ -6,14 +13,16 @@ struct CameraTimerView: View {
     @State private var isExpanded = false
     
     var body: some View {
-        ZStack(alignment: .leading) {
+        ZStack {
+            // 배경 캡슐 - 확장 시 검정, 축소 시 흰색
             Capsule()
                 .fill(isExpanded ? Color.black : Color.white)
-                .frame(width: isExpanded ? 185 : 60, height: 30)
+                .frame(width: isExpanded ? 200 : 60, height: 30)
                 .overlay(
                     RoundedRectangle(cornerRadius: 50)
                         .inset(by: 0.5)
                         .stroke(isExpanded ? Color.clear : Color.gray01, lineWidth: 1)
+                    
                 )
                 .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isExpanded)
             
@@ -25,7 +34,6 @@ struct CameraTimerView: View {
                         .frame(width: 20, height: 20)
                         .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
                         .animation(.easeInOut, value: motionManager.currentOrientation)
-                        .padding(.leading, 5) // 아이콘의 leading 패딩값
                     
                     Button("Off") {
                         viewModel.delayTime = 0
@@ -33,7 +41,7 @@ struct CameraTimerView: View {
                             isExpanded = false
                         }
                     }
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 13, weight: viewModel.delayTime == 0 ? .bold : .regular))
                     .foregroundColor(.white)
                     
                     Button("3초") {
@@ -42,7 +50,7 @@ struct CameraTimerView: View {
                             isExpanded = false
                         }
                     }
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 13, weight: viewModel.delayTime == 3 ? .bold : .regular))
                     .foregroundColor(.white)
                     
                     Button("5초") {
@@ -51,7 +59,7 @@ struct CameraTimerView: View {
                             isExpanded = false
                         }
                     }
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 13, weight: viewModel.delayTime == 5 ? .bold : .regular))
                     .foregroundColor(.white)
                     
                     Button("7초") {
@@ -60,11 +68,12 @@ struct CameraTimerView: View {
                             isExpanded = false
                         }
                     }
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 13, weight: viewModel.delayTime == 7 ? .bold : .regular))
                     .foregroundColor(.white)
                 }
+                .padding(.horizontal, 16)
             } else {
-                // 축소 뷰
+                // 축소 시 기본 뷰
                 HStack(spacing: 8) {
                     Image("timerBlack")
                         .resizable()
@@ -76,13 +85,12 @@ struct CameraTimerView: View {
                         .font(.system(size: 13))
                         .foregroundColor(.black)
                 }
-                .padding(5)
+                //                .padding(.horizontal, 16)
             }
         }
-        // 왼쪽으로만 확장되도록 offset 적용
-        .frame(width: isExpanded ? 185 : 60, height: 30, alignment: .leading)
+        .frame(width: isExpanded ? 200 : 100, height: 30)
+        
         .contentShape(Capsule())
-//        .offset(x: isExpanded ? -16 : 0)
         .onTapGesture {
             if !isExpanded {
                 withAnimation(.spring(response: 0.2)) {
