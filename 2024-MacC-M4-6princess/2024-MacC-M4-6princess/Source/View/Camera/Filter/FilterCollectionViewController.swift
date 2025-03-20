@@ -31,13 +31,14 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     private let defaultCellSize: CGFloat = 38
     
     init(filterImages: [StoreImages], selectedFilter: @escaping (UUID?) -> Void, initialFilter: UUID?, viewModel: CameraViewModel, frameManager: FrameManager) {
-        self.filterImages = filterImages.sorted { $0.uuid?.uuidString ?? "" > $1.uuid?.uuidString ?? "" }
+        self.filterImages = filterImages // 정렬 로직 제거
         self.selectedFilter = selectedFilter
         self.currentSelectedFilter = initialFilter
         self.viewModel = viewModel
         self.frameManager = frameManager
         super.init(nibName: nil, bundle: nil)
     }
+
     
     required init?(coder: NSCoder) {
         fatalError("초기화 오류")
@@ -148,22 +149,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             return cell
         }
     }
-    
-    //    func cellSize(for indexPath: IndexPath) -> CGFloat {
-    //        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-    //        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
-    //        let distance = abs(cellFrame.midX - centerX)
-    //
-    //        if indexPath.item == 0 {
-    //            return defaultCellSize
-    //        } else if distance < (centerCellSize / 2) {
-    //            return centerCellSize
-    //        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
-    //            return rightOfCenterCellSize
-    //        } else {
-    //            return defaultCellSize
-    //        }
-    //    }
+
     
     func cellSize(for indexPath: IndexPath) -> CGFloat {
         // 화면 중앙 위치 계산
@@ -302,24 +288,24 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         updateCellSizesAndSpacing()
     }
     
-    func addNewFilter(_ newFilter: StoreImages) {
-        newFilter.uuid = UUID()
-        newFilter.order = Int32(Date().timeIntervalSince1970)
-        
-        filterImages.insert(newFilter, at: 0)
-        
-        collectionView.performBatchUpdates({
-            self.collectionView.insertItems(at: [IndexPath(item: 1, section: 0)])
-        }, completion: { _ in
-            self.scrollToNewestFilter()
-        })
-    }
+//    func addNewFilter(_ newFilter: StoreImages) {
+////        filterImages.insert(newFilter, at: 0) // 새 필터를 배열의 맨 앞에 추가
+//        
+//        collectionView.performBatchUpdates({
+//            self.collectionView.insertItems(at: [IndexPath(item: 1, section: 0)])
+//        }, completion: { _ in
+//            self.scrollToNewestFilter()
+//        })
+//    }
+
+
 
     
     private func scrollToNewestFilter() {
-        let newestIndexPath = IndexPath(item: filterImages.count, section: 0)
+        let newestIndexPath = IndexPath(item: 1, section: 0) // 새로운 필터는 항상 Empty 셀 다음 위치
         collectionView.scrollToItem(at: newestIndexPath, at: .centeredHorizontally, animated: true)
     }
+
     
     
     

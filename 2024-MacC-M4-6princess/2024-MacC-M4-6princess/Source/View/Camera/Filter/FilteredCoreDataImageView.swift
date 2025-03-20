@@ -33,7 +33,7 @@ struct FilteredCoreDataImageView: View {
                     .resizable()
                     .scaledToFit()
             } else {
-                Color.clear // 이미지 없을 때 빈 화면 처리
+                Color.clear
             }
         }
         .allowsHitTesting(false)
