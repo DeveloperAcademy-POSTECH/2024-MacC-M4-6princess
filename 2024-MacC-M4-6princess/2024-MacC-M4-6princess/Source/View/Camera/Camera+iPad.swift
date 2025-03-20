@@ -83,7 +83,6 @@ extension FilteredImageView{
             ZStack {
                 
                 FilterCollectionViewRepresentable(
-                    filterImages: Array(filterImages),
                     viewModel: viewModel
                 )
                 .frame(height: 100)
