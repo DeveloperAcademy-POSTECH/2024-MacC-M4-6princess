@@ -15,7 +15,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> FilterCollectionViewController {
         return FilterCollectionViewController(
-            filterImages: filterImages.reversed(),
+            filterImages: filterImages,
             selectedFilter: { uuid in
                 frameManager.selectedFrame = uuid
             },

@@ -39,18 +39,25 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
             previousCellMaxX = attribute.frame.maxX
         }
         // 중앙 셀 찾기
-            let centerX = collectionView.bounds.midX
-            let centerCell = attributes.min { abs($0.center.x - centerX) < abs($1.center.x - centerX) }
-            
-            attributes.forEach { attr in
-                if attr != centerCell {
-                    let distance = abs(attr.center.x - centerCell!.center.x)
-                    if distance < 58 + centerCellSpacing + 50 {
-                        let direction = attr.center.x > centerCell!.center.x ? 1 : -1
-                        attr.center.x = centerCell!.center.x + CGFloat(direction) * (54 + centerCellSpacing)
+        let centerX = collectionView.bounds.midX
+        let centerCell = attributes.min { abs($0.center.x - centerX) < abs($1.center.x - centerX) }
+
+        attributes.forEach { attr in
+            if attr != centerCell {
+                let distance = abs(attr.center.x - centerCell!.center.x)
+                if distance < 58 + centerCellSpacing + 50 {
+                    let direction = attr.center.x > centerCell!.center.x ? 1 : -1
+                    attr.center.x = centerCell!.center.x + CGFloat(direction) * (54 + centerCellSpacing)
+                } else {
+                    // 중앙 셀 주변이 아닌 경우 기본 간격 적용
+                    let index = attributes.firstIndex(of: attr)!
+                    if index > 0 {
+                        let prevAttr = attributes[index - 1]
+                        attr.frame.origin.x = prevAttr.frame.maxX + defaultCellSpacing
                     }
                 }
             }
+        }
         
         return attributes
     }

@@ -6,7 +6,7 @@ struct FilteredImageView: View {
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var frameManager: FrameManager
     @FetchRequest(entity: StoreImages.entity(),
-                  sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)])
+                  sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: false)])
     var filterImages: FetchedResults<StoreImages>
     
 //    @State var selectedFilter: UUID?

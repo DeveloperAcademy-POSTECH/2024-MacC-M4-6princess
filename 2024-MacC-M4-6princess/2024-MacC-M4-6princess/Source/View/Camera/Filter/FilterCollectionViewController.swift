@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import SwiftUI
 import AVFoundation
 import FirebaseAnalytics
 
 class FilterCollectionViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+    @Environment(\.managedObjectContext) private var viewContext
+    
     var frameManager: FrameManager
     private let viewModel: CameraViewModel
     
@@ -24,12 +27,13 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     private let filterCellId = "FilterCell"
     private let emptyCellId = "EmptyCell"
     private let cellSpacing: CGFloat = 20
+    private let centerCellSpacing: CGFloat = 31
     private let centerCellSize: CGFloat = 58
     private let rightOfCenterCellSize: CGFloat = 50
     private let defaultCellSize: CGFloat = 38
     
     init(filterImages: [StoreImages], selectedFilter: @escaping (UUID?) -> Void, initialFilter: UUID?, viewModel: CameraViewModel, frameManager: FrameManager) {
-        self.filterImages = filterImages
+        self.filterImages = filterImages.sorted { $0.order > $1.order }
         self.selectedFilter = selectedFilter
         self.currentSelectedFilter = initialFilter
         self.viewModel = viewModel
@@ -302,6 +306,11 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     
     // 필터 추가 함수 - 삭제 예정
     func addNewFilter(_ newFilter: StoreImages) {
+        
+        let newOrder = (filterImages.max { $0.order < $1.order }?.order ?? 0) + 1
+            let newFilter = StoreImages(context: viewContext)
+            newFilter.order = newOrder
+        
         filterImages.append(newFilter)
         
         // collectionView의 데이터 소스를 갱신
