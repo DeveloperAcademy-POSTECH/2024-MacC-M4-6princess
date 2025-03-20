@@ -27,7 +27,7 @@ struct HomeView: View {
             HStack {
                 Image("appLogo")
                     .frame(width: 100, height: 20)
-                    .padding(.top, 18)
+//                    .padding(.top, 18)
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -85,7 +85,7 @@ struct HomeView: View {
                     Button {
                         naviManager.push(screen: Screen.manageFrame)
                     } label: {
-                        HStack {
+                        HStack(spacing: 0) {
                             Text("전체보기")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(Color.gray01)
