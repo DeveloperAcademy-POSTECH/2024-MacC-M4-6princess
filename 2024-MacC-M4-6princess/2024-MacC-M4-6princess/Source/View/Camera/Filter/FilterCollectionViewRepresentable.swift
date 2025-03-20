@@ -41,10 +41,10 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
         // 데이터 변경 시 업데이트 (배열 내용 비교)
         let currentFilters = uiViewController.filterImages.map { $0.uuid }
-        let newFilters = filterImages.reversed().map { $0.uuid }
+        let newFilters = filterImages.map { $0.uuid }
         
         if currentFilters != newFilters {
-            uiViewController.filterImages = filterImages.reversed()
+            uiViewController.filterImages = filterImages
             uiViewController.collectionView.reloadData()
         }
 
