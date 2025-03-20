@@ -17,34 +17,34 @@ struct MFDetailView: View {
     
     var topBar : some View {
         ZStack{
-            HStack{
+            HStack(alignment: .center){
                 Button {
                     frameManager.selectedFrameIdForDetail = nil
                     naviManager.pop()
                 } label: {
                     Image("chevronLeft")
                         .resizable()
-                        .frame(width: 40, height: 40)
+                        .frame(width: 37, height: 40)
                         .padding(.leading, 10)
                 }
-                
                 Spacer()
             }
+//            .frame(height: 60)
+            
             HStack(alignment: .center) {
-                Spacer()
-                Text("\(viewModel.indexOfSelectedImage() ?? 0)/\(viewModel.totalImageCount())")
+                Text("\(viewModel.indexOfSelectedImage() ?? 0) / \(viewModel.totalImageCount())")
                     .font(.body)
                     .fontWeight(.bold)
                     .foregroundStyle(.gray01)
-                Spacer()
             }
+//            .frame(height: 60)
+            
         }
-        .navigationBarBackButtonHidden()
     }
     
     var bottomBar : some View {
         VStack {
-            HStack(spacing: 57) {
+            HStack(spacing: 56) {
                 VStack {
                     Button {
                         //카메라뷰로 이동
@@ -62,29 +62,8 @@ struct MFDetailView: View {
                         .foregroundStyle(.gray01)
                 }
                 VStack {
-                    //                    Button {
-                    //                        //수정뷰로 이동
-                    //                        viewModel.imageDataArray.forEach {
-                    //                            if $0.id == viewModel.selectedImageIds.first {
-                    ////                                frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
-                    //                                Task {
-                    //                                    loadSelectedFrame() {
-                    //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                    //                                            naviManager.push(screen: Screen.modifyFrame)
-                    //                                        })
-                    //                                    }
-                    //                                }
-                    //                            }
-                    //                        }
-                    //                        dismiss()
-                    //                    } label: {
-                    //                        Image("ToolIconModify")
-                    //                            .resizable()
-                    //                            .frame(width: 40, height: 40)
-                    //                    }
                     Button {
                         frameManager.selectedFrame = viewModel.selectedImageId
-//                        dismiss()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             naviManager.push(screen: Screen.modifyFrame)
                         }
@@ -112,7 +91,7 @@ struct MFDetailView: View {
                 }
             }
             .frame(height: 102)
-            .padding(.top, 20)
+//            .padding(.top, 20)
         }
     }
     
@@ -147,11 +126,16 @@ struct MFDetailView: View {
     
     
     var body: some View {
-        VStack  {
-            topBar
-            bodyContentView
-            bottomBar
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                topBar
+                    .frame(width: geo.size.width, height: 80)
+                bodyContentView
+                bottomBar
+            }
         }
+//        .ignoresSafeArea(edges: .top)
+        .navigationBarBackButtonHidden(true)
         .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
                 viewModel.deleteSelectedImage()
