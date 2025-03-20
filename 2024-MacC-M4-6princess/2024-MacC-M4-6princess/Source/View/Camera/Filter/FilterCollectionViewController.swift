@@ -41,23 +41,60 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         fatalError("init(coder:) has not been implemented")
     }
     
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        setupCollectionView()
+//    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
+        
+        // 앱 시작 시 선택된 필터가 없다면 Empty 셀을 선택
+        if currentSelectedFilter == nil {
+            DispatchQueue.main.async {
+                // Empty 셀 선택
+                self.selectedFilter?(nil)
+                self.frameManager.selectedFrame = nil
+                self.frameManager.resultImage = nil
+                
+                // Empty 셀로 스크롤
+                let emptyIndexPath = IndexPath(item: 0, section: 0)
+                self.collectionView.scrollToItem(at: emptyIndexPath, at: .centeredHorizontally, animated: false)
+                self.updateCellSizesAndSpacing()
+            }
+        }
     }
+
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         scrollToSelectedFilter(animated: false)
     }
     
-    func scrollToSelectedFilter(animated: Bool) {
-        guard let selectedUUID = currentSelectedFilter,
-              let index = filterImages.firstIndex(where: { $0.uuid == selectedUUID }) else { return }
-        
-        let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
-        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
-    }
+//    func scrollToSelectedFilter(animated: Bool) {
+//        guard let selectedUUID = currentSelectedFilter,
+//              let index = filterImages.firstIndex(where: { $0.uuid == selectedUUID }) else { return }
+//        
+//        let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
+//        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+//    }
+    
+    // scrollToSelectedFilter 메서드 수정
+        func scrollToSelectedFilter(animated: Bool) {
+            if currentSelectedFilter == nil {
+                // Empty 셀로 스크롤
+                let indexPath = IndexPath(item: 0, section: 0)
+                collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+                return
+            }
+            
+            guard let selectedUUID = currentSelectedFilter,
+                  let index = filterImages.firstIndex(where: { $0.uuid == selectedUUID }) else { return }
+            
+            let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+        }
     
     private func setupCollectionView() {
         let layout = CustomFlowLayout()
@@ -203,7 +240,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         //        print("현재 셀의 인덱스: \(filterImages[indexPath.item])")
     }
     
-    
     private func updateCellSizesAndSpacing() {
         for cell in collectionView.visibleCells {
             guard let indexPath = collectionView.indexPath(for: cell) else { continue }
@@ -217,10 +253,13 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
                         filterCell.configure(with: uiImage, size: size, isSelected: isSelected)
                     }
                 }
+                // 셀의 레이아웃 즉시 업데이트
+                filterCell.layoutIfNeeded()
             }
         }
         collectionView.collectionViewLayout.invalidateLayout()
     }
+
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
