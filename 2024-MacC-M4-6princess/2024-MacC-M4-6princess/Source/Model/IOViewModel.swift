@@ -143,7 +143,7 @@ class IOViewModel: ObservableObject {
     }
     
     
-    private func showAlert(message: String) {
+    func showAlert(message: String) {
         DispatchQueue.main.async {
             self.alertMessage = message
             self.showAlert = true

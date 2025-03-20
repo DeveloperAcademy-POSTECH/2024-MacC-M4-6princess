@@ -31,7 +31,7 @@ struct IOView: View {
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray01)
                     }
-                 
+                    
                 }
                 else{
                     HStack(alignment: .center, spacing: 14) {
@@ -67,12 +67,12 @@ struct IOView: View {
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                     VStack(alignment: .center, spacing: 8){
-//                        Spacer()
-//                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-//                            .font(.system(size:12))
-//                            .multilineTextAlignment(.center)
-//                            .foregroundColor(.gray01)
-//                            .padding(.top,5)
+                        //                        Spacer()
+                        //                        Text("저장된 사진은 갤러리에서 확인해주세요.")
+                        //                            .font(.system(size:12))
+                        //                            .multilineTextAlignment(.center)
+                        //                            .foregroundColor(.gray01)
+                        //                            .padding(.top,5)
                         Spacer()
                         HStack{
                             // 카메라로 이동 버튼
@@ -92,22 +92,23 @@ struct IOView: View {
                             }
                             Button(action: {
                                 
-                                viewModel.showShareButton.toggle()
+                                //                                viewModel.showShareButton.toggle()
+                                viewModel.changeOverlay = true
                             }) {
                                 Image("share.icon")
                                     .resizable()
                                     .frame(width:60,height: 60)
                                 
-
+                                
                             }
                         }
                         .frame(maxWidth: .infinity)
-//                        .padding(.bottom, 26)
+                        //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                         Spacer()
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                             .ignoresSafeArea(.all)
-                            
+                        
                         
                         
                     }
@@ -145,10 +146,10 @@ struct IOView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-//                        .padding(.bottom, 26)
+                        //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
-                         
+                        
                         
                     }
                 }
@@ -175,15 +176,15 @@ struct IOView: View {
                 print("onchange start")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
                     
-                        viewModel.changeOverlay = true
-                        print("changeoverlay")
+                    viewModel.changeOverlay = true
+                    print("changeoverlay")
                     
                 }
             }
         })
         .overlay(
             Group {
-
+                
                 if viewModel.changeOverlay, let photo = viewModel.compositeImage {
                     IOShareSheet(isPresented: $viewModel.changeOverlay, shareData: (photo, "title", "Frameet으로 사진 찍어왔음"))
                         .onAppear{

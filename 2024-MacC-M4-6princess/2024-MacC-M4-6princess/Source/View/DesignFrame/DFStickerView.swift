@@ -37,13 +37,13 @@ struct DFStickerView: View {
                                 RoundedRectangle(cornerRadius: 13)
                                     .fill(.gray02)
                                     .frame(width: 56, height: 26)
-                                
                             }
                             Text(tab.displayName)
                                 .font(.system(size: 15, weight: selectedTab == tab ? .bold : .medium))
                                 .foregroundColor(selectedTab == tab ? .white : .gray02)
                                 .onTapGesture {
                                     selectedTab = tab
+                                    viewModel.selectedStickerTab = tab
                                 }
                         }
                         
@@ -54,8 +54,8 @@ struct DFStickerView: View {
                 }
                 
             }
-                        .padding(.horizontal,20)
-            //            .padding(.vertical, 6)
+            .padding(.horizontal,20)
+            
             Divider()
             ScrollView {
                 LazyVGrid(
@@ -73,25 +73,29 @@ struct DFStickerView: View {
                                 .background(Color.gray.opacity(0.2))
                                 .cornerRadius(10)
                         }
-                                                .onTapGesture {
-                                                    let newImage = SubjectImage()
-                                                    if let image = UIImage(named: imageName) {
-                                                        newImage.sticker = image
-                                                        newImage.originalImage = image
-                                                        imageModel.imageList.forEach { $0.isTapped = false }
-                                                        imageModel.imageList.append(newImage)
-                        
-                                                        Analytics.logEvent("A5_스티커선택", parameters: ["sticker_name": imageName])
-                        
-                                                        viewModel.selectedSubject = imageModel.imageList.last
-                                                        viewModel.selectedIndex = imageModel.imageList.indices.last
-                                                        viewModel.modelListControl(subject: imageModel.imageList.last!)
-                                                    } else {
-                                                        print("Image not found")
-                                                    }
-                        
-                                                    viewModel.showStickerSheet = false
-                                                }
+                        .onTapGesture {
+                            let newImage = SubjectImage()
+                            if let image = UIImage(named: imageName) {
+                                newImage.sticker = image
+                                newImage.originalImage = image
+                                if viewModel.selectedStickerTab == .full{
+                                    newImage.isFullSticker = true
+                                }
+                                
+                                imageModel.imageList.forEach { $0.isTapped = false }
+                                imageModel.imageList.append(newImage)
+                                
+                                Analytics.logEvent("A5_스티커선택", parameters: ["sticker_name": imageName])
+                                
+                                viewModel.selectedSubject = imageModel.imageList.last
+                                viewModel.selectedIndex = imageModel.imageList.indices.last
+                                viewModel.modelListControl(subject: imageModel.imageList.last!)
+                            } else {
+                                print("Image not found")
+                            }
+                            
+                            viewModel.showStickerSheet = false
+                        }
                         .frame(maxWidth: .infinity, maxHeight: .infinity) // 정사각형 박스 크기
                         .aspectRatio(1, contentMode: .fit) // 비율 유지
                     }

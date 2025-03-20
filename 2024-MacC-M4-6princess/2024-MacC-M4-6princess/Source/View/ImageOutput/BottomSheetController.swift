@@ -36,13 +36,13 @@ class BottomSheetController: UIViewController {
     }
     private func setupUI() {
         view.backgroundColor = .white
-
+        
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 25
         stackView.distribution = .equalSpacing
         stackView.alignment = .center
-
+        
         let twitterButton = createShareButton(icon: "x.icon", text: "X") { [weak self] in
             guard let self = self else { return }
             self.viewModel.showShareButton = false
@@ -50,38 +50,64 @@ class BottomSheetController: UIViewController {
             self.viewModel.showAcitivity.toggle()
             print("showActivity: \(self.viewModel.showAcitivity)")
         }
+        
+        
 
+        
         let instagramButton = createShareButton(icon: "insta.icon", text: "인스타그램") { [weak self] in
             guard let self = self, let composite = self.viewModel.compositeImage else { return }
-            if InstagramSharingUtils.canOpenInstagramStories {
-                InstagramSharingUtils.shareToInstagramStories(composite)
+
+            // UIImage를 JPEG로 변환 후 임시 디렉터리에 저장
+            guard let imageData = composite.jpegData(compressionQuality: 0.9) else { return }
+            
+            let fileName = "instagram_share.jpg"
+            let fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
+            
+            do {
+                try imageData.write(to: fileURL)
+            } catch {
+                print("❌ 이미지 저장 실패: \(error.localizedDescription)")
+                return
+            }
+
+            // Instagram이 설치되어 있는지 확인
+            let instagramURL = URL(string: "instagram://app")!
+            if UIApplication.shared.canOpenURL(instagramURL) {
+                // Document Interaction API를 사용하여 Instagram으로 공유
+                let documentController = UIDocumentInteractionController(url: fileURL)
+                documentController.uti = "com.instagram.exclusivegram"
+                documentController.presentOpenInMenu(from: CGRect.zero, in: UIApplication.shared.windows.first!.rootViewController!.view, animated: true)
+            } else {
+                print("❌ Instagram이 설치되지 않았습니다.")
             }
         }
 
+
+        
         let kakaoButton = createShareButton(icon: "kakao.icon", text: "카카오톡") { [weak self] in
             self?.viewModel.showShareButton = false
             self?.viewModel.showAcitivity.toggle()
         }
-
+        
         let messageButton = createShareButton(icon: "message.icon", text: "Message") { [weak self] in
             self?.viewModel.showShareButton = false
             self?.viewModel.showAcitivity.toggle()
         }
-
+        
         let moreButton = createShareButton(icon: "more.icon", text: "더보기") { [weak self] in
             self?.viewModel.showShareButton = false
             self?.viewModel.showAcitivity.toggle()
         }
-
+        
         [twitterButton, instagramButton, kakaoButton, messageButton, moreButton].forEach { stackView.addArrangedSubview($0) }
-
+        
         view.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-
+        
         // 하단 중앙에 sharesheet.arrow 이미지뷰 추가
         let arrowImageView = UIImageView()
         arrowImageView.image = UIImage(named: "sharesheet.arrow")?.withRenderingMode(.alwaysOriginal)
@@ -95,7 +121,7 @@ class BottomSheetController: UIViewController {
             arrowImageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
         ])
     }
-
+    
     private func createShareButton(icon: String, text: String, action: @escaping () -> Void) -> UIStackView {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: icon)?.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -114,4 +140,26 @@ class BottomSheetController: UIViewController {
         
         return stackView
     }
+    func shareToInstagramFeed(image: UIImage) {
+        // 이미지를 JPEG 형식으로 변환하고 .ig 확장자를 가진 파일로 저장
+        guard let imageData = image.jpegData(compressionQuality: 1.0) else { return }
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("tempImage.ig")
+        do {
+            try imageData.write(to: fileURL)
+        } catch {
+            viewModel.alertMessage = "다시 시도해주세요"
+            viewModel.showAlert = true
+            print("파일 저장 실패: \(error.localizedDescription)")
+            return
+        }
+
+        // UIDocumentInteractionController를 사용하여 Instagram으로 공유
+        let documentController = UIDocumentInteractionController(url: fileURL)
+        documentController.uti = "com.instagram.exclusivegram"
+//        documentController.delegate = self
+        if documentController.presentOpenInMenu(from: self.view.frame, in: self.view, animated: true) == false {
+            print("Instagram이 설치되어 있지 않거나 열 수 없습니다.")
+        }
+    }
+
 }
