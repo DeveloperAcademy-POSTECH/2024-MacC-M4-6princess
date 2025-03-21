@@ -16,7 +16,7 @@ struct CameraTopView: View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             HStack() {
                 Spacer()
-                CameraTimerView(viewModel: viewModel, motionManager: motionManager)
+                CameraTimerView(viewModel: viewModel)
                 Button {
                     viewModel.changeCamera()
                 } label: {

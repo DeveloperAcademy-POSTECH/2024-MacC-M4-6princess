@@ -121,7 +121,6 @@ struct CameraView: View {
         }
         .persistentSystemOverlays(.hidden)
         .onAppear {
-            
             motionManager.startDeviceMotionUpdates()
             if isActuallyiPad() {
                 viewModel.showOrientationAlert = true

@@ -45,20 +45,17 @@ struct MFView: View {
                         } label: {
                             ZStack {
                                 Rectangle()
-                                    .foregroundColor(.pointPink)
-                                    .frame(height: 60)
-                                    .frame(maxWidth: .infinity)
-                                    .cornerRadius(10)
-                                    .padding(.horizontal, 20)
-                                    
-//                                    .overlay(
-//                                        RoundedRectangle(cornerRadius: 10)
-//                                            .inset(by: 1)
-//                                            .stroke(.pointPink, lineWidth: 2)
-//                                    )
-                                Text("프레임 삭제")
-                                    .font(.system(size: 17))
                                     .foregroundColor(.white)
+                                    .frame(width: 164, height: 60)
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .inset(by: 1)
+                                            .stroke(.pointPink, lineWidth: 2)
+                                    )
+                                Text("삭제하기")
+                                    .font(.system(size: 17))
+                                    .foregroundColor(.pointPink)
                                     .fontWeight(.bold)
                             }
                         }
@@ -100,8 +97,7 @@ struct MFView: View {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
             }
             .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
-                MFDetailView()
-                    .environmentObject(frameManager)
+                MFDetailView(viewModel: viewModel)
             }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
@@ -120,13 +116,13 @@ struct SheetTitleView: View {
     var body: some View {
         ZStack {
             HStack(alignment: .center) {
+                Spacer()
                 Text("프레임 관리")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
                     .foregroundColor(.gray01)
+                Spacer()
             }
-            .frame(height: 80)
-            
             HStack(alignment: .center) {
                 Button {
                     dismiss()
@@ -145,13 +141,13 @@ struct SheetTitleView: View {
                             .font(.system(size: 17))
                             .fontWeight(.bold)
                             .foregroundColor(.gray01)
-                            .padding(.trailing, 20)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10.49618)
                     }
                 }
             }
-            .frame(height: 80)
+            .padding(.vertical, 20)
         }
-        
         
     }
 }
@@ -209,8 +205,7 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-//            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
-            frameManager.selectedFrameIdForDetail = imageInfo.id
+            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
             if !viewModel.isEditing {
                 viewModel.selectedImageIds = [imageInfo.id]
                 viewModel.isShowMFDetailView = true

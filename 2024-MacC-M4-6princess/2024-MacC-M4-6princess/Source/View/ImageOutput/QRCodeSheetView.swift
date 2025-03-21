@@ -81,6 +81,6 @@ struct SnsTestView: View {
                 }
             }
         )
-    }
+      }
     
 }
