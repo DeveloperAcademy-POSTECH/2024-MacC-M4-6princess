@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "humor08.svg",
+      "filename" : "humor08.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "humor08@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "humor08@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
