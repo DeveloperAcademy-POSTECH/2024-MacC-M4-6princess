@@ -15,28 +15,28 @@ struct PhotosPickerView: View {
         ZStack {
             VStack {
                 toolbarButton
-                Spacer()
                 ScrollViewWithOffset
-                    .padding(.top, UIScreen.main.bounds.height*0.05)
+                    .padding(.top, 10)
             }
             VStack {
                 toastMessage
-                    .padding(.bottom, UIScreen.main.bounds.height * 0.67)
+                    .padding(.bottom, UIScreen.main.bounds.height * 0.65)
                     .opacity(vm.messageOpacity)
             }
         }
         .onAppear {
-            
+            print("w: \(UIScreen.main.bounds.width)")
+            print("h: \(UIScreen.main.bounds.height)")
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
-//                    DispatchQueue.main.async {
-                        vm.fetchAlbum()
-                        print(vm.album.count)
-                        for i in 0..<vm.album.count {
-                            print("모델 삽입 실행됨")
-                            vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
-                        }
-//                    }
+                    //                    DispatchQueue.main.async {
+                    vm.fetchAlbum()
+                    print(vm.album.count)
+                    for i in 0..<vm.album.count {
+                        print("모델 삽입 실행됨")
+                        vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
+                    }
+                    //                    }
                 }
             }
             vm.changeOpacity()
@@ -123,17 +123,6 @@ extension PhotosPickerView {
                                             }
                                         }
                                     }
-                                VStack {
-                                    HStack {
-                                        Spacer()
-                                        Image("frameCheckIcon")
-                                            .resizable()
-                                            .frame(width:20, height: 20)
-                                            .padding([.trailing, .top], 5)
-                                            .opacity(vm.models[i].isSelected ? 1 : 0)
-                                    }
-                                    Spacer()
-                                }
                             }
                         }
                     }
@@ -201,7 +190,7 @@ extension PhotosPickerView {
             
             Button {
                 naviManager.pop()
-//                dismiss()
+                //                dismiss()
             } label: {
                 Image(systemName: "xmark")
                     .resizable()
@@ -222,6 +211,7 @@ extension PhotosPickerView {
             
             
         }
+        .padding(.top, 20)
     }
 }
 

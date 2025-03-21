@@ -21,79 +21,88 @@ struct DFModifyView: View {
     @State var beforeDragOffsetY: CGFloat = .zero
     
     var body: some View {
-        
-        ZStack {
-            if isFirstLaunching == true && !viewModel.showAgain == true {
-                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
-                    .zIndex(1)
+        VStack {
+            
+            if !viewModel.showTextView && !frameManager.showTextModifyView {
+                toolBarButtons
+                    .padding(.top, 10)
             }
             
-            Color.clear
-                .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
-                .onTapGesture {
-                    isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
+            ZStack {
+                if isFirstLaunching == true && !viewModel.showAgain == true {
+                    DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
+                        .zIndex(1)
                 }
-            
-            if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
-                let extractedExpr: VStack<TupleView<(some View, some View)>> = VStack {
-                    ZStack {
-                        Image("checkBox")
-                            .resizable()
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
-                        
-                        imageView
-                            .onAppear {
-                                if let list = imageModel.imageList.last {
-                                    if let _ = list.image {
-                                        viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+                
+                Color.clear
+                    .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
+                    .onTapGesture {
+                        isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
+                    }
+                
+                if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                    let extractedExpr: VStack<TupleView<(some View, some View)>> = VStack {
+                        ZStack {
+                            Image("checkBox")
+                                .resizable()
+                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
+                            
+                            imageView
+                                .onAppear {
+                                    frameManager.maskImage = nil
+                                    if let list = imageModel.imageList.last {
+                                        if let _ = list.image {
+                                            viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+                                        }
                                     }
                                 }
+                            
+                            RoundedRectangle(cornerRadius: 30)
+                                .fill(Color.white)
+                                .opacity(viewModel.btnOpacity)
+                                .frame(width: 175, height: 38)
+                                .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
+                            if let selected = viewModel.selectedSubject,selected.isTapped,imageModel.imageList.count > 1{
+                                newLayerIndicator
                             }
-                        
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(Color.white)
-                            .opacity(viewModel.btnOpacity)
-                            .frame(width: 175, height: 38)
-                            .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
-                        if let selected = viewModel.selectedSubject,selected.isTapped,imageModel.imageList.count > 1{
-                            newLayerIndicator
                         }
-                    }
-                    .gesture(viewModel.backgroundGesture())
-                    .onTapGesture {
-                        viewModel.isTappedImage = false
-                        imageModel.imageList.forEach {
-                            $0.isTapped = viewModel.isTappedImage
+                        .padding(.bottom, 30)
+                        .gesture(viewModel.backgroundGesture())
+                        .onTapGesture {
+                            viewModel.isTappedImage = false
+                            imageModel.imageList.forEach {
+                                $0.isTapped = viewModel.isTappedImage
+                            }
                         }
+                        .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3).padding(.bottom, 30))
+                        DFImageDecoView(viewModel: viewModel)
+                            .padding(.bottom, 50)
                     }
-                    .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
-                    DFImageDecoView(viewModel: viewModel)
-                        .padding(.top, 58)
+                    extractedExpr
                 }
-                extractedExpr
-            }
-            else{
-                modifyIpad
-            }
-            if viewModel.showTextView {
-                DFTextView(modiViewModel:viewModel)
-            }
-            if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
-                DFTextModifyView(
-                    modiViewModel: viewModel
-                    
-                )
-            }
-            
-            VStack{
-                Spacer()
-                HStack{
-                    if isLongPressed{
-                        oldLayerIndicator
+                else{
+                    modifyIpad
+                }
+                if viewModel.showTextView {
+                    DFTextView(modiViewModel:viewModel)
+                }
+                if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
+                    DFTextModifyView(
+                        modiViewModel: viewModel
+                        
+                    )
+                }
+                
+                VStack{
+                    Spacer()
+                    HStack{
+                        if isLongPressed{
+                            oldLayerIndicator
+                        }
+                        Spacer()
                     }
                     Spacer()
                 }
-                Spacer()
             }
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
@@ -103,12 +112,12 @@ struct DFModifyView: View {
         }
         .ignoresSafeArea(.keyboard)
         .navigationBarBackButtonHidden()
-        .toolbar {
-            if !viewModel.showTextView && !frameManager.showTextModifyView {
-                toolBarButtons
-            }
-            
-        }
+//        .toolbar {
+//            if !viewModel.showTextView && !frameManager.showTextModifyView {
+//                toolBarButtons
+//            }
+//
+//        }
         .onChange(of: viewModel.showCamera) { newValue in
             if newValue {
                 // 1초 후에 화면 전환

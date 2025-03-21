@@ -7,7 +7,7 @@ struct DFImageDecoView: View {
     
     var body: some View {
             
-        HStack(spacing: 40){
+        HStack(spacing: 56){
             
             appendImageView
             
