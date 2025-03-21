@@ -246,11 +246,21 @@ class DFModifyViewModel: ObservableObject {
     }
     func addImage(albumImageData: Data?, context: NSManagedObjectContext, subjects: ImageListModel) {
          
+        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+        
         
         let newImage = StoreImages(context: context)
         newImage.image = albumImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
+        
+        do {
+            let storedImages = try context.fetch(fetchRequest)
+            newImage.order = Int32(storedImages.count)
+            
+        } catch {
+            print("이미지 로드 실패: \(error)")
+        }
         
         for i in subjects.imageList {
             let newSubject = Subject(context: context)
