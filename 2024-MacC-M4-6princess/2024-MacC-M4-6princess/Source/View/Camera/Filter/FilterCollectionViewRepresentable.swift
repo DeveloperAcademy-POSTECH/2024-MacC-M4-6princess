@@ -10,12 +10,17 @@ import SwiftUI
 
 struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @EnvironmentObject var frameManager: FrameManager
-    let filterImages: [StoreImages]
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        entity: StoreImages.entity(),
+        sortDescriptors: [] // 빈 배열 전달
+
+    ) var filterImages: FetchedResults<StoreImages>
     let viewModel: CameraViewModel
     
     func makeUIViewController(context: Context) -> FilterCollectionViewController {
         return FilterCollectionViewController(
-            filterImages: filterImages.reversed(),
+            filterImages: Array(filterImages),
             selectedFilter: { uuid in
                 frameManager.selectedFrame = uuid
             },
@@ -25,34 +30,13 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         )
     }
     
-    //    func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-    //        uiViewController.collectionView.reloadData()
-    //
-    //        // 선택된 필터를 스크롤로 중앙에 위치시키기
-    //        if let selectedFilter = frameManager.selectedFrame,
-    //           let index = uiViewController.filterImages.firstIndex(where: { $0.uuid == selectedFilter }) {
-    //            uiViewController.collectionView.scrollToItem(
-    //                at: IndexPath(item: index + 1, section: 0),
-    //                at: .centeredHorizontally,
-    //                animated: true
-    //            )
-    //        }
-    //    }
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-        // 데이터 변경 시 업데이트 (배열 내용 비교)
-        let currentFilters = uiViewController.filterImages.map { $0.uuid }
-        let newFilters = filterImages.reversed().map { $0.uuid }
+        uiViewController.filterImages = Array(filterImages)
+        uiViewController.collectionView.reloadData()
         
-        if currentFilters != newFilters {
-            uiViewController.filterImages = filterImages.reversed()
-            uiViewController.collectionView.reloadData()
-        }
-
-        // 선택된 필터 변경됐을 때만 업데이트
         if uiViewController.currentSelectedFilter != frameManager.selectedFrame {
             uiViewController.currentSelectedFilter = frameManager.selectedFrame
             uiViewController.scrollToSelectedFilter(animated: false)
         }
     }
-
 }

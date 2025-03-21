@@ -12,7 +12,7 @@ extension CameraTopView{
     var cameraIPadTopView: some View {
         HStack() {
             Spacer()
-            CameraTimerView(viewModel: viewModel)
+            CameraTimerView(viewModel: viewModel, motionManager: motionManager)
             Button {
                 viewModel.changeCamera()
             } label: {
@@ -83,7 +83,6 @@ extension FilteredImageView{
             ZStack {
                 
                 FilterCollectionViewRepresentable(
-                    filterImages: Array(filterImages),
                     viewModel: viewModel
                 )
                 .frame(height: 100)

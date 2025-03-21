@@ -14,7 +14,7 @@ struct IOCanvasView: View {
     @GestureState var startLocation: CGPoint? = nil
     @State var currentScale: CGFloat = 1.0
     @GestureState var zoomFactor: CGFloat = 1.0
-    
+    var widthSize:CGFloat = 80
     var body: some View {
         ZStack {
             // 배경 이미지
@@ -44,19 +44,70 @@ struct IOCanvasView: View {
                             .frame(width: viewModel.frameBGSize.width,
                                    height: viewModel.frameBGSize.height)
                     )
+                    .zIndex(1)
             }
             
-            VStack{
-                Spacer()
-                HStack{
-                    Spacer()
-                    Image("logo.output")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100)
-                        .padding()
+            // Portrait 또는 PortraitUpsideDown일 때
+            if viewModel.currentOrientation == .portrait || viewModel.currentOrientation == .portraitUpsideDown  {
+                VStack{
+                    Spacer() // 상단 여백
+                    HStack {
+                        Spacer() // 좌측 여백
+                        Image("logo.output")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: widthSize)
+                            .padding()
+                    }
                 }
             }
+            // Landscape일 때
+            else if viewModel.currentOrientation == .landscapeLeft {
+                VStack{
+                    Spacer() // 상단 여백
+                    HStack {
+                        
+                        Image("logo.right")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: widthSize)
+                            .padding()
+                        Spacer() // 좌측 여백
+                    }
+                }
+                
+            }
+            // Landscape일 때
+            else if  viewModel.currentOrientation == .landscapeRight {
+                
+                HStack {
+                    Spacer()
+                    VStack {
+                        Image("logo.left")
+                            .resizable()
+                            .scaledToFit()
+                        //                                .rotationEffect(rotationAngle(for: viewModel.initialOrientation))
+                            .frame(height:widthSize)
+                            .padding()
+                        Spacer()
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            //            VStack{
+            //                Spacer()
+            //                HStack{
+            //                    Spacer()
+            //                    Image("logo.output")
+            //                        .resizable()
+            //                        .scaledToFit()
+            //                        .frame(width: 100)
+            //                        .padding()
+            //                }
+            //            }
         }
         .onAppear {
             viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
