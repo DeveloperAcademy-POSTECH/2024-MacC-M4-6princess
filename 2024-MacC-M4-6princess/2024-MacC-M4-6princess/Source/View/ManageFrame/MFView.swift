@@ -139,7 +139,12 @@ struct SheetTitleView: View {
                 Spacer()
                 if !viewModel.imageDataArray.isEmpty {
                     Button {
-                        viewModel.isEditing.toggle()
+//                        viewModel.isEditing.toggle()
+                        if viewModel.isEditing {
+                            viewModel.isEditing = false
+                        } else {
+                            viewModel.isEditing = true
+                        }
                     } label: {
                         Text(viewModel.isEditing ? "취소" : "편집")
                             .font(.system(size: 17))
@@ -189,6 +194,7 @@ struct GridItemView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
+        
         ZStack(alignment: .topTrailing) {
             if let image = UIImage(data: viewModel.loadImageIfNeeded(for: imageInfo.id) ?? Data()) {
                 Image(uiImage: image)
@@ -216,6 +222,8 @@ struct GridItemView: View {
                 viewModel.isShowMFDetailView = true
 //                naviManager.push(screen: Screen.manageDetailFrame)
                 Analytics.logEvent("A2_프레임선택", parameters: nil)
+            } else {
+                viewModel.selectedImageIds.insert(imageInfo.id)
             }
         }
 //        .onTapGesture {
