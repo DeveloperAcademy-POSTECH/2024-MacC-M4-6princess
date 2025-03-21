@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "bubble16.png",
+      "filename" : "bubble16.svg",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "bubble16@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "bubble16@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
