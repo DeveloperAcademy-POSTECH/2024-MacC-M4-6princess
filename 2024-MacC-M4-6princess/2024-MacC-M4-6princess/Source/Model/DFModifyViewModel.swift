@@ -246,12 +246,11 @@ class DFModifyViewModel: ObservableObject {
     }
     func addImage(albumImageData: Data?, context: NSManagedObjectContext, subjects: ImageListModel) {
          
-        
         let newImage = StoreImages(context: context)
         newImage.image = albumImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
-        
+        newImage.createdDate = Date()
         for i in subjects.imageList {
             let newSubject = Subject(context: context)
             
