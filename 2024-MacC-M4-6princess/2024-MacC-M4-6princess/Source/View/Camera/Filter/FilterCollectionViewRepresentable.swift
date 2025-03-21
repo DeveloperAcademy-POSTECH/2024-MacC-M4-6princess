@@ -13,7 +13,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         entity: StoreImages.entity(),
-        sortDescriptors: [] // 빈 배열 전달
+        sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)] // 빈 배열 전달
 
     ) var filterImages: FetchedResults<StoreImages>
     let viewModel: CameraViewModel
@@ -31,7 +31,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-        uiViewController.filterImages = Array(filterImages)
+        uiViewController.filterImages = Array(filterImages.reversed())
         uiViewController.collectionView.reloadData()
         
         if uiViewController.currentSelectedFilter != frameManager.selectedFrame {

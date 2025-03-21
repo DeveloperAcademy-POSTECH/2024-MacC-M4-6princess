@@ -1,13 +1,14 @@
 import SwiftUI
 import UIKit
 import FirebaseAnalytics
+import CoreData
 
 struct FilteredImageView: View {
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var frameManager: FrameManager
     @FetchRequest(
         entity: StoreImages.entity(),
-        sortDescriptors: [] // 빈 배열 전달
+        sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)] // 빈 배열 전달
     )
 
     var filterImages: FetchedResults<StoreImages>
@@ -68,6 +69,7 @@ struct FilteredImageView: View {
     }
     
     func reloadFilterImages() {
+        
         for image in filterImages {
             viewContext.refresh(image, mergeChanges: true)
         }
