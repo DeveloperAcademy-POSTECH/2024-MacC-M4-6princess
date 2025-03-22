@@ -45,24 +45,25 @@ extension FontStyle: CaseIterable {
         }
     }
 }
-enum NewFontStyle: String,CaseIterable {
+
+
+enum NewFontStyle: String, CaseIterable {
     case modern = "Pretendard-Regular"
     case handwriting = "HakgyoansimGeurimilgiOTF-R"
-    case bold = "Pretendard-Bold" // 시스템 기본 볼드체
-    
+    case bold = "Pretendard-Bold"
+
+    /// 로컬라이징된 이름 반환
     var displayName: String {
-        switch self {
-        case .modern:
-            return "모던체"
-        case .handwriting:
-            return "손글씨체"
-        case .bold:
-            return "볼드체"
-        }
+        NSLocalizedString("font.\(self.key)", comment: "")
     }
-    
+
+    /// 폰트 패밀리 이름이 아닌 enum case 이름을 키로 사용
+    private var key: String {
+        String(describing: self)
+    }
+
+    /// 사용 가능한 폰트 목록 출력 (디버깅용)
     func printFamilyFont() {
-        // 사용 가능한 폰트 목록 출력
         UIFont.familyNames.sorted().forEach { familyName in
             print("*** \(familyName) ***")
             UIFont.fontNames(forFamilyName: familyName).forEach { fontName in
@@ -71,21 +72,18 @@ enum NewFontStyle: String,CaseIterable {
             print("---------------------")
         }
     }
-    
+
+    /// UIKit용 UIFont 반환
     func applyFont(size: CGFloat) -> UIFont {
         return UIFont(name: self.rawValue, size: size) ?? UIFont.systemFont(ofSize: size)
     }
+
+    /// SwiftUI용 Font 반환
     func oldApplyFont(size: CGFloat) -> Font {
-        switch self {
-            case .modern:
-                return .custom("Pretendard-Regular",size: size) // 시스템 폰트
-            case .handwriting:
-                return .custom("HakgyoansimGeurimilgiOTF-R", size: size) // 헬베티카 폰트
-            case .bold:
-                return .custom("Pretendard-Bold",size: size) // 시스템 기본 볼드체
-        }
+        .custom(self.rawValue, size: size)
     }
 }
+
 
 
 struct ColorPreset {

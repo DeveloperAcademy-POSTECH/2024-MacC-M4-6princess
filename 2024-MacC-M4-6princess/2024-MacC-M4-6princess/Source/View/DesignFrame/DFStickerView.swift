@@ -108,16 +108,12 @@ struct DFStickerView: View {
 
 enum StickerTab: String, CaseIterable {
     case bubble, humor, character, full
-    
+
     var displayName: String {
-        switch self {
-            case .bubble: return "말풍선"
-            case .humor: return "유머"
-            case .character: return "캐릭터"
-            case .full: return "프레임"
-        }
+        NSLocalizedString("stickerTab.\(self.rawValue)", comment: "")
     }
 }
+
 struct StickerImages {
     static func getStickerImages() -> [StickerTab: [String]] {
         return [

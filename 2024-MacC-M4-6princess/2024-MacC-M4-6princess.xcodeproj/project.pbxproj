@@ -204,9 +204,13 @@
 			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				Base,
 				ko,
 				en,
+				ja,
+				"zh-Hans",
+				ar,
+				de,
+				Base,
 			);
 			mainGroup = 89A94AA62CA9B64C00824592;
 			minimizedProjectReferenceProxies = 1;

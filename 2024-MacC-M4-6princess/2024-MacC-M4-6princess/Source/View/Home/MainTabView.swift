@@ -69,7 +69,7 @@ struct CustomTabBar: View {
             HStack {
                 
                 TabBarButton(imageName: selectedTab == 0 ? "homeIconFill" : "homeIcon",
-                             title: "홈",
+                             title:String(localized: "tab.home"),
                              isSelected: selectedTab == 0) {
                     selectedTab = 0
                 }
@@ -78,7 +78,7 @@ struct CustomTabBar: View {
                 Spacer()
                 
                 TabBarButton(imageName: selectedTab == 1 ? "cameraIconFill" : "cameraIcon",
-                             title: "카메라",
+                             title: String(localized: "tab.camera"),
                              isSelected: selectedTab == 1) {
                     selectedTab = 1
                 }

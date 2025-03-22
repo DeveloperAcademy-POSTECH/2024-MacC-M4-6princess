@@ -57,7 +57,7 @@ struct MFDetailView: View {
                             .resizable()
                             .frame(width: 40, height: 40)
                     }
-                    Text("사진촬영")
+                    Text("사진 촬영")
                         .font(.caption)
                         .foregroundStyle(.gray01)
                 }
