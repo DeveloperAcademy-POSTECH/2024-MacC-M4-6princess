@@ -46,9 +46,6 @@ class DFModifyViewModel: ObservableObject {
     @Published var selectedSubject: SubjectImage? = nil
     @Published var selectedIndex: Int? = nil
     
-    /// 스티커 변수
-    var selectedStickerTab = StickerTab.bubble
-    
     @Published var style:TextStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: "", font: .modern, color: ColorPreset.colorPallete[0], alignment: .center )
     
     func backgroundGesture() -> some Gesture {
@@ -157,7 +154,7 @@ class DFModifyViewModel: ObservableObject {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
             //            render.scale = scaleCompute(inputImage)
-            render.scale = UIScreen.main.scale + 1
+            render.scale = UIScreen.main.scale
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context, subjects: imageModel)
         }
@@ -249,22 +246,11 @@ class DFModifyViewModel: ObservableObject {
     }
     func addImage(albumImageData: Data?, context: NSManagedObjectContext, subjects: ImageListModel) {
          
-        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
-        
-        
         let newImage = StoreImages(context: context)
         newImage.image = albumImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
-        
-        do {
-            let storedImages = try context.fetch(fetchRequest)
-            newImage.order = Int32(storedImages.count)
-            
-        } catch {
-            print("이미지 로드 실패: \(error)")
-        }
-        
+        newImage.createdDate = Date()
         for i in subjects.imageList {
             let newSubject = Subject(context: context)
             

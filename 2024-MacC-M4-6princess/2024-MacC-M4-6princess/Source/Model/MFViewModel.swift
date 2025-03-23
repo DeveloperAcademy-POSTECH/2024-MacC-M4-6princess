@@ -34,7 +34,8 @@ class MFViewModel: ObservableObject {
     ///코어데이터에서 이미지 id를 가져옴
     func loadImages() {
         let request = StoreImages.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+//        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)]
         
         do {
             let storedImages = try viewContext.fetch(request)

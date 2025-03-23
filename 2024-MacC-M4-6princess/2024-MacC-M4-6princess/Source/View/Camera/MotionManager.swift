@@ -10,40 +10,29 @@ import CoreMotion
 
 class MotionManager: ObservableObject {
     @Published var currentOrientation: UIDeviceOrientation = .portrait //이걸 model로 따로 빼기
-    {
-        didSet{
-            print("현재방향:\(currentOrientation.rawValue)")
-        }
-    }
     private var motionManager = CMMotionManager()
     private var lastUpdate: Date = Date()
-    private var isMotionActive = false
-    
+
     init() {
         startDeviceMotionUpdates()
     }
 
     //코어 모션 인식을 시작하는 함수
     func startDeviceMotionUpdates() {
-            guard !isMotionActive, motionManager.isDeviceMotionAvailable else { return }
+        if motionManager.isDeviceMotionAvailable {
             motionManager.deviceMotionUpdateInterval = 0.1
             motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (data, error) in
                 guard let self = self, let attitude = data?.attitude else { return }
+                
+                // 일정 시간 간격으로 업데이트
                 if Date().timeIntervalSince(self.lastUpdate) > 0.5 {
                     self.lastUpdate = Date()
                     self.updateOrientation(attitude: attitude)
+                    
                 }
             }
-            isMotionActive = true
-            print("Device motion updates started.")
         }
-
-        func stopDeviceMotionUpdates() {
-            guard isMotionActive, motionManager.isDeviceMotionAvailable else { return }
-            motionManager.stopDeviceMotionUpdates()
-            isMotionActive = false
-            print("Device motion updates stopped. Active: \(motionManager.isDeviceMotionActive)")
-        }
+    }
 
     //카메라뷰 아이콘 회전을 위한 함수
     func rotationAngle(for orientation: UIDeviceOrientation) -> Angle {
@@ -99,18 +88,5 @@ class MotionManager: ObservableObject {
             return .up 
         }
     }
-    
-    //기기의 회전에 따라 다른 값을 출력하는 함수
-    func imageRotate(input:UIDeviceOrientation) -> UIImage.Orientation {
-        switch input {
-        case .landscapeLeft:
-            return .left
-        case .landscapeRight:
-            return .right
-        case .portraitUpsideDown:
-            return .down
-        default:
-            return .up
-        }
-    }
+
 }

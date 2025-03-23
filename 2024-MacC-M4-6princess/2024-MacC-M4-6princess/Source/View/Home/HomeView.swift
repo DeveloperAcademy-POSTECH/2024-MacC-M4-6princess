@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseAnalytics
 
 struct HomeView: View {
     @Environment(\.dismiss) private var dismiss
@@ -27,7 +26,7 @@ struct HomeView: View {
             HStack {
                 Image("appLogo")
                     .frame(width: 100, height: 20)
-//                    .padding(.top, 18)
+                    .padding(.top, 18)
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -62,10 +61,10 @@ struct HomeView: View {
                 
             } label: {
                 HStack(alignment: .center) {
-                    Text("프레임만들기")
+                    Text("프레임 만들기")
                         .padding(.vertical, 20)
                         .foregroundStyle(Color.pointPink)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 16, weight: .semibold))
                 }
                 .frame(height: 60, alignment: .center)
                 .frame(maxWidth: .infinity)
@@ -79,18 +78,17 @@ struct HomeView: View {
             VStack {
                 HStack {
                     Text("내가 만든 프레임")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.gray01)
                     Spacer()
                     Button {
                         naviManager.push(screen: Screen.manageFrame)
                     } label: {
-                        HStack(spacing: 0) {
+                        HStack {
                             Text("전체보기")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(Color.gray01)
                             Image("chevronRight")
-                            // 이미지 확인해서 테두리 여백 확인하기
                                 .resizable()
                                 .frame(width: 18, height: 18)
                         }
@@ -111,12 +109,6 @@ struct HomeView: View {
                         HomeGridView(imageInfo: imageInfo,
                                      viewModel: viewModel)
                         .id(imageInfo.id)
-                        .onTapGesture {
-                            frameManager.selectedFrameIdForDetail = imageInfo.id // 선택한 이미지 ID 저장
-                            print("이미지 아이디를 frameManager에 저장했어요")
-                            naviManager.push(screen: Screen.detailFrame) // MFDetailView로 이동
-                            print("디테일뷰를 푸시했어요")
-                        }
                     }
                 }
                 .padding([.horizontal, .bottom], 20)
@@ -130,23 +122,13 @@ struct HomeView: View {
         .onAppear {
             viewModel.loadImages()
         }
-//        .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
-//            if let selectedFrameId = frameManager.selectedFrame {
-//                MFDetailView(viewModel: MFDetailViewModel(context: viewContext, selectedId: selectedFrameId))
-//                    .environmentObject(frameManager)
-//                    .environmentObject(imageModel)
-//                    .environmentObject(naviManager)
-//            }
-//        }
     }
     
 }
 
-struct HomeGridView: View {
+struct HomeGridView: View { // 기존 GridItemView에서 이름 변경
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
     @ObservedObject var viewModel: HomeViewModel
-    @EnvironmentObject var frameManager: FrameManager
-    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -159,9 +141,5 @@ struct HomeGridView: View {
                     .clipped()
             }
         }
-//        .onTapGesture {
-//            frameManager.selectedFrame = imageInfo.id
-//            viewModel.isShowMFDetailView = true
-//        }
     }
 }

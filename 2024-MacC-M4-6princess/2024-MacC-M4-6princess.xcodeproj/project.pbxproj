@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4EB66FB72D8DE9650042B399 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */; };
 		898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F72CFD5F5800EA200A /* FirebaseAnalytics */; };
 		898B14FA2CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F92CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		898B159C2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 898B159B2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion */; };
@@ -33,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "2024-MacC-M4-6princess.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94ABF2CA9B66300824592 /* 2024-MacC-M4-6princessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94AC92CA9B66300824592 /* 2024-MacC-M4-6princessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,6 +89,7 @@
 		89A94AA62CA9B64C00824592 = {
 			isa = PBXGroup;
 			children = (
+				4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */,
 				89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */,
 				898B159A2CFD8CCD00EA200A /* Frameworks */,
 				89A94AB02CA9B64C00824592 /* Products */,
@@ -201,8 +204,13 @@
 			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				Base,
 				ko,
+				en,
+				ja,
+				"zh-Hans",
+				ar,
+				de,
+				Base,
 			);
 			mainGroup = 89A94AA62CA9B64C00824592;
 			minimizedProjectReferenceProxies = 1;
@@ -227,6 +235,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EB66FB72D8DE9650042B399 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +352,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -399,6 +409,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -412,7 +423,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"2024-MacC-M4-6princess/Preview Content\"";
-				DEVELOPMENT_TEAM = 89S2Z5S7CX;
+				DEVELOPMENT_TEAM = KB52T46C6D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
@@ -431,7 +442,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = sixPrincess.release.com;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -452,7 +463,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"2024-MacC-M4-6princess/Preview Content\"";
-				DEVELOPMENT_TEAM = 89S2Z5S7CX;
+				DEVELOPMENT_TEAM = KB52T46C6D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
@@ -471,7 +482,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = sixPrincess.release.com;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

@@ -5,12 +5,13 @@ import FirebaseAnalytics
 struct FilteredImageView: View {
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var frameManager: FrameManager
-    @FetchRequest(
-        entity: StoreImages.entity(),
-        sortDescriptors: [] // 빈 배열 전달
-    )
-
+//    @FetchRequest(entity: StoreImages.entity(),
+//                  sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)])
+                  @FetchRequest(entity: StoreImages.entity(),
+                                sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)])
     var filterImages: FetchedResults<StoreImages>
+    
+//    @State var selectedFilter: UUID?
     
     @StateObject var viewModel: CameraViewModel
     
@@ -19,10 +20,12 @@ struct FilteredImageView: View {
             GeometryReader { geometry in
                 ZStack {
                     FilterCollectionViewRepresentable(
+                        filterImages: Array(filterImages),
                         viewModel: viewModel
                     )
                     .frame(height: 100)
                     
+                    // 투명한 탭 영역
                     Color.clear
                         .frame(width: 100, height: 100)
                         .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
@@ -30,7 +33,7 @@ struct FilteredImageView: View {
                     Button {
                         if frameManager.resultImage != nil {
                             self.viewModel.isTakePic = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + viewModel.delayTime) {
+                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
                                 viewModel.takePic()
                                 viewModel.cameraManager.stopSession()
                                 Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
@@ -44,14 +47,20 @@ struct FilteredImageView: View {
                             .frame(width: 80, height: 80)
                     }
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
+                    .allowsHitTesting(true)
                     .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
                         Button("닫기", role: .cancel) { }
+                    } message: {
+                        Text("")
                     }
+                    
+                    
                 }
             }
             .frame(height: 124)
             .onAppear {
                 DispatchQueue.main.async {
+                    //보라색 무시해주세요
                     viewModel.cameraManager.session.startRunning()
                     reloadFilterImages()
                 }
@@ -59,18 +68,18 @@ struct FilteredImageView: View {
             .onDisappear {
                 viewModel.cameraManager.stopSession()
             }
-            .onChange(of: frameManager.resultImage) { _, _ in
+            .onChange(of: frameManager.resultImage, initial: true) { oldValue, newValue in
                 reloadFilterImages()
             }
-        } else {
-            filteredIPad // iPad 레이아웃 구현부 (생략)
+        }
+            else{
+                filteredIPad
+            }
+        }
+        func reloadFilterImages() {
+            // FetchRequest 갱신
+            for image in filterImages {
+                viewContext.refresh(image, mergeChanges: true)
+            }
         }
     }
-    
-    func reloadFilterImages() {
-        for image in filterImages {
-            viewContext.refresh(image, mergeChanges: true)
-        }
-    }
-}
-

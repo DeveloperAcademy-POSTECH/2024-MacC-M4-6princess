@@ -43,7 +43,7 @@ struct CameraBottomView: View {
                                         .frame(width: 50, height: 50)
 //                                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
 //                                        .animation(.easeInOut, value: motionManager.currentOrientation)
-                                    Text("새 프레임")
+                                    Text(String(localized:"새 프레임"))
                                         .font(.caption)
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(.black)

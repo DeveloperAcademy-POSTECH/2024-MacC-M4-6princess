@@ -10,7 +10,6 @@ import CoreData
 
 class HomeViewModel: ObservableObject {
     @Published var imageDataArray: [(id: UUID, data: Data, isLoaded: Bool)] = []
-    @Published var isShowMFDetailView: Bool = false
     private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
 
@@ -21,7 +20,8 @@ class HomeViewModel: ObservableObject {
     /// Core Data에서 이미지 ID를 가져옴
     func loadImages() {
         let request = StoreImages.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+//        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)]
         
         do {
             let storedImages = try viewContext.fetch(request)
@@ -46,24 +46,20 @@ class HomeViewModel: ObservableObject {
         }
         return nil
     }
+
+    /// 특정 이미지 데이터를 Core Data에서 가져옴
     func loadImageData(for id: UUID) -> Data? {
         let request = StoreImages.fetchRequest()
         request.predicate = NSPredicate(format: "uuid == %@", id as CVarArg)
-
+        
         do {
             guard let storeImage = try viewContext.fetch(request).first,
                   let imageData = storeImage.image else {
                 return nil
             }
-
-            let image = UIImage(data: imageData)!
-            let targetSize = CGSize(width: UIScreen.main.bounds.width / 3,
-                                    height: (UIScreen.main.bounds.width / 3) * (4 / 3))
-
-            if let downsampledImage = downsampleImage(image, to: targetSize) {
-                return convertToJPEGWithWhiteBackground(image: downsampledImage)  // ✅ 흰색 배경으로 변환 후 JPEG 변환
-            }
-            return nil
+            return downsampleImage(UIImage(data: imageData)!,
+                                   to: CGSize(width: UIScreen.main.bounds.width / 3,
+                                              height: (UIScreen.main.bounds.width / 3) * (4 / 3)))?.jpegData(compressionQuality: 0.5)
         } catch {
             print("이미지 로딩 실패: \(error)")
             return nil
@@ -73,11 +69,11 @@ class HomeViewModel: ObservableObject {
     /// 이미지를 다운샘플링하여 메모리 사용량 줄이기
     func downsampleImage(_ image: UIImage, to pointSize: CGSize) -> UIImage? {
         let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-        guard let imageData = image.pngData(),  // ✅ PNG로 변환하여 투명도 유지
-              let imageSource = CGImageSourceCreateWithData(imageData as CFData, imageSourceOptions) else {
+        guard let data = image.jpegData(compressionQuality: 1.0),
+              let imageSource = CGImageSourceCreateWithData(data as CFData, imageSourceOptions) else {
             return nil
         }
-
+        
         let maxDimensionInPixels = max(pointSize.width, pointSize.height) * UIScreen.main.scale
         let downsampleOptions = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
@@ -85,26 +81,12 @@ class HomeViewModel: ObservableObject {
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
         ] as CFDictionary
-
+        
         guard let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions) else {
             return nil
         }
-
+        
         return UIImage(cgImage: downsampledImage)
     }
-    func convertToJPEGWithWhiteBackground(image: UIImage) -> Data? {
-        let format = UIGraphicsImageRendererFormat()
-        format.opaque = true  // ✅ 투명 배경을 없애고 불투명한 배경을 설정
-
-        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-        let newImage = renderer.image { context in
-            UIColor.white.setFill()  // ✅ 흰색 배경 설정 (검정색이 아니라 흰색으로 변경)
-            context.fill(CGRect(origin: .zero, size: image.size))
-            image.draw(at: .zero)
-        }
-
-        return newImage.jpegData(compressionQuality: 0.5)
-    }
-
 }
 

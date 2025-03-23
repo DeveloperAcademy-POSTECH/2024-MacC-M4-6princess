@@ -201,7 +201,7 @@ extension PhotosPickerView {
             .padding(.leading, UIScreen.main.bounds.width * 0.09)
             Spacer()
             
-            Text("사진선택")
+            Text("사진 선택")
                 .fontWeight(.bold)
                 .foregroundStyle(.gray01)
                 .padding(.leading, UIScreen.main.bounds.width * 0.04)

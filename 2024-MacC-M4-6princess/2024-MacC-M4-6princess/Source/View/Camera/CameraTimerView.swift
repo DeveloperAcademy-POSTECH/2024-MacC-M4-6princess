@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CameraTimerView: View {
     @ObservedObject var viewModel: CameraViewModel
-    @ObservedObject var motionManager: MotionManager
     @State private var isExpanded = false
     
     var body: some View {
@@ -32,8 +31,6 @@ struct CameraTimerView: View {
                     Image("timerWhite")
                         .resizable()
                         .frame(width: 20, height: 20)
-                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                        .animation(.easeInOut, value: motionManager.currentOrientation)
                     
                     Button("Off") {
                         viewModel.delayTime = 0
@@ -78,8 +75,6 @@ struct CameraTimerView: View {
                     Image("timerBlack")
                         .resizable()
                         .frame(width: 20, height: 20)
-                        .rotationEffect(motionManager.rotationAngle(for: motionManager.currentOrientation))
-                        .animation(.easeInOut, value: motionManager.currentOrientation)
                     
                     Text(viewModel.delayTime == 0 ? "Off" : "\(Int(viewModel.delayTime))초")
                         .font(.system(size: 13))
