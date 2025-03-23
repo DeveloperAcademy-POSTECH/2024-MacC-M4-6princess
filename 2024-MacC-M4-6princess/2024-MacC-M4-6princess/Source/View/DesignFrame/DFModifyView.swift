@@ -84,17 +84,7 @@ struct DFModifyView: View {
                     
                 )
             }
-            
-            VStack{
-                Spacer()
-                HStack{
-                    if isLongPressed{
-                        oldLayerIndicator
-                    }
-                    Spacer()
-                }
-                Spacer()
-            }
+
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)

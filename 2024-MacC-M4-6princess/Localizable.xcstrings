@@ -53,7 +53,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld ثانية"
+            "value" : "%lld ث"
           }
         },
         "en" : {
@@ -81,7 +81,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "٣ ثوانٍ"
+            "value" : "٣ "
           }
         },
         "en" : {
@@ -109,7 +109,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " ٥ ثوانٍ"
+            "value" : " ٥ "
           }
         },
         "en" : {
@@ -137,7 +137,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " ٧ ثوانٍ\n"
+            "value" : " ٧ "
           }
         },
         "en" : {
@@ -293,16 +293,6 @@
         }
       }
     },
-    "Image %lld" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image %lld"
-          }
-        }
-      }
-    },
     "Off" : {
       "localizations" : {
         "ar" : {
@@ -330,9 +320,6 @@
           }
         }
       }
-    },
-    "QR 보기" : {
-
     },
     "stickerTab.bubble" : {
       "extractionState" : "manual",
@@ -574,34 +561,6 @@
         }
       }
     },
-    "갤러리에 저장완료!" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم حفظ الصورة في المعرض بنجاح!"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Successfully saved to Gallery!"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ギャラリーに保存完了！\n"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已保存到相册！"
-          }
-        }
-      }
-    },
     "나가기" : {
       "localizations" : {
         "ar" : {
@@ -654,34 +613,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "我的框架"
-          }
-        }
-      }
-    },
-    "다시 찍기" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إعادة التصوير"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retake"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再撮影"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新拍摄"
           }
         }
       }
@@ -1441,34 +1372,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存"
-          }
-        }
-      }
-    },
-    "저장 중.." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جارٍ الحفظ..."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saving..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存中..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存中..."
           }
         }
       }
