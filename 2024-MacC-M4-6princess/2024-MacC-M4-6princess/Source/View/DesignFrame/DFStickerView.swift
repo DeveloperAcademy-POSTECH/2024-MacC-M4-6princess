@@ -41,6 +41,8 @@ struct DFStickerView: View {
                             Text(tab.displayName)
                                 .font(.system(size: 15, weight: selectedTab == tab ? .bold : .medium))
                                 .foregroundColor(selectedTab == tab ? .white : .gray02)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
                                 .onTapGesture {
                                     selectedTab = tab
                                     viewModel.selectedStickerTab = tab

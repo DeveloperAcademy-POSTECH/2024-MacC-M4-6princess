@@ -188,9 +188,6 @@
         }
       }
     },
-    "Font Size: %lld" : {
-
-    },
     "font.bold" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -959,7 +956,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add Photo"
+            "value" : "Photo"
           }
         },
         "ja" : {

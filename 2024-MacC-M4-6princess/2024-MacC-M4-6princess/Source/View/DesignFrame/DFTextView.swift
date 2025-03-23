@@ -35,17 +35,12 @@ struct DFTextView: View {
                     }
                 }
             }
-            // 👇 폰트 사이즈 슬라이더 추가
-               VStack {
-                   Text("Font Size: \(Int(viewModel.fontSize))")
-                       .foregroundColor(.white)
-                       .font(.caption)
-                   Slider(value: $viewModel.fontSize, in: 10...72, step: 1)
-                       .accentColor(.pointPink)
-                       .padding(.horizontal)
-               }
-               .padding(.bottom, 8)
-
+            
+//            Slider(value: $viewModel.fontSize, in: 10...72, step: 1)
+//                .accentColor(.gray01)
+//                .padding(.horizontal,20)
+//                .padding(.bottom, 8)
+            
             if viewModel.tab == 0 {
                 newFontSelector
                 
