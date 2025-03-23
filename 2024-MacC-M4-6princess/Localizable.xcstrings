@@ -334,9 +334,6 @@
     "QR 보기" : {
 
     },
-    "QR 코드를 생성 중입니다..." : {
-
-    },
     "stickerTab.bubble" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -606,6 +603,7 @@
       }
     },
     "공유하기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
