@@ -19,7 +19,7 @@ extension DFModifyView{
         for _ in 0..<steps {
             guard currentIndex > 0 else { return 0}
             guard currentIndex < imageModel.imageList.count else { return imageModel.imageList.count - 1}
-//            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
+            //            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
             imageModel.imageList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
@@ -33,14 +33,14 @@ extension DFModifyView{
         for _ in 0..<steps {
             guard currentIndex < imageModel.imageList.count - 1 else { return imageModel.imageList.count-1}
             guard currentIndex >= 0 else { return 0}
-//            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
+            //            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
             imageModel.imageList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
         return currentIndex
     }
     
-    // 레이어 순서 표시 뷰(구버전)
+    // 레이어 순서 표시 뷰(신버전)
     var newLayerIndicator: some View {
         HStack{
             Group{
@@ -141,7 +141,6 @@ extension DFModifyView{
     func longPressAndDragGesture(for index: Int) -> some Gesture {
         LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
             .onEnded { _ in
-                isLongPressed = true // 길게 눌림 활성화
                 selectedLayerIndex = index
                 imageListUpdate()
                 
@@ -149,14 +148,11 @@ extension DFModifyView{
             }
             .simultaneously(with: DragGesture(minimumDistance: 0)
                 .onChanged { value in
-                    if isLongPressed { // 길게 누른 상태에서만 드래그 동작
-                        dragOnChanged(value: value, index: index)
-                    }
+                    dragOnChanged(value: value, index: index)
                 }
                 .onEnded { _ in
                     dragOnEnded()
                     beforeDragOffsetY = .zero
-                    isLongPressed = false
                     imageListUpdate()
                 }
             )
@@ -167,23 +163,23 @@ extension DFModifyView{
         
         DragGesture()
             .onChanged { value in
-                if !isLongPressed{
-                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                }
+                
+                viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                
             }
             .onEnded { value in
-                if !isLongPressed {
-                    viewModel.accumulatedOffSet = .zero
-                    viewModel.modelListControl(subject: subject)
-                    subject.isTapped = true
-                    imageModel.imageList.append(subject)
-                    imageModel.imageList.removeLast()
-                }
+                
+                viewModel.accumulatedOffSet = .zero
+                viewModel.modelListControl(subject: subject)
+                subject.isTapped = true
+                imageModel.imageList.append(subject)
+                imageModel.imageList.removeLast()
+                
                 
             }
             .simultaneously(with: RotateGesture()
                 .onChanged { value in
-                    if !isLongPressed && subject.isTapped  {
+                    if subject.isTapped  {
                         if viewModel.current == .zero {
                             viewModel.current = subject.getAngle()
                         }
@@ -191,21 +187,11 @@ extension DFModifyView{
                         subject.setAngle(angle: viewModel.angle)
                     }
                 }
-                .onEnded { value in
-                    if !isLongPressed{
-                        viewModel.current = .zero
-                    }
-                }
             )
             .simultaneously(with: MagnifyGesture()
                 .onChanged { value in
-                    if !isLongPressed && subject.isTapped {
+                    if subject.isTapped {
                         viewModel.setScaleVolume(value.magnification, subject: subject)
-                    }
-                }
-                .onEnded { value in
-                    if !isLongPressed{
-                        viewModel.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
                     }
                 }
             )
@@ -319,39 +305,6 @@ extension DFModifyView{
 }
 // 인스타 layer 버전
 extension DFModifyView{
-    // 레이어 순서 표시 뷰(구버전)
-    var oldLayerIndicator: some View {
-        VStack(spacing: 6) {
-            ForEach(imageModel.imageList.indices.reversed(), id: \.self) { index in
-                if index == selectedLayerIndex {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            RoundedRectangle(cornerRadius: 3)
-                                .frame(width: 24, height: 4)
-                                .foregroundColor(.white)
-                                .padding(.leading, 4)
-                            Spacer()
-                        }
-                        Spacer()
-                    }
-                    .frame(height: 6)
-                } else {
-                    HStack {
-                        Image("heart.union")
-                            .resizable()
-                            .frame(width: 8, height: 6)
-                        Spacer()
-                    }
-                }
-            }
-        }
-        .padding(6)
-        .frame(width: 40)
-        .background(Color.gray)
-        .cornerRadius(8)
-        .padding(.horizontal, 5)
-    }
     // 드래그 중 호출되는 함수 (구버전)
     func dragOnChanged(value: DragGesture.Value, index: Int) {
         if !isDragging {

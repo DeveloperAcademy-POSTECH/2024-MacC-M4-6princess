@@ -188,6 +188,9 @@
         }
       }
     },
+    "Font Size: %lld" : {
+
+    },
     "font.bold" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -294,6 +297,7 @@
       }
     },
     "Image %lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -330,9 +334,6 @@
           }
         }
       }
-    },
-    "QR 보기" : {
-
     },
     "stickerTab.bubble" : {
       "extractionState" : "manual",
@@ -575,6 +576,7 @@
       }
     },
     "갤러리에 저장완료!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -688,6 +690,7 @@
       }
     },
     "다시 찍기" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1447,6 +1450,7 @@
       }
     },
     "저장 중.." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

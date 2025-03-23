@@ -35,7 +35,17 @@ struct DFTextView: View {
                     }
                 }
             }
-            
+            // 👇 폰트 사이즈 슬라이더 추가
+               VStack {
+                   Text("Font Size: \(Int(viewModel.fontSize))")
+                       .foregroundColor(.white)
+                       .font(.caption)
+                   Slider(value: $viewModel.fontSize, in: 10...72, step: 1)
+                       .accentColor(.pointPink)
+                       .padding(.horizontal)
+               }
+               .padding(.bottom, 8)
+
             if viewModel.tab == 0 {
                 newFontSelector
                 
@@ -53,9 +63,6 @@ struct DFTextView: View {
             Color.black.opacity(0.5) // 반투명 검정색
         )
         .ignoresSafeArea(.keyboard)
-//        .onAppear {
-//            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
-//        }
         
     }
     

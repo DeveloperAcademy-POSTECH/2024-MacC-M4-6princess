@@ -17,7 +17,7 @@ struct DFModifyView: View {
     /// 구버전 레이어 관련한 것으로 조만간 파일로 정리한 뒤 삭제할 예정입니다.
     @State var isDragging: Bool = false
     @State var selectedLayerIndex: Int?
-    @State var isLongPressed: Bool = false
+//    @State var isLongPressed: Bool = false
     @State var beforeDragOffsetY: CGFloat = .zero
     
     var body: some View {
@@ -36,9 +36,9 @@ struct DFModifyView: View {
                 
                 Color.clear
                     .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
-                    .onTapGesture {
-                        isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
-                    }
+//                    .onTapGesture {
+//                        isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
+//                    }
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                     let extractedExpr: VStack<TupleView<(some View, some View)>> = VStack {
@@ -91,17 +91,6 @@ struct DFModifyView: View {
                         modiViewModel: viewModel
                         
                     )
-                }
-                
-                VStack{
-                    Spacer()
-                    HStack{
-                        if isLongPressed{
-                            oldLayerIndicator
-                        }
-                        Spacer()
-                    }
-                    Spacer()
                 }
             }
         }

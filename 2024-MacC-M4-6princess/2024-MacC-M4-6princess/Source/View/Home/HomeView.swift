@@ -14,7 +14,7 @@ struct HomeView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
-    @EnvironmentObject var layerListViewModel: LayerListViewModel
+//    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject private var viewModel = HomeViewModel(context: PersistenceController.shared.container.viewContext)
     
     
