@@ -61,7 +61,7 @@ struct HomeView: View {
                 
             } label: {
                 HStack(alignment: .center) {
-                    Text("프레임만들기")
+                    Text("프레임 만들기")
                         .padding(.vertical, 20)
                         .foregroundStyle(Color.pointPink)
                         .font(.system(size: 16, weight: .semibold))
