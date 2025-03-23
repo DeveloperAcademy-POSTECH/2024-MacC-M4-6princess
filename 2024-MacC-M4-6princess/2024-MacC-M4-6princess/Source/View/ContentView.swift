@@ -11,7 +11,7 @@ struct ContentView: View {
     let persistenceController = PersistenceController.shared
     @StateObject var frameManager = FrameManager()
     @StateObject var naviManager = NavigationManager()
-    @ObservedObject var layerListViewModel = LayerListViewModel()
+//    @ObservedObject var layerListViewModel = LayerListViewModel()
     @ObservedObject var imageModel = ImageListModel()
 //    @EnvironmentObject var imageModel: ImageListModel
 //    @EnvironmentObject var layerListViewModel: LayerListViewModel
@@ -22,7 +22,7 @@ struct ContentView: View {
             .environmentObject(frameManager)
             .environmentObject(naviManager)
             .environmentObject(imageModel)
-            .environmentObject(layerListViewModel)
+//            .environmentObject(layerListViewModel)
     }
 }
 

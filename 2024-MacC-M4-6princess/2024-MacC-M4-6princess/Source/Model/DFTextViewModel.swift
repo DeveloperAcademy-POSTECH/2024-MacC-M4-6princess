@@ -13,23 +13,14 @@ class DFTextViewModel: ObservableObject {
     //    @Published var selectedFont: FontStyle = .modern
     @Published var selectedFont:NewFontStyle = .modern
     @Published var fontSize: Double = 20
-    @Published var selectedColor: Color = ColorPreset.colorPallete[0] {
-        didSet {
-            // 값이 변경될 때마다 프린트
-            print("폰트컬러체인지드: \(selectedColor.toHex())")
-        }
-    }
+    @Published var selectedColor: Color = ColorPreset.colorPallete[0]
     @Published var renderedImage: UIImage?
     @Published var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     @Published var tab = 0
     @Published var colorNum = 0
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
     let colorChip: [Color] = ColorPreset.colorPallete
-    @Published var attributedTxt: NSAttributedString?{
-        didSet{
-            print("텍스트변경:\(attributedTxt?.string)")
-        }
-    }
+    @Published var attributedTxt: NSAttributedString?
     
     // 캡처 크기를 저장할 변수 추가
     @Published var captureSize: CGSize = .zero // 캡처할 크기 (너비, 높이)
@@ -246,136 +237,6 @@ class DFTextViewModel: ObservableObject {
 }
 
 
-
-//struct DFCustomTextView: UIViewRepresentable {
-//    @ObservedObject var modiViewModel: DFModifyViewModel
-//    @ObservedObject var viewModel: DFTextViewModel
-//    
-//    private let displayScale: CGFloat
-//    @EnvironmentObject var imageModel: ImageListModel
-//    
-//    init(modiViewModel: DFModifyViewModel,
-//         viewModel: DFTextViewModel,
-//         displayScale: CGFloat) {
-//        self.modiViewModel = modiViewModel
-//        self.viewModel = viewModel
-//        self.displayScale = displayScale
-//    }
-//    
-//    func makeUIView(context: Context) -> UITextView {
-//        let textView = UITextView()
-//        textView.delegate = context.coordinator
-//        textView.backgroundColor = .clear
-//        textView.isScrollEnabled = true
-//        
-//        // Center text horizontally
-//        textView.textAlignment = .center
-//        
-//        // Center text vertically
-//        textView.contentInsetAdjustmentBehavior = .automatic
-//        
-//        // Add keyboard notifications
-//        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
-//                                               object: nil,
-//                                               queue: .main) { notification in
-//            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
-//        }
-//        
-//        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
-//                                               object: nil,
-//                                               queue: .main) { notification in
-//            context.coordinator.adjustForKeyboard(notification: notification, textView: textView)
-//        }
-//        
-//        // iOS 18.0 이상에서 적응형 이미지 글리프 지원 설정
-//        if #available(iOS 18.0, *) {
-//            textView.supportsAdaptiveImageGlyph = true
-//        } else {
-//            // Fallback on earlier versions
-//        }
-//        
-//        updateTextViewAppearance(textView)
-//        return textView
-//    }
-//    
-//    func updateUIView(_ uiView: UITextView, context: Context) {
-//        // Update text
-//        uiView.text = viewModel.txt
-//        
-//        // Apply real-time font color, size, and font family
-//        updateTextViewAppearance(uiView)
-//        
-//        // Center text vertically
-//        let size = uiView.sizeThatFits(CGSize(width: uiView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
-//        let topOffset = max(0, (uiView.bounds.height - size.height) / 2)
-//        uiView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
-//    }
-//    
-//    private func updateTextViewAppearance(_ textView: UITextView) {
-//        let paragraphStyle = NSMutableParagraphStyle()
-//        paragraphStyle.lineSpacing = 5
-//        paragraphStyle.alignment = .center
-//        
-//        // 기존 attributedText를 가져와서 수정
-//        let mutableAttributedString = NSMutableAttributedString(attributedString: textView.attributedText ?? NSAttributedString(string: textView.text ?? ""))
-//        
-//        let attributes: [NSAttributedString.Key: Any] = [
-//            .foregroundColor: UIColor(viewModel.fontColor),
-//            .font: UIFont(name: viewModel.newSelectedFont.rawValue, size: viewModel.fontSize) ?? UIFont.systemFont(ofSize: viewModel.fontSize),
-//            .paragraphStyle: paragraphStyle
-//        ]
-//        
-//        // 기존 텍스트 전체에 속성 적용 (이미지 글리프 유지)
-//        mutableAttributedString.addAttributes(attributes, range: NSRange(location: 0, length: mutableAttributedString.length))
-//        
-//        textView.attributedText = mutableAttributedString
-//        textView.typingAttributes = attributes
-//        
-//        textView.bounds.size.height = UIScreen.main.bounds.height / 4
-//    }
-//    
-//    func makeCoordinator() -> Coordinator {
-//        Coordinator(self)
-//    }
-//    
-//    class Coordinator: NSObject, UITextViewDelegate {
-//        var parent: DFCustomTextView
-//        
-//        init(_ parent: DFCustomTextView) {
-//            self.parent = parent
-//        }
-//        
-//        func textViewDidChange(_ textView: UITextView) {
-//            parent.viewModel.txt = textView.text
-//            
-//            // Recenter text vertically when content changes
-//            let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
-//            let topOffset = max(0, (textView.bounds.height - size.height) / 2)
-//            textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
-//        }
-//        
-//        func adjustForKeyboard(notification: Notification, textView: UITextView) {
-//            guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-//            
-//            let keyboardScreenEndFrame = keyboardValue.cgRectValue
-//            let keyboardIsShowing = notification.name == UIResponder.keyboardWillShowNotification
-//            
-//            if keyboardIsShowing {
-//                let keyboardHeight = keyboardScreenEndFrame.height
-//                textView.contentInset = UIEdgeInsets(top: (textView.bounds.height - textView.contentSize.height) / 2,
-//                                                     left: 0,
-//                                                     bottom: keyboardHeight,
-//                                                     right: 0)
-//            } else {
-//                let size = textView.sizeThatFits(CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude))
-//                let topOffset = max(0, (textView.bounds.height - size.height) / 2)
-//                textView.contentInset = UIEdgeInsets(top: topOffset, left: 0, bottom: 0, right: 0)
-//            }
-//            
-//            textView.scrollIndicatorInsets = textView.contentInset
-//        }
-//    }
-//}
 extension Color {
     func toHex() -> String? {
         // UIColor 변환 시도
