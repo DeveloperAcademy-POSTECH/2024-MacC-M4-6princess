@@ -37,13 +37,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld個のフレームを削除しますか？"
+            "value" : "%lldつのフレームを本当に削除しますか？"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "是否删除%lld个框架？"
+            "value" : "您确定要删除 %lld 个框架吗？"
           }
         }
       }
@@ -547,7 +547,6 @@
 
     },
     "갤러리에 저장되었습니다" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -599,35 +598,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已保存到相册！"
-          }
-        }
-      }
-    },
-    "공유하기" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مشاركة"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Photo"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "共有する"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享"
           }
         }
       }
@@ -783,13 +753,13 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " إلى الأمام"
+            "value" : " "
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Backward"
+            "value" : "Down"
           }
         },
         "ja" : {
@@ -1003,7 +973,32 @@
       }
     },
     "삭제하기" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Frames"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
+          }
+        }
+      }
     },
     "새 프레임" : {
       "localizations" : {
@@ -1209,7 +1204,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ابدأ"
+            "value" : "ابدأ الآن"
           }
         },
         "en" : {
@@ -1221,13 +1216,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "開始"
+            "value" : "はじめる"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开始"
+            "value" : "开始使用"
           }
         }
       }
@@ -1237,13 +1232,13 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " إلى الأمام"
+            "value" : " "
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forward"
+            "value" : "Up"
           }
         },
         "ja" : {
@@ -1389,7 +1384,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "是否删除此框架？"
+            "value" : "您确定要删除此框架吗？"
           }
         }
       }
@@ -1506,9 +1501,6 @@
         }
       }
     },
-    "저장완료" : {
-
-    },
     "전체보기" : {
       "localizations" : {
         "ar" : {
@@ -1548,19 +1540,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edited content will not be saved when you exit."
+            "value" : "If you exit now, your work will not be saved."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "終了時に編集内容は保存されません。"
+            "value" : "今終了すると、作業内容は保存されません。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "结束时编辑的内容将不会保存。"
+            "value" : "现在退出，您的更改将不会被保存。"
           }
         }
       }
@@ -1570,7 +1562,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "صنع إطارك الخاص باستخدام صورتك المفضلة."
+            "value" : "إذا خرجت الآن، فلن يتم حفظ عملك."
           }
         },
         "en" : {
@@ -1817,35 +1809,6 @@
         }
       }
     },
-    "프레임 삭제" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حذف الإطار"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete Frames"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フレームを削除"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除框架"
-          }
-        }
-      }
-    },
     "프레임 편집을 종료하시겠습니까?" : {
       "localizations" : {
         "ar" : {
@@ -1879,25 +1842,25 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إذا قمت بحذف الإطار، فلن تتمكن من استرجاعه."
+            "value" : "لا يمكن استعادة الحذف."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This action cannot be undone."
+            "value" : "Deletion cannot be reversed."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フレームを削除すると、元には戻せません。"
+            "value" : "削除を元に戻すことはできません。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除框架后无法恢复。"
+            "value" : "删除框架后将无法恢复。"
           }
         }
       }

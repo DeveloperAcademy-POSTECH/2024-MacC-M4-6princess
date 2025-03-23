@@ -80,6 +80,7 @@ extension DFModifyView{
                         .multilineTextAlignment(.center)
                         .foregroundColor(.gray01)
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .minimumScaleFactor(0.5)
                     Spacer()
                         .frame(height: 12)
                     Button(action: {
@@ -117,6 +118,7 @@ extension DFModifyView{
                         .multilineTextAlignment(.center)
                         .foregroundColor(.gray01)
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .minimumScaleFactor(0.5)
                 }
                 .padding(.vertical, 8)
                 .frame(width: 40, height: 116, alignment: .topLeading)
