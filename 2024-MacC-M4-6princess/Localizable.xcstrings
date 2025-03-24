@@ -1,5 +1,5 @@
 {
-  "sourceLanguage" : "ko",
+  "sourceLanguage" : "en",
   "strings" : {
     "" : {
 
@@ -12,7 +12,7 @@
     },
     "%lld/%lld" : {
       "localizations" : {
-        "ko" : {
+        "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld/%2$lld"
@@ -32,6 +32,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to delete %lld frames?"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anda yakin ingin menghapus %lld frame?"
           }
         },
         "ja" : {
@@ -203,6 +209,12 @@
             "value" : "Bold"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tebal"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -236,6 +248,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Handwritng"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tulisan tangan"
           }
         },
         "ja" : {
@@ -273,6 +291,12 @@
             "value" : "Modern"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modern"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -298,13 +322,19 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إيقاف"
+            "value" : "٠"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Off"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mati"
           }
         },
         "ja" : {
@@ -334,6 +364,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bubble"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelembung"
           }
         },
         "ja" : {
@@ -371,6 +407,12 @@
             "value" : "Character"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karakter"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -404,6 +446,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Full"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penuh"
           }
         },
         "ja" : {
@@ -441,6 +489,12 @@
             "value" : "Humor"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Humor"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -473,6 +527,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Camera"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamera"
           }
         },
         "ja" : {
@@ -508,6 +568,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Home"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rumah"
           }
         },
         "ja" : {
@@ -547,6 +613,12 @@
             "value" : "Saved to Gallery."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disimpan ke Galeri."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -573,6 +645,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Go Back"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kembali"
           }
         },
         "ja" : {
@@ -603,6 +681,12 @@
             "value" : "My Frames"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bingkai Saya"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -631,6 +715,12 @@
             "value" : "Don't show again"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jangan muncul lagi"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -657,6 +747,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Close"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutup"
           }
         },
         "ja" : {
@@ -693,6 +789,12 @@
             "value" : "Down"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bawah"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -719,6 +821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preview"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pratilik"
           }
         },
         "ja" : {
@@ -749,6 +857,12 @@
             "value" : "Background Removal"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Penghapusan Latar Belakang"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -775,6 +889,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Removing background..."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menghapus latar belakang..."
           }
         },
         "ja" : {
@@ -805,6 +925,12 @@
             "value" : "Select Photo"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih Foto"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -831,6 +957,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Take Photo"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambil Foto"
           }
         },
         "ja" : {
@@ -861,6 +993,12 @@
             "value" : "Add Photo"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah Foto"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -887,6 +1025,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buang"
           }
         },
         "ja" : {
@@ -917,6 +1061,12 @@
             "value" : "Delete Frames"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus Bingkai"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -943,6 +1093,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New Frame"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bingkai Baru"
           }
         },
         "ja" : {
@@ -973,6 +1129,12 @@
             "value" : "Remove"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buang"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -999,6 +1161,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah"
           }
         },
         "ja" : {
@@ -1029,6 +1197,12 @@
             "value" : "Use Add or Remove to adjust the selected area."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gunakan Tambah atau Hapus untuk menyesuaikan area yang dipilih."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1055,6 +1229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Portrait mode recommended"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode potret direkomendasikan"
           }
         },
         "ja" : {
@@ -1088,6 +1268,12 @@
             "value" : "Edit"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunting"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1116,6 +1302,12 @@
             "value" : "Sticker"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stiker"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1142,6 +1334,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Get Started"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mulai"
           }
         },
         "ja" : {
@@ -1200,6 +1398,12 @@
             "value" : "Disappeared"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menghilang"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1220,6 +1424,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "An error occurred"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terjadi galat"
           }
         },
         "ja" : {
@@ -1250,6 +1460,12 @@
             "value" : "OK"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baiklah."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1278,6 +1494,12 @@
             "value" : "This app works best in portrait mode.\nPlease enable portrait orientation."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikasi ini bekerja dengan baik dalam mode potret.\nHarap aktifkan orientasi potret."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1293,6 +1515,7 @@
       }
     },
     "이 프레임을 삭제할까요?" : {
+      "comment" : "단복수",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1304,6 +1527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete this frame?"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus frame ini?"
           }
         },
         "ja" : {
@@ -1334,6 +1563,12 @@
             "value" : "Failed to render the image. Please try again."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gagal membuat gambar. Silakan coba lagi."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1360,6 +1595,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Save"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simpan"
           }
         },
         "ja" : {
@@ -1390,6 +1631,12 @@
             "value" : "You can check the saved photo in your gallery."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto telah disimpan ke galeri."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1416,6 +1663,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "See All"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lihat Semua"
           }
         },
         "ja" : {
@@ -1446,6 +1699,12 @@
             "value" : "If you exit now, your work will not be saved."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jika keluar sekarang, perubahanmu tidak akan disimpan."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1472,6 +1731,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create your own frame using a photo of your favorite!"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buat bingkai unik dengan foto favoritmu."
           }
         },
         "ja" : {
@@ -1502,6 +1767,12 @@
             "value" : "Pick a photo of your bias."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih foto favoritmu."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1528,6 +1799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batalkan"
           }
         },
         "ja" : {
@@ -1558,6 +1835,12 @@
             "value" : "Go to Camera"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pergi ke Kamera"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1584,6 +1867,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Text"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teks"
           }
         },
         "ja" : {
@@ -1614,6 +1903,12 @@
             "value" : "Edit"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunting"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1640,6 +1935,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "My Frames"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manajemen bingkai"
           }
         },
         "ja" : {
@@ -1670,6 +1971,12 @@
             "value" : "Decorate Frame"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekorasi bingkai"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1696,6 +2003,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Make Frame"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buat Bingkai"
           }
         },
         "ja" : {
@@ -1726,6 +2039,12 @@
             "value" : "Do you want to exit frame editing?"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anda yakin ingin keluar dari penyuntingan bingkai?"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1754,6 +2073,12 @@
             "value" : "Deletion cannot be reversed."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidak bisa dikembalikan setelah dihapus."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1772,25 +2097,31 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "لم يتم اختيار الإطار. الرجاء اختيار الإطار!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deleting a frame is irreversible."
+            "value" : "Oops! You haven’t selected a frame yet."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ups! Belum ada frame yang dipilih."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "フレームが選択されていません。フレームを選択してください！"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "未选择框架，请选择框架！"
           }
         }
@@ -1808,6 +2139,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baiklah."
           }
         },
         "ja" : {

@@ -201,16 +201,13 @@
 				};
 			};
 			buildConfigurationList = 89A94AAA2CA9B64C00824592 /* Build configuration list for PBXProject "2024-MacC-M4-6princess" */;
-			developmentRegion = ko;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				ko,
-				en,
-				ja,
-				"zh-Hans",
-				ar,
-				de,
 				Base,
+				en,
+				id,
 			);
 			mainGroup = 89A94AA62CA9B64C00824592;
 			minimizedProjectReferenceProxies = 1;
