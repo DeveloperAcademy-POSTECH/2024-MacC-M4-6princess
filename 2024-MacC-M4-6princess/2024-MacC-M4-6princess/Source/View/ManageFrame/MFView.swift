@@ -26,7 +26,7 @@ struct MFView: View {
     var body: some View {
             ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
-                    SheetTitleView(viewModel: viewModel)
+                    SheetTitleView(naviManager: _naviManager, viewModel: viewModel)
                         .environmentObject(frameManager)
                         .environmentObject(naviManager)
                         .environmentObject(layerListViewModel)
@@ -45,17 +45,20 @@ struct MFView: View {
                         } label: {
                             ZStack {
                                 Rectangle()
-                                    .foregroundColor(.white)
-                                    .frame(width: 164, height: 60)
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .inset(by: 1)
-                                            .stroke(.pointPink, lineWidth: 2)
-                                    )
-                                Text("삭제하기")
-                                    .font(.system(size: 17))
                                     .foregroundColor(.pointPink)
+                                    .frame(height: 60)
+                                    .frame(maxWidth: .infinity)
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 20)
+                                    
+//                                    .overlay(
+//                                        RoundedRectangle(cornerRadius: 10)
+//                                            .inset(by: 1)
+//                                            .stroke(.pointPink, lineWidth: 2)
+//                                    )
+                                Text("프레임 삭제")
+                                    .font(.system(size: 17))
+                                    .foregroundColor(.white)
                                     .fontWeight(.bold)
                             }
                         }
@@ -96,10 +99,10 @@ struct MFView: View {
             } message: {
                 Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
             }
-            .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
-                MFDetailView()
-                    .environmentObject(frameManager)
-            }
+//            .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
+//                MFDetailView()
+//                    .environmentObject(frameManager)
+//            }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
         }
@@ -111,22 +114,23 @@ struct MFView: View {
 // MARK: - 프레임관리 상단바 커스텀
 
 struct SheetTitleView: View {
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var naviManager: NavigationManager
     @ObservedObject var viewModel: MFViewModel
+    
     
     var body: some View {
         ZStack {
             HStack(alignment: .center) {
-                Spacer()
                 Text("프레임 관리")
                     .font(.system(size: 17))
                     .fontWeight(.bold)
                     .foregroundColor(.gray01)
-                Spacer()
             }
+            .frame(height: 80)
+            
             HStack(alignment: .center) {
                 Button {
-                    dismiss()
+                    naviManager.pop()
                 } label: {
                     Image("chevronLeft")
                         .resizable()
@@ -142,13 +146,13 @@ struct SheetTitleView: View {
                             .font(.system(size: 17))
                             .fontWeight(.bold)
                             .foregroundColor(.gray01)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10.49618)
+                            .padding(.trailing, 20)
                     }
                 }
             }
-            .padding(.vertical, 20)
+            .frame(height: 80)
         }
+        
         
     }
 }
@@ -206,10 +210,12 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
+//            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
+            frameManager.selectedFrameIdForDetail = imageInfo.id
+            naviManager.push(screen: Screen.detailFrame)
             if !viewModel.isEditing {
                 viewModel.selectedImageIds = [imageInfo.id]
-                viewModel.isShowMFDetailView = true
+//                viewModel.isShowMFDetailView = true
 //                naviManager.push(screen: Screen.manageDetailFrame)
                 Analytics.logEvent("A2_프레임선택", parameters: nil)
             }
@@ -229,4 +235,3 @@ struct GridItemView: View {
         
     }
 }
-

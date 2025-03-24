@@ -20,11 +20,9 @@ class MFViewModel: ObservableObject {
     //    private var viewContext: NSManagedObjectContext
     private var imageCache: [UUID: Data] = [:]
     private var viewContext: NSManagedObjectContext
-    private var frameManager: FrameManager
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context
-        self.frameManager = FrameManager()
     }
     
     //    init(context: NSManagedObjectContext, frameManager: FrameManager) {
@@ -33,15 +31,9 @@ class MFViewModel: ObservableObject {
     //    }
     //
     
-//    ///HomeView에서 프레임을 눌렀을 때 넘겨준 아이디를 받아서 MFDetailView가 appear될 때 초기화
-//    func addFrameToSelectedIDArray(frameID: UUID) {
-//        selectedImageIds.insert(frameID)
-//    }
-    
     ///코어데이터에서 이미지 id를 가져옴
     func loadImages() {
         let request = StoreImages.fetchRequest()
-//        request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)]
         
         do {
