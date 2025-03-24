@@ -33,7 +33,7 @@ struct HomeView: View {
             
             Image("homeViewBanner")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(contentMode: .fill)
             Button {
                 //                    PhotosPickerView()
                 naviManager.push(screen: Screen.photoPicker)
@@ -75,6 +75,7 @@ struct HomeView: View {
                     
                 }
                 .padding(.horizontal, 20)
+                .padding(.bottom, 16)
                 
                 LazyVGrid(
                     columns: [
@@ -96,10 +97,10 @@ struct HomeView: View {
                         }
                     }
                 }
-                .padding([.horizontal, .bottom], 20)
+                .padding(.horizontal, 20)
             }
             
-            Spacer()
+//            Spacer()
         }
         //            .fullScreenCover(isPresented: $isFullScreenPresented) {
         //                PhotosPickerView() // 풀스크린으로 표시할 뷰
@@ -111,7 +112,7 @@ struct HomeView: View {
     
 }
 
-struct HomeGridView: View { // 기존 GridItemView에서 이름 변경
+struct HomeGridView: View {
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
     @ObservedObject var viewModel: HomeViewModel
     
