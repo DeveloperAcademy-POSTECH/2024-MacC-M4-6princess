@@ -34,4 +34,6 @@ extension CameraView {
             frameManager.resultImage = nil
         }
     }
+    
+//    func 
 }

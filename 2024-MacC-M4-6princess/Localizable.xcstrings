@@ -10,12 +10,12 @@
     "%lld" : {
 
     },
-    "%lld/%lld" : {
+    "%lld / %lld" : {
       "localizations" : {
         "ko" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$lld/%2$lld"
+            "value" : "%1$lld / %2$lld"
           }
         }
       }
@@ -919,6 +919,7 @@
       }
     },
     "사진 촬영" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -974,6 +975,16 @@
         }
       }
     },
+    "사진촬영" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真撮影"
+          }
+        }
+      }
+    },
     "삭제" : {
       "localizations" : {
         "ar" : {
@@ -1001,9 +1012,6 @@
           }
         }
       }
-    },
-    "삭제하기" : {
-
     },
     "새 프레임" : {
       "localizations" : {
@@ -1507,7 +1515,14 @@
       }
     },
     "저장완료" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存完了"
+          }
+        }
+      }
     },
     "전체보기" : {
       "localizations" : {
@@ -1818,7 +1833,6 @@
       }
     },
     "프레임 삭제" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
