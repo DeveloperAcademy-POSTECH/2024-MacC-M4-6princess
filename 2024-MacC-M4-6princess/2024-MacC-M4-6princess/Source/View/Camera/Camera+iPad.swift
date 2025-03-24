@@ -12,7 +12,7 @@ extension CameraTopView{
     var cameraIPadTopView: some View {
         HStack() {
             Spacer()
-            CameraTimerView(viewModel: viewModel)
+            CameraTimerView(viewModel: viewModel, motionManager: motionManager)
             Button {
                 viewModel.changeCamera()
             } label: {

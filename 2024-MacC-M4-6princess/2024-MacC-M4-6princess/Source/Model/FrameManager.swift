@@ -30,6 +30,9 @@ public final class FrameManager: ObservableObject {
     @Published var selectedTextStyle:TextStyle?
     @Published var showTextModifyView: Bool = false
     @Published var textUUID: UUID?
+    
+    //MFDetailView 관련 변수
+    @Published var selectedFrameIdForDetail: UUID? = nil
 }
 
 extension FrameManager {

@@ -14,7 +14,7 @@ struct MFDetailView: View {
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var naviManager: NavigationManager
-    @ObservedObject var viewModel: MFViewModel
+    @ObservedObject var viewModel: MFDetailViewModel = MFDetailViewModel()
     
     var topBar : some View {
         ZStack{
@@ -48,7 +48,7 @@ struct MFDetailView: View {
                 VStack {
                     Button {
                         //카메라뷰로 이동
-                        frameManager.selectedFrame = viewModel.selectedImageIds.first
+                        frameManager.selectedFrame = viewModel.selectedImageId
                         dismiss()
                         naviManager.pop()
                         //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
@@ -65,7 +65,7 @@ struct MFDetailView: View {
                     Button {
                         //수정뷰로 이동
                         viewModel.imageDataArray.forEach {
-                            if $0.id == viewModel.selectedImageIds.first {
+                            if $0.id == viewModel.selectedImageId {
 //                                frameManager.updateFrame(withId: $0.id, imageData: viewModel.loadImageData(for: $0.id))
                                 Task {
                                     loadSelectedFrame() {
@@ -102,8 +102,8 @@ struct MFDetailView: View {
     }
     
     var bodyContentView: some View {
-            if let selectedId = viewModel.selectedImageIds.first,
-               let data = viewModel.loadOriginalImageData(for: selectedId),
+            if let selectedId = viewModel.selectedImageId,
+               let data = viewModel.loadOriginalImageData(),
                let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -126,7 +126,7 @@ struct MFDetailView: View {
         }
         .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
-                viewModel.deleteSelectedImages()
+                viewModel.isDeleteAlertDetail = true
                 dismiss()
             } label: {
                 Text("삭제")
