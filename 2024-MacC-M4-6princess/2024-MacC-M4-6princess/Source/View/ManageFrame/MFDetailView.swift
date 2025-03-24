@@ -49,7 +49,10 @@ struct MFDetailView: View {
                     Button {
                         //카메라뷰로 이동
                         frameManager.selectedFrame = viewModel.selectedImageId
-//                        dismiss()
+                        if let imageData = viewModel.loadOriginalImageData(),
+                               let uiImage = UIImage(data: imageData) {
+                                frameManager.resultImage = uiImage
+                            }
                         naviManager.pop()
                         //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
                     } label: {
