@@ -13,7 +13,7 @@ struct HomeView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
-//    @EnvironmentObject var layerListViewModel: LayerListViewModel
+    //    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject private var viewModel = HomeViewModel(context: PersistenceController.shared.container.viewContext)
     
     
@@ -30,83 +30,85 @@ struct HomeView: View {
                 Spacer()
             }
             .padding(.horizontal, 20)
-            
-            Image("homeViewBanner")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-            Button {
-                //                    PhotosPickerView()
-                naviManager.push(screen: Screen.photoPicker)
-                
-            } label: {
-                HStack(alignment: .center) {
-                    Text("프레임 만들기")
-                        .padding(.vertical, 20)
-                        .foregroundStyle(Color.pointPink)
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .frame(height: 60, alignment: .center)
-                .frame(maxWidth: .infinity)
-                .background(Color.pointPinkBG)
-                .cornerRadius(8)
-            }
-            .padding(.top, 20)
-            .padding(.bottom, 37)
-            .padding(.horizontal, 20)
-            
-            VStack {
-                HStack {
-                    Text("내가 만든 프레임")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color.gray01)
-                    Spacer()
-                    Button {
-                        naviManager.push(screen: Screen.manageFrame)
-                    } label: {
-                        HStack {
-                            Text("전체보기")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(Color.gray01)
-                            Image("chevronRight")
-                                .resizable()
-                                .frame(width: 18, height: 18)
-                        }
-                    }
+            ScrollView {
+                Image("homeViewBanner")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: UIScreen.main.bounds.width)
+                Button {
+                    //                    PhotosPickerView()
+                    naviManager.push(screen: Screen.photoPicker)
                     
+                } label: {
+                    HStack(alignment: .center) {
+                        Text("프레임 만들기")
+                            .padding(.vertical, 20)
+                            .foregroundStyle(Color.pointPink)
+                            .font(.system(size: 16, weight: .semibold))
+                    }
+                    .frame(height: 60, alignment: .center)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.pointPinkBG)
+                    .cornerRadius(8)
                 }
+                .padding(.top, 20)
+                .padding(.bottom, 37)
                 .padding(.horizontal, 20)
-                .padding(.bottom, 16)
                 
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(), spacing: 8), // 열 간격
-                        GridItem(.flexible(), spacing: 8),
-                        GridItem(.flexible(), spacing: 8)
-                    ],
-                    spacing: 8 // 행 간격
-                ) {
-                    ForEach(viewModel.imageDataArray.reversed().prefix(6), id: \.id) { imageInfo in
-                        HomeGridView(imageInfo: imageInfo,
-                                     viewModel: viewModel)
-                        .id(imageInfo.id)
-                        .onTapGesture {
-                            frameManager.selectedFrameIdForDetail = imageInfo.id // 선택한 이미지 ID 저장
-                            print("이미지 아이디를 frameManager에 저장했어요")
-                            naviManager.push(screen: Screen.detailFrame) // MFDetailView로 이동
-                            print("디테일뷰를 푸시했어요")
+                VStack {
+                    HStack {
+                        Text("내가 만든 프레임")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.gray01)
+                        Spacer()
+                        Button {
+                            naviManager.push(screen: Screen.manageFrame)
+                        } label: {
+                            HStack {
+                                Text("전체보기")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(Color.gray01)
+                                Image("chevronRight")
+                                    .resizable()
+                                    .frame(width: 18, height: 18)
+                            }
+                        }
+                        
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 16)
+                    
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: 8), // 열 간격
+                            GridItem(.flexible(), spacing: 8),
+                            GridItem(.flexible(), spacing: 8)
+                        ],
+                        spacing: 8 // 행 간격
+                    ) {
+                        ForEach(viewModel.imageDataArray.reversed().prefix(6), id: \.id) { imageInfo in
+                            HomeGridView(imageInfo: imageInfo,
+                                         viewModel: viewModel)
+                            .id(imageInfo.id)
+                            .onTapGesture {
+                                frameManager.selectedFrameIdForDetail = imageInfo.id // 선택한 이미지 ID 저장
+                                print("이미지 아이디를 frameManager에 저장했어요")
+                                naviManager.push(screen: Screen.detailFrame) // MFDetailView로 이동
+                                print("디테일뷰를 푸시했어요")
+                            }
                         }
                     }
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
+                
+                //            Spacer()
             }
-            
-//            Spacer()
-        }
-        //            .fullScreenCover(isPresented: $isFullScreenPresented) {
-        //                PhotosPickerView() // 풀스크린으로 표시할 뷰
-        //            }
-        .onAppear {
-            viewModel.loadImages()
+            //            .fullScreenCover(isPresented: $isFullScreenPresented) {
+            //                PhotosPickerView() // 풀스크린으로 표시할 뷰
+            //            }
+            .onAppear {
+                viewModel.loadImages()
+            }
         }
     }
     
