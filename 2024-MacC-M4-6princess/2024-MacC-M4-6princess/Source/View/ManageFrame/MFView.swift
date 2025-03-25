@@ -16,7 +16,7 @@ struct MFView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
-    @EnvironmentObject var layerListViewModel: LayerListViewModel
+//    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject var viewModel: MFViewModel
     
     init() {
@@ -29,12 +29,12 @@ struct MFView: View {
                     SheetTitleView(naviManager: _naviManager, viewModel: viewModel)
                         .environmentObject(frameManager)
                         .environmentObject(naviManager)
-                        .environmentObject(layerListViewModel)
+//                        .environmentObject(layerListViewModel)
                     ScrollView {
                         FrameGridItem(viewModel: viewModel)
                             .environmentObject(frameManager)
                             .environmentObject(naviManager)
-                            .environmentObject(layerListViewModel)
+//                            .environmentObject(layerListViewModel)
                     }
                     
                 }

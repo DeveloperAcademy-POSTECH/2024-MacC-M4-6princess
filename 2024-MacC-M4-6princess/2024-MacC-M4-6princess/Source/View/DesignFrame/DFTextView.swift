@@ -36,6 +36,11 @@ struct DFTextView: View {
                 }
             }
             
+//            Slider(value: $viewModel.fontSize, in: 10...72, step: 1)
+//                .accentColor(.gray01)
+//                .padding(.horizontal,20)
+//                .padding(.bottom, 8)
+            
             if viewModel.tab == 0 {
                 newFontSelector
                 
@@ -53,9 +58,6 @@ struct DFTextView: View {
             Color.black.opacity(0.5) // 반투명 검정색
         )
         .ignoresSafeArea(.keyboard)
-//        .onAppear {
-//            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
-//        }
         
     }
     

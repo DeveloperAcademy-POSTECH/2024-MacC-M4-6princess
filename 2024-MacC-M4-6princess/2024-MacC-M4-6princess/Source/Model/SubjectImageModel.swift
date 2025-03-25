@@ -21,13 +21,13 @@ class SubjectImage: Identifiable {
     var isTapped: Bool = true
     
     let id: UUID = UUID()
-    
+    var isFullSticker = false
     
 //    func setTappedState(_ state: Bool) {
 //        print(isTapped)
 //        isTapped = state
 //        print(isTapped)
-//        
+//
 //    }
     
     func getTapState() -> Bool {
@@ -64,4 +64,3 @@ class SubjectImage: Identifiable {
         return angle
     }
 }
-

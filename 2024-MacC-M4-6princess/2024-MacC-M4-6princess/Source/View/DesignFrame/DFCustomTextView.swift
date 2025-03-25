@@ -18,7 +18,7 @@ struct DFCustomTextView: UIViewRepresentable {
     // 디스플레이 스케일 (화면 해상도에 맞게 크기를 조정하기 위한 값)
     private let displayScale: CGFloat
     // 텍스트의 폰트 크기 (기본값 20으로 설정 가능)
-    let fontSize: CGFloat
+//    let fontSize: CGFloat
     // 이미지 데이터를 관리하는 환경 객체 (SwiftUI의 @EnvironmentObject로 주입)
     @EnvironmentObject var imageModel: ImageListModel
     
@@ -28,7 +28,7 @@ struct DFCustomTextView: UIViewRepresentable {
         displayScale: CGFloat, fontSize: CGFloat = 20) {
             self.viewModel = viewModel
             self.displayScale = displayScale
-            self.fontSize = fontSize
+            
         }
     
     // UIKit의 UITextView를 처음 생성하는 메서드 (SwiftUI에서 호출됨)
@@ -43,7 +43,7 @@ struct DFCustomTextView: UIViewRepresentable {
         textView.attributedText = viewModel.attributedTxt
         
         // 폰트 설정: viewModel에서 선택된 폰트를 지정된 크기로 적용
-        let font = viewModel.selectedFont.applyFont(size: fontSize)
+        let font = viewModel.selectedFont.applyFont(size: viewModel.fontSize)
         textView.font = font
         
         // 텍스트 정렬과 색상 설정
@@ -90,7 +90,7 @@ struct DFCustomTextView: UIViewRepresentable {
         uiView.attributedText = viewModel.attributedTxt // 최신 속성 텍스트 적용
         context.coordinator.centerTextVertically(in: uiView) // 텍스트 수직 중앙 정렬
         // 폰트, 정렬, 색상 속성 업데이트
-        let font = viewModel.selectedFont.applyFont(size: fontSize)
+        let font = viewModel.selectedFont.applyFont(size: viewModel.fontSize)
         uiView.font = font // 폰트 설정
         uiView.textAlignment = NSTextAlignment(viewModel.textAlignment) // 텍스트 정렬
         uiView.textColor = UIColor(color: viewModel.selectedColor) // 텍스트 색상

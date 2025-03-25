@@ -4,7 +4,6 @@
 //
 //  Created by ram on 3/5/25.
 //
-
 import SwiftUI
 import UIKit
 import LinkPresentation
@@ -19,17 +18,45 @@ struct IOShareSheet: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
         if isPresented && uiViewController.presentedViewController == nil {
-            let items: [Any] = [
-                SharePinNumberActivityItemSource(title: shareData.title, content: shareData.content, photo: shareData.image)
-            ]
-            
-            let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
-            activityVC.completionWithItemsHandler = { _, _, _, _ in
-                DispatchQueue.main.async {
-                    self.isPresented = false
+            DispatchQueue.global(qos: .userInitiated).async {
+                let fileURL = saveImageAsFile(image: shareData.image)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {  // 0.1초 지연 후 실행하여 UI 블로킹 방지
+                    var items: [Any] = []
+                    
+                    if let fileURL = fileURL {
+                        items.append(fileURL) // 이미지 파일 URL 추가
+                    }
+                    
+                    let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
+                    activityVC.completionWithItemsHandler = { _, _, _, _ in
+                        DispatchQueue.main.async {
+                            self.isPresented = false
+                        }
+                        //                        if let fileURL = fileURL {
+                        //                            deleteFile(at: fileURL)
+                        //                        }
+                    }
+                    uiViewController.present(activityVC, animated: true, completion: nil)
                 }
             }
-            uiViewController.present(activityVC, animated: true, completion: nil)
+        }
+    }
+    
+    /// 이미지를 PNG 파일로 저장하고 URL을 반환하는 함수
+    private func saveImageAsFile(image: UIImage) -> URL? {
+        guard let data = image.pngData() else { return nil }
+        
+        let fileManager = FileManager.default
+        let tempDir = fileManager.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("shared_image.png")
+        
+        do {
+            try data.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("Failed to save image to file: \(error)")
+            return nil
         }
     }
 }
@@ -51,12 +78,7 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        // PNG 데이터로 변환
-        guard let pngData = image.pngData() else { return content }
-
-                
-        return pngData
-        
+        return image.pngData() ?? content
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
@@ -71,4 +93,3 @@ final class SharePinNumberActivityItemSource: NSObject, UIActivityItemSource {
         return metaData
     }
 }
-

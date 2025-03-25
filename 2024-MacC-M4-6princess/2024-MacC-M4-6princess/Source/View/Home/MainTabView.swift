@@ -11,7 +11,7 @@ struct MainTabView: View {
     @EnvironmentObject private var naviManager: NavigationManager
     @EnvironmentObject private var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
-    @EnvironmentObject var layerListViewModel: LayerListViewModel
+//    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @Environment(\.managedObjectContext) private var viewContext
     @State var selectedTab = 1
     var tabBarHeight: CGFloat = 76
@@ -32,7 +32,7 @@ struct MainTabView: View {
                 .environmentObject(naviManager)
                 .environmentObject(frameManager)
                 .environmentObject(imageModel)
-                .environmentObject(layerListViewModel)
+//                .environmentObject(layerListViewModel)
                 
                 CustomTabBar(selectedTab: $selectedTab)
                 //처음 실행했을 때 - 온보딩 합침

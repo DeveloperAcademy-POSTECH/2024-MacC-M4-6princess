@@ -15,7 +15,7 @@ struct CameraView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
-    @EnvironmentObject var layerListViewModel: LayerListViewModel
+//    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject var viewModel = CameraViewModel()
     @StateObject var motionManager = MotionManager()
     //    @StateObject var frameManager = FrameManager()
@@ -100,7 +100,7 @@ struct CameraView: View {
                     .environmentObject(naviManager)
                     .environmentObject(frameManager)
                     .environmentObject(imageModel)
-                    .environmentObject(layerListViewModel)
+//                    .environmentObject(layerListViewModel)
             }
             if viewModel.delayTime != 0 && viewModel.isTakePic == true {
                 CameraTimerSecondsView(viewModel: viewModel)

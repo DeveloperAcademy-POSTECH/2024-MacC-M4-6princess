@@ -17,38 +17,62 @@ struct DFStickerView: View {
     
     var body: some View {
         VStack {
+            
             Text("스티커")
                 .font(.system(size: 17, weight: .bold))
                 .frame(maxWidth: .infinity) // 부모 뷰의 가로 폭을 채우기
                 .multilineTextAlignment(.center) // 텍스트 중앙 정렬
                 .padding(.top)
+                .padding(.vertical,8)
+            
             Divider()
             // 탭 선택 버튼
-            HStack(spacing: 20) {
+            HStack() {
+                
                 ForEach(StickerTab.allCases, id: \.self) { tab in
-                    Text(tab.displayName)
-                        .font(.system(size: 13, weight: selectedTab == tab ? .bold : .medium))
-                        .foregroundColor(selectedTab == tab ? .pointPink : .gray02)
-                        .onTapGesture {
-                            selectedTab = tab
+                    HStack{
+                        Spacer()
+                        ZStack{
+                            if selectedTab == tab {
+                                RoundedRectangle(cornerRadius: 13)
+                                    .fill(.gray02)
+                                    .frame(width: 70, height: 26)
+                            }
+                            Text(tab.displayName)
+                                .font(.system(size: 15, weight: selectedTab == tab ? .bold : .medium))
+                                .foregroundColor(selectedTab == tab ? .white : .gray02)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                                .onTapGesture {
+                                    selectedTab = tab
+                                    viewModel.selectedStickerTab = tab
+                                }
+                                .frame(width:UIScreen.main.bounds.width/5-20)
                         }
+                        
+                        Spacer()
+                    }
+                    .frame(width:UIScreen.main.bounds.width/5)
+                    
                 }
-                Spacer()
+                
             }
-            .padding(.horizontal)
-            .padding(.vertical, 6)
+            .padding(.horizontal,20)
+            
             Divider()
-            // 이미지 스크롤 뷰
             ScrollView {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 80, maximum: 120), spacing: 10)],
+                    spacing: 10
+                ) {
                     ForEach(stickers[selectedTab] ?? [], id: \.self) { imageName in
                         VStack {
-                            
                             Image(imageName)
                                 .resizable()
                                 .scaledToFit()
                                 .padding(10)
-                                .frame(width: 80, height: 80)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity) // 정사각형 유지
+                                .aspectRatio(1, contentMode: .fit) // 비율 유지
                                 .background(Color.gray.opacity(0.2))
                                 .cornerRadius(10)
                         }
@@ -57,34 +81,30 @@ struct DFStickerView: View {
                             if let image = UIImage(named: imageName) {
                                 newImage.sticker = image
                                 newImage.originalImage = image
-                                ///새로 추가한 이미지를 제외하고 모든 이미지의 선택을 해제합니다.
-                                imageModel.imageList.forEach {
-                                    if $0.isTapped {
-                                        $0.isTapped = false
-                                    }
+                                if viewModel.selectedStickerTab == .full{
+                                    newImage.isFullSticker = true
                                 }
-                                //                                newImage.scale = 0.5
+                                
+                                imageModel.imageList.forEach { $0.isTapped = false }
                                 imageModel.imageList.append(newImage)
-                                Analytics.logEvent("A5_스티커선택", parameters: [
-                                    "sticker_name": imageName
-                                ])
+                                
+                                Analytics.logEvent("A5_스티커선택", parameters: ["sticker_name": imageName])
+                                
                                 viewModel.selectedSubject = imageModel.imageList.last
                                 viewModel.selectedIndex = imageModel.imageList.indices.last
-                                viewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+                                viewModel.modelListControl(subject: imageModel.imageList.last!)
                             } else {
-                                //TODO: 에러 처리 해야함
                                 print("Image not found")
                             }
                             
                             viewModel.showStickerSheet = false
-                            
                         }
-                        
-                        .frame(width: 80, height: 80) // 정사각형 박스 크기
+                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 정사각형 박스 크기
+                        .aspectRatio(1, contentMode: .fit) // 비율 유지
                     }
                 }
+                .padding(.horizontal,20)
             }
-            .padding(.horizontal)
         }
     }
 }
