@@ -26,35 +26,14 @@ struct HomeView: View {
             HStack {
                 Image("appLogo")
                     .frame(width: 100, height: 20)
-                    .padding(.top, 18)
+                    .padding(.vertical, 18)
                 Spacer()
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 18)
             
             Image("homeViewBanner")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-            
-            //                Button {
-            //                    // 프레임 만들기 페이지로 이동
-            //                    isFullScreenPresented = true
-            //                } label: {
-            //                    HStack(alignment: .center) {
-            //                        Text("프레임만들기")
-            //                            .padding(.vertical, 20)
-            //                            .foregroundStyle(Color.pointPink)
-            //                            .font(.system(size: 16, weight: .semibold))
-            //                    }
-            //                    .frame(height: 60, alignment: .center)
-            //                    .frame(maxWidth: .infinity)
-            //                    .background(Color.pointPinkBG)
-            //                    .cornerRadius(8)
-            //                }
-            //                .padding(.top, 20)
-            //                .padding(.bottom, 37)
-            //                .padding(.horizontal, 20)
-            
+                .aspectRatio(contentMode: .fill)
             Button {
                 //                    PhotosPickerView()
                 naviManager.push(screen: Screen.photoPicker)
@@ -96,6 +75,7 @@ struct HomeView: View {
                     
                 }
                 .padding(.horizontal, 20)
+                .padding(.bottom, 16)
                 
                 LazyVGrid(
                     columns: [
@@ -109,12 +89,18 @@ struct HomeView: View {
                         HomeGridView(imageInfo: imageInfo,
                                      viewModel: viewModel)
                         .id(imageInfo.id)
+                        .onTapGesture {
+                            frameManager.selectedFrameIdForDetail = imageInfo.id // 선택한 이미지 ID 저장
+                            print("이미지 아이디를 frameManager에 저장했어요")
+                            naviManager.push(screen: Screen.detailFrame) // MFDetailView로 이동
+                            print("디테일뷰를 푸시했어요")
+                        }
                     }
                 }
-                .padding([.horizontal, .bottom], 20)
+                .padding(.horizontal, 20)
             }
             
-            Spacer()
+//            Spacer()
         }
         //            .fullScreenCover(isPresented: $isFullScreenPresented) {
         //                PhotosPickerView() // 풀스크린으로 표시할 뷰
@@ -126,7 +112,7 @@ struct HomeView: View {
     
 }
 
-struct HomeGridView: View { // 기존 GridItemView에서 이름 변경
+struct HomeGridView: View {
     let imageInfo: (id: UUID, data: Data, isLoaded: Bool)
     @ObservedObject var viewModel: HomeViewModel
     

@@ -164,5 +164,4 @@ struct CameraView: View {
         return longerSide > 1000
     }
     
-    
 }
