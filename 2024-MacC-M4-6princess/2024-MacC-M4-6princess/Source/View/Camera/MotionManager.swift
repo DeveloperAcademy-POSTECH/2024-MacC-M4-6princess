@@ -12,7 +12,7 @@ class MotionManager: ObservableObject {
     @Published var currentOrientation: UIDeviceOrientation = .portrait //이걸 model로 따로 빼기
     {
         didSet{
-            print("현재방향:\(currentOrientation.rawValue)")
+//            print("현재방향:\(currentOrientation.rawValue)")
         }
     }
     private var motionManager = CMMotionManager()

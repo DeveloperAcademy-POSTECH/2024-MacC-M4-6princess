@@ -47,7 +47,7 @@ struct MainTabView: View {
             .navigationDestination(for: Screen.self) { screen in
                 FeatureView(type: screen)
             }
-            .onChange(of: frameManager.selectedFrame) { oldFrame,newFrame in
+            .onChange(of: frameManager.resultImage) { oldFrame,newFrame in
                 selectedTab = 1
             }
         }
@@ -89,7 +89,7 @@ struct CustomTabBar: View {
             .background(
                 Rectangle()
                     .fill(Color.white)
-                    .frame(height: 76)
+                    .frame(height: 56)
                     .frame(maxWidth: .infinity)
             )
             .overlay(
@@ -101,11 +101,11 @@ struct CustomTabBar: View {
                 
             )
         }
-        Rectangle()
-            .fill(Color.gray10)
-            .frame(height: 0.5)
-            .edgesIgnoringSafeArea(.horizontal)
-            .padding(.bottom, 56) // safeArea 고려해서 76->56으로 조정
+//        Rectangle()
+//            .fill(Color.gray10)
+//            .frame(height: 0.5)
+//            .edgesIgnoringSafeArea(.horizontal)
+//            .padding(.bottom, 56) // safeArea 고려해서 76->56으로 조정
     }
 }
 
