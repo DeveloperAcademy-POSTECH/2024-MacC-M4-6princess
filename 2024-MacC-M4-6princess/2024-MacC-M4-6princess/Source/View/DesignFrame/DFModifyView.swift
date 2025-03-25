@@ -23,10 +23,10 @@ struct DFModifyView: View {
     var body: some View {
         
         ZStack {
-            if isFirstLaunching == true && !viewModel.showAgain == true {
-                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
-                    .zIndex(1)
-            }
+//            if isFirstLaunching == true && !viewModel.showAgain == true {
+//                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
+//                    .zIndex(1)
+//            }
             
             Color.clear
                 .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
