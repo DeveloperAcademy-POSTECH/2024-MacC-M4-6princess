@@ -210,13 +210,13 @@ struct GridItemView: View {
             }
         }
         .onTapGesture {
-//            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
+            frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
             frameManager.selectedFrameIdForDetail = imageInfo.id
-            naviManager.push(screen: Screen.detailFrame)
+//            naviManager.push(screen: Screen.detailFrame)
             if !viewModel.isEditing {
                 viewModel.selectedImageIds = [imageInfo.id]
 //                viewModel.isShowMFDetailView = true
-//                naviManager.push(screen: Screen.manageDetailFrame)
+                naviManager.push(screen: Screen.detailFrame)
                 Analytics.logEvent("A2_프레임선택", parameters: nil)
             }
         }
