@@ -121,7 +121,7 @@ struct StickerImages {
     static func getStickerImages() -> [StickerTab: [String]] {
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
-            .humor: (1...12).map { String(format: "humor%02d", $0) },
+            .humor: (1...29).map { String(format: "humor%02d", $0) },
             .character: (1...10).map { String(format: "character%02d", $0) },
             .full: (1...7).map { String(format: "full%02d", $0) }
         ]
