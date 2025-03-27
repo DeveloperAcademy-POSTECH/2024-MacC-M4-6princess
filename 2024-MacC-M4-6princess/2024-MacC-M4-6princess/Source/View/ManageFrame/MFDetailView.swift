@@ -66,9 +66,13 @@ struct MFDetailView: View {
                 }
                 VStack {
                     Button {
-                        frameManager.selectedFrame = viewModel.selectedImageId
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            naviManager.push(screen: Screen.modifyFrame)
+//                        frameManager.selectedFrame = viewModel.selectedImageId
+                        frameManager.updateFrame = viewModel.selectedImageId
+                        print("업데이트할 프레임 \(frameManager.updateFrame)")
+                        loadSelectedFrame {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                naviManager.push(screen: Screen.modifyFrame)
+                            }
                         }
                     } label: {
                         Image("ToolIconModify")
