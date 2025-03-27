@@ -49,7 +49,7 @@ struct IOView: View {
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     .onAppear{
                         viewModel.currentOrientation = motionManager.currentOrientation
-                        viewModel.saveRenderedView(content: canvasView, motionManager: motionManager, orientation: viewModel.currentOrientation) // 사진을 그리면서 동시에 저장
+                        viewModel.renderAndSaveViewImage(content: canvasView, motionManager: motionManager, orientation: viewModel.currentOrientation) // 사진을 그리면서 동시에 저장
                         motionManager.stopDeviceMotionUpdates()
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")

@@ -7,55 +7,115 @@
 
 import SwiftUI
 import Photos
+import ClockKit
 
 class IOViewModel: ObservableObject {
+    /// for 에러 알림창
     @Published var showAlert: Bool = false
     @Published var alertMessage: String = ""
+    
     @Published var frameBGSize: CGSize = .zero // 프레임상의 축소된 배경 이미지 크기
     var compositeImage:UIImage?
     var bgImg: UIImage?
     var idolImg: UIImage?
     @Published var frameIdolSize: CGSize = .zero // 프레임상 아이돌 이미지 크기
     @Published var location: CGPoint = CGPoint(x: 100, y: 100)
-    @Published var screenSize: CGSize = .zero
+    //    @Published var screenSize: CGSize = .zero
     /// for 이미지 저장
-    @Published var savePhoto = false
+    //    @Published var savePhoto = false
     @Published var saveAnimate = false
     
     @Published var showShareButton = false
     @Published var showAcitivity = false
     @Published var changeOverlay = false
     var currentOrientation:UIDeviceOrientation = .portrait
-    /// 사진 저장 함수
+    
+    
+    /// 뷰를 이미지로 변환 후 저장
     @MainActor
-    func saveRenderedView<T: View>(content: T, motionManager: MotionManager,orientation:UIDeviceOrientation) {
-        let renderedImage = ImageRenderer(
-            content: content
-                .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
-        )
-        // 해상도
-        renderedImage.scale = UIScreen.main.scale + 1
-        print("UIScreen.main.scale:\(UIScreen.main.scale)")
-        
-        if var uiImage = renderedImage.uiImage {
-            // 기기 방향에 따라 이미지 회전
+    func renderAndSaveViewImage<T: View>(content: T, motionManager: MotionManager,orientation:UIDeviceOrientation) {
+        guard let uiImage = renderImage(content, motionManager) else {
+            showAlert(message: "렌더링 실패: 다시 시도해주세요.\n에러가 반복될 시 캡쳐후 제보부탁드립니다.")
+            return
+        }
+        let rotatedImage = applyOrientationToImage(uiImage:uiImage,motionManager:motionManager)
+        self.compositeImage = rotatedImage
+        requestPhotoLibraryPermission { granted in
+            if granted {
+                self.saveImageToAlbum(uiImage: rotatedImage)
+            }
+            else{
+                self.showAlert(message: "사진 저장 권한이 필요합니다.\n 설정에서 권한 설정을 해주세요.")
+            }
+        }
+        /// 뷰를 uiImage로 변환
+        @MainActor
+        func renderImage<T:View>(_ content:T, _ motionManager: MotionManager) -> UIImage? {
+            
+            let renderer = ImageRenderer(
+                content: content
+                    .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
+            )
+            // 해상도
+            renderer.scale = UIScreen.main.scale + 1
+            return renderer.uiImage
+        }
+        /// 기기의 방향에 따른 이미지 회전을 재조정하여 .up 회전으로 모두 통일
+        func applyOrientationToImage(uiImage:UIImage,motionManager: MotionManager) -> UIImage {
+            
             let orientation = motionManager.imageRotate()
-            if orientation != .up {
-                if let cgImage = uiImage.cgImage {
-                    uiImage = UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
+            if orientation == .up {return uiImage} // 정방형일 때 그대로 내보냄
+            guard let cgImage = uiImage.cgImage else { return uiImage } // cgImage로 변환 실패시 그대로 내보냄
+            
+            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
+            
+        }
+        
+        func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
+            PHPhotoLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    switch status {
+                    case .authorized, .limited:
+                        completion(true)
+                    case .denied, .restricted:
+                        showAlertWithSettingsRedirect(message: "갤러리 접근이 거부되어 저장할 수 없습니다.\n설정에서 권한을 허용해주세요.")
+                        completion(false)
+                    case .notDetermined:
+                        self.showAlert(message: "갤러리 권한을 확인 중입니다.")
+                        completion(false)
+                    @unknown default:
+                        completion(false)
+                    }
                 }
             }
-            
-            self.compositeImage = uiImage
-            saveImageToAlbum(uiImage: uiImage)
-        } else {
-            showAlert(message: "렌더링 실패: 이미지 생성에 문제가 발생했습니다.")
+            func showAlertWithSettingsRedirect(message: String) {
+                let alert = UIAlertController(title: "권한 필요", message: message, preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default, handler: { _ in
+                    if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(appSettings)
+                    }
+                }))
+                alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+                
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let rootVC = windowScene.windows.first?.rootViewController {
+                    rootVC.present(alert, animated: true, completion: nil)
+                }
+            }
         }
+        
     }
     
     
+    
+    
+    /// 앨범에 이미지를 저장
     func saveImageToAlbum(uiImage: UIImage) {
         let albumName = "Frameet"
+        
+        getAlbum { album in
+            saveImageToAlbum(album: album)
+        }
         
         func getAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
             let fetchOptions = PHFetchOptions()
@@ -99,17 +159,37 @@ class IOViewModel: ObservableObject {
                     if success {
                         print("사진이 앨범 '\(albumName)'에 성공적으로 저장되었습니다.")
                     } else {
-                        self.showAlert(message: "사진 저장 실패: \(error?.localizedDescription ?? "알 수 없는 오류")")
+                        let errorMessage = error?.localizedDescription ?? "알 수 없는 오류"
+                        showAction(message: "사진 저장 실패: \(errorMessage)", retryAction: {
+                            // Retry the save action
+                            saveImageToAlbum(album: album)
+                        })
                     }
                 }
             }
         }
-        
-        getAlbum { album in
-            saveImageToAlbum(album: album)
+
+        func showAction(message: String, retryAction: (() -> Void)? = nil) {
+            let alert = UIAlertController(title: "알림", message: message, preferredStyle: .actionSheet)
+            
+            let retryAction = UIAlertAction(title: "다시 시도", style: .default) { _ in
+                retryAction?()
+            }
+            alert.addAction(retryAction)
+            
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+            alert.addAction(cancelAction)
+            
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootVC = windowScene.windows.first?.rootViewController {
+                rootVC.present(alert, animated: true, completion: nil)
+            }
         }
+
+        
     }
     
+    /// 뷰가 생성될 때 화면을 초기화하는 함수
     func canvasOnAppear(bgImg: UIImage, idolImg: UIImage, bounds: CGSize) {
         let screenWidth = bounds.width
         let bgImageRatio = bgImg.size.height / bgImg.size.width
