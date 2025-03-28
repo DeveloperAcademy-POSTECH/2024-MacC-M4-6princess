@@ -67,10 +67,3 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
     }
 }
 
-// Float 비교를 위한 연산자
-infix operator ≈≈ : ComparisonPrecedence
-extension CGFloat {
-    static func ≈≈(lhs: CGFloat, rhs: CGFloat) -> Bool {
-        return abs(lhs - rhs) < 2.0
-    }
-}
