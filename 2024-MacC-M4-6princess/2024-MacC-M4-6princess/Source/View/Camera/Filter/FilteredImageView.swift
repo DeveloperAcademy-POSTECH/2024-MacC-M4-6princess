@@ -14,6 +14,7 @@ struct FilteredImageView: View {
 //    @State var selectedFilter: UUID?
     
     @StateObject var viewModel: CameraViewModel
+    @State private var refreshID = UUID() // 강제 새로고침을 위한 ID
     
     var body: some View {
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
@@ -67,9 +68,11 @@ struct FilteredImageView: View {
             }
             .onDisappear {
                 viewModel.cameraManager.stopSession()
-            }
-            .onChange(of: frameManager.resultImage, initial: true) { oldValue, newValue in
                 reloadFilterImages()
+            }
+            .onChange(of: frameManager.resultImage) { oldValue, newValue in
+                reloadFilterImages()
+                //왜 안될까...
             }
         }
             else{

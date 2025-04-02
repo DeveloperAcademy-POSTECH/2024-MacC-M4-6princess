@@ -39,11 +39,37 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     //        }
     //    }
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-        // 데이터 변경 시 업데이트 (배열 내용 비교)
-        let currentFilters = uiViewController.filterImages.map { $0.uuid }
-        let newFilters = filterImages.reversed().map { $0.uuid }
+        // 데이터가 있는지 확인
+        guard !uiViewController.filterImages.isEmpty && !filterImages.isEmpty else {
+            return // 데이터가 없으면 아무것도 하지 않음
+        }
         
-        if currentFilters != newFilters {
+        // createdDate가 nil이 아닌 필터만 추출하여 정렬(프레임이 아무것도 없을 때)
+        let currentFiltersWithDates = uiViewController.filterImages.filter { $0.createdDate != nil }
+        let newFiltersWithDates = filterImages.reversed().filter { $0.createdDate != nil }
+        
+        // 날짜가 있는 필터가 하나도 없으면 비교하지 않음(프레임이 아무것도 없을 때)
+        guard !currentFiltersWithDates.isEmpty && !newFiltersWithDates.isEmpty else {
+            return
+        }
+        
+        // 날짜로 정렬
+        let sortedCurrentFilters = currentFiltersWithDates.sorted {
+            guard let date1 = $0.createdDate, let date2 = $1.createdDate else { return false }
+            return date1 > date2
+        }
+        
+        let sortedNewFilters = newFiltersWithDates.sorted {
+            guard let date1 = $0.createdDate, let date2 = $1.createdDate else { return false }
+            return date1 > date2
+        }
+        
+        // 날짜만 추출하여 비교
+        let currentDates = sortedCurrentFilters.compactMap { $0.createdDate }
+        let newDates = sortedNewFilters.compactMap { $0.createdDate }
+        
+        // 날짜 배열이 다르면 업데이트
+        if currentDates != newDates {
             uiViewController.filterImages = filterImages.reversed()
             uiViewController.collectionView.reloadData()
         }
@@ -54,5 +80,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
             uiViewController.scrollToSelectedFilter(animated: false)
         }
     }
+
+
 
 }
