@@ -35,14 +35,14 @@ class MotionManager: ObservableObject {
                 }
             }
             isMotionActive = true
-            print("Device motion updates started.")
+//            print("Device motion updates started.")
         }
 
         func stopDeviceMotionUpdates() {
             guard isMotionActive, motionManager.isDeviceMotionAvailable else { return }
             motionManager.stopDeviceMotionUpdates()
             isMotionActive = false
-            print("Device motion updates stopped. Active: \(motionManager.isDeviceMotionActive)")
+//            print("Device motion updates stopped. Active: \(motionManager.isDeviceMotionActive)")
         }
 
     //카메라뷰 아이콘 회전을 위한 함수

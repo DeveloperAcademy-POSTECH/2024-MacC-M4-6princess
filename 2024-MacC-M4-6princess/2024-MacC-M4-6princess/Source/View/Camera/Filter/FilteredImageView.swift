@@ -39,7 +39,7 @@ struct FilteredImageView: View {
                                 viewModel.cameraManager.stopSession()
                                 Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
                             }
-                        } else {
+                        } else { //EmptyCell을 선택한 채로 셔터 버튼을 눌렀을 때
                             viewModel.isShowAlert = true
                         }
                     } label: {
