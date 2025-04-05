@@ -29,7 +29,7 @@ struct MFDetailView: View {
                 }
                 Spacer()
             }
-//            .frame(height: 60)
+            //            .frame(height: 60)
             
             HStack(alignment: .center) {
                 Text("\(viewModel.indexOfSelectedImage() ?? 0) / \(viewModel.totalImageCount())")
@@ -37,7 +37,7 @@ struct MFDetailView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.gray01)
             }
-//            .frame(height: 60)
+            //            .frame(height: 60)
             
         }
     }
@@ -50,9 +50,9 @@ struct MFDetailView: View {
                         //카메라뷰로 이동
                         frameManager.selectedFrame = viewModel.selectedImageId
                         if let imageData = viewModel.loadOriginalImageData(),
-                               let uiImage = UIImage(data: imageData) {
-                                frameManager.resultImage = uiImage
-                            }
+                           let uiImage = UIImage(data: imageData) {
+                            frameManager.resultImage = uiImage
+                        }
                         naviManager.pop()
                         //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
                     } label: {
@@ -66,7 +66,7 @@ struct MFDetailView: View {
                 }
                 VStack {
                     Button {
-//                        frameManager.selectedFrame = viewModel.selectedImageId
+                        //                        frameManager.selectedFrame = viewModel.selectedImageId
                         frameManager.updateFrame = viewModel.selectedImageId
                         print("업데이트할 프레임 \(frameManager.updateFrame)")
                         loadSelectedFrame {
@@ -98,7 +98,7 @@ struct MFDetailView: View {
                 }
             }
             .frame(height: 102)
-//            .padding(.top, 20)
+            //            .padding(.top, 20)
         }
     }
     
@@ -118,18 +118,18 @@ struct MFDetailView: View {
     //        }
     //    }
     var bodyContentView: some View {
-            if let data = viewModel.loadOriginalImageData(), let uiImage = UIImage(data: data) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(.white)
-            } else {
-                Image(systemName: "heart")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(.white)
-            }
+        if let data = viewModel.loadOriginalImageData(), let uiImage = UIImage(data: data) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .foregroundStyle(.white)
+        } else {
+            Image(systemName: "heart")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .foregroundStyle(.white)
         }
+    }
     
     
     var body: some View {
@@ -141,13 +141,13 @@ struct MFDetailView: View {
                 bottomBar
             }
         }
-//        .ignoresSafeArea(edges: .top)
+        //        .ignoresSafeArea(edges: .top)
         .navigationBarBackButtonHidden(true)
         .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
                 viewModel.deleteSelectedImage()
                 {
-//                    dismiss()
+                    //                    dismiss()
                 }
             } label: {
                 Text("삭제")

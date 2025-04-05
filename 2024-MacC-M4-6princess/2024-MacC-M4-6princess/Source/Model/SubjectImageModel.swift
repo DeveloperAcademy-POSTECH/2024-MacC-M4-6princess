@@ -23,12 +23,12 @@ class SubjectImage: Identifiable {
     let id: UUID = UUID()
     var isFullSticker = false
     
-//    func setTappedState(_ state: Bool) {
-//        print(isTapped)
-//        isTapped = state
-//        print(isTapped)
-//
-//    }
+    //    func setTappedState(_ state: Bool) {
+    //        print(isTapped)
+    //        isTapped = state
+    //        print(isTapped)
+    //
+    //    }
     
     func getTapState() -> Bool {
         return isTapped

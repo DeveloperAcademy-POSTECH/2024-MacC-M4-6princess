@@ -111,7 +111,7 @@ struct DFStickerView: View {
 
 enum StickerTab: String, CaseIterable {
     case bubble, humor, character, full
-
+    
     var displayName: String {
         NSLocalizedString("stickerTab.\(self.rawValue)", comment: "")
     }
@@ -122,8 +122,8 @@ struct StickerImages {
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
             .humor: (1...29).map { String(format: "humor%02d", $0) },
-            .character: (1...10).map { String(format: "character%02d", $0) },
-            .full: (1...7).map { String(format: "full%02d", $0) }
+            .character: (1...6).map { String(format: "character%02d", $0) },
+            .full: (1...5).map { String(format: "full%02d", $0) }
         ]
     }
 }
