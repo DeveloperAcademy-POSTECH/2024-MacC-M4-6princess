@@ -114,7 +114,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     //        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
     //        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
     //        let distance = abs(cellFrame.midX - centerX)
-    //        
+    //
     //        if indexPath.item == 0 {
     //            return defaultCellSize
     //        } else if distance < (centerCellSize / 2) {
@@ -196,12 +196,13 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
                 self.selectedFilter?(selectedFilter.uuid)
                 currentSelectedFilter = selectedFilter.uuid
                 frameManager.selectedFrame = currentSelectedFilter
+                
+                // 추가: resultImage를 강제로 업데이트
+                frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
             }
         }
-        frameManager.isFrameLoading = true
-        updateCellSizesAndSpacing()
-        //        print("현재 셀의 인덱스: \(filterImages[indexPath.item])")
     }
+
     
     
     private func updateCellSizesAndSpacing() {
@@ -278,10 +279,10 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     //    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
     //    private func scrollToNewestFilter() {
     //        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
-    //        
+    //
     //        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
     //        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
-    //        
+    //
     //        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
     //    }
     private func scrollToNewestFilter() {
