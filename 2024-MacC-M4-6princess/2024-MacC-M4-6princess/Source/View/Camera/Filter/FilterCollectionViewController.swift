@@ -196,12 +196,13 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
                 self.selectedFilter?(selectedFilter.uuid)
                 currentSelectedFilter = selectedFilter.uuid
                 frameManager.selectedFrame = currentSelectedFilter
+                
+                // 추가: resultImage를 강제로 업데이트
+                frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
             }
         }
-        frameManager.isFrameLoading = true
-        updateCellSizesAndSpacing()
-        //        print("현재 셀의 인덱스: \(filterImages[indexPath.item])")
     }
+
     
     
     private func updateCellSizesAndSpacing() {

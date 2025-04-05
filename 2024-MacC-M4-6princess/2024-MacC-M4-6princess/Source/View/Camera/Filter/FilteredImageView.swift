@@ -5,13 +5,11 @@ import FirebaseAnalytics
 struct FilteredImageView: View {
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var frameManager: FrameManager
-//    @FetchRequest(entity: StoreImages.entity(),
-//                  sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.order, ascending: true)])
-                  @FetchRequest(entity: StoreImages.entity(),
-                                sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)])
+    @FetchRequest(entity: StoreImages.entity(),
+                  sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)])
     var filterImages: FetchedResults<StoreImages>
     
-//    @State var selectedFilter: UUID?
+    //    @State var selectedFilter: UUID?
     
     @StateObject var viewModel: CameraViewModel
     @State private var refreshID = UUID() // 강제 새로고침을 위한 ID
@@ -26,12 +24,18 @@ struct FilteredImageView: View {
                     )
                     .frame(height: 100)
                     
+                    
                     // 투명한 탭 영역
                     Color.clear
                         .frame(width: 100, height: 100)
                         .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
                     
                     Button {
+                        guard let selectedFrame = frameManager.selectedFrame else {
+                            viewModel.isShowAlert = true
+                            return
+                        }
+                        
                         if frameManager.resultImage != nil {
                             self.viewModel.isTakePic = true
                             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
@@ -47,23 +51,24 @@ struct FilteredImageView: View {
                             .resizable()
                             .frame(width: 80, height: 80)
                     }
-                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
-                    .allowsHitTesting(true)
                     .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
                         Button("닫기", role: .cancel) { }
                     } message: {
                         Text("")
                     }
+
                     
                     
                 }
             }
+//            .id(refreshID) //뷰 강제 업데이트
             .frame(height: 124)
             .onAppear {
                 DispatchQueue.main.async {
                     //보라색 무시해주세요
                     viewModel.cameraManager.session.startRunning()
                     reloadFilterImages()
+//                    refreshID = UUID()
                 }
             }
             .onDisappear {
@@ -72,17 +77,18 @@ struct FilteredImageView: View {
             }
             .onChange(of: frameManager.resultImage) { oldValue, newValue in
                 reloadFilterImages()
+//                refreshID = UUID()
                 //왜 안될까...
             }
         }
-            else{
-                filteredIPad
-            }
-        }
-        func reloadFilterImages() {
-            // FetchRequest 갱신
-            for image in filterImages {
-                viewContext.refresh(image, mergeChanges: true)
-            }
+        else{
+            filteredIPad
         }
     }
+    func reloadFilterImages() {
+        // FetchRequest 갱신
+        for image in filterImages {
+            viewContext.refresh(image, mergeChanges: true)
+        }
+    }
+}
