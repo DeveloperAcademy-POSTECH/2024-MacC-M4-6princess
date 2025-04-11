@@ -23,6 +23,10 @@ struct FilteredImageView: View {
                         viewModel: viewModel
                     )
                     .frame(height: 100)
+                    .id(refreshID)
+                    .onAppear {
+                        refreshID = UUID()
+                    }
                     
                     
                     // 투명한 탭 영역
