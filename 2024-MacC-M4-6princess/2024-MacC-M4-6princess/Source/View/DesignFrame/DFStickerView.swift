@@ -62,7 +62,7 @@ struct DFStickerView: View {
             Divider()
             ScrollView {
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 80, maximum: 120), spacing: 10)],
+                    columns: [GridItem(.adaptive(minimum: 70, maximum: 120), spacing: 10)],
                     spacing: 10
                 ) {
                     ForEach(stickers[selectedTab] ?? [], id: \.self) { imageName in
