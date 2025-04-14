@@ -62,7 +62,7 @@ struct DFStickerView: View {
             Divider()
             ScrollView {
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 80, maximum: 120), spacing: 10)],
+                    columns: [GridItem(.adaptive(minimum: 70, maximum: 120), spacing: 10)],
                     spacing: 10
                 ) {
                     ForEach(stickers[selectedTab] ?? [], id: \.self) { imageName in
@@ -121,7 +121,7 @@ struct StickerImages {
     static func getStickerImages() -> [StickerTab: [String]] {
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
-            .humor: (1...29).map { String(format: "humor%02d", $0) },
+            .humor: (1...39).map { String(format: "humor%02d", $0) },
             .character: (1...6).map { String(format: "character%02d", $0) },
             .full: (1...5).map { String(format: "full%02d", $0) }
         ]

@@ -10,7 +10,9 @@ import SwiftUI
 
 struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @EnvironmentObject var frameManager: FrameManager
-    let filterImages: [StoreImages]
+    @FetchRequest(entity: StoreImages.entity(),
+                  sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)])
+    var filterImages: FetchedResults<StoreImages>
     let viewModel: CameraViewModel
     
     func makeUIViewController(context: Context) -> FilterCollectionViewController {
@@ -18,6 +20,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
             filterImages: filterImages.reversed(),
             selectedFilter: { uuid in
                 frameManager.selectedFrame = uuid
+                print("🔥 selectedFilter 클로저 호출됨! uuid: \(uuid?.uuidString ?? "nil")")
             },
             initialFilter: frameManager.selectedFrame,
             viewModel: viewModel,

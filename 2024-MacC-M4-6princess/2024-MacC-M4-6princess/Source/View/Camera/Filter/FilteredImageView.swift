@@ -19,10 +19,13 @@ struct FilteredImageView: View {
             GeometryReader { geometry in
                 ZStack {
                     FilterCollectionViewRepresentable(
-                        filterImages: Array(filterImages),
                         viewModel: viewModel
                     )
                     .frame(height: 100)
+                    .id(refreshID)
+                    .onAppear {
+                        refreshID = UUID()
+                    }
                     
                     
                     // 투명한 탭 영역
@@ -64,10 +67,14 @@ struct FilteredImageView: View {
 //            .id(refreshID) //뷰 강제 업데이트
             .frame(height: 124)
             .onAppear {
-                DispatchQueue.main.async {
+//                DispatchQueue.main.async {
+                DispatchQueue.global(qos: .userInitiated).async {
                     //보라색 무시해주세요
                     viewModel.cameraManager.session.startRunning()
-                    reloadFilterImages()
+                    DispatchQueue.main.async {
+                             reloadFilterImages()
+                             // refreshID = UUID()
+                         }
 //                    refreshID = UUID()
                 }
             }

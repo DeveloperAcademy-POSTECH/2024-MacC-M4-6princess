@@ -16,9 +16,15 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     var collectionView: UICollectionView!
     var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
+//    {
+//        didSet{
+//            print("selectedFilter:\(selectedFilter ?? nil)")
+//        }
+//    }
     var currentSelectedFilter: UUID? {
         didSet {
             scrollToSelectedFilter(animated: true)
+            print("currentSelectedFilter:\(currentSelectedFilter ?? nil)")
         }
     }
     private let filterCellId = "FilterCell"
