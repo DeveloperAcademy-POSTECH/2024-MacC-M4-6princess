@@ -22,8 +22,9 @@ struct IOView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack{
-                Spacer()
+              
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+//                    Spacer()
                     HStack(alignment: .center, spacing: 14) {
                         Text("갤러리에 저장되었습니다")
                             .font(.system(size:17))
@@ -31,6 +32,9 @@ struct IOView: View {
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray01)
                     }
+                    .padding(.vertical,10)
+                 
+                    Spacer()
                     
                 }
                 else{
@@ -41,9 +45,9 @@ struct IOView: View {
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray01)
                     }
-                    .padding(.top, 26)
+//                    .padding(.top, 26)
                 }
-                Spacer()
+                
                 // 후보정 레이어 편집 뷰
                 canvasView
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
@@ -63,9 +67,11 @@ struct IOView: View {
                         )
                     }
                     .scaledToFit()
-                Spacer()
+                
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
+                    Spacer()
+                        .background(Color.red)
                     VStack(alignment: .center, spacing: 8){
                         //                        Spacer()
                         //                        Text("저장된 사진은 갤러리에서 확인해주세요.")
@@ -73,7 +79,7 @@ struct IOView: View {
                         //                            .multilineTextAlignment(.center)
                         //                            .foregroundColor(.gray01)
                         //                            .padding(.top,5)
-                        Spacer()
+//                        Spacer()
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -105,7 +111,7 @@ struct IOView: View {
                         .frame(maxWidth: .infinity)
                         //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
-                        Spacer()
+                      
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                             .ignoresSafeArea(.all)
                         
@@ -115,11 +121,11 @@ struct IOView: View {
                 }
                 else{
                     VStack(alignment: .center, spacing: 8){
-                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-                            .font(.system(size:12))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.gray01)
-                            .padding(5)
+//                        Text("저장된 사진은 갤러리에서 확인해주세요.")
+//                            .font(.system(size:12))
+//                            .multilineTextAlignment(.center)
+//                            .foregroundColor(.gray01)
+//                            .padding(5)
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -149,6 +155,7 @@ struct IOView: View {
                         //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
+                        Spacer()
                         
                         
                     }

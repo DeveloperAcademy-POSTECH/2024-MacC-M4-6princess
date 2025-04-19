@@ -1487,6 +1487,7 @@
       }
     },
     "저장된 사진은 갤러리에서 확인해주세요." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

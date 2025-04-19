@@ -35,7 +35,7 @@ struct IOBottomBannerAdMob: UIViewRepresentable {
         
         private(set) lazy var bannerView: BannerView = {
             let banner = BannerView(adSize: parent.adSize)
-            banner.adUnitID = self.parent.trueUnitID
+            banner.adUnitID = self.parent.testUnitID
             banner.load(Request())
             banner.delegate = self
             return banner
