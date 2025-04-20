@@ -33,6 +33,7 @@ struct IOView: View {
                             .foregroundColor(.gray01)
                     }
                     .padding(.vertical,10)
+                    
                  
                     Spacer()
                     
@@ -70,8 +71,7 @@ struct IOView: View {
                 
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
-                    Spacer()
-                        .background(Color.red)
+                  
                     VStack(alignment: .center, spacing: 8){
                         //                        Spacer()
                         //                        Text("저장된 사진은 갤러리에서 확인해주세요.")
@@ -111,6 +111,7 @@ struct IOView: View {
                         .frame(maxWidth: .infinity)
                         //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
+                        .padding(.vertical,10)
                       
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                             .ignoresSafeArea(.all)
@@ -118,6 +119,7 @@ struct IOView: View {
                         
                         
                     }
+                   
                 }
                 else{
                     VStack(alignment: .center, spacing: 8){
