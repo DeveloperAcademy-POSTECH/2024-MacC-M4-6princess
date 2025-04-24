@@ -35,12 +35,7 @@ struct DFTextView: View {
                     }
                 }
             }
-            
-//            Slider(value: $viewModel.fontSize, in: 10...72, step: 1)
-//                .accentColor(.gray01)
-//                .padding(.horizontal,20)
-//                .padding(.bottom, 8)
-            
+
             if viewModel.tab == 0 {
                 newFontSelector
                 
