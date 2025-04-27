@@ -55,6 +55,8 @@ struct DFCustomTextView: UIViewRepresentable {
         textView.keyboardDismissMode = .interactive // 키보드 내릴 때 인터랙티브하게 설정
         textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal) // 수평 압축 저항 낮게 설정 (레이아웃 유연성)
         
+        textView.isOpaque = true
+        
         // iOS 18 이상에서만 사용 가능한 기능 (적응형 이미지 글리프 지원)
         if #available(iOS 18.0, *) {
             textView.supportsAdaptiveImageGlyph = true
@@ -194,7 +196,3 @@ extension UIView {
         return subviews.flatMap { [$0] + $0.allSubviews }
     }
 }
-//생성하면 색상,정렬,폰트 적용안됨 -> 뷰모델엔 저장되어있는데도 말이죠
-// 수정할 때 뒤늦게 되는 것을 보아 렌더링의 문제같음
-// 가로 채워지면 줄바꿈 되게하기
-
