@@ -68,68 +68,75 @@ class DFTextViewModel: ObservableObject {
         }
     }
     @MainActor
-    func captureTextView(from tv: UITextView) -> UIImage? {
-        guard let attributedText = tv.attributedText, attributedText.length > 0 else {
+    func captureTextView(from textView: UITextView) -> UIImage? {
+        // 1) 텍스트 유효성 검사
+        guard let attributedText = textView.attributedText, attributedText.length > 0 else {
             return nil
         }
-        
-        // 텍스트뷰의 inset을 제거하고 실제 텍스트 크기 가져오기
-        tv.textContainerInset = .zero
-        
-        // as-be
-        //        let textSize = attributedText.size() // 실제 텍스트 크기 사용
-        //        guard textSize != .zero else {
-        //            return nil
-        //        }
-        //to-be
-        let maxWidth = tv.bounds.width
-        
-        // boundingRect로 높이 계산
-        let bounding = attributedText.boundingRect(with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude),
-                                                   options: [.usesLineFragmentOrigin,.usesFontLeading], // 텍스트의 라인 기준으로 그리기,폰트의 줄 간격을 구려하여 텍스트 그리기
-                                                   context: nil)
-        
-        // 요청된 패딩 추가 (필요 시 조정)
-        let padding: CGFloat = 5
-        let contentSize = CGSize(
-            width: bounding.width + (padding * 2),
-            height: bounding.height + (padding * 2)
+
+        // 2) textView의 inset과 padding 값 읽어오기 (원본 변경 금지)
+        let inset = textView.textContainerInset
+        let linePadding = textView.textContainer.lineFragmentPadding
+
+        // 3) 실제 글자가 들어갈 폭 계산
+        let maxWidth = textView.bounds.width
+            - inset.left - inset.right
+            - linePadding * 2
+
+        // 4) 줄바꿈·행간 옵션으로 전체 높이 계산
+        let bounding = attributedText.boundingRect(
+            with: CGSize(width: maxWidth, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            context: nil
         )
-        
-        // 고해상도 스케일 설정
-        let scale: CGFloat = 5.0 // 필요에 따라 조정
-        UIGraphicsBeginImageContextWithOptions(contentSize, false, scale)
+
+        // 5) 원하는 추가 여백
+        let extraPadding: CGFloat = 5
+
+        // 6) 최종 캔버스 크기
+        let contentSize = CGSize(
+            width: bounding.width
+                   + inset.left + inset.right
+                   + linePadding * 2
+                   + extraPadding * 2,
+            height: bounding.height
+                   + inset.top + inset.bottom
+                   + extraPadding * 2
+        )
+
+        // 7) 그래픽 컨텍스트 시작
+        UIGraphicsBeginImageContextWithOptions(contentSize, false, 0.0)
         guard let context = UIGraphicsGetCurrentContext() else {
             UIGraphicsEndImageContext()
             return nil
         }
-        
-        // 배경 투명 설정
+
+        // 8) 투명 배경 초기화
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: contentSize))
-        
-        // 렌더링 품질 향상 설정
         context.setShouldAntialias(true)
         context.interpolationQuality = .high
         context.setRenderingIntent(.perceptual)
-        
-        // 텍스트를 정확한 크기로 그리기
-        let drawingRect = CGRect(
-            x: padding,
-            y: padding,
+
+        // 9) draw(with:) 호출 위치 계산
+        let drawRect = CGRect(
+            x: inset.left + linePadding + extraPadding,
+            y: inset.top + extraPadding,
             width: bounding.width,
             height: bounding.height
         )
         attributedText.draw(
-            with: drawingRect,
+            with: drawRect,
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             context: nil
         )
+
+        // 10) 이미지 얻고 종료
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
         return image
     }
+
     
     
     /// DFTextModifyView에서 사용

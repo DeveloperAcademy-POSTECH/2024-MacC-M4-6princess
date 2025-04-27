@@ -252,6 +252,7 @@ private extension DFEditView {
         }
     }
     
+    
     var thicknessControl: some View {
         
         ZStack {

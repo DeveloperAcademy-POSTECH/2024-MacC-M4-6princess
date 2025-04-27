@@ -8,52 +8,82 @@ struct DFTextView: View {
     @Environment(\.displayScale) var displayScale
     
     var body: some View {
-        VStack {
-            Spacer()
-            
-            DFCustomTextView(
-                viewModel: viewModel,
-                displayScale: displayScale
-            )
-            .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("완료") {
-                        if let textView = UIApplication.shared.windows.first?.allSubviews.compactMap({ $0 as? UITextView }).first(where: { $0.isFirstResponder }) {
-                            viewModel.renderedImage = viewModel.captureTextView(from: textView)
-                            /// 이미지와 메타데이터를 코어데이터에 저장
-                            imageToCoredata()
-                            modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
+        ZStack{
+            VStack {
+                Spacer()
+                
+                DFCustomTextView(
+                    viewModel: viewModel,
+                    displayScale: displayScale
+                )
+                .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("완료") {
+                            if let window = UIApplication.shared.keyWindowInForeground,
+                               let textView = window.allSubviews
+                                .compactMap({ $0 as? UITextView })
+                                .first(where: { $0.isFirstResponder }) {
+                                viewModel.renderedImage = viewModel.captureTextView(from: textView)
+                                /// 이미지와 메타데이터를 코어데이터에 저장
+                                imageToCoredata()
+                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
+                                
+                                /// 텍스트뷰를 닫음
+                                modiViewModel.showTextView = false
+                            }
                             
-                            /// 텍스트뷰를 닫음
-                            modiViewModel.showTextView = false
                         }
-                        /// 텍스트를 이미지로 변환
-                        //                        viewModel.renderedImage=viewModel.attributedTextToImage()
-                        
-                        
                     }
                 }
-            }
-
-            if viewModel.tab == 0 {
-                newFontSelector
                 
-            } else if viewModel.tab == 1 {
-                colorSelector
+                if viewModel.tab == 0 {
+                    newFontSelector
+                    
+                } else if viewModel.tab == 1 {
+                    colorSelector
+                }
+                
+                textTabBar
+                Spacer()
+                    .frame(height: viewModel.keyboardHeight)
             }
+            .animation(.easeOut(duration: 0.3))
+            .keyboardHeight($viewModel.keyboardHeight)
+            .background(
+                Color.black.opacity(0.5) // 반투명 검정색
+            )
+            .ignoresSafeArea(.keyboard)
             
-            textTabBar
-            Spacer()
-                .frame(height: viewModel.keyboardHeight)
+            VStack{
+                Spacer()
+                HStack{
+                    Slider(
+                        value: $viewModel.fontSize ,
+                        in: 1...30,
+                        step: 1
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .frame(height: 200)
+                    .accentColor(.pointPink)
+                    .frame(width: 200)
+                    Spacer()
+                }
+                Spacer()
+            }
         }
-        .animation(.easeOut(duration: 0.3))
-        .keyboardHeight($viewModel.keyboardHeight)
-        .background(
-            Color.black.opacity(0.5) // 반투명 검정색
-        )
-        .ignoresSafeArea(.keyboard)
-        
     }
     
+}
+import UIKit
+
+extension UIApplication {
+    /// 현재 포그라운드에 활성화된 씬의 keyWindow를 반환
+    var keyWindowInForeground: UIWindow? {
+        connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+    }
 }
