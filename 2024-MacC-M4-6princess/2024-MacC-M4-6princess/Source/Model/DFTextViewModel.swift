@@ -74,11 +74,11 @@ class DFTextViewModel: ObservableObject {
             return nil
         }
 
-        // 2) inset과 padding 값 읽기 (원본 변경 금지)
+        // 2) textView의 inset과 padding 값 읽어오기 (원본 변경 금지)
         let inset = textView.textContainerInset
         let linePadding = textView.textContainer.lineFragmentPadding
 
-        // 3) 실제 글자 영역 폭 계산
+        // 3) 실제 글자가 들어갈 폭 계산
         let maxWidth = textView.bounds.width
             - inset.left - inset.right
             - linePadding * 2
@@ -90,10 +90,10 @@ class DFTextViewModel: ObservableObject {
             context: nil
         )
 
-        // 5) 추가 여백
+        // 5) 원하는 추가 여백
         let extraPadding: CGFloat = 5
 
-        // 6) 캔버스 전체 크기
+        // 6) 최종 캔버스 크기
         let contentSize = CGSize(
             width: bounding.width
                    + inset.left + inset.right
@@ -111,19 +111,14 @@ class DFTextViewModel: ObservableObject {
             return nil
         }
 
-        // 8) 컨텍스트 상태 보존
-        context.saveGState()
-
-        // 9) 배경 투명 처리
+        // 8) 투명 배경 초기화
         UIColor.clear.setFill()
         context.fill(CGRect(origin: .zero, size: contentSize))
-
-        // 10) 렌더링 품질 설정
         context.setShouldAntialias(true)
         context.interpolationQuality = .high
         context.setRenderingIntent(.perceptual)
 
-        // 11) draw(with:) 호출 위치 계산
+        // 9) draw(with:) 호출 위치 계산
         let drawRect = CGRect(
             x: inset.left + linePadding + extraPadding,
             y: inset.top + extraPadding,
@@ -136,15 +131,11 @@ class DFTextViewModel: ObservableObject {
             context: nil
         )
 
-        // 12) 컨텍스트 상태 복원
-        context.restoreGState()
-
-        // 13) 이미지 얻고 종료
+        // 10) 이미지 얻고 종료
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
     }
-
 
     
     

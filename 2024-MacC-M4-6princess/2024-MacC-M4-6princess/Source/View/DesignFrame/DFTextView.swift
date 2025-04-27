@@ -57,19 +57,20 @@ struct DFTextView: View {
             
             VStack{
                 Spacer()
+                    .frame(height:UIScreen.main.bounds.height * 0.35)
                 HStack{
-                    Slider(
-                        value: $viewModel.fontSize ,
-                        in: 1...30,
-                        step: 1
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .frame(height: 200)
-                    .accentColor(.pointPink)
-                    .frame(width: 200)
+                    Slider(value: $viewModel.fontSize, in: 10...40, step: 1)
+                        .frame(width: 150)                      // ① 회전 전에 “길이”를 가로 폭으로 지정
+                        .rotationEffect(.degrees(-90))          // ② 90도 회전
+                        .frame(width: 20)                       // ③ 회전 후 “두께”를 가로(=세로) 폭으로 지정
+                        .accentColor(.pointPink)
+
                     Spacer()
+                        
                 }
                 Spacer()
+                    
+                
             }
         }
     }
