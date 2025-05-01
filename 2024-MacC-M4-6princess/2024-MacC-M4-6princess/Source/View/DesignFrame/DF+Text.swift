@@ -51,7 +51,7 @@ extension DFTextView{
             }
             .padding(.horizontal,5)
         }
-        .frame(width: 335)
+        .frame(maxWidth:.infinity)
     }
     var colorSelector: some View {
         // fontColor 선택
@@ -79,67 +79,62 @@ extension DFTextView{
     }
     
     var textTabBar: some View {
-        ZStack {
-            Rectangle()
-                .foregroundColor(.clear)
-                .frame(width: 335, height: 40)
-                .background(.white)
-                .cornerRadius(10)
-                .opacity(0.5)
+        GeometryReader { geometry in
+            let totalWidth = geometry.size.width
+            let itemWidth = totalWidth / 3 - 10
             
-            HStack(spacing: 0) {
-                Text("Aa")
-                    .font(.system(size: 16))
-                    .foregroundColor(.black)
-                    .frame(width: 105, height: 30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(viewModel.tab == 0 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
-                    )
-                    .onTapGesture {
-                        viewModel.tab = 0
-                    }
-                    .frame(width: 105, height: 30)
+            ZStack {
+                Rectangle()
+                    .foregroundColor(.clear)
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .opacity(0.5)
                 
-                Group {
+                HStack(spacing: 0) {
+                    Text("Aa")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+                        .frame(width: itemWidth, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(viewModel.tab == 0 ? Color.white : Color.clear)
+                        )
+                        .onTapGesture {
+                            viewModel.tab = 0
+                        }
+                    
                     Image("df.colorChip")
                         .resizable()
                         .scaledToFit()
                         .padding(3)
-                        .frame(width: 105, height: 30)
+                        .frame(width: itemWidth, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.tab == 1 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                                .fill(viewModel.tab == 1 ? Color.white : Color.clear)
                         )
                         .onTapGesture {
                             viewModel.tab = 1
                         }
-                }
-                .frame(width: 105, height: 30)
-                
-                Group {
+                    
                     Image(viewModel.imageForAlignment(viewModel.textAlignment))
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 105, height: 30)
+                        .frame(width: itemWidth, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.tab == 2 ? Color.white : Color.clear) // 탭 상태에 따른 배경색
+                                .fill(viewModel.tab == 2 ? Color.white : Color.clear)
                         )
                         .onTapGesture {
                             viewModel.tab = 2
-                            viewModel.toggleTextAlignment() // 텍스트 정렬 변경 함수 호출
+                            viewModel.toggleTextAlignment()
                         }
                 }
-                .frame(width: 105, height: 30)
-                
+                .frame(maxWidth: .infinity)
             }
-            .padding()
         }
         .frame(height: 40)
-        .frame(maxWidth:.infinity)
-        
     }
+    
     func imageToCoredata() {
         let newImage = SubjectImage()
         if let image = viewModel.renderedImage {
@@ -239,7 +234,7 @@ extension DFTextModifyView{
             }
             .padding(.horizontal,5)
         }
-        .frame(width: 335)
+        .frame(maxWidth:.infinity)
     }
     var colorSelector: some View {
         // fontColor 선택
@@ -264,7 +259,7 @@ extension DFTextModifyView{
             }
             .padding(5)
         }
-        .frame(width: 335)
+        .frame(maxWidth:.infinity)
     }
     var textTabBar: some View {
         ZStack {
@@ -334,12 +329,12 @@ import SwiftUI
 extension NSTextAlignment {
     init(_ alignment: TextAlignment) {
         switch alignment {
-            case .leading:
-                self = .left
-            case .center:
-                self = .center
-            case .trailing:
-                self = .right
+        case .leading:
+            self = .left
+        case .center:
+            self = .center
+        case .trailing:
+            self = .right
         }
     }
 }

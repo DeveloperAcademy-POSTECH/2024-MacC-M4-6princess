@@ -6,8 +6,10 @@ struct DFTextView: View {
     @EnvironmentObject var imageModel: ImageListModel
     @FocusState var isKeyboardVisible: Bool
     @Environment(\.displayScale) var displayScale
+    @StateObject private var keyboardResponder = KeyboardHeightResponder()
     
     var body: some View {
+        let availableHeight = UIScreen.main.bounds.height - keyboardResponder.currentHeight
         ZStack{
             VStack {
                 Spacer()
@@ -16,6 +18,9 @@ struct DFTextView: View {
                     viewModel: viewModel,
                     displayScale: displayScale
                 )
+                .frame(width: UIScreen.main.bounds.width * 0.8, height: availableHeight * 0.5)
+                .position(x: UIScreen.main.bounds.width / 2, y: availableHeight / 2)
+                .animation(.easeInOut, value: keyboardResponder.currentHeight)
                 .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -36,17 +41,22 @@ struct DFTextView: View {
                         }
                     }
                 }
-                
-                if viewModel.tab == 0 {
-                    newFontSelector
+                VStack{
+                    if viewModel.tab == 0 {
+                        newFontSelector
+                            .padding(.horizontal,10)
+                        
+                    } else if viewModel.tab == 1 {
+                        colorSelector
+                            .padding(.horizontal,10)
+                    }
                     
-                } else if viewModel.tab == 1 {
-                    colorSelector
+                    textTabBar
+                    //                        .frame(maxWidth:.infinity)
+                        .padding(.horizontal,10)
+                    
                 }
-                
-                textTabBar
-                Spacer()
-                    .frame(height: viewModel.keyboardHeight)
+                .padding(.bottom, keyboardResponder.currentHeight == 0 ? 20 : keyboardResponder.currentHeight+5)
             }
             .animation(.easeOut(duration: 0.3))
             .keyboardHeight($viewModel.keyboardHeight)
@@ -64,12 +74,12 @@ struct DFTextView: View {
                         .rotationEffect(.degrees(-90))          // ② 90도 회전
                         .frame(width: 20)                       // ③ 회전 후 “두께”를 가로(=세로) 폭으로 지정
                         .accentColor(.pointPink)
-
+                    
                     Spacer()
-                        
+                    
                 }
                 Spacer()
-                    
+                
                 
             }
         }
