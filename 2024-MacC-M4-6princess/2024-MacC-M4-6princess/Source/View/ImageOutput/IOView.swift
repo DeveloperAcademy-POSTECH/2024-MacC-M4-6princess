@@ -208,3 +208,15 @@ struct IOView: View {
         IOCanvasView(viewModel: viewModel)
     }
 }
+import UIKit
+
+extension UIApplication {
+    /// 현재 포그라운드에 활성화된 씬의 keyWindow를 반환
+    var keyWindowInForeground: UIWindow? {
+        connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+    }
+}

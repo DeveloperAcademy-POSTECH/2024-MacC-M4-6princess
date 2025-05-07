@@ -30,7 +30,7 @@ struct DFTextModifyView: View {
                         
                         /// 텍스트를 이미지로 변환
                         if let textView = UIApplication.shared.windows.first?.allSubviews.compactMap({ $0 as? UITextView }).first(where: { $0.isFirstResponder }) {
-                            viewModel.renderedImage=viewModel.captureTextView(from: textView)
+                            viewModel.captureTextView(from: textView)
 //                            modiViewModel.style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
 //                            modiViewModel.style.txt =  viewModel.txt
 //                            modiViewModel.style.color = viewModel.selectedColor

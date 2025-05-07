@@ -13,7 +13,6 @@ struct DFTextView: View {
         ZStack{
             VStack {
                 Spacer()
-                
                 DFCustomTextView(
                     viewModel: viewModel,
                     displayScale: displayScale
@@ -29,9 +28,10 @@ struct DFTextView: View {
                                let textView = window.allSubviews
                                 .compactMap({ $0 as? UITextView })
                                 .first(where: { $0.isFirstResponder }) {
-                                viewModel.renderedImage = viewModel.captureTextView(from: textView)
+                                viewModel.captureTextView(from: textView)
                                 /// 이미지와 메타데이터를 코어데이터에 저장
                                 imageToCoredata()
+                                
                                 modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
                                 
                                 /// 텍스트뷰를 닫음
@@ -50,15 +50,12 @@ struct DFTextView: View {
                         colorSelector
                             .padding(.horizontal,10)
                     }
-                    
                     textTabBar
-                    //                        .frame(maxWidth:.infinity)
                         .padding(.horizontal,10)
-                    
                 }
                 .padding(.bottom, keyboardResponder.currentHeight == 0 ? 20 : keyboardResponder.currentHeight+5)
             }
-            .animation(.easeOut(duration: 0.3))
+            .animation(.easeOut(duration: 0.3), value: keyboardResponder.currentHeight)
             .keyboardHeight($viewModel.keyboardHeight)
             .background(
                 Color.black.opacity(0.5) // 반투명 검정색
@@ -76,25 +73,10 @@ struct DFTextView: View {
                         .accentColor(.pointPink)
                     
                     Spacer()
-                    
                 }
                 Spacer()
-                
-                
             }
         }
     }
     
-}
-import UIKit
-
-extension UIApplication {
-    /// 현재 포그라운드에 활성화된 씬의 keyWindow를 반환
-    var keyWindowInForeground: UIWindow? {
-        connectedScenes
-            .filter { $0.activationState == .foregroundActive }
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
-            .first { $0.isKeyWindow }
-    }
 }
