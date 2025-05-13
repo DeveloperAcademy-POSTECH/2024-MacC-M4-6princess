@@ -31,7 +31,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete %lld frames?"
+            "value" : "Are you sure you want to delete?"
           }
         },
         "ja" : {
@@ -235,7 +235,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Handwritng"
+            "value" : "Handwrting"
           }
         },
         "ja" : {
@@ -414,7 +414,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Full"
+            "value" : "Effect"
           }
         },
         "ja" : {
@@ -448,8 +448,8 @@
         },
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Humor"
+            "state" : "translated",
+            "value" : "Fun"
           }
         },
         "ja" : {
@@ -555,7 +555,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved to Gallery."
+            "value" : "Saved to gallery"
           }
         },
         "ja" : {
@@ -844,7 +844,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Background Removal"
+            "value" : "Removing\\nbackground"
           }
         },
         "ja" : {
@@ -900,7 +900,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Photo"
+            "value" : "Select a Photo"
           }
         },
         "ja" : {
@@ -929,7 +929,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Take Photo"
+            "value" : "Camera"
           }
         },
         "ja" : {
@@ -995,7 +995,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove"
+            "value" : "Delete"
           }
         },
         "ja" : {
@@ -1023,7 +1023,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New Frame"
+            "value" : "New\\nFrame"
           }
         },
         "ja" : {
@@ -1107,7 +1107,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Add or Remove to adjust the selected area."
+            "value" : "Edit your selection\\nusing the add/remove tools"
           }
         },
         "ja" : {
@@ -1469,7 +1469,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saving..."
+            "value" : "Saving the frame"
           }
         },
         "ja" : {
@@ -1593,7 +1593,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Create your own frame using a photo of your favorite!"
+            "value" : "Create your own frame\\nWith your favorite photo"
           }
         },
         "ja" : {
@@ -1621,7 +1621,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pick a photo of your bias."
+            "value" : "Pick a photo of your bias"
           }
         },
         "ja" : {
@@ -1789,7 +1789,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decorate Frame"
+            "value" : "Decorate a Frame"
           }
         },
         "ja" : {
@@ -1901,7 +1901,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This action cannot be undone."
+            "value" : "You won’t be able to undo this."
           }
         },
         "ja" : {
