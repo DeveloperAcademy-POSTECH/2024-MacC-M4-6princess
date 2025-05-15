@@ -59,23 +59,19 @@ struct FilteredImageView: View {
                     } message: {
                         Text("")
                     }
-
+                    
                     
                     
                 }
             }
-//            .id(refreshID) //뷰 강제 업데이트
             .frame(height: 124)
             .onAppear {
-//                DispatchQueue.main.async {
                 DispatchQueue.global(qos: .userInitiated).async {
                     //보라색 무시해주세요
                     viewModel.cameraManager.session.startRunning()
                     DispatchQueue.main.async {
-                             reloadFilterImages()
-                             // refreshID = UUID()
-                         }
-//                    refreshID = UUID()
+                        reloadFilterImages()
+                    }
                 }
             }
             .onDisappear {
@@ -84,8 +80,6 @@ struct FilteredImageView: View {
             }
             .onChange(of: frameManager.resultImage) { oldValue, newValue in
                 reloadFilterImages()
-//                refreshID = UUID()
-                //왜 안될까...
             }
         }
         else{
