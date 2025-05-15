@@ -16,6 +16,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     var collectionView: UICollectionView!
     var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
+    private var shutterButton: UIButton!
 //    {
 //        didSet{
 //            print("selectedFilter:\(selectedFilter ?? nil)")
@@ -88,8 +89,13 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
+        // 셔터버튼 여백 고려
         let inset = (view.bounds.width - centerCellSize) / 2
         collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+        
+        // 셔터 버튼 설정
+        setupShutterButton()
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -115,6 +121,24 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             return cell
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        // 셔터 버튼 영역 계산
+        let shutterFrame = shutterButton.convert(shutterButton.bounds, to: collectionView)
+        
+        // 선택하려는 셀의 프레임
+        guard let cellAttributes = collectionView.layoutAttributesForItem(at: indexPath) else {
+            return true
+        }
+        
+        // 셔터 버튼과 겹치는지 확인
+        if shutterFrame.intersects(cellAttributes.frame) {
+            return false // 셔터 버튼과 겹치면 선택 불가
+        }
+        
+        return true
+    }
+
     
     //    func cellSize(for indexPath: IndexPath) -> CGFloat {
     //        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
@@ -282,15 +306,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         scrollToNewestFilter()
     }
     
-    //    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
-    //    private func scrollToNewestFilter() {
-    //        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
-    //
-    //        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
-    //        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
-    //
-    //        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
-    //    }
     private func scrollToNewestFilter() {
         // 역순 정렬된 배열에서는 가장 최근 필터가 인덱스 0에 위치
         // EmptyCell을 고려하여 인덱스 1로 설정
@@ -298,7 +313,62 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         collectionView.scrollToItem(at: newestIndexPath, at: .centeredHorizontally, animated: true)
     }
 
+    private func setupShutterButton() {
+        // 셔터 버튼 생성
+        shutterButton = UIButton(type: .custom)
+        shutterButton.setImage(UIImage(named: "shutterImage"), for: .normal)
+        shutterButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        // 버튼 크기 설정
+        shutterButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        shutterButton.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        
+        // 버튼 액션 추가
+        shutterButton.addTarget(self, action: #selector(shutterButtonTapped), for: .touchUpInside)
+        
+        // 뷰에 버튼 추가
+        view.addSubview(shutterButton)
+        
+        // 버튼 위치 설정 - 컬렉션뷰 중앙에 배치
+        NSLayoutConstraint.activate([
+            shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            shutterButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 6)
+        ])
+        
+        // 버튼을 컬렉션뷰 위에 표시하기 위해 z-index 조정
+        view.bringSubviewToFront(shutterButton)
+    }
     
+    @objc private func shutterButtonTapped() {
+        guard frameManager.selectedFrame != nil else {
+            showAlert(message: "프레임이 선택되지 않았습니다. 프레임을 선택해주세요!")
+            return
+        }
+        
+        if frameManager.resultImage != nil {
+            viewModel.isTakePic = true
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
+                self.viewModel.takePic()
+                self.viewModel.cameraManager.stopSession()
+                Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+            }
+        } else {
+            showAlert(message: "프레임이 선택되지 않았습니다. 프레임을 선택해주세요!")
+        }
+    }
+
+    private func showAlert(message: String) {
+        let alert = UIAlertController(
+            title: message,
+            message: "",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+        present(alert, animated: true)
+    }
+
+
     
     
 }

@@ -18,12 +18,12 @@ class FilterCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         // 이미지 뷰를 셀 크기의 90%로 설정하여 여백 생성
-        imageView.frame = CGRect(
-            x: bounds.width * 0.05,
-            y: bounds.height * 0.05,
-            width: bounds.width * 0.9,
-            height: bounds.height * 0.9
-        )
+//        imageView.frame = CGRect(
+//            x: bounds.width * 0.05,
+//            y: bounds.height * 0.05,
+//            width: bounds.width * 0.9,
+//            height: bounds.height * 0.9
+//        )
     }
     
     override init(frame: CGRect) {
