@@ -9,14 +9,14 @@ import UIKit
 
 class CustomFlowLayout: UICollectionViewFlowLayout {
     // 셀 크기 상수
-    let centerCellSize: CGFloat = 58      // 중앙 셀 크기
-    let rightOfCenterCellSize: CGFloat = 50 // 중앙 오른쪽 셀 크기
-    let defaultCellSize: CGFloat = 38     // 기본 셀 크기
-    let emptyCellWidth: CGFloat = 58      // 빈 셀 너비
+    let centerCellSize: CGFloat = 58
+    let rightOfCenterCellSize: CGFloat = 50
+    let defaultCellSize: CGFloat = 38
+    let emptyCellWidth: CGFloat = 58
     
     // 간격 상수
-    let centerCellSpacing: CGFloat = 31   // 중앙 셀 주변 간격
-    let defaultCellSpacing: CGFloat = 20  // 기본 셀 간격
+    let centerCellSpacing: CGFloat = 31
+    let defaultCellSpacing: CGFloat = 20
     
     override func prepare() {
         super.prepare()
@@ -94,12 +94,12 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
             
             for (index, attr) in rightCells.enumerated() {
                 if index == 0 {
-                    // 중앙 셀 바로 오른쪽 셀 (간격: centerCellSpacing)
+                    // 중앙 셀 바로 오른쪽 셀 간격: centerCellSpacing
                     attr.size = CGSize(width: rightOfCenterCellSize, height: rightOfCenterCellSize)
                     attr.frame.origin.x = lastRightX + centerCellSpacing
                     lastRightX = attr.frame.maxX
                 } else {
-                    // 나머지 오른쪽 셀들 (간격: defaultCellSpacing)
+                    // 나머지 오른쪽 셀들 간격: defaultCellSpacing
                     attr.size = CGSize(width: defaultCellSize, height: defaultCellSize)
                     attr.frame.origin.x = lastRightX + defaultCellSpacing
                     lastRightX = attr.frame.maxX
