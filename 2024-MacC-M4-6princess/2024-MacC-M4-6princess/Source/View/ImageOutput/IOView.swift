@@ -73,13 +73,6 @@ struct IOView: View {
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                   
                     VStack(alignment: .center, spacing: 8){
-                        //                        Spacer()
-                        //                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-                        //                            .font(.system(size:12))
-                        //                            .multilineTextAlignment(.center)
-                        //                            .foregroundColor(.gray01)
-                        //                            .padding(.top,5)
-//                        Spacer()
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -180,17 +173,15 @@ struct IOView: View {
             BottomSheetWrapper(viewModel: viewModel)
                 .presentationDetents([.height(200)])
         }
-        .onChange(of: viewModel.showShareButton, perform: { newValue in
-            if viewModel.showShareButton == false && viewModel.showAcitivity == true{
-                print("onchange start")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                    
+        .onChange(of: viewModel.showShareButton) {
+            if viewModel.showShareButton == false && viewModel.showAcitivity == true {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     viewModel.changeOverlay = true
-                    print("changeoverlay")
-                    
                 }
             }
-        })
+        }
+
+
         .overlay(
             Group {
                 
