@@ -18,6 +18,9 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
     let centerCellSpacing: CGFloat = 31
     let defaultCellSpacing: CGFloat = 20
     
+    private let standardSpacing: CGFloat = 20
+    private let centerSpacing: CGFloat = 31
+    
     override func prepare() {
         super.prepare()
         guard let collectionView = collectionView else { return }
@@ -28,101 +31,95 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         
         // 스크롤 감속률 설정
         collectionView.decelerationRate = .normal
+        
+        minimumLineSpacing = standardSpacing
     }
     
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        guard let collectionView = collectionView else { return nil }
-        
-        // 확장된 rect를 사용하여 화면 밖의 셀도 포함하도록 함
-        let extendedRect = CGRect(
-            x: rect.origin.x - collectionView.bounds.width,
-            y: rect.origin.y,
-            width: rect.width + collectionView.bounds.width * 2,
-            height: rect.height
-        )
-        
-        guard let attributes = super.layoutAttributesForElements(in: extendedRect)?.map({ $0.copy() as! UICollectionViewLayoutAttributes }) else {
+        guard let attributes = super.layoutAttributesForElements(in: rect)?.map({ $0.copy() }) as? [UICollectionViewLayoutAttributes],
+              let collectionView = collectionView else {
             return nil
         }
         
-        // 화면 중앙 X 좌표
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        let centerY = collectionView.bounds.height / 2 + 4 // 세로 중앙 위치
         
-        // 1. Empty 셀 항상 왼쪽 끝에 고정
-        if let emptyCellAttr = attributes.first(where: { $0.indexPath.item == 0 }) {
-            emptyCellAttr.frame.origin.x = 0
-            emptyCellAttr.size = CGSize(width: emptyCellWidth, height: emptyCellWidth)
-            emptyCellAttr.zIndex = 1
-            emptyCellAttr.center.y = centerY
-        }
         
-        // 2. 중앙에 가장 가까운 셀 찾기
         let centerCell = attributes.min { abs($0.center.x - centerX) < abs($1.center.x - centerX) }
         
-        // 3. 모든 셀의 세로 위치 설정 및 초기 위치 계산
-        var previousCellMaxX: CGFloat = emptyCellWidth // Empty 셀 너비 기준
+        guard let centerCell = centerCell else { return attributes }
         
-        for attr in attributes.sorted(by: { $0.indexPath.item < $1.indexPath.item }) where attr.indexPath.item > 0 {
-            // 세로 중앙 정렬
-            attr.center.y = centerY
-            
-            // 셀 크기 설정
-            if attr == centerCell {
-                attr.size = CGSize(width: centerCellSize, height: centerCellSize)
-            } else if attr.indexPath.item == centerCell?.indexPath.item.advanced(by: 1) {
-                attr.size = CGSize(width: rightOfCenterCellSize, height: rightOfCenterCellSize)
-            } else {
-                attr.size = CGSize(width: defaultCellSize, height: defaultCellSize)
+        
+        for attribute in attributes {
+            if attribute.indexPath.item == 0 {
+                // Empty cell maintains constant size
+                attribute.size = CGSize(width: emptyCellWidth, height: emptyCellWidth)
+                continue
             }
             
-            // 초기 위치 설정
-            attr.frame.origin.x = previousCellMaxX + defaultCellSpacing
-            previousCellMaxX = attr.frame.maxX
-        }
-        
-        // 4. 중앙 셀 및 주변 셀 위치 조정
-        if let centerCell = centerCell {
-            // 중앙 셀 정확히 중앙에 위치
-            centerCell.center.x = centerX
+            let distanceFromCenter = abs(attribute.center.x - centerX)
             
-            // 중앙 셀 오른쪽에 있는 셀들 조정
-            let rightCells = attributes.filter { $0.center.x > centerCell.center.x && $0.indexPath.item > 0 }
-                                     .sorted { $0.indexPath.item < $1.indexPath.item }
+            // 부드러운 움직임을 위한 거리 계산
+            let size: CGFloat
+            let maxTransitionDistance: CGFloat = 100 // 전환 거리 증가
             
-            var lastRightX = centerCell.center.x + centerCellSize / 2
-            
-            for (index, attr) in rightCells.enumerated() {
-                if index == 0 {
-                    // 중앙 셀 바로 오른쪽 셀 간격: centerCellSpacing
-                    attr.size = CGSize(width: rightOfCenterCellSize, height: rightOfCenterCellSize)
-                    attr.frame.origin.x = lastRightX + centerCellSpacing
-                    lastRightX = attr.frame.maxX
-                } else {
-                    // 나머지 오른쪽 셀들 간격: defaultCellSpacing
-                    attr.size = CGSize(width: defaultCellSize, height: defaultCellSize)
-                    attr.frame.origin.x = lastRightX + defaultCellSpacing
-                    lastRightX = attr.frame.maxX
-                }
-            }
-            
-            // 중앙 셀 왼쪽에 있는 셀들 조정
-            let leftCells = attributes.filter { $0.center.x < centerCell.center.x && $0.indexPath.item > 0 }
-                                    .sorted { $0.indexPath.item > $1.indexPath.item }
-            
-            var lastLeftX = centerCell.frame.minX
-            
-            for attr in leftCells {
-                // 모든 왼쪽 셀들 (간격: defaultCellSpacing 또는 centerCellSpacing)
-                attr.size = CGSize(width: defaultCellSize, height: defaultCellSize)
+            if distanceFromCenter <= maxTransitionDistance {
+                // 부드러운 크기 전환을 위한 progress 계산 (0.0 ~ 1.0)
+                let progress = distanceFromCenter / maxTransitionDistance
                 
-                // 중앙 셀 바로 왼쪽 셀인 경우 centerCellSpacing 사용
-                if attr.indexPath.item == centerCell.indexPath.item - 1 {
-                    attr.frame.origin.x = lastLeftX - centerCellSpacing - attr.size.width
+                // Cubic easing function for smoother transition
+                let easedProgress = progress * progress * (3 - 2 * progress)
+                
+                if attribute.indexPath.item == centerCell.indexPath.item {
+                    // 중앙셀
+                    size = centerCellSize
+                } else if attribute.indexPath.item == centerCell.indexPath.item + 1 {
+                    // 중앙 바로 오른쪽 셀
+                    let sizeRange = centerCellSize - rightOfCenterCellSize
+                    size = centerCellSize - (sizeRange * easedProgress)
+                } else if attribute.indexPath.item == centerCell.indexPath.item - 1 {
+                    // 중앙 바로 왼쪽 셀
+                    let sizeRange = rightOfCenterCellSize - defaultCellSize
+                    size = rightOfCenterCellSize - (sizeRange * easedProgress)
                 } else {
-                    attr.frame.origin.x = lastLeftX - defaultCellSpacing - attr.size.width
+                    // 나머지 셀
+                    let sizeRange = rightOfCenterCellSize - defaultCellSize
+                    size = defaultCellSize + (sizeRange * (1 - easedProgress))
                 }
-                lastLeftX = attr.frame.minX
+            } else {
+                size = defaultCellSize
+            }
+            
+            attribute.size = CGSize(width: size, height: size)
+            
+            // Adjust spacing around center cell
+            if attribute.center.x < centerCell.center.x {
+                // 중앙 기준 왼쪽
+                if attribute.indexPath.item == centerCell.indexPath.item - 1 {
+                    // 바로 옆 간격 31로 조정
+                    let offset = centerCellSpacing + (attribute.size.width + centerCell.size.width) / 2
+                    attribute.center.x = centerCell.center.x - offset
+                } else {
+                    // 나머지 셀들엔 20으로 설정
+                    let previousAttribute = attributes.first { $0.indexPath.item == attribute.indexPath.item + 1 }
+                    if let previous = previousAttribute {
+                        let offset = standardSpacing + (attribute.size.width + previous.size.width) / 2
+                        attribute.center.x = previous.center.x - offset
+                    }
+                }
+            } else if attribute.center.x > centerCell.center.x {
+                // 중앙 기준 오른쪽
+                if attribute.indexPath.item == centerCell.indexPath.item + 1 {
+                    // 바로 옆 간격 31로 조정
+                    let offset = centerCellSpacing + (attribute.size.width + centerCell.size.width) / 2
+                    attribute.center.x = centerCell.center.x + offset
+                } else {
+                    // 나머지 셀들엔 20으로 설정
+                    let previousAttribute = attributes.first { $0.indexPath.item == attribute.indexPath.item - 1 }
+                    if let previous = previousAttribute {
+                        let offset = standardSpacing + (attribute.size.width + previous.size.width) / 2
+                        attribute.center.x = previous.center.x + offset
+                    }
+                }
             }
         }
         
@@ -148,36 +145,32 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
     }
     
     override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        guard let collectionView = collectionView else { return proposedContentOffset }
-        
-        // 제안된 위치에서의 화면 영역
-        let targetRect = CGRect(
-            x: proposedContentOffset.x - collectionView.bounds.width / 2,
-            y: 0,
-            width: collectionView.bounds.width * 2,
-            height: collectionView.bounds.height
-        )
-        
-        // 해당 영역에 있는 모든 레이아웃 속성 가져오기
-        guard let attributes = layoutAttributesForElements(in: targetRect) else {
-            return proposedContentOffset
+        guard let collectionView = collectionView else {
+            return super.targetContentOffset(forProposedContentOffset: proposedContentOffset, withScrollingVelocity: velocity)
         }
         
-        // 화면 중앙 X 좌표
-        let horizontalCenter = proposedContentOffset.x + collectionView.bounds.width / 2
+        let targetRect = CGRect(x: proposedContentOffset.x, y: 0, width: collectionView.bounds.width, height: collectionView.bounds.height)
+        guard let attributes = layoutAttributesForElements(in: targetRect) else {
+            return super.targetContentOffset(forProposedContentOffset: proposedContentOffset, withScrollingVelocity: velocity)
+        }
         
-        // 중앙에 가장 가까운 셀 찾기 (빈 셀 포함)
-        var closestDistance: CGFloat = .greatestFiniteMagnitude
+        let centerX = proposedContentOffset.x + collectionView.bounds.width / 2
+        
+        var minDistance = CGFloat.greatestFiniteMagnitude
         var targetOffset = proposedContentOffset
         
-        for attr in attributes {
-            let distance = abs(attr.center.x - horizontalCenter)
-            if distance < closestDistance {
-                closestDistance = distance
-                // 셀이 정확히 중앙에 오도록 offset 계산
-                targetOffset.x = attr.center.x - collectionView.bounds.width / 2
+        for attribute in attributes {
+            let distance = abs(attribute.center.x - centerX)
+            if distance < minDistance {
+                minDistance = distance
+                targetOffset.x = attribute.center.x - collectionView.bounds.width / 2
             }
         }
+        
+        // 애니메이션 속도 조정하는 곳
+        let damping: CGFloat = 0.6
+        let velocityMultiplier: CGFloat = velocity.x * damping
+        targetOffset.x += velocityMultiplier
         
         return targetOffset
     }
