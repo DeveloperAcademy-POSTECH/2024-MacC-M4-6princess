@@ -31,13 +31,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete %lld frames?"
+            "value" : "Are you sure you want to delete?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld個のフレームを削除しますか？"
+            "value" : "%lld枚のフレームを削除しますか？"
           }
         },
         "zh-Hans" : {
@@ -235,7 +235,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Handwritng"
+            "value" : "Handwrting"
           }
         },
         "ja" : {
@@ -368,6 +368,7 @@
       }
     },
     "stickerTab.character" : {
+      "comment" : "フレーム",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -414,13 +415,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Full"
+            "value" : "Effect"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フルフレーム"
+            "value" : "フレーム"
           }
         },
         "ko" : {
@@ -448,8 +449,8 @@
         },
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Humor"
+            "state" : "translated",
+            "value" : "Fun"
           }
         },
         "ja" : {
@@ -555,13 +556,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved to Gallery."
+            "value" : "Saved to gallery"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ギャラリーに保存されました。"
+            "value" : "ギャラリーに保存しました"
           }
         },
         "zh-Hans" : {
@@ -788,7 +789,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Backward"
+            "value" : "Down"
           }
         },
         "ja" : {
@@ -844,13 +845,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Background Removal"
+            "value" : "Remove Background"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "背景削除"
+            "value" : "背景を消す"
           }
         },
         "zh-Hans" : {
@@ -878,7 +879,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "背景を削除中… "
+            "value" : "背景を削除しています…"
           }
         },
         "zh-Hans" : {
@@ -900,13 +901,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Photo"
+            "value" : "Select a Photo"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真を選択"
+            "value" : "写真を選ぶ"
           }
         },
         "zh-Hans" : {
@@ -929,7 +930,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Take Photo"
+            "value" : "Camera"
           }
         },
         "ja" : {
@@ -963,7 +964,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真追加 "
+            "value" : "写真を追加"
           }
         },
         "zh-Hans" : {
@@ -976,10 +977,16 @@
     },
     "사진촬영" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真撮影"
+            "value" : "カメラ"
           }
         }
       }
@@ -995,7 +1002,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove"
+            "value" : "Delete"
           }
         },
         "ja" : {
@@ -1023,13 +1030,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New Frame"
+            "value" : "New\nFrame"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新規フレーム"
+            "value" : "新しい\nフレーム"
           }
         },
         "zh-Hans" : {
@@ -1057,7 +1064,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択解除"
+            "value" : "削除"
           }
         },
         "zh-Hans" : {
@@ -1085,7 +1092,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択追加"
+            "value" : "追加"
           }
         },
         "zh-Hans" : {
@@ -1107,13 +1114,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Add or Remove to adjust the selected area."
+            "value" : "Edit your selection\nusing the add/remove tools"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択追加・削除機能で選択範囲を修正してください。"
+            "value" : "「追加」や「削除」機能を使って、\n選択範囲を編集してください。"
           }
         },
         "zh-Hans" : {
@@ -1228,7 +1235,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "開始"
+            "value" : "スタート"
           }
         },
         "zh-Hans" : {
@@ -1250,7 +1257,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forward"
+            "value" : "Up"
           }
         },
         "ja" : {
@@ -1469,13 +1476,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saving..."
+            "value" : "Saving the frame"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存中..."
+            "value" : "フレームを保存しています…"
           }
         },
         "zh-Hans" : {
@@ -1537,7 +1544,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "See All"
+            "value" : "View All"
           }
         },
         "ja" : {
@@ -1593,13 +1600,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Create your own frame using a photo of your favorite!"
+            "value" : "Create your own frame\nWith your favorite photo"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お気に入りの写真で自分だけのフレームを作ってみましょう。"
+            "value" : "推しの写真で、自分だけの\nフレームを作ろう！"
           }
         },
         "zh-Hans" : {
@@ -1621,13 +1628,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pick a photo of your bias."
+            "value" : "Pick a photo of your bias"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お気に入りの写真を選んでください。"
+            "value" : "推しの写真を選んでください"
           }
         },
         "zh-Hans" : {
@@ -1655,7 +1662,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "中止"
+            "value" : "キャンセル"
           }
         },
         "zh-Hans" : {
@@ -1767,7 +1774,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フレーム管理"
+            "value" : "マイフレーム"
           }
         },
         "zh-Hans" : {
@@ -1789,13 +1796,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decorate Frame"
+            "value" : "Decorate a Frame"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フレームを飾る"
+            "value" : "フレームを飾り付け"
           }
         },
         "zh-Hans" : {
@@ -1845,7 +1852,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete Frames"
+            "value" : "Delete Frame"
           }
         },
         "ja" : {
@@ -1901,13 +1908,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This action cannot be undone."
+            "value" : "You won’t be able to undo this."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フレームを削除すると、元には戻せません。"
+            "value" : "この操作は元に戻せません。"
           }
         },
         "zh-Hans" : {
@@ -1929,7 +1936,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deleting a frame is irreversible."
+            "value" : "No frame selected. Please choose a frame."
           }
         },
         "ja" : {
@@ -1963,7 +1970,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "確認"
+            "value" : "次へ"
           }
         },
         "zh-Hans" : {

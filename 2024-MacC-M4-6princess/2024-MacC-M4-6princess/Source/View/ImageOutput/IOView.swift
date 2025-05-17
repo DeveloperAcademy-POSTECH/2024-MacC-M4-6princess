@@ -73,13 +73,6 @@ struct IOView: View {
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                   
                     VStack(alignment: .center, spacing: 8){
-                        //                        Spacer()
-                        //                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-                        //                            .font(.system(size:12))
-                        //                            .multilineTextAlignment(.center)
-                        //                            .foregroundColor(.gray01)
-                        //                            .padding(.top,5)
-//                        Spacer()
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -180,17 +173,15 @@ struct IOView: View {
             BottomSheetWrapper(viewModel: viewModel)
                 .presentationDetents([.height(200)])
         }
-        .onChange(of: viewModel.showShareButton, perform: { newValue in
-            if viewModel.showShareButton == false && viewModel.showAcitivity == true{
-                print("onchange start")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                    
+        .onChange(of: viewModel.showShareButton) {
+            if viewModel.showShareButton == false && viewModel.showAcitivity == true {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     viewModel.changeOverlay = true
-                    print("changeoverlay")
-                    
                 }
             }
-        })
+        }
+
+
         .overlay(
             Group {
                 
@@ -206,5 +197,17 @@ struct IOView: View {
     }
     var canvasView: some View {
         IOCanvasView(viewModel: viewModel)
+    }
+}
+import UIKit
+
+extension UIApplication {
+    /// 현재 포그라운드에 활성화된 씬의 keyWindow를 반환
+    var keyWindowInForeground: UIWindow? {
+        connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
     }
 }
