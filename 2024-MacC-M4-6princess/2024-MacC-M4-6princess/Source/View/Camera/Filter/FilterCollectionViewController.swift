@@ -16,6 +16,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     var collectionView: UICollectionView!
     var filterImages: [StoreImages]
     private var selectedFilter: ((UUID?) -> Void)?
+    private var shutterButton: UIButton!
 //    {
 //        didSet{
 //            print("selectedFilter:\(selectedFilter ?? nil)")
@@ -68,13 +69,12 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     private func setupCollectionView() {
         let layout = CustomFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = cellSpacing
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.decelerationRate = .fast
+        collectionView.decelerationRate = .normal
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(FilterCell.self, forCellWithReuseIdentifier: filterCellId)
         collectionView.register(EmptyCell.self, forCellWithReuseIdentifier: emptyCellId)
@@ -82,14 +82,18 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.heightAnchor.constraint(equalToConstant: 80)
         ])
         
+        // 셔터버튼 여백 고려
         let inset = (view.bounds.width - centerCellSize) / 2
         collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+        
+        // 셔터 버튼 설정
+        setupShutterButton()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -116,22 +120,24 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
-    //    func cellSize(for indexPath: IndexPath) -> CGFloat {
-    //        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-    //        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
-    //        let distance = abs(cellFrame.midX - centerX)
-    //
-    //        if indexPath.item == 0 {
-    //            return defaultCellSize
-    //        } else if distance < (centerCellSize / 2) {
-    //            return centerCellSize
-    //        } else if distance < (centerCellSize / 2 + rightOfCenterCellSize / 2) {
-    //            return rightOfCenterCellSize
-    //        } else {
-    //            return defaultCellSize
-    //        }
-    //    }
-    
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        // 셔터 버튼 영역 계산
+        let shutterFrame = shutterButton.convert(shutterButton.bounds, to: collectionView)
+        
+        // 선택하려는 셀의 프레임
+        guard let cellAttributes = collectionView.layoutAttributesForItem(at: indexPath) else {
+            return true
+        }
+        
+        // 셔터 버튼과 겹치는지 확인
+        if shutterFrame.intersects(cellAttributes.frame) {
+            return false // 셔터 버튼과 겹치면 선택 불가
+        }
+        
+        return true
+    }
+
+
     func cellSize(for indexPath: IndexPath) -> CGFloat {
         // 화면 중앙 위치 계산
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
@@ -165,16 +171,25 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        updateCellSizesAndSpacing()
+        // Add smooth animation for cell size changes
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+            self.updateCellSizesAndSpacing()
+        })
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        centerOnClosestCell()
+        // 스크롤이 멈춘 후 빠른 위치 조정
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+            self.centerOnClosestCell()
+        })
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            centerOnClosestCell()
+            // 드래그가 끝난 후 빠른 위치 조정
+            UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+                self.centerOnClosestCell()
+            })
         }
     }
     
@@ -187,68 +202,48 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             return
         }
         
-        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-        
-        if indexPath.item == 0 {
-            // EmptyCell 선택 시
-            self.selectedFilter?(nil)
-            currentSelectedFilter = nil
-            frameManager.selectedFrame = nil
-        } else {
-            // FilterCell 선택 시
-            let filterIndex = indexPath.item - 1
-            if filterIndex >= 0 && filterIndex < filterImages.count {
-                let selectedFilter = filterImages[filterIndex]
-                self.selectedFilter?(selectedFilter.uuid)
-                currentSelectedFilter = selectedFilter.uuid
-                frameManager.selectedFrame = currentSelectedFilter
-                
-                // 추가: resultImage를 강제로 업데이트
-                frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+        // 빠른 위치 조정 애니메이션
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+            self.collectionView.layoutIfNeeded()
+        }) { _ in
+            // Update filter selection after animation
+            if indexPath.item == 0 {
+                self.selectedFilter?(nil)
+                self.currentSelectedFilter = nil
+                self.frameManager.selectedFrame = nil
+                self.frameManager.resultImage = nil
+            } else {
+                let filterIndex = indexPath.item - 1
+                if filterIndex >= 0 && filterIndex < self.filterImages.count {
+                    let selectedFilter = self.filterImages[filterIndex]
+                    self.selectedFilter?(selectedFilter.uuid)
+                    self.currentSelectedFilter = selectedFilter.uuid
+                    self.frameManager.selectedFrame = self.currentSelectedFilter
+                    self.frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+                }
             }
+            
+            // 모든 셀의 크기와 테두리 상태 업데이트
+            self.updateCellSizesAndSpacing()
         }
+        
+        frameManager.isFrameLoading = true
     }
 
     
     
     private func updateCellSizesAndSpacing() {
-        for cell in collectionView.visibleCells {
-            guard let indexPath = collectionView.indexPath(for: cell) else { continue }
-            let size = cellSize(for: indexPath)
-            if let filterCell = cell as? FilterCell {
-                let filterIndex = indexPath.item - 1 // EmptyCell 고려
-                if filterIndex >= 0 && filterIndex < filterImages.count {
-                    let filter = filterImages[filterIndex]
-                    if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
-                        let isSelected = filter.uuid == currentSelectedFilter
-                        filterCell.configure(with: uiImage, size: size, isSelected: isSelected)
-                    }
-                }
-            }
-        }
-        collectionView.collectionViewLayout.invalidateLayout()
-    }
-    
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
         
-        // 현재 선택된 셀의 중앙 위치와 비교
-        if abs(cellFrame.midX - centerX) < (centerCellSize / 2) {
-            // 중앙지점 탭했을 경우 반응 안함
-            collectionView.deselectItem(at: indexPath, animated: false)
+        // 중앙에 가장 가까운 셀 찾기
+        guard let closestCell = collectionView.visibleCells
+            .min(by: { abs($0.frame.midX - centerX) < abs($1.frame.midX - centerX) }),
+              let indexPath = collectionView.indexPath(for: closestCell) else {
             return
         }
         
-        selectAndScrollToItem(at: indexPath)
-    }
-    
-    private func selectAndScrollToItem(at indexPath: IndexPath) {
-        
-        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-        
-        // EmptyCell 처리
+        // 중앙 셀의 선택 상태 업데이트
         if indexPath.item == 0 {
             self.selectedFilter?(nil)
             currentSelectedFilter = nil
@@ -264,8 +259,65 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             }
         }
         
+        // 모든 보이는 셀의 크기와 테두리 업데이트
+        for cell in collectionView.visibleCells {
+            guard let cellIndexPath = collectionView.indexPath(for: cell) else { continue }
+            if let filterCell = cell as? FilterCell {
+                let filterIndex = cellIndexPath.item - 1
+                if filterIndex >= 0 && filterIndex < filterImages.count {
+                    let filter = filterImages[filterIndex]
+                    if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
+                        let size = cellSize(for: cellIndexPath)
+                        let isSelected = filter.uuid == currentSelectedFilter
+                        filterCell.configure(with: uiImage, size: size, isSelected: isSelected)
+                    }
+                }
+            }
+        }
+        
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        let cellFrame = collectionView.layoutAttributesForItem(at: indexPath)?.frame ?? .zero
+        
+        // 현재 선택된 셀이 이미 중앙에 있는 경우 무시
+        if abs(cellFrame.midX - centerX) < (centerCellSize / 2) {
+            collectionView.deselectItem(at: indexPath, animated: false)
+            return
+        }
+        
+        // 터치로 인한 선택은 기존 애니메이션 속도 유지
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+            self.collectionView.layoutIfNeeded()
+        }) { _ in
+            // 애니메이션 완료 후 필터 선택 상태 업데이트
+            if indexPath.item == 0 {
+                self.selectedFilter?(nil)
+                self.currentSelectedFilter = nil
+                self.frameManager.selectedFrame = nil
+                self.frameManager.resultImage = nil
+            } else {
+                let filterIndex = indexPath.item - 1
+                if filterIndex >= 0 && filterIndex < self.filterImages.count {
+                    let selectedFilter = self.filterImages[filterIndex]
+                    self.selectedFilter?(selectedFilter.uuid)
+                    self.currentSelectedFilter = selectedFilter.uuid
+                    self.frameManager.selectedFrame = selectedFilter.uuid
+                    self.frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+                }
+            }
+            
+            // 빠른 위치 미세 조정
+            UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+                self.updateCellSizesAndSpacing()
+            })
+        }
+        
         frameManager.isFrameLoading = true
-        updateCellSizesAndSpacing()
     }
     
     // 필터 추가 함수 - 삭제 예정
@@ -282,15 +334,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         scrollToNewestFilter()
     }
     
-    //    // 가장 최근에 추가된 필터를 중앙에 위치시키는 함수
-    //    private func scrollToNewestFilter() {
-    //        let newIndexPath = IndexPath(item: filterImages.count, section: 0)
-    //
-    //        // 실제 IndexPath는 EmptyCell을 고려해야 하므로 1을 더함
-    //        let actualIndexPath = IndexPath(item: filterImages.count, section: 0)
-    //
-    //        collectionView.scrollToItem(at: actualIndexPath, at: .centeredHorizontally, animated: true)
-    //    }
     private func scrollToNewestFilter() {
         // 역순 정렬된 배열에서는 가장 최근 필터가 인덱스 0에 위치
         // EmptyCell을 고려하여 인덱스 1로 설정
@@ -298,7 +341,62 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         collectionView.scrollToItem(at: newestIndexPath, at: .centeredHorizontally, animated: true)
     }
 
+    private func setupShutterButton() {
+        // 셔터 버튼 생성
+        shutterButton = UIButton(type: .custom)
+        shutterButton.setImage(UIImage(named: "shutterImage"), for: .normal)
+        shutterButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        // 버튼 크기 설정
+        shutterButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        shutterButton.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        
+        // 버튼 액션 추가
+        shutterButton.addTarget(self, action: #selector(shutterButtonTapped), for: .touchUpInside)
+        
+        // 뷰에 버튼 추가
+        view.addSubview(shutterButton)
+        
+        // 버튼 위치 설정 - 컬렉션뷰와 같은 높이로 배치
+        NSLayoutConstraint.activate([
+            shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            shutterButton.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
+        ])
+        
+        // 버튼을 컬렉션뷰 위에 표시하기 위해 z-index 조정
+        view.bringSubviewToFront(shutterButton)
+    }
     
+    @objc private func shutterButtonTapped() {
+        guard frameManager.selectedFrame != nil else {
+            showAlert(message: "프레임이 선택되지 않았습니다. 프레임을 선택해주세요!")
+            return
+        }
+        
+        if frameManager.resultImage != nil {
+            viewModel.isTakePic = true
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
+                self.viewModel.takePic()
+                self.viewModel.cameraManager.stopSession()
+                Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
+            }
+        } else {
+            showAlert(message: "프레임이 선택되지 않았습니다. 프레임을 선택해주세요!")
+        }
+    }
+
+    private func showAlert(message: String) {
+        let alert = UIAlertController(
+            title: message,
+            message: "",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+        present(alert, animated: true)
+    }
+
+
     
     
 }

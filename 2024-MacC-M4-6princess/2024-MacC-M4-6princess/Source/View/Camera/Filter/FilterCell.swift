@@ -18,12 +18,12 @@ class FilterCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         // 이미지 뷰를 셀 크기의 90%로 설정하여 여백 생성
-        imageView.frame = CGRect(
-            x: bounds.width * 0.05,
-            y: bounds.height * 0.05,
-            width: bounds.width * 0.9,
-            height: bounds.height * 0.9
-        )
+//        imageView.frame = CGRect(
+//            x: bounds.width * 0.05,
+//            y: bounds.height * 0.05,
+//            width: bounds.width * 0.9,
+//            height: bounds.height * 0.9
+//        )
     }
     
     override init(frame: CGRect) {
@@ -49,18 +49,22 @@ class FilterCell: UICollectionViewCell {
     func configure(with image: UIImage, size: CGFloat, isSelected: Bool) {
         imageView.image = image
         
+        // 선택된 셀은 항상 58pt, 선택되지 않은 셀은 전달받은 size 사용
+        let finalSize = isSelected ? 58 : size
+        
         // 셀 크기 설정
-        self.frame.size = CGSize(width: size, height: size)
+        self.frame.size = CGSize(width: finalSize, height: finalSize)
         
         // 원형 모양 설정
-        self.layer.cornerRadius = size / 2
-        self.contentView.layer.cornerRadius = size / 2
+        self.layer.cornerRadius = finalSize / 2
+        self.contentView.layer.cornerRadius = finalSize / 2
         self.layer.masksToBounds = true
         self.contentView.layer.masksToBounds = true
         
         // 선택 상태에 따른 테두리 설정
         if isSelected {
             self.layer.borderWidth = 0
+            self.layer.borderColor = nil
         } else {
             self.layer.borderWidth = 1
             self.layer.borderColor = UIColor(named: "PointPink")?.cgColor ?? UIColor.systemPink.cgColor
