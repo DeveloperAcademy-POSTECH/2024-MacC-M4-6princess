@@ -45,6 +45,12 @@
             "state" : "translated",
             "value" : "是否删除%lld个框架？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要刪除 %lld 個邊框嗎？"
+          }
         }
       }
     },
@@ -53,7 +59,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld ثانية"
+            "value" : "%lld ث"
           }
         },
         "en" : {
@@ -73,6 +79,12 @@
             "state" : "translated",
             "value" : "%lld秒"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 秒"
+          }
         }
       }
     },
@@ -81,7 +93,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "٣ ثوانٍ"
+            "value" : "٣ث"
           }
         },
         "en" : {
@@ -101,6 +113,12 @@
             "state" : "translated",
             "value" : "3秒"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3秒"
+          }
         }
       }
     },
@@ -109,7 +127,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " ٥ ثوانٍ"
+            "value" : " ٥ث"
           }
         },
         "en" : {
@@ -129,6 +147,12 @@
             "state" : "translated",
             "value" : "5秒"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5秒"
+          }
         }
       }
     },
@@ -137,7 +161,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " ٧ ثوانٍ\n"
+            "value" : " ٧ث"
           }
         },
         "en" : {
@@ -153,6 +177,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7秒"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "7秒"
@@ -184,6 +214,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "✏️"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字"
           }
         }
       }
@@ -220,6 +256,12 @@
             "state" : "translated",
             "value" : "粗体"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粗體"
+          }
         }
       }
     },
@@ -254,6 +296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "手写体"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手寫體"
           }
         }
       }
@@ -290,6 +338,12 @@
             "state" : "translated",
             "value" : "现代体"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現代體"
+          }
         }
       }
     },
@@ -300,6 +354,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Image %lld"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片 %lld"
           }
         }
       }
@@ -328,6 +388,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关闭"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉"
           }
         }
       }
@@ -363,6 +429,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "气泡"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "對話框"
           }
         }
       }
@@ -400,10 +472,17 @@
             "state" : "translated",
             "value" : "角色"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色"
+          }
         }
       }
     },
     "stickerTab.full" : {
+      "comment" : "사진틀",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -434,6 +513,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全屏"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邊框"
           }
         }
       }
@@ -466,6 +551,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "幽默"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "幽默"
@@ -504,6 +595,12 @@
             "state" : "translated",
             "value" : "相机"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相機"
+          }
         }
       }
     },
@@ -539,6 +636,12 @@
             "state" : "translated",
             "value" : "首页"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首頁"
+          }
         }
       }
     },
@@ -569,6 +672,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已保存到相册。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存至相簿。"
           }
         }
       }
@@ -656,6 +765,12 @@
             "state" : "translated",
             "value" : "返回"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "離開"
+          }
         }
       }
     },
@@ -683,6 +798,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "我的框架"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我製作的邊框"
           }
         }
       }
@@ -741,6 +862,12 @@
             "state" : "translated",
             "value" : "不再显示"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不再顯示"
+          }
         }
       }
     },
@@ -769,14 +896,46 @@
             "state" : "translated",
             "value" : "关闭"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉"
+          }
         }
       }
     },
     "두 손가락을 모으면" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "双指合拢时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "雙指合攏時"
+          }
+        }
+      }
     },
     "두 손가락을 벌리면" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "双指张开时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "雙指張開時"
+          }
+        }
+      }
     },
     "뒤로" : {
       "localizations" : {
@@ -802,6 +961,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "返回"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "向後"
           }
         }
       }
@@ -831,6 +996,12 @@
             "state" : "translated",
             "value" : "预览"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預覽"
+          }
         }
       }
     },
@@ -858,6 +1029,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "去除背景"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除背景"
           }
         }
       }
@@ -887,6 +1064,12 @@
             "state" : "translated",
             "value" : "正在去除背景..."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在移除背景⋯"
+          }
         }
       }
     },
@@ -914,6 +1097,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择照片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇照片"
           }
         }
       }
@@ -944,6 +1133,12 @@
             "state" : "translated",
             "value" : "拍照"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍攝照片"
+          }
         }
       }
     },
@@ -972,6 +1167,12 @@
             "state" : "translated",
             "value" : "添加照片"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增照片"
+          }
         }
       }
     },
@@ -987,6 +1188,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カメラ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍照"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍攝照片"
           }
         }
       }
@@ -1016,6 +1229,12 @@
             "state" : "translated",
             "value" : "删除"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
+          }
         }
       }
     },
@@ -1030,7 +1249,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New\nFrame"
+            "value" : "New Frame"
           }
         },
         "ja" : {
@@ -1043,6 +1262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新建框架"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增邊框"
           }
         }
       }
@@ -1072,6 +1297,12 @@
             "state" : "translated",
             "value" : "移除选择"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除選取"
+          }
         }
       }
     },
@@ -1099,6 +1330,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加选择"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加選取"
           }
         }
       }
@@ -1128,6 +1365,12 @@
             "state" : "translated",
             "value" : "通过选择添加和移除功能修改选择区域。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請使用添加或移除功能來修改選取區域。"
+          }
         }
       }
     },
@@ -1156,11 +1399,30 @@
             "state" : "translated",
             "value" : "建议启用竖屏锁定"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建議啟用直向鎖定"
+          }
         }
       }
     },
     "손가락을 움직이면" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移动手指时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動手指時"
+          }
+        }
+      }
     },
     "수정" : {
       "localizations" : {
@@ -1183,6 +1445,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修改"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "修改"
@@ -1215,6 +1483,12 @@
             "state" : "translated",
             "value" : "贴纸"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貼圖"
+          }
         }
       }
     },
@@ -1242,6 +1516,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开始"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始使用"
           }
         }
       }
@@ -1271,6 +1551,12 @@
             "state" : "translated",
             "value" : "向前"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "向前"
+          }
         }
       }
     },
@@ -1289,6 +1575,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消失"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "消失"
@@ -1321,6 +1613,12 @@
             "state" : "translated",
             "value" : "发生错误"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發生錯誤"
+          }
         }
       }
     },
@@ -1345,6 +1643,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "完成"
@@ -1377,6 +1681,12 @@
             "state" : "translated",
             "value" : "此应用在竖屏模式下提供更好的体验。\n请启用竖屏锁定。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本應用程式在直向模式下能提供更佳的使用體驗。  \n請啟用直向螢幕鎖定。"
+          }
         }
       }
     },
@@ -1404,6 +1714,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "是否删除此框架？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要刪除這個邊框嗎？"
           }
         }
       }
@@ -1433,6 +1749,12 @@
             "state" : "translated",
             "value" : "图像渲染失败，请重试。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片渲染失敗，請再試一次。"
+          }
         }
       }
     },
@@ -1460,6 +1782,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
           }
         }
       }
@@ -1519,6 +1847,12 @@
             "state" : "translated",
             "value" : "保存的照片请在相册中查看。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存的照片可在相簿中查看。"
+          }
         }
       }
     },
@@ -1558,6 +1892,12 @@
             "state" : "translated",
             "value" : "查看全部"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看全部"
+          }
         }
       }
     },
@@ -1585,6 +1925,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "结束时编辑的内容将不会保存。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結束後，編輯的內容將不會被保存。"
           }
         }
       }
@@ -1614,6 +1960,12 @@
             "state" : "translated",
             "value" : "用你最喜欢的照片制作属于你自己的框架吧！"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用您最喜歡的照片，打造專屬於您的邊框！"
+          }
         }
       }
     },
@@ -1642,6 +1994,12 @@
             "state" : "translated",
             "value" : "选择你最喜欢的照片。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請選擇您最喜歡的照片。"
+          }
         }
       }
     },
@@ -1666,6 +2024,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "取消"
@@ -1698,6 +2062,12 @@
             "state" : "translated",
             "value" : "前往相机"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往相機"
+          }
         }
       }
     },
@@ -1725,6 +2095,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文本"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字"
           }
         }
       }
@@ -1754,6 +2130,12 @@
             "state" : "translated",
             "value" : "编辑"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯"
+          }
         }
       }
     },
@@ -1781,6 +2163,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "框架管理"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邊框管理"
           }
         }
       }
@@ -1810,6 +2198,12 @@
             "state" : "translated",
             "value" : "装饰框架"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邊框美化"
+          }
         }
       }
     },
@@ -1837,6 +2231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "制作框架"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增邊框"
           }
         }
       }
@@ -1866,6 +2266,12 @@
             "state" : "translated",
             "value" : "删除框架"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除邊框"
+          }
         }
       }
     },
@@ -1893,6 +2299,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "是否结束编辑框架？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您要結束邊框編輯嗎？"
           }
         }
       }
@@ -1922,6 +2334,12 @@
             "state" : "translated",
             "value" : "删除框架后无法恢复。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除邊框後將無法還原。"
+          }
         }
       }
     },
@@ -1950,6 +2368,12 @@
             "state" : "translated",
             "value" : "未选择框架，请选择框架！"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未選擇邊框。請選擇一個邊框！"
+          }
         }
       }
     },
@@ -1977,6 +2401,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "确认"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確定"
           }
         }
       }
