@@ -48,6 +48,8 @@ struct CameraBottomView: View {
                                 Text(String(localized:"새 프레임"))
                                     .font(.caption)
                                     .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.5)
                                     .foregroundColor(.black)
                             }
                         }

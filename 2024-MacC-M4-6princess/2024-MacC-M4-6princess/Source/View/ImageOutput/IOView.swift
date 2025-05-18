@@ -138,7 +138,8 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                viewModel.showShareButton = true
+//                                viewModel.showShareButton = true
+                                viewModel.changeOverlay = true
                             }
                             ) {
                                 Image("share.icon")

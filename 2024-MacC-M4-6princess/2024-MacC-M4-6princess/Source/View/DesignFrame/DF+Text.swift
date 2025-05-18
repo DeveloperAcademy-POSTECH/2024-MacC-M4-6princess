@@ -28,7 +28,7 @@ extension DFTextView{
     var newFontSelector: some View {
         // 폰트 선택 ScrollView
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 7) {
                 
                 ForEach(NewFontStyle.allCases, id: \.self) { fontStyle in
                     Text(fontStyle.displayName) // 한글 이름 표시

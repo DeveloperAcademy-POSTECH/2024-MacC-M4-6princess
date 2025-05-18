@@ -130,8 +130,8 @@
             filePath = "2024-MacC-M4-6princess/Source/View/DesignFrame/DFModifyView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "176"
-            endingLineNumber = "176"
+            startingLineNumber = "169"
+            endingLineNumber = "169"
             landmarkName = "imageView"
             landmarkType = "24">
          </BreakpointContent>
@@ -162,8 +162,8 @@
             filePath = "2024-MacC-M4-6princess/Source/View/DesignFrame/DFModifyView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "181"
-            endingLineNumber = "181"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
             landmarkName = "imageView"
             landmarkType = "24">
          </BreakpointContent>
@@ -178,8 +178,8 @@
             filePath = "2024-MacC-M4-6princess/Source/View/DesignFrame/DFModifyView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
+            startingLineNumber = "180"
+            endingLineNumber = "180"
             landmarkName = "imageView"
             landmarkType = "24">
          </BreakpointContent>
@@ -194,8 +194,8 @@
             filePath = "2024-MacC-M4-6princess/Source/View/DesignFrame/DFModifyView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "201"
-            endingLineNumber = "201"
+            startingLineNumber = "194"
+            endingLineNumber = "194"
             landmarkName = "imageView"
             landmarkType = "24">
          </BreakpointContent>
@@ -230,22 +230,6 @@
             endingLineNumber = "22"
             landmarkName = "makeUIViewController(context:)"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0519FBD7-04EC-4552-A8B1-88DBFAE736DA"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "2024-MacC-M4-6princess/Source/View/DesignFrame/DFModifyView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "79"
-            endingLineNumber = "79"
-            landmarkName = "body"
-            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
