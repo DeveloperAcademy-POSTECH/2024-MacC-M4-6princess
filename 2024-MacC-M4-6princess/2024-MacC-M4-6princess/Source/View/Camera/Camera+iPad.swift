@@ -87,43 +87,15 @@ extension FilteredImageView{
                 )
                 .frame(height: 100)
                 
-                // 투명한 탭 영역
-                Color.clear
-                    .frame(width: 100, height: 100)
-                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
-                
-                Button {
-                    if frameManager.resultImage != nil {
-                        self.viewModel.isTakePic = true
-                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + viewModel.delayTime) {
-                            viewModel.takePic()
-                            viewModel.cameraManager.stopSession()
-                            Analytics.logEvent("A1_셔터버튼눌림", parameters: nil)
-                        }
-                    } else {
-                        viewModel.isShowAlert = true
-                    }
-                } label: {
-                    Image("shutterImage")
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                }
-                .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 6)
-                .allowsHitTesting(true)
-                .alert("프레임이 선택되지 않았습니다. 프레임을 선택해주세요!", isPresented: $viewModel.isShowAlert) {
-                    Button("닫기", role: .cancel) { }
-                } message: {
-                    Text("")
-                }
-                
-                
             }
         }
         .frame(height: 124)
         .onAppear {
-            DispatchQueue.main.async {
-                //보라색 무시해주세요
+            DispatchQueue.global(qos: .userInitiated).async {
                 viewModel.cameraManager.session.startRunning()
+                DispatchQueue.main.async {
+                    reloadFilterImages()
+                }
             }
         }
         .onDisappear {
