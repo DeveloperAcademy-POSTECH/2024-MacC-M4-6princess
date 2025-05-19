@@ -324,13 +324,13 @@ private extension DFEditView {
                     
                 }
             }
-            .frame(minWidth: 40, maxWidth: .infinity)
+            .frame(minWidth: UIScreen.main.bounds.width * 0.1, maxWidth: .infinity)
             .padding(.leading, 50)
             
             Text("배경 제거")
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
-                .frame(minWidth: 169, maxWidth: .infinity)
+                .frame(minWidth: UIScreen.main.bounds.width * 0.43, maxWidth: .infinity)
             
             Button {
                 viewModel.removingLoadingOpacity = 1
@@ -375,7 +375,7 @@ private extension DFEditView {
                 Text("확인")
                     .fontWeight(.semibold)
                     .foregroundStyle(.pointPink)
-                    .frame(minWidth: 40, maxWidth: .infinity)
+                    .frame(minWidth: UIScreen.main.bounds.width * 0.1, maxWidth: .infinity)
             }
             .padding(.trailing, 60)
             .disabled(viewModel.clickedButton) // 버튼이 클릭된 동안 비활성화

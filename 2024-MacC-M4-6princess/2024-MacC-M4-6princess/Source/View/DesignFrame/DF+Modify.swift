@@ -208,8 +208,10 @@ extension DFModifyView{
                     Image(systemName: "chevron.backward")
                         .fontWeight(.semibold)
                         .foregroundStyle(.gray01)
+                        .frame(minWidth: UIScreen.main.bounds.width * 0.1, maxWidth: .infinity)
                 }
             }
+            .padding(.trailing, 60)
             .alert("프레임 편집을 종료하시겠습니까?", isPresented: $viewModel.isAlert) {
                 Button {
                     viewModel.isAlert.toggle()
@@ -231,16 +233,14 @@ extension DFModifyView{
             } message: {
                 Text("종료 시 편집된 내용은 저장되지 않습니다.")
             }
-            .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 20)
             
             
             Text("프레임 꾸미기")
                 .foregroundStyle(.gray01)
                 .font(.system(size: 17))
                 .fontWeight(.bold)
-                .frame(width: UIScreen.main.bounds.width * 0.27, height: UIScreen.main.bounds.height * 0.035)
-                .padding(.leading, UIScreen.main.bounds.width * 0.1)
-                .padding(.trailing, UIScreen.main.bounds.width * 0.1)
+                .frame(minWidth: UIScreen.main.bounds.width * 0.37, maxWidth: .infinity)
+                .padding(.trailing, 30)
             
             Button {
                 if let _  = frameManager.updateFrame {
@@ -300,9 +300,9 @@ extension DFModifyView{
                 Text("저장")
                     .fontWeight(.semibold)
                     .foregroundStyle(.pointPink)
-                    .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
+                    .frame(minWidth: UIScreen.main.bounds.width * 0.1, maxWidth: .infinity)
             }
-            .padding(.trailing, UIScreen.main.bounds.width * 0.1)
+            .padding(13)
             .disabled(viewModel.isPushedSaveBtn)
             
         }
