@@ -239,6 +239,8 @@ extension DFModifyView{
                 .foregroundStyle(.gray01)
                 .font(.system(size: 17))
                 .fontWeight(.bold)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
                 .frame(minWidth: UIScreen.main.bounds.width * 0.37, maxWidth: .infinity)
                 .padding(.trailing, 30)
             
