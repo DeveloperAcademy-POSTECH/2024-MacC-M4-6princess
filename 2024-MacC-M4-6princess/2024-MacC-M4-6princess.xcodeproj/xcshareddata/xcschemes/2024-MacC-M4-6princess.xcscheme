@@ -58,10 +58,7 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-<<<<<<< HEAD
       language = "zh-Hans"
-=======
->>>>>>> parent of 59f5892 (Design: #207 - 로컬라이제이션 시 번역이 제대로 적용이 되지 않는 문제 해결)
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
