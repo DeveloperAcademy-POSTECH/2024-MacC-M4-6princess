@@ -87,7 +87,7 @@ struct DFEditView: View {
                                         .foregroundStyle(viewModel.showPreview ? Color.gray03 : Color.gray02)
                                 }
                             }
-                            .padding(.trailing, 20)
+                            .padding(.trailing, 45)
                             .padding(.bottom, 2)
 
                         }
@@ -330,6 +330,8 @@ private extension DFEditView {
             Text("배경 제거")
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
                 .frame(minWidth: UIScreen.main.bounds.width * 0.43, maxWidth: .infinity)
             
             Button {
