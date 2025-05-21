@@ -87,7 +87,7 @@ struct DFEditView: View {
                                         .foregroundStyle(viewModel.showPreview ? Color.gray03 : Color.gray02)
                                 }
                             }
-                            .padding(.trailing, 20)
+                            .padding(.trailing, 45)
                             .padding(.bottom, 2)
 
                         }
@@ -324,16 +324,15 @@ private extension DFEditView {
                     
                 }
             }
-            .padding(.leading, UIScreen.main.bounds.width * 0.2)
-            .padding(.trailing, UIScreen.main.bounds.width * 0.07)
-            .frame(width: UIScreen.main.bounds.width * 0.1, height: UIScreen.main.bounds.height * 0.05)
+            .frame(minWidth: UIScreen.main.bounds.width * 0.1, maxWidth: .infinity)
+            .padding(.leading, 50)
             
             Text("배경 제거")
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
-                .frame(width: UIScreen.main.bounds.width * 0.2, height: UIScreen.main.bounds.height * 0.04)
-                .padding(.leading, UIScreen.main.bounds.width * 0.2)
-                .padding(.trailing, 10)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .frame(minWidth: UIScreen.main.bounds.width * 0.43, maxWidth: .infinity)
             
             Button {
                 viewModel.removingLoadingOpacity = 1
@@ -378,11 +377,9 @@ private extension DFEditView {
                 Text("확인")
                     .fontWeight(.semibold)
                     .foregroundStyle(.pointPink)
-                    .padding(.leading, UIScreen.main.bounds.width * 0.04)
-                    .padding(.trailing, UIScreen.main.bounds.width * 0.01 )
-                    .frame(width: UIScreen.main.bounds.width / 5, height: UIScreen.main.bounds.height / 20)
+                    .frame(minWidth: UIScreen.main.bounds.width * 0.1, maxWidth: .infinity)
             }
-            .padding(.trailing, UIScreen.main.bounds.width * 0.051)
+            .padding(.trailing, 60)
             .disabled(viewModel.clickedButton) // 버튼이 클릭된 동안 비활성화
             
             
