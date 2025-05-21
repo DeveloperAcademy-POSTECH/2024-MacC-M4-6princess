@@ -249,8 +249,7 @@ extension DFModifyView{
                         $0.isTapped = false
                     }
                     
-//                    viewModel.saveStateText = "저장 중입니다..."
-                    viewModel.saveStateText = NSLocalizedString("저장 중입니다...", comment: "")
+                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     
                     viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
@@ -269,8 +268,7 @@ extension DFModifyView{
                         $0.isTapped = false
                     }
                     
-//                    viewModel.saveStateText = "저장 중입니다..."
-                    viewModel.saveStateText = NSLocalizedString("저장 중입니다...", comment: "")
+                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.isPushedSaveBtn = true
                     
                     viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
@@ -284,8 +282,7 @@ extension DFModifyView{
                     
                 } else {
                     
-//                    viewModel.saveStateText = "저장할 이미지가 없습니다."
-                    viewModel.saveStateText = NSLocalizedString("저장할 이미지가 없습니다.", comment: "")
+                    viewModel.saveStateText = "저장할 이미지가 없습니다."
                     Task {
                         viewModel.btnOpacity = 1
                         try await Task.sleep(for: .seconds(1))
