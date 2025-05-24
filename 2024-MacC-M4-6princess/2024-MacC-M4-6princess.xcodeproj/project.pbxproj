@@ -430,8 +430,8 @@
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Frameet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSCameraUsageDescription = "최애와 사진을 찍기 위해 촬영 권한을 허용해 주세요.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "최애와 같이 찍은 사진을 저장하기 위해 앨범 권한을 허용해 주세요.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "$(CAMERA_USAGE_DESCRIPTION)";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "$(PHOTOLIB_USAGE_DESCRIPTION)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -471,8 +471,8 @@
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Frameet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSCameraUsageDescription = "최애와 사진을 찍기 위해 촬영 권한을 허용해 주세요.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "최애와 같이 찍은 사진을 저장하기 위해 앨범 권한을 허용해 주세요.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "$(CAMERA_USAGE_DESCRIPTION)";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "$(PHOTOLIB_USAGE_DESCRIPTION)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

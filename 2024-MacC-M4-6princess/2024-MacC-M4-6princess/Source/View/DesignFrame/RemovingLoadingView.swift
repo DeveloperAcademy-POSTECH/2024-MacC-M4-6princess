@@ -15,6 +15,8 @@ struct RemovingLoadingView: View {
                     .font(.system(size: 14))
                     .fontWeight(.regular)
                     .foregroundStyle(.white)
+                    .frame(alignment: .center)
+                    .multilineTextAlignment(.center)
                 
             }
         }

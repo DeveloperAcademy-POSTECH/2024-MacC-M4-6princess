@@ -230,7 +230,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الخط العريض "
+            "value" : "العريض "
           }
         },
         "en" : {
@@ -271,7 +271,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الخط اليدوي"
+            "value" : "اليدوي"
           }
         },
         "en" : {
@@ -306,13 +306,54 @@
         }
       }
     },
+    "font.light" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خفيف"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Light"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트체"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "细体"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "細體"
+          }
+        }
+      }
+    },
     "font.modern" : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الخط العصري"
+            "value" : "العصري"
           }
         },
         "en" : {
@@ -360,6 +401,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "圖片 %lld"
+          }
+        }
+      }
+    },
+    "light" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خفيف"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライト"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "细体"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "細體"
           }
         }
       }
@@ -659,7 +734,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved to gallery"
+            "value" : "Saved to Photos"
           }
         },
         "ja" : {
@@ -907,6 +982,24 @@
     },
     "두 손가락을 모으면" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند جمع إصبعين"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinch with two fingers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2本の指を近づけると"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -923,6 +1016,24 @@
     },
     "두 손가락을 벌리면" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند إبعاد إصبعين"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinch out with two fingers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2本の指を広げると"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1016,7 +1127,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Removing\nBackground…"
+            "value" : "Remove Background"
           }
         },
         "ja" : {
@@ -1050,13 +1161,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saving the frame…"
+            "value" : "Removing\nBackground…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フレームを保存しています…"
+            "value" : "背景を削除しています…"
           }
         },
         "zh-Hans" : {
@@ -1346,7 +1457,42 @@
         }
       }
     },
+    "선택 추가, 제거 기능으로 선택 영역을 수정하세요." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قم بتعديل منطقة الاختيار باستخدام\n وظيفة إضافة وإزالة الاختيار."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit your selection\nusing the add/remove tools"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「追加」や「削除」機能を使って、\n選択範囲を編集してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通过选择添加和移除功能修改选择区域。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請使用添加或移除功能來修改選取區域。"
+          }
+        }
+      }
+    },
     "선택추가, 제거기능으로 선택영역을 수정하세요." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1416,6 +1562,24 @@
     },
     "손가락을 움직이면" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند تحريك الإصبع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you move your finger,"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指を動かすと"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1578,6 +1742,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Disappeared"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非表示"
           }
         },
         "zh-Hans" : {
@@ -1838,19 +2008,25 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saving..."
+            "value" : "Saving the frame…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存中です"
+            "value" : "フレームを保存しています…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在保存中…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在儲存…"
           }
         }
       }
@@ -1943,6 +2119,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "没有可保存的图片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有可儲存的圖片。"
           }
         }
       }
@@ -2038,13 +2220,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "用你最喜欢的照片制作属于你自己的框架吧！"
+            "value" : "用你最爱的照片，\n打造只属于你的相框吧！"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "用您最喜歡的照片，打造專屬於您的邊框！"
+            "value" : "用您最喜愛的照片，打造專屬您的相框吧！"
           }
         }
       }
@@ -2128,7 +2310,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Go to Camera"
+            "value" : "Back to Camera"
           }
         },
         "ja" : {
@@ -2298,13 +2480,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make Frame"
+            "value" : "Create Frame"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フレームを作る"
+            "value" : "新しいフレームを作る"
           }
         },
         "zh-Hans" : {

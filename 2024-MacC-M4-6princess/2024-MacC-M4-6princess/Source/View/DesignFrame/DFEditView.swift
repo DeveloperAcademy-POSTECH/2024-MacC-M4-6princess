@@ -406,7 +406,7 @@ private extension DFEditView {
                     Text("선택 추가")
                         .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
-                        .offset(y: 38)
+                        .offset(y: 42)
                 }
             }
             

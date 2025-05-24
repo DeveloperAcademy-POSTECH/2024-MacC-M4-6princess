@@ -9,13 +9,21 @@ import SwiftUI
 import UIKit
 enum NewFontStyle: String, CaseIterable {
     case modern    = "Pretendard-Medium"
+    case light = "system-light"
     case handwriting = "HakgyoansimGeurimilgiOTF-R" // 기본 핸드라이팅
     case bold      = "Pretendard-Bold"
     
+    
     /// 로컬라이즈된 이름 반환
     var displayName: String {
-        NSLocalizedString("font.\(self.key)", comment: "")
-    }
+            switch self {
+            case .light:
+                return NSLocalizedString("light", comment: "")
+            default:
+                return NSLocalizedString("font.\(self.key)", comment: "")
+            }
+        }
+    
     private var key: String { String(describing: self) }
     
     /// 실제 사용할 폰트 파일 이름을 언어별로 결정
@@ -38,14 +46,28 @@ enum NewFontStyle: String, CaseIterable {
     }
     
     /// UIKit용 UIFont 반환
+    ///
     func applyFont(size: CGFloat) -> UIFont {
-        UIFont(name: fontName, size: size) ?? .systemFont(ofSize: size)
+        switch self {
+        case .light:
+            return UIFont.systemFont(ofSize: size, weight: .light)
+        default:
+            return UIFont(name: self.rawValue, size: size) ?? UIFont.systemFont(ofSize: size)
+        }
     }
+//    func applyFont(size: CGFloat) -> UIFont {
+//        UIFont(name: fontName, size: size) ?? .systemFont(ofSize: size)
+//    }
 
     /// SwiftUI용 Font 반환
     func oldApplyFont(size: CGFloat) -> Font {
-        .custom(fontName, size: size)
-    }
+            switch self {
+            case .light:
+                return .system(size: size, weight: .light)
+            default:
+                return .custom(self.rawValue, size: size)
+            }
+        }
 }
 
 

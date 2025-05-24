@@ -13,10 +13,12 @@ struct ToastMessageView: View {
                 Image("pencil")
                     .resizable()
                     .frame(width: 20, height: 20)
-                Text("선택추가, 제거기능으로 선택영역을 수정하세요.")
+                Text("선택 추가, 제거 기능으로 선택 영역을 수정하세요.")
                     .font(.footnote)
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
+                    .frame(alignment: .center)
+                    .multilineTextAlignment(.center)
             }
         }
     }
