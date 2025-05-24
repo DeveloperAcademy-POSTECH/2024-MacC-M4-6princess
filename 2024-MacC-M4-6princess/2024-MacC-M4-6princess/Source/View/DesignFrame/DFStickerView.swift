@@ -119,11 +119,29 @@ enum StickerTab: String, CaseIterable {
 
 struct StickerImages {
     static func getStickerImages() -> [StickerTab: [String]] {
+        let locale = Locale.current.identifier
+
+        let humorStickers: [String]
+        switch locale {
+//        case let id where id.hasPrefix("ko"):
+//            humorStickers = (1...39).map { String(format: "humor%02d", $0) }
+        case let id where id.hasPrefix("ja"):
+            humorStickers = (1...10).map { String(format: "jahumor%02d", $0) }
+//        case let id where id.hasPrefix("zh-hans"): // 간체
+//            humorStickers = (1...25).map { String(format: "zhhumor%02d", $0) }
+//        case let id where id.hasPrefix("zh-hant"):
+//            humorStickers = (1...25).map { String(format: "zhhumor%02d", $0) }
+            
+        default: // 영어 포함
+            humorStickers = (1...20).map { String(format: "humor%02d", $0) }
+        }
+
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
-            .humor: (1...39).map { String(format: "humor%02d", $0) },
+            .humor: humorStickers,
             .character: (1...6).map { String(format: "character%02d", $0) },
             .full: (1...5).map { String(format: "full%02d", $0) }
         ]
     }
+
 }

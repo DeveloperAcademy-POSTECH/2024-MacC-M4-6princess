@@ -277,7 +277,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Handwrting"
+            "value" : "Handwriting"
           }
         },
         "ja" : {
@@ -1050,13 +1050,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Removing background..."
+            "value" : "Saving the frame…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "背景を削除しています…"
+            "value" : "フレームを保存しています…"
           }
         },
         "zh-Hans" : {
@@ -1108,7 +1108,6 @@
       }
     },
     "사진 촬영" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1125,7 +1124,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真撮影"
+            "value" : "カメラ"
           }
         },
         "zh-Hans" : {
@@ -1177,7 +1176,14 @@
       }
     },
     "사진촬영" : {
+      "extractionState" : "stale",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التقاط الصورة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1804,7 +1810,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saving the frame"
+            "value" : "Saving…"
           }
         },
         "ja" : {
@@ -2418,6 +2424,7 @@
       }
     },
     "프레임이 선택되지 않았습니다. 프레임을 선택해주세요!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
