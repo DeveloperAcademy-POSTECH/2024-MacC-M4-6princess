@@ -189,10 +189,13 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Hakgyoansim Geurimilgi OTF R.otf</string>
-		<string>Hakgyoansim Geurimilgi TTF R.ttf</string>
+		<string>Yomogi-Regular.ttf</string>
 		<string>Pretendard-Bold.otf</string>
+		<string>Pretendard-Medium.otf</string>
 		<string>Pretendard-Regular.otf</string>
+		<string>NotoSerifTC-VariableFont_wght.ttf</string>
+		<string>Hakgyoansim Geurimilgi TTF R.ttf</string>
+		<string>Hakgyoansim Geurimilgi OTF R.otf</string>
 	</array>
 </dict>
 </plist>

@@ -7,44 +7,47 @@
 
 import SwiftUI
 import UIKit
-
-
 enum NewFontStyle: String, CaseIterable {
-    case modern = "Pretendard-Medium"
-    case handwriting = "HakgyoansimGeurimilgiOTF-R"
-    case bold = "Pretendard-Bold"
-
-    /// 로컬라이징된 이름 반환
+    case modern    = "Pretendard-Medium"
+    case handwriting = "HakgyoansimGeurimilgiOTF-R" // 기본 핸드라이팅
+    case bold      = "Pretendard-Bold"
+    
+    /// 로컬라이즈된 이름 반환
     var displayName: String {
         NSLocalizedString("font.\(self.key)", comment: "")
     }
-
-    /// 폰트 패밀리 이름이 아닌 enum case 이름을 키로 사용
-    private var key: String {
-        String(describing: self)
-    }
-
-    /// 사용 가능한 폰트 목록 출력 (디버깅용)
-    func printFamilyFont() {
-        UIFont.familyNames.sorted().forEach { familyName in
-            print("*** \(familyName) ***")
-            UIFont.fontNames(forFamilyName: familyName).forEach { fontName in
-                print("\(fontName)")
+    private var key: String { String(describing: self) }
+    
+    /// 실제 사용할 폰트 파일 이름을 언어별로 결정
+    private var fontName: String {
+        switch self {
+        case .handwriting:
+            // 현재 디바이스의 언어 코드 가져오기 (ex: "ko", "ja", "zh")
+            let lang = Locale.preferredLanguages.first?.prefix(2) ?? "ko"
+            switch lang {
+            case "ja":
+                return "Yomogi-Regular"  // ja-handwriting.ttf 를 Info.plist UIAppFonts 에 등록
+            case "zh":
+                return "NotoSerifTC-VariableFont_wght"  // zh-handwriting.ttf
+            default:
+                return rawValue          // 그 외엔 기본값
             }
-            print("---------------------")
+        default:
+            return rawValue
         }
     }
-
+    
     /// UIKit용 UIFont 반환
     func applyFont(size: CGFloat) -> UIFont {
-        return UIFont(name: self.rawValue, size: size) ?? UIFont.systemFont(ofSize: size)
+        UIFont(name: fontName, size: size) ?? .systemFont(ofSize: size)
     }
 
     /// SwiftUI용 Font 반환
     func oldApplyFont(size: CGFloat) -> Font {
-        .custom(self.rawValue, size: size)
+        .custom(fontName, size: size)
     }
 }
+
 
 
 

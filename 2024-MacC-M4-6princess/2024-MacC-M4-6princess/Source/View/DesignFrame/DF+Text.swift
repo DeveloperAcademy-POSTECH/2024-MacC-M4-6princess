@@ -36,6 +36,8 @@ extension DFTextView{
                         .padding(.horizontal,15)
                         .padding(.vertical,6)
                         .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
+                        .frame(maxWidth:UIScreen.main.bounds.width/3)
+                        .minimumScaleFactor(0.5)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정

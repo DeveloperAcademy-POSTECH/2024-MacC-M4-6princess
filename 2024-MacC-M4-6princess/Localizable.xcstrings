@@ -242,7 +242,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ボールド体"
+            "value" : "ボールド"
           }
         },
         "ko" : {
@@ -283,7 +283,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "手書き風フォント"
+            "value" : "手書き"
           }
         },
         "ko" : {
@@ -324,7 +324,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "モダン体"
+            "value" : "モダン"
           }
         },
         "ko" : {
@@ -1016,7 +1016,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove Background"
+            "value" : "Removing\nBackground…"
           }
         },
         "ja" : {

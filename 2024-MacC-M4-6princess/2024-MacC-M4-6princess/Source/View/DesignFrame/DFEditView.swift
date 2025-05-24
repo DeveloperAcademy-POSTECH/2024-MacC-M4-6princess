@@ -85,6 +85,8 @@ struct DFEditView: View {
                                     Text("미리보기")
                                         .font(.custom("pretendard-medium", size: 16))
                                         .foregroundStyle(viewModel.showPreview ? Color.gray03 : Color.gray02)
+                                        .frame(width: 65, height: 25)
+                                        .minimumScaleFactor(0.5)
                                 }
                             }
                             .padding(.trailing, 45)

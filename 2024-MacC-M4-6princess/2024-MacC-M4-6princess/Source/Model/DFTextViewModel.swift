@@ -148,7 +148,7 @@ class DFTextViewModel: ObservableObject {
                 style: style
             )
         )
-        renderer.scale = 10
+        renderer.scale = 9
         if let uiImage = renderer.uiImage {
             renderedImage = uiImage
             
