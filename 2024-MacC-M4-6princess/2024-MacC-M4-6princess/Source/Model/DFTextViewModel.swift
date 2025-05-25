@@ -68,10 +68,10 @@ class DFTextViewModel: ObservableObject {
         }
     }
     @MainActor
-    func captureTextView(from textView: UITextView)->UIImage?{
+    func captureTextView(from textView: UITextView){
         // 1) 텍스트 유효성 검사
         guard let attributedText = textView.attributedText, attributedText.length > 0 else {
-            return nil
+            return
         }
 
         // 2) textView의 inset과 padding 값 읽어오기 (원본 변경 금지)
@@ -108,7 +108,7 @@ class DFTextViewModel: ObservableObject {
         UIGraphicsBeginImageContextWithOptions(contentSize, false, 0.0)
         guard let context = UIGraphicsGetCurrentContext() else {
             UIGraphicsEndImageContext()
-            return nil
+            return
         }
 
         // 8) 투명 배경 초기화
@@ -135,7 +135,7 @@ class DFTextViewModel: ObservableObject {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         self.renderedImage = image
-        return image
+        
     }
 
     
@@ -148,7 +148,7 @@ class DFTextViewModel: ObservableObject {
                 style: style
             )
         )
-        renderer.scale = 9
+        renderer.scale = 10
         if let uiImage = renderer.uiImage {
             renderedImage = uiImage
             

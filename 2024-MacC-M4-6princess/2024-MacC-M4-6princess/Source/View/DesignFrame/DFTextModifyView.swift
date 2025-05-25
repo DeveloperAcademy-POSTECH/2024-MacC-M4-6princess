@@ -35,20 +35,15 @@ struct DFTextModifyView: View {
                                let textView = window.allSubviews
                                 .compactMap({ $0 as? UITextView })
                                 .first(where: { $0.isFirstResponder }) {
-                                viewModel.renderedImage=viewModel.captureTextView(from: textView)
-                              //                            modiViewModel.style.attributedString = viewModel.attributedTxt ?? NSAttributedString(string: "")
-                              //                            modiViewModel.style.txt =  viewModel.txt
-                              //                            modiViewModel.style.color = viewModel.selectedColor
-                              //                            modiViewModel.style.font = viewModel.selectedFont
-                              //                            modiViewModel.style.alignment = viewModel.textAlignment
-                              //
-                                                          modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
-                                                          //                        TextStyle(attributedString: viewModel.attributedTxt!, txt: viewModel.txt, font: viewModel.newSelectedFont, color: viewModel.fontColor, alignment: viewModel.textAlignment)
-                                                          /// 이미지와 메타데이터를 코어데이터에 저장
-                                                          imageToCoredata()
-                                                          
-                                                          /// 텍스트뷰를 닫음
-                                                          frameManager.showTextModifyView = false
+                                viewModel.captureTextView(from: textView)
+                                
+                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
+                                
+                                /// 이미지와 메타데이터를 코어데이터에 저장
+                                imageToCoredata()
+                                
+                                /// 텍스트뷰를 닫음
+                                frameManager.showTextModifyView = false
                             }
                             
                         }
