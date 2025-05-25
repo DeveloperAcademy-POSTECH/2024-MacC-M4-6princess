@@ -91,7 +91,7 @@ class DFTextViewModel: ObservableObject {
         )
 
         // 5) 원하는 추가 여백
-        let extraPadding: CGFloat = 5
+        let extraPadding: CGFloat = 0
 
         // 6) 최종 캔버스 크기
         let contentSize = CGSize(

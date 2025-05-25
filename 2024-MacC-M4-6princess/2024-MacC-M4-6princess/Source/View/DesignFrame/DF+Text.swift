@@ -28,7 +28,7 @@ extension DFTextView{
     var newFontSelector: some View {
         // 폰트 선택 ScrollView
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 7) {
                 
                 ForEach(NewFontStyle.allCases, id: \.self) { fontStyle in
                     Text(fontStyle.displayName) // 한글 이름 표시
@@ -36,6 +36,8 @@ extension DFTextView{
                         .padding(.horizontal,15)
                         .padding(.vertical,6)
                         .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
+                        .frame(maxWidth:UIScreen.main.bounds.width/3)
+                        .minimumScaleFactor(0.5)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정

@@ -53,20 +53,20 @@ struct IOView: View {
                 canvasView
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     .onAppear{
-                        viewModel.currentOrientation = motionManager.currentOrientation
+//                        viewModel.currentOrientation = motionManager.currentOrientation
                         viewModel.renderAndSaveViewImage(content: canvasView, motionManager: motionManager, orientation: viewModel.currentOrientation) // 사진을 그리면서 동시에 저장
                         motionManager.stopDeviceMotionUpdates()
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")
                     }
-                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-                        original.modifier(
-                            RotatedAndScaledEffect(
-                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-                                scale: 0.75  //하드코딩 수정필요
-                            )
-                        )
-                    }
+//                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
+//                        original.modifier(
+//                            RotatedAndScaledEffect(
+//                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
+//                                scale: 0.75  //하드코딩 수정필요
+//                            )
+//                        )
+//                    }
                     .scaledToFit()
                 
                 
@@ -138,7 +138,8 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                viewModel.showShareButton = true
+//                                viewModel.showShareButton = true
+                                viewModel.changeOverlay = true
                             }
                             ) {
                                 Image("share.icon")

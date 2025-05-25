@@ -38,11 +38,11 @@ class IOViewModel: ObservableObject {
             showAlert(message: "렌더링 실패: 다시 시도해주세요.\n에러가 반복될 시 캡쳐후 제보부탁드립니다.")
             return
         }
-        let rotatedImage = applyOrientationToImage(uiImage:uiImage,motionManager:motionManager)
-        self.compositeImage = rotatedImage
+//        let rotatedImage = applyOrientationToImage(uiImage:uiImage,motionManager:motionManager)
+        self.compositeImage = uiImage
         requestPhotoLibraryPermission { granted in
             if granted {
-                self.saveImageToAlbum(uiImage: rotatedImage)
+                self.saveImageToAlbum(uiImage: uiImage)
             }
             else{
                 self.showAlert(message: "사진 저장 권한이 필요합니다.\n 설정에서 권한 설정을 해주세요.")
@@ -57,19 +57,19 @@ class IOViewModel: ObservableObject {
                     .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
             )
             // 해상도
-            renderer.scale = UIScreen.main.scale + 1
+            renderer.scale = UIScreen.main.scale
             return renderer.uiImage
         }
-        /// 기기의 방향에 따른 이미지 회전을 재조정하여 .up 회전으로 모두 통일
-        func applyOrientationToImage(uiImage:UIImage,motionManager: MotionManager) -> UIImage {
-            
-            let orientation = motionManager.imageRotate()
-            if orientation == .up {return uiImage} // 정방형일 때 그대로 내보냄
-            guard let cgImage = uiImage.cgImage else { return uiImage } // cgImage로 변환 실패시 그대로 내보냄
-            
-            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
-            
-        }
+//        /// 기기의 방향에 따른 이미지 회전을 재조정하여 .up 회전으로 모두 통일
+//        func applyOrientationToImage(uiImage:UIImage,motionManager: MotionManager) -> UIImage {
+//            
+//            let orientation = motionManager.imageRotate()
+//            if orientation == .up {return uiImage} // 정방형일 때 그대로 내보냄
+//            guard let cgImage = uiImage.cgImage else { return uiImage } // cgImage로 변환 실패시 그대로 내보냄
+//            
+//            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
+//            
+//        }
         
         func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
             PHPhotoLibrary.requestAuthorization { status in

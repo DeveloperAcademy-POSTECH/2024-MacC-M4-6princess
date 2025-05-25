@@ -82,6 +82,7 @@ struct CameraTimerView: View {
                     Text(viewModel.delayTime == 0 ? "Off" : "\(Int(viewModel.delayTime))초")
                         .font(.system(size: 13))
                         .foregroundColor(.black)
+                        .minimumScaleFactor(0.5)
                 }
                 .padding(5)
             }

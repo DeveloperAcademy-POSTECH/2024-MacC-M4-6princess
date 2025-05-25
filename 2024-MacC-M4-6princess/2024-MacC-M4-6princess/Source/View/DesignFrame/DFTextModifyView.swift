@@ -35,6 +35,8 @@ struct DFTextModifyView: View {
                                let textView = window.allSubviews
                                 .compactMap({ $0 as? UITextView })
                                 .first(where: { $0.isFirstResponder }) {
+                                viewModel.captureTextView(from: textView)
+                                
                                 modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
                                 
                                 /// 이미지와 메타데이터를 코어데이터에 저장
@@ -68,29 +70,29 @@ struct DFTextModifyView: View {
             )
             .ignoresSafeArea(.keyboard)
             
-            VStack{
-                Spacer()
-                    .frame(height:UIScreen.main.bounds.height * 0.35)
-                HStack{
-                    Slider(value: $viewModel.fontSize, in: 10...40, step: 1)
-                        .frame(width: 150)                      // ① 회전 전에 “길이”를 가로 폭으로 지정
-                        .rotationEffect(.degrees(-90))          // ② 90도 회전
-                        .frame(width: 20)                       // ③ 회전 후 “두께”를 가로(=세로) 폭으로 지정
-                        .accentColor(.pointPink)
-                    
-                    Spacer()
-                }
-                Spacer()
-            }
+            //            VStack{
+            //                Spacer()
+            //                    .frame(height:UIScreen.main.bounds.height * 0.35)
+            //                HStack{
+            //                    Slider(value: $viewModel.fontSize, in: 10...40, step: 1)
+            //                        .frame(width: 150)                      // ① 회전 전에 “길이”를 가로 폭으로 지정
+            //                        .rotationEffect(.degrees(-90))          // ② 90도 회전
+            //                        .frame(width: 20)                       // ③ 회전 후 “두께”를 가로(=세로) 폭으로 지정
+            //                        .accentColor(.pointPink)
+            //
+            //                    Spacer()
+            //                }
+            //                Spacer()
+            //            }
         }
-            .onAppear {
-                viewModel.attributedTxt = modiViewModel.style.attributedString
-                viewModel.txt = modiViewModel.style.txt
-                viewModel.selectedColor = modiViewModel.style.color
-                viewModel.selectedFont = modiViewModel.style.font
-                viewModel.textAlignment = modiViewModel.style.alignment
-                isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
-            }
+        .onAppear {
+            viewModel.attributedTxt = modiViewModel.style.attributedString
+            viewModel.txt = modiViewModel.style.txt
+            viewModel.selectedColor = modiViewModel.style.color
+            viewModel.selectedFont = modiViewModel.style.font
+            viewModel.textAlignment = modiViewModel.style.alignment
+            isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
+        }
     }
     
 }

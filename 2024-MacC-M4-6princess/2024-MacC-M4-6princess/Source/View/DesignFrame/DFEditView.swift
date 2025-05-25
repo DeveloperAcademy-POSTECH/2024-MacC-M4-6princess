@@ -85,6 +85,8 @@ struct DFEditView: View {
                                     Text("미리보기")
                                         .font(.custom("pretendard-medium", size: 16))
                                         .foregroundStyle(viewModel.showPreview ? Color.gray03 : Color.gray02)
+                                        .frame(width: 65, height: 25)
+                                        .minimumScaleFactor(0.5)
                                 }
                             }
                             .padding(.trailing, 45)
@@ -404,7 +406,7 @@ private extension DFEditView {
                     Text("선택 추가")
                         .foregroundStyle(viewModel.selectionModeIndex == 0 ? Color(.pointPink) : Color(.white))
                         .font(.custom("Pretendard-medium", size: 13))
-                        .offset(y: 38)
+                        .offset(y: 42)
                 }
             }
             
