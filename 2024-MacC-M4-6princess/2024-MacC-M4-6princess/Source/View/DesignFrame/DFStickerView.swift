@@ -123,24 +123,26 @@ struct StickerImages {
 
         let humorStickers: [String]
         switch locale {
-//        case let id where id.hasPrefix("ko"):
-//            humorStickers = (1...39).map { String(format: "humor%02d", $0) }
         case let id where id.hasPrefix("ja"):
-            humorStickers = (1...10).map { String(format: "jahumor%02d", $0) }
-//        case let id where id.hasPrefix("zh-hans"): // 간체
-//            humorStickers = (1...25).map { String(format: "zhhumor%02d", $0) }
-//        case let id where id.hasPrefix("zh-hant"):
-//            humorStickers = (1...25).map { String(format: "zhhumor%02d", $0) }
+            humorStickers = (1...17).map { String(format: "ja_humor%02d", $0) }
+        case let id where id.hasPrefix("zh"):
+            humorStickers = (1...21).map { String(format: "zh_humor%02d", $0) }
+        default: // 영어 포함
+            humorStickers = (1...28).map { String(format: "humor%02d", $0) }
+        }
+        let fullStickers: [String]
+        switch locale {
+        case let id where id.hasPrefix("ja"):
+            fullStickers = (1...4).map { String(format: "ja_full%02d", $0) }
             
         default: // 영어 포함
-            humorStickers = (1...20).map { String(format: "humor%02d", $0) }
+            fullStickers = (1...5).map { String(format: "full%02d", $0) }
         }
-
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
             .humor: humorStickers,
             .character: (1...6).map { String(format: "character%02d", $0) },
-            .full: (1...5).map { String(format: "full%02d", $0) }
+            .full: fullStickers
         ]
     }
 

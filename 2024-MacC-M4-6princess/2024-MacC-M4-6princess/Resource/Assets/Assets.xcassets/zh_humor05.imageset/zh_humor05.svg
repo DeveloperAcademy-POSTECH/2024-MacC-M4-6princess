@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 449.59 746.8">
+  <defs>
+    <style>
+      .cls-1 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-2 {
+        clip-path: url(#clippath-3);
+      }
+
+      .cls-3 {
+        clip-path: url(#clippath-2);
+      }
+
+      .cls-4 {
+        fill: #8c4f22;
+      }
+
+      .cls-5 {
+        fill: #bc2e2e;
+      }
+
+      .cls-6 {
+        fill: #e53838;
+      }
+
+      .cls-7 {
+        fill: #fff;
+      }
+
+      .cls-8 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <circle class="cls-5" cx="288.92" cy="489.09" r="86.97"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <circle class="cls-5" cx="221.82" cy="367.49" r="86.97"/>
+    </clipPath>
+    <clipPath id="clippath-2">
+      <circle class="cls-5" cx="154.71" cy="245.9" r="86.97"/>
+    </clipPath>
+    <clipPath id="clippath-3">
+      <circle class="cls-5" cx="87.61" cy="124.3" r="86.97"/>
+    </clipPath>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <rect class="cls-4" x="330.15" y="360.24" width="18.31" height="409.41" transform="translate(-237.01 245.34) rotate(-30)"/>
+      <rect class="cls-4" x="101.13" y="-22.85" width="18.31" height="409.41" transform="translate(-76.15 79.5) rotate(-30)"/>
+      <g>
+        <circle class="cls-5" cx="288.92" cy="489.09" r="86.97"/>
+        <g class="cls-8">
+          <circle class="cls-6" cx="273.35" cy="471.32" r="90.69"/>
+        </g>
+      </g>
+      <rect class="cls-7" x="318.03" y="484.68" width="21.28" height="21.28"/>
+      <g>
+        <circle class="cls-5" cx="221.82" cy="367.49" r="86.97"/>
+        <g class="cls-1">
+          <circle class="cls-6" cx="206.25" cy="349.73" r="90.69"/>
+        </g>
+      </g>
+      <rect class="cls-7" x="250.93" y="363.09" width="21.28" height="21.28"/>
+      <g>
+        <circle class="cls-5" cx="154.71" cy="245.9" r="86.97"/>
+        <g class="cls-3">
+          <circle class="cls-6" cx="139.14" cy="228.13" r="90.69"/>
+        </g>
+      </g>
+      <rect class="cls-7" x="183.82" y="241.49" width="21.28" height="21.28"/>
+      <g>
+        <circle class="cls-5" cx="87.61" cy="124.3" r="86.97"/>
+        <g class="cls-2">
+          <circle class="cls-6" cx="72.04" cy="106.54" r="90.69"/>
+        </g>
+      </g>
+      <rect class="cls-7" x="116.72" y="119.9" width="21.28" height="21.28"/>
+    </g>
+  </g>
+</svg>
