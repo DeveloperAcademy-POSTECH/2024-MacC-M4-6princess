@@ -2000,6 +2000,7 @@
       }
     },
     "프레임이 선택되지 않았습니다. 프레임을 선택해주세요!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
