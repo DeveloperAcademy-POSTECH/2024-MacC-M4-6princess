@@ -17,6 +17,7 @@ struct CameraTopView: View {
             HStack() {
                 Spacer()
                 CameraTimerView(viewModel: viewModel, motionManager: motionManager)
+                    .padding(8)
                 Button {
                     viewModel.changeCamera()
                 } label: {
