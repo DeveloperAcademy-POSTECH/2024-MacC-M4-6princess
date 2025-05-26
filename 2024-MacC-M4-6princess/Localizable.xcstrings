@@ -1996,7 +1996,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "انتقل إلى الكاميرا"
+            "value" : "العودة إلى الكاميرا"
           }
         },
         "en" : {
@@ -2014,13 +2014,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "前往相机"
+            "value" : "返回相机"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "前往相機"
+            "value" : "回到相機"
           }
         }
       }

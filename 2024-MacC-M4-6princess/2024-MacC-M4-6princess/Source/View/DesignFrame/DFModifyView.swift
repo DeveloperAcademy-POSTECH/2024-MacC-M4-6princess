@@ -53,7 +53,7 @@ struct DFModifyView: View {
                         RoundedRectangle(cornerRadius: 30)
                             .fill(Color.white)
                             .opacity(viewModel.btnOpacity)
-                            .frame(width: 175, height: 38)
+                            .frame(width: 203, height: 38)
                             .overlay(Text("\(viewModel.saveStateText)").foregroundStyle(.black).font(.footnote).opacity(viewModel.btnOpacity))
                         if let selected = viewModel.selectedSubject,selected.isTapped,imageModel.imageList.count > 1{
                             newLayerIndicator

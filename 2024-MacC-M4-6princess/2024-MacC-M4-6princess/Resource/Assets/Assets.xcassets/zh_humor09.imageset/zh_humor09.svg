@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 501.3 561.33">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #659956;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7 {
+        stroke: #fff;
+      }
+
+      .cls-2, .cls-8 {
+        fill: #fff;
+      }
+
+      .cls-2, .cls-4 {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 12.71px;
+      }
+
+      .cls-9 {
+        fill: #ffcaca;
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-3, .cls-5, .cls-6, .cls-7 {
+        stroke-miterlimit: 10;
+        stroke-width: 9px;
+      }
+
+      .cls-4 {
+        fill: none;
+      }
+
+      .cls-10 {
+        fill: #282828;
+      }
+
+      .cls-5 {
+        fill: url(#linear-gradient-4);
+      }
+
+      .cls-6 {
+        fill: url(#linear-gradient-3);
+      }
+
+      .cls-7 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-11 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <circle class="cls-2" cx="374.43" cy="222.75" r="120.51"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="262.15" y1="45.37" x2="486.71" y2="45.37" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffc23b"/>
+      <stop offset="1" stop-color="#ff9f3b"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="5.75" x2="230.31" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="4.5" y1="324.48" x2="235.06" y2="324.48" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-4" x1="270.97" y1="458.55" x2="477.88" y2="458.55" xlink:href="#linear-gradient"/>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g>
+        <g>
+          <circle class="cls-8" cx="374.43" cy="222.75" r="120.51"/>
+          <g class="cls-11">
+            <path class="cls-1" d="M245.23,242.58s45.77-44.74,78.64-1.16c32.87,43.59,83.88,20.74,87.47-2.92,3.6-23.66,36.23-58.11,90.08-27.56,53.85,30.55,10.33-120.12,10.33-120.12l-166.82-31-76.32,35.91-56.57,58.19,33.18,88.66Z"/>
+            <circle class="cls-9" cx="291.57" cy="314.4" r="62.2"/>
+            <circle class="cls-9" cx="478.44" cy="285.08" r="62.2"/>
+          </g>
+          <circle class="cls-4" cx="374.43" cy="222.75" r="120.51"/>
+        </g>
+        <ellipse class="cls-10" cx="327.37" cy="240.56" rx="24.92" ry="24.96"/>
+        <ellipse class="cls-8" cx="316.88" cy="235.08" rx="7.5" ry="7.52"/>
+        <ellipse class="cls-8" cx="336.11" cy="252.53" rx="3.33" ry="3.33"/>
+        <ellipse class="cls-10" cx="420.78" cy="235.08" rx="24.92" ry="24.96"/>
+        <ellipse class="cls-8" cx="411.04" cy="231.79" rx="7.5" ry="7.52"/>
+        <ellipse class="cls-8" cx="430.27" cy="249.23" rx="3.33" ry="3.33"/>
+      </g>
+      <ellipse class="cls-3" cx="374.43" cy="45.37" rx="112.28" ry="40.87"/>
+      <ellipse class="cls-7" cx="118.03" cy="45.37" rx="112.28" ry="40.87"/>
+      <path class="cls-6" d="M192.9,253.53c-2.57-2.57-5.18-5.03-7.8-7.39-.48-.43-.53-1.15-.13-1.65,25.98-32.4,42.26-61.69,44.05-79.59,0-.1.03-.19.07-.29.8-1.97,1.22-3.99,1.22-6.04,0-22.57-50.27-40.87-112.28-40.87S5.75,136,5.75,158.57s50.27,40.87,112.28,40.87h.03c1.12,0,1.63,1.39.78,2.12-4.31,3.7-8.65,7.56-13.01,11.56-.1.09-.21.16-.34.21-2.43,1-4.59,2.38-6.4,4.19-.81.81-1.54,1.69-2.18,2.64-1.55,2.27-3.24,4.44-5.21,6.36-1.26,1.23-2.51,2.47-3.77,3.73C28,290.21-7.65,351.74,8.31,367.7c10.3,10.3,39.59-.9,75.19-26.26.83-.59,1.97.03,1.9,1.04-.71,11.33-1.09,23.14-1.09,35.28,0,84.77,18.3,153.5,40.87,153.5s40.87-68.72,40.87-153.5c0-13.76-.48-27.1-1.39-39.79-.07-.99,1.02-1.62,1.85-1.09,26.26,16.86,50.96,21.85,62.37,10.44,15.96-15.96-.16-57.96-36-93.8Z"/>
+      <rect class="cls-5" x="270.97" y="360.28" width="206.91" height="196.55" rx="33.24" ry="33.24"/>
+      <path class="cls-8" d="M401.5,431.48c70.98-1.21,70.98,55.35,0,54.15,1.21,70.98-55.35,70.98-54.15,0-70.98,1.21-70.98-55.35,0-54.15-1.21-70.98,55.35-70.98,54.15,0Z"/>
+    </g>
+  </g>
+</svg>

@@ -10,8 +10,9 @@ import UIKit
 enum NewFontStyle: String, CaseIterable {
     case modern    = "Pretendard-Medium"
     case light = "system-light"
-    case handwriting = "HakgyoansimGeurimilgiOTF-R" // 기본 핸드라이팅
     case bold      = "Pretendard-Bold"
+    case handwriting = "HakgyoansimGeurimilgiOTF-R" // 기본 핸드라이팅
+   
     
     
     /// 로컬라이즈된 이름 반환

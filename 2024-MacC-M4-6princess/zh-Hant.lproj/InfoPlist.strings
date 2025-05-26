@@ -1,0 +1,9 @@
+/*
+  Localizable_.strings
+  2024-MacC-M4-6princess
+
+  Created by piri kim on 5/26/25.
+  
+*/
+"NSPhotoLibraryUsageDescription" = "使用此應用程式需要存取相簿。";
+"NSCameraUsageDescription" = "使用此應用程式需要存取相機。";
