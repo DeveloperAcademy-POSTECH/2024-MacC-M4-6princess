@@ -126,7 +126,7 @@ struct StickerImages {
         case let id where id.hasPrefix("ja"):
             humorStickers = (1...17).map { String(format: "ja_humor%02d", $0) }
         case let id where id.hasPrefix("zh"):
-            humorStickers = (1...21).map { String(format: "zh_humor%02d", $0) }
+            humorStickers = (1...22).map { String(format: "zh_humor%02d", $0) }
         default: // 영어 포함
             humorStickers = (1...28).map { String(format: "humor%02d", $0) }
         }
@@ -134,6 +134,8 @@ struct StickerImages {
         switch locale {
         case let id where id.hasPrefix("ja"):
             fullStickers = (1...4).map { String(format: "ja_full%02d", $0) }
+        case let id where id.hasPrefix("zh"):
+            fullStickers = (1...3).map { String(format: "zh_full%02d", $0) }
             
         default: // 영어 포함
             fullStickers = (1...5).map { String(format: "full%02d", $0) }

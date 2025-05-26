@@ -1,0 +1,9 @@
+/*
+  Localizable_.strings
+  2024-MacC-M4-6princess
+
+  Created by piri kim on 5/26/25.
+  
+*/
+"NSPhotoLibraryUsageDescription" = "يتطلب هذا التطبيق إذن الوصول إلى مكتبة الصور.";
+"NSCameraUsageDescription" = "يتطلب هذا التطبيق إذن الوصول إلى الكاميرا.";

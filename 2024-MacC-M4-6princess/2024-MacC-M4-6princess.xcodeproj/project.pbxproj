@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4EA88E822DE49BF2009C920D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4EA88E802DE49BF2009C920D /* InfoPlist.strings */; };
 		4EB66FB72D8DE9650042B399 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */; };
 		898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F72CFD5F5800EA200A /* FirebaseAnalytics */; };
 		898B14FA2CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F92CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport */; };
@@ -34,6 +35,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4EA88E812DE49BF2009C920D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4EA88E832DE49C1E009C920D /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4EA88E842DE49C1F009C920D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		4EA88E852DE49C20009C920D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		4EA88E872DE49C28009C920D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4EA88E882DE49C29009C920D /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "2024-MacC-M4-6princess.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89A94ABF2CA9B66300824592 /* 2024-MacC-M4-6princessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "2024-MacC-M4-6princessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +96,7 @@
 		89A94AA62CA9B64C00824592 = {
 			isa = PBXGroup;
 			children = (
+				4EA88E802DE49BF2009C920D /* InfoPlist.strings */,
 				4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */,
 				89A94AB12CA9B64C00824592 /* 2024-MacC-M4-6princess */,
 				898B159A2CFD8CCD00EA200A /* Frameworks */,
@@ -237,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4EB66FB72D8DE9650042B399 /* Localizable.xcstrings in Resources */,
+				4EA88E822DE49BF2009C920D /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +301,22 @@
 			targetProxy = 89A94ACA2CA9B66300824592 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		4EA88E802DE49BF2009C920D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4EA88E812DE49BF2009C920D /* ko */,
+				4EA88E832DE49C1E009C920D /* ar */,
+				4EA88E842DE49C1F009C920D /* zh-Hans */,
+				4EA88E852DE49C20009C920D /* zh-Hant */,
+				4EA88E872DE49C28009C920D /* en */,
+				4EA88E882DE49C29009C920D /* ja */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		89A94AD12CA9B66300824592 /* Debug */ = {
@@ -430,8 +455,8 @@
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Frameet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSCameraUsageDescription = "$(CAMERA_USAGE_DESCRIPTION)";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "$(PHOTOLIB_USAGE_DESCRIPTION)";
+				INFOPLIST_KEY_NSCameraUsageDescription = "$(NSCameraUsageDescription)";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "$(NSPhotoLibraryUsageDescription)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -471,8 +496,8 @@
 				INFOPLIST_FILE = "-024-MacC-M4-6princess-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Frameet;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSCameraUsageDescription = "$(CAMERA_USAGE_DESCRIPTION)";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "$(PHOTOLIB_USAGE_DESCRIPTION)";
+				INFOPLIST_KEY_NSCameraUsageDescription = "$(NSCameraUsageDescription)";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "$(NSPhotoLibraryUsageDescription)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

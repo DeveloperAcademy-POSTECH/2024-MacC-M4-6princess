@@ -1,0 +1,9 @@
+/*
+  Localizable_.strings
+  2024-MacC-M4-6princess
+
+  Created by piri kim on 5/26/25.
+  
+*/
+"NSPhotoLibraryUsageDescription" = "앱을 사용하려면 앨범 접근 권한이 필요합니다.";
+"NSCameraUsageDescription" = "앱을 사용하려면 카메라 권한이 필요합니다.";

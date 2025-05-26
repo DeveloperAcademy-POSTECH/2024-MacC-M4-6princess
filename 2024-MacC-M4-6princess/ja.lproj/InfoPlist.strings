@@ -1,0 +1,9 @@
+/*
+  Localizable_.strings
+  2024-MacC-M4-6princess
+
+  Created by piri kim on 5/26/25.
+  
+*/
+"NSPhotoLibraryUsageDescription" = "このアプリを使用するには写真ライブラリへのアクセスが必要です。";
+"NSCameraUsageDescription" = "このアプリを使用するにはカメラへのアクセスが必要です。";
