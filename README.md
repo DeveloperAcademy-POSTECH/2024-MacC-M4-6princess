@@ -102,17 +102,40 @@
 
 ---
 -->
-
 ## 👩‍💻 팀원 소개
 
-| 이름   | 역할                      |
-|--------|---------------------------|
-| Skylar | PM |
-| Nana   | 디자인 |
-| Sora   | 디자인 |
-| Jane   | 개발|
-| Jamie  | 개발 |
-| Piri   | 개발 |
+<div align="left">
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/c0574fc9-1e62-45fb-9365-71f9918b20c5" width="88" alt="Skylar"/><br />
+      <b>Skylar</b><br />PM
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/93bc62d9-e95a-4153-92ed-84ff95547c4f" width="88" alt="Nana"/><br />
+      <b>Nana</b><br />디자이너
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/1f84d2c6-6fb3-427a-9a41-fe01006dfbe3" width="88" alt="Sora"/><br />
+      <b>Sora</b><br />디자이너
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/b0aa9cdd-d644-4633-ab1b-67b4e2565270" width="88" alt="Jane"/><br />
+      <b>Jane</b><br />iOS 개발
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/92ba2e86-79e2-4e29-b07e-09ba0346d585" width="88" alt="Jamie"/><br />
+      <b>Jamie</b><br />iOS 개발
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/4f096031-c7bf-4946-895e-e2cbe3c4085d" width="88" alt="Piri"/><br />
+      <b>Piri</b><br />iOS 개발
+    </td>
+  </tr>
+</table>
+
+</div>
 
 ---
 
