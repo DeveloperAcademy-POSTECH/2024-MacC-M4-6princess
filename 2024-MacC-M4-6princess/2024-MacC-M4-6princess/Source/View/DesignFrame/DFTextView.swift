@@ -56,7 +56,13 @@ struct DFTextView: View {
                 
             }
             HStack{
-                TextSizeSliderView(barSize: CGSize(width: 16, height: 200))
+                TextSizeSliderView(
+                              barSize: CGSize(width: 16, height: 200),
+                              minFontSize: 20,
+                              maxFontSize: 60,
+                              fontSize: $viewModel.fontSize
+                          )
+                
                     .padding(5)
                 Spacer()
             }
