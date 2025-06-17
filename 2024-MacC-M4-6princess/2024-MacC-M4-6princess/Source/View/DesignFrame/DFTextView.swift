@@ -17,7 +17,7 @@ struct DFTextView: View {
                     viewModel: viewModel,
                     displayScale: displayScale
                 )
-                .frame(width: UIScreen.main.bounds.width * 0.8, height: availableHeight * 0.5)
+                .frame(width: UIScreen.main.bounds.width * 0.9, height: availableHeight * 0.6)
                 .position(x: UIScreen.main.bounds.width / 2, y: availableHeight / 2)
                 .animation(.easeInOut, value: keyboardResponder.currentHeight)
                 .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
