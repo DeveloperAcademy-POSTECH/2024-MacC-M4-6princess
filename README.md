@@ -87,21 +87,15 @@
 → **디지털로 인증샷 제작이 가능한 방식 필요**
 -->
 ---
-<!--
-## 🖥️ UI/UX 스크린샷
 
-> 주요 흐름: 프레임 선택 → 사진 업로드 → 자동 배경 제거 → 꾸미기 → 촬영/저장
+## 🖥️ Main Flow
 
-| 프레임 선택 | 사진 선택 | 배경 제거 | 프레임 꾸미기 |
-|-------------|-----------|------------|----------------|
-| ![step1](./screenshots/frame-select.png) | ![step2](./screenshots/photo-select.png) | ![step3](./screenshots/remove-bg.png) | ![step4](./screenshots/edit-frame.png) |
+![6@3x](https://github.com/user-attachments/assets/d6c630f0-0046-469b-a142-fe4a75b3fa1d)
+![7@3x](https://github.com/user-attachments/assets/e146b30f-68a9-4ad0-afcd-944141869df3)
 
-| 촬영 화면 | 저장 화면 |
-|-----------|------------|
-| ![shoot](./screenshots/shoot.png) | ![save](./screenshots/save.png) |
 
 ---
--->
+
 ## 👩‍💻 Team 6공주 소개
 
 <div align="left">
