@@ -34,7 +34,7 @@ struct DFCustomTextView: UIViewRepresentable {
     // UIKit의 UITextView를 처음 생성하는 메서드 (SwiftUI에서 호출됨)
     func makeUIView(context: Context) -> UITextView {
         // UITextView 객체 생성 (텍스트를 입력하고 표시할 수 있는 UIKit 컴포넌트)
-        let textView = UITextView()
+        let textView = VerticallyCenteredTextView()
         // 키보드가 바로 올라오도록 설정
         DispatchQueue.main.async {
             textView.becomeFirstResponder()
@@ -71,6 +71,9 @@ struct DFCustomTextView: UIViewRepresentable {
         uiView.font = font // 폰트 설정
         uiView.textAlignment = NSTextAlignment(viewModel.textAlignment) // 텍스트 정렬
         uiView.textColor = UIColor(color: viewModel.selectedColor) // 텍스트 색상
+        
+        // 레이아웃 갱신을 강제
+        uiView.setNeedsLayout()
     }
     
     // Coordinator 객체 생성 (UITextView와 SwiftUI 간의 상호작용 관리)
@@ -78,6 +81,16 @@ struct DFCustomTextView: UIViewRepresentable {
         Coordinator(self)
     }
     
+    func centerVertically(_ textView: UITextView) {
+        let fittingSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+        let contentHeight = textView.sizeThatFits(fittingSize).height
+        let textViewHeight = textView.bounds.height
+
+        let topInset = max((textViewHeight - contentHeight) / 2, 0)
+        textView.contentInset.top = topInset
+        textView.contentInset.bottom = 0 // 아래 인셋은 보통 0으로
+    }
+
     // Coordinator 클래스: UITextView의 이벤트와 동작을 처리
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: DFCustomTextView // 부모 CustomTextView 참조
@@ -148,5 +161,33 @@ extension DFCustomTextView {
 extension UIView {
     var allSubviews: [UIView] {
         return subviews.flatMap { [$0] + $0.allSubviews }
+    }
+}
+class VerticallyCenteredTextView: UITextView {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // 편집 중일 때는 중앙 정렬 해제 (흔들림 방지)
+        guard !isFirstResponder else {
+            textContainerInset.top = 0
+            return
+        }
+        
+        // contentSize.height: 실제 텍스트 전체 높이
+        let contentHeight = contentSize.height
+        let containerHeight = bounds.height
+        
+        // 차이가 양수일 때만 중앙 정렬, 소수점 이하 버림 처리
+        let diff = containerHeight - contentHeight
+        let top = diff > 0
+            ? floor(diff / 2)
+            : 0
+        
+        textContainerInset = UIEdgeInsets(
+            top: top,
+            left: textContainerInset.left,
+            bottom: 0,
+            right: textContainerInset.right
+        )
     }
 }
