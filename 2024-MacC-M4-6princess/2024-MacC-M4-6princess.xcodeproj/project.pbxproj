@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E5AFD0A2E01EC2F00307D91 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5AFD092E01EC2F00307D91 /* FirebaseCrashlytics */; };
 		4EA88E822DE49BF2009C920D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4EA88E802DE49BF2009C920D /* InfoPlist.strings */; };
 		4EB66FB72D8DE9650042B399 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */; };
 		898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 898B14F72CFD5F5800EA200A /* FirebaseAnalytics */; };
@@ -63,6 +64,7 @@
 				89938ADD2D7EC5F800EAD63B /* GoogleMobileAds in Frameworks */,
 				89DC209F2D324E0D00C1BD4E /* FirebaseAppCheck in Frameworks */,
 				898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */,
+				4E5AFD0A2E01EC2F00307D91 /* FirebaseCrashlytics in Frameworks */,
 				898B159C2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 				89DC20A12D324E2D00C1BD4E /* FirebaseStorage in Frameworks */,
 				898B14FA2CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
@@ -140,6 +142,7 @@
 				89DC209E2D324E0D00C1BD4E /* FirebaseAppCheck */,
 				89DC20A02D324E2D00C1BD4E /* FirebaseStorage */,
 				89938ADC2D7EC5F800EAD63B /* GoogleMobileAds */,
+				4E5AFD092E01EC2F00307D91 /* FirebaseCrashlytics */,
 			);
 			productName = "2024-MacC-M4-6princess";
 			productReference = 89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */;
@@ -674,6 +677,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4E5AFD092E01EC2F00307D91 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
 		898B14F72CFD5F5800EA200A /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

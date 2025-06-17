@@ -14,16 +14,23 @@ struct IOBottomBannerAdMob: UIViewRepresentable {
     init(_ adSize: AdSize) {
         self.adSize = adSize
     }
-    
     func makeUIView(context: Context) -> UIView {
-        // Wrap the GADBannerView in a UIView. GADBannerView automatically reloads a new ad when its
-        // frame size changes; wrapping in a UIView container insulates the GADBannerView from size
-        // changes that impact the view returned from makeUIView.
-        let view = UIView()
-        view.addSubview(context.coordinator.bannerView)
-        return view
+        let container = UIView()
+        let banner = context.coordinator.bannerView
+        banner.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(banner)
+
+        // 명확한 위치와 크기 지정
+        NSLayoutConstraint.activate([
+            banner.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            banner.topAnchor.constraint(equalTo: container.topAnchor),
+            banner.widthAnchor.constraint(equalToConstant: adSize.size.width),
+            banner.heightAnchor.constraint(equalToConstant: adSize.size.height)
+        ])
+
+        return container
     }
-    
+
     func updateUIView(_ uiView: UIView, context: Context) {
         context.coordinator.bannerView.adSize = adSize
     }
