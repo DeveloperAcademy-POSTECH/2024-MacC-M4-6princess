@@ -90,8 +90,9 @@
 
 ## 🖥️ Main Flow
 
-![6@3x](https://github.com/user-attachments/assets/d6c630f0-0046-469b-a142-fe4a75b3fa1d)
-![7@3x](https://github.com/user-attachments/assets/e146b30f-68a9-4ad0-afcd-944141869df3)
+
+![6@3x](https://github.com/user-attachments/assets/dcdcfea3-af1e-405b-89cc-a639d2b439c4)
+![7@3x](https://github.com/user-attachments/assets/c2260de3-148b-4bb5-ba7b-f4d98730de76)
 
 
 
@@ -103,29 +104,42 @@
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/c0574fc9-1e62-45fb-9365-71f9918b20c5" width="88" alt="Skylar"/><br />
+        <a href="https://www.linkedin.com/in/minkimskylar">
+      <img src="https://github.com/user-attachments/assets/74fe407c-0935-4a59-93a0-1e29c7191357" width="88" alt="Skylar"/>
+        </a><br />
       <b>Skylar</b><br />PM
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/93bc62d9-e95a-4153-92ed-84ff95547c4f" width="88" alt="Nana"/><br />
+        <a href="https://www.linkedin.com/in/yurimbae">
+      <img src="https://github.com/user-attachments/assets/dc398567-eb9b-4c41-94b0-8f6b5e0b7baa" width="88" alt="Nana"/>
+        </a><br />
       <b>Nana</b><br />디자이너
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/1f84d2c6-6fb3-427a-9a41-fe01006dfbe3" width="88" alt="Sora"/><br />
+        <a href="https://www.linkedin.com/in/yejin-kang-a8b534209/">
+      <img src="https://github.com/user-attachments/assets/fbb17175-f3a2-4d65-b840-6f97ad00f943" width="88" alt="Sora"/>
+        </a><br />
       <b>Sora</b><br />디자이너
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/b0aa9cdd-d644-4633-ab1b-67b4e2565270" width="88" alt="Jane"/><br />
+        <a href="https://github.com/darongzzang">
+      <img src="https://github.com/user-attachments/assets/63184230-f325-44f7-ab22-50e03b9491a6" width="88" alt="Jane"/>
+        </a><br />
       <b>Jane</b><br />iOS 개발
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/92ba2e86-79e2-4e29-b07e-09ba0346d585" width="88" alt="Jamie"/><br />
+        <a href="https://github.com/TakeMos">
+      <img src="https://github.com/user-attachments/assets/8343aaed-cbec-450f-b0b1-6a50814e5800" width="88" alt="Jamie"/>
+        </a><br />
       <b>Jamie</b><br />iOS 개발
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/4f096031-c7bf-4946-895e-e2cbe3c4085d" width="88" alt="Piri"/><br />
-      <b>Piri</b><br />iOS 개발
-    </td>
+  <a href="https://github.com/piriram">
+    <img src="https://github.com/user-attachments/assets/84f13066-2163-4d6b-acfa-73ce79c9d1d4" width="88" alt="Piri"/>
+  </a><br />
+  <b>Piri</b><br />iOS 개발
+</td>
+
   </tr>
 </table>
 
@@ -138,3 +152,8 @@
 1. 앱으로 돈벌기! 
 2. 사용자 인터뷰와 테스트를 가능한 자주, 깊이있게 진행하기!
 3. 아카데미 이후로도 지속적으로 유지·관리하기!
+
+## ⬇ 프레임밋 실행
+[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/kr/app/frameet-%ED%94%84%EB%A0%88%EC%9E%84%EB%B0%8B/id6737822930)
+
+
