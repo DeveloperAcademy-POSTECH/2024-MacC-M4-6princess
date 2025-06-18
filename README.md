@@ -104,7 +104,7 @@
 <table>
   <tr>
     <td align="center">
-        <a href="https://github.com/Skylar0817">
+        <a href="https://www.linkedin.com/in/minkimskylar">
       <img src="https://github.com/user-attachments/assets/74fe407c-0935-4a59-93a0-1e29c7191357" width="88" alt="Skylar"/>
         </a><br />
       <b>Skylar</b><br />PM
@@ -116,7 +116,7 @@
       <b>Nana</b><br />디자이너
     </td>
     <td align="center">
-        <a href="https://github.com/yejinkang1025">
+        <a href="https://www.linkedin.com/in/yejin-kang-a8b534209/">
       <img src="https://github.com/user-attachments/assets/fbb17175-f3a2-4d65-b840-6f97ad00f943" width="88" alt="Sora"/>
         </a><br />
       <b>Sora</b><br />디자이너
