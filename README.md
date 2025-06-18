@@ -90,8 +90,9 @@
 
 ## 🖥️ Main Flow
 
-![6@3x](https://github.com/user-attachments/assets/d6c630f0-0046-469b-a142-fe4a75b3fa1d)
-![7@3x](https://github.com/user-attachments/assets/e146b30f-68a9-4ad0-afcd-944141869df3)
+
+![6@3x](https://github.com/user-attachments/assets/dcdcfea3-af1e-405b-89cc-a639d2b439c4)
+![7@3x](https://github.com/user-attachments/assets/c2260de3-148b-4bb5-ba7b-f4d98730de76)
 
 
 
@@ -103,27 +104,27 @@
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/c0574fc9-1e62-45fb-9365-71f9918b20c5" width="88" alt="Skylar"/><br />
+      <img src="https://github.com/user-attachments/assets/74fe407c-0935-4a59-93a0-1e29c7191357" width="88" alt="Skylar"/><br />
       <b>Skylar</b><br />PM
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/93bc62d9-e95a-4153-92ed-84ff95547c4f" width="88" alt="Nana"/><br />
+      <img src="https://github.com/user-attachments/assets/dc398567-eb9b-4c41-94b0-8f6b5e0b7baa" width="88" alt="Nana"/><br />
       <b>Nana</b><br />디자이너
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/1f84d2c6-6fb3-427a-9a41-fe01006dfbe3" width="88" alt="Sora"/><br />
+      <img src="https://github.com/user-attachments/assets/fbb17175-f3a2-4d65-b840-6f97ad00f943" width="88" alt="Sora"/><br />
       <b>Sora</b><br />디자이너
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/b0aa9cdd-d644-4633-ab1b-67b4e2565270" width="88" alt="Jane"/><br />
+      <img src="https://github.com/user-attachments/assets/63184230-f325-44f7-ab22-50e03b9491a6" width="88" alt="Jane"/><br />
       <b>Jane</b><br />iOS 개발
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/92ba2e86-79e2-4e29-b07e-09ba0346d585" width="88" alt="Jamie"/><br />
+      <img src="https://github.com/user-attachments/assets/8343aaed-cbec-450f-b0b1-6a50814e5800" width="88" alt="Jamie"/><br />
       <b>Jamie</b><br />iOS 개발
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/4f096031-c7bf-4946-895e-e2cbe3c4085d" width="88" alt="Piri"/><br />
+      <img src="https://github.com/user-attachments/assets/84f13066-2163-4d6b-acfa-73ce79c9d1d4" width="88" alt="Piri"/><br />
       <b>Piri</b><br />iOS 개발
     </td>
   </tr>
