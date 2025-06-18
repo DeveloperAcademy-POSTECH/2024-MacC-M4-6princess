@@ -152,3 +152,8 @@
 1. 앱으로 돈벌기! 
 2. 사용자 인터뷰와 테스트를 가능한 자주, 깊이있게 진행하기!
 3. 아카데미 이후로도 지속적으로 유지·관리하기!
+
+## ⬇ 프레임밋 실행
+[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/kr/app/frameet-%ED%94%84%EB%A0%88%EC%9E%84%EB%B0%8B/id6737822930)
+
+
