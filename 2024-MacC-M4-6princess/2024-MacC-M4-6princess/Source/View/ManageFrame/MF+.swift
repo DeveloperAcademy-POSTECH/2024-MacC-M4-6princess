@@ -49,7 +49,7 @@ extension MFView {
                     newImage.maskImage = UIImage(data: mask)
                 } else if let text = subject.text, let originText = subject.originalText {
                     newImage.text = UIImage(data: text)
-                    newImage.textStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: originText, font: .modern, color: ColorPreset.colorPallete[0], alignment: .center)
+                    newImage.textStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: originText, font: .modern, color: ColorPreset.colorPallete[0], alignment: .center, fontSize: 20)
                 } else if let sticker = subject.sticker {
                     newImage.sticker = UIImage(data: sticker)
                 }
