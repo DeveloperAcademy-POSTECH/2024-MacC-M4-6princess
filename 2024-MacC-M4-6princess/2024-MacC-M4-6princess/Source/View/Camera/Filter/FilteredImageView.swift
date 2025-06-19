@@ -26,7 +26,7 @@ struct FilteredImageView: View {
                     refreshID = UUID()
                 }
             }
-            .frame(height: 124)
+//            .frame(height: 124)
             .onAppear {
                 DispatchQueue.global(qos: .userInitiated).async {
                     viewModel.cameraManager.session.startRunning()
