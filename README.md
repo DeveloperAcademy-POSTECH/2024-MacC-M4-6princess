@@ -91,8 +91,8 @@
 ## 🖥️ Main Flow
 
 
-![6@3x](https://github.com/user-attachments/assets/dcdcfea3-af1e-405b-89cc-a639d2b439c4)
-![7@3x](https://github.com/user-attachments/assets/c2260de3-148b-4bb5-ba7b-f4d98730de76)
+![6@3x](images/screenshot1.png)
+![7@3x](./images/screenshot2.png)
 
 
 
@@ -105,37 +105,37 @@
   <tr>
     <td align="center">
         <a href="https://www.linkedin.com/in/minkimskylar">
-      <img src="https://github.com/user-attachments/assets/74fe407c-0935-4a59-93a0-1e29c7191357" width="88" alt="Skylar"/>
+      <img src="/images/skyla.png" width="88" alt="Skylar"/>
         </a><br />
       <b>Skylar</b><br />PM
     </td>
     <td align="center">
         <a href="https://www.linkedin.com/in/yurimbae">
-      <img src="https://github.com/user-attachments/assets/dc398567-eb9b-4c41-94b0-8f6b5e0b7baa" width="88" alt="Nana"/>
+      <img src="/images/nana.png" width="88" alt="Nana"/>
         </a><br />
       <b>Nana</b><br />디자이너
     </td>
     <td align="center">
         <a href="https://www.linkedin.com/in/yejin-kang-a8b534209/">
-      <img src="https://github.com/user-attachments/assets/fbb17175-f3a2-4d65-b840-6f97ad00f943" width="88" alt="Sora"/>
+      <img src="/images/sora.png" width="88" alt="Sora"/>
         </a><br />
       <b>Sora</b><br />디자이너
     </td>
     <td align="center">
         <a href="https://github.com/darongzzang">
-      <img src="https://github.com/user-attachments/assets/63184230-f325-44f7-ab22-50e03b9491a6" width="88" alt="Jane"/>
+      <img src="/images/jane.png" width="88" alt="Jane"/>
         </a><br />
       <b>Jane</b><br />iOS 개발
     </td>
     <td align="center">
         <a href="https://github.com/TakeMos">
-      <img src="https://github.com/user-attachments/assets/8343aaed-cbec-450f-b0b1-6a50814e5800" width="88" alt="Jamie"/>
+      <img src="/images/jamie.png" width="88" alt="Jamie"/>
         </a><br />
       <b>Jamie</b><br />iOS 개발
     </td>
     <td align="center">
   <a href="https://github.com/piriram">
-    <img src="https://github.com/user-attachments/assets/84f13066-2163-4d6b-acfa-73ce79c9d1d4" width="88" alt="Piri"/>
+    <img src="/images/piri.png" width="88" alt="Piri"/>
   </a><br />
   <b>Piri</b><br />iOS 개발
 </td>
