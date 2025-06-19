@@ -37,7 +37,7 @@ struct DFTextModifyView: View {
                                 .first(where: { $0.isFirstResponder }) {
                                 viewModel.captureTextView(from: textView)
                                 
-                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
+                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment, fontSize: viewModel.fontSize)
                                 
                                 /// 이미지와 메타데이터를 코어데이터에 저장
                                 imageToCoredata()
@@ -61,36 +61,35 @@ struct DFTextModifyView: View {
                     textTabBar
                         .padding(.horizontal,10)
                 }
-                .padding(.bottom, keyboardResponder.currentHeight == 0 ? 20 : keyboardResponder.currentHeight+5)
+                
             }
-            .animation(.easeOut(duration: 0.3), value: keyboardResponder.currentHeight)
-            .keyboardHeight($viewModel.keyboardHeight)
-            .background(
-                Color.black.opacity(0.5) // 반투명 검정색
-            )
-            .ignoresSafeArea(.keyboard)
+            HStack{
+                TextSizeSliderView(
+                    barSize: CGSize(width: 16, height: 200),
+                    minFontSize: 20,
+                    maxFontSize: 60,
+                    fontSize: $viewModel.fontSize
+                )
+                
+                .padding(5)
+                Spacer()
+            }
             
-            //            VStack{
-            //                Spacer()
-            //                    .frame(height:UIScreen.main.bounds.height * 0.35)
-            //                HStack{
-            //                    Slider(value: $viewModel.fontSize, in: 10...40, step: 1)
-            //                        .frame(width: 150)                      // ① 회전 전에 “길이”를 가로 폭으로 지정
-            //                        .rotationEffect(.degrees(-90))          // ② 90도 회전
-            //                        .frame(width: 20)                       // ③ 회전 후 “두께”를 가로(=세로) 폭으로 지정
-            //                        .accentColor(.pointPink)
-            //
-            //                    Spacer()
-            //                }
-            //                Spacer()
-            //            }
         }
+        .padding(.bottom, keyboardResponder.currentHeight == 0 ? 20 : keyboardResponder.currentHeight+5)
+        .animation(.easeOut(duration: 0.3), value: keyboardResponder.currentHeight)
+        .keyboardHeight($viewModel.keyboardHeight)
+        .background(
+            Color.black.opacity(0.5) // 반투명 검정색
+        )
+        .ignoresSafeArea(.keyboard)
         .onAppear {
             viewModel.attributedTxt = modiViewModel.style.attributedString
             viewModel.txt = modiViewModel.style.txt
             viewModel.selectedColor = modiViewModel.style.color
             viewModel.selectedFont = modiViewModel.style.font
             viewModel.textAlignment = modiViewModel.style.alignment
+            viewModel.fontSize = modiViewModel.style.fontSize
             isKeyboardVisible = true // 뷰가 나타날 때 키보드 열기
         }
     }

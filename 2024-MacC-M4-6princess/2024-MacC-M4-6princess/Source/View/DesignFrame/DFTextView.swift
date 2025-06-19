@@ -32,7 +32,7 @@ struct DFTextView: View {
                                 /// 이미지와 메타데이터를 코어데이터에 저장
                                 imageToCoredata()
                                 
-                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
+                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment, fontSize: viewModel.fontSize)
                                 
                                 /// 텍스트뷰를 닫음
                                 modiViewModel.showTextView = false
@@ -57,13 +57,13 @@ struct DFTextView: View {
             }
             HStack{
                 TextSizeSliderView(
-                              barSize: CGSize(width: 16, height: 200),
-                              minFontSize: 20,
-                              maxFontSize: 60,
-                              fontSize: $viewModel.fontSize
-                          )
+                    barSize: CGSize(width: 16, height: 200),
+                    minFontSize: 5,
+                    maxFontSize: 50,
+                    fontSize: $viewModel.fontSize
+                )
                 
-                    .padding(5)
+                .padding(5)
                 Spacer()
             }
         }

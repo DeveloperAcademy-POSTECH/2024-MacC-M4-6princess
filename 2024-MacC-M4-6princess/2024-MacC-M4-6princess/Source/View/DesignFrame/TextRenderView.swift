@@ -30,4 +30,5 @@ struct TextStyle {
     var font: NewFontStyle
     var color: Color
     var alignment: TextAlignment
+    var fontSize: CGFloat
 }

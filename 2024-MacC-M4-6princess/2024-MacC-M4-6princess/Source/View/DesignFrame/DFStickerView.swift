@@ -52,7 +52,7 @@ struct DFStickerView: View {
                         
                         Spacer()
                     }
-                    .frame(width:UIScreen.main.bounds.width/5)
+//                    .frame(width:UIScreen.main.bounds.width/5)
                     
                 }
                 
@@ -105,15 +105,16 @@ struct DFStickerView: View {
                 }
                 .padding(.horizontal,20)
             }
+            .frame(width:UIScreen.main.bounds.width)
         }
     }
 }
 
 enum StickerTab: String, CaseIterable {
-    case bubble, humor, character, full
+    case bubble, humor, character,y2k, full
     
     var displayName: String {
-        NSLocalizedString("stickerTab.\(self.rawValue)", comment: "")
+        NSLocalizedString("\(self.rawValue)", comment: "\(self.rawValue)")
     }
 }
 
@@ -138,13 +139,14 @@ struct StickerImages {
             fullStickers = (1...3).map { String(format: "zh_full%02d", $0) }
             
         default: // 영어 포함
-            fullStickers = (1...5).map { String(format: "full%02d", $0) }
+            fullStickers = (1...10).map { String(format: "full%02d", $0) }
         }
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
             .humor: humorStickers,
             .character: (1...6).map { String(format: "character%02d", $0) },
-            .full: fullStickers
+            .full: fullStickers,
+            .y2k : (1...6).map { String(format: "hype%02d", $0) },
         ]
     }
 

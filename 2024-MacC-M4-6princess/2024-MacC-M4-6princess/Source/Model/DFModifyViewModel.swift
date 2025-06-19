@@ -49,7 +49,7 @@ class DFModifyViewModel: ObservableObject {
     /// 스티커 변수
     var selectedStickerTab = StickerTab.bubble
     
-    @Published var style:TextStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: "", font: .modern, color: ColorPreset.colorPallete[0], alignment: .center )
+    @Published var style:TextStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: "", font: .modern, color: ColorPreset.colorPallete[0], alignment: .center, fontSize: 20 )
     
     func backgroundGesture() -> some Gesture {
         

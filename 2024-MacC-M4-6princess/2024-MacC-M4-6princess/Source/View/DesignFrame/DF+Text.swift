@@ -143,7 +143,7 @@ extension DFTextView{
             newImage.text = image
             newImage.originalImage = image
             if let att = viewModel.attributedTxt{
-                newImage.textStyle = TextStyle(attributedString: att, txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment)
+                newImage.textStyle = TextStyle(attributedString: att, txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment, fontSize: viewModel.fontSize)
             }
             else{
                 
