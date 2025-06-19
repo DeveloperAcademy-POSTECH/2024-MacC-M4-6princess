@@ -22,14 +22,16 @@ struct CameraBottomView: View {
         FilteredImageView(viewModel: viewModel)
             .environmentObject(frameManager)
             .environmentObject(imageModel)
+            .frame(height: 111)
     }
     
     var body: some View {
         
         if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0 {
             VStack{
-                Spacer()
-                ZStack {
+//                Spacer()
+//                Spacer()
+                ZStack(alignment: .center) {
                     filteredImageView
                     HStack {
                         //새 프레임 만들기 버튼
@@ -54,16 +56,19 @@ struct CameraBottomView: View {
                             }
                         }
                         .padding(.leading, 20)
-                        .frame(width: 80, height: 80)
+                        .frame(width: 70, height: 70)
                         .background(.white)
                         
                         Spacer()
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
+                .padding(.top, 20)
+//                .padding(.bottom, 24)
+                .frame(height: 111)
                 
-                Spacer()
             }
-            .frame(width: UIScreen.main.bounds.width, height: 132)
+            .frame(width: UIScreen.main.bounds.width, height: 111)
             .background(.white)
         }
         else {
