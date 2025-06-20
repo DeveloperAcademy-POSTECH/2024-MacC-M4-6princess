@@ -13,26 +13,12 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     
-    
-    /// 구버전 레이어 관련한 것으로 조만간 파일로 정리한 뒤 삭제할 예정입니다.
-    //    @State var isDragging: Bool = false
-    //    @State var selectedLayerIndex: Int?
-    //    @State var isLongPressed: Bool = false
-    //    @State var beforeDragOffsetY: CGFloat = .zero
-    
     var body: some View {
         
         ZStack {
-            //            if isFirstLaunching == true && !viewModel.showAgain == true {
-            //                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
-            //                    .zIndex(1)
-            //            }
             
             Color.clear
                 .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
-            //                .onTapGesture {
-            //                    isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
-            //                }
             
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 let extractedExpr: VStack<TupleView<(some View, some View)>> = VStack {
@@ -157,8 +143,6 @@ struct DFModifyView: View {
                                 viewModel.selectedIndex = index
                                 viewModel.selectedSubject = subject
                             }
-                        //                            .gesture(combinedGesture(subject: subject))
-                        //                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.sticker {
                     ZStack {
@@ -166,24 +150,6 @@ struct DFModifyView: View {
                             width: image.size.width / viewModel.scaleCompute(image),
                             height: image.size.height / viewModel.scaleCompute(image)
                         )
-                        //                        var size: CGSize {
-                        //                            if subject.isFullSticker{
-                        //                                return CGSize(width: image.size.width / viewModel.scaleCompute(image), height: image.size.height / viewModel.scaleCompute(image))
-                        //                            }
-                        //                            else if image.size.height > image.size.width {
-                        //                                return CGSize(
-                        //                                    width: UIScreen.main.bounds.height / 3 * (image.size.width / image.size.height),
-                        //                                    height: UIScreen.main.bounds.height / 3
-                        //                                )
-                        //                            } else {
-                        //                                return CGSize(
-                        //                                    width: UIScreen.main.bounds.width / 2,
-                        //                                    height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
-                        //                                )
-                        //                            }
-                        //                        }
-                        
-                        
                         
                         DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
@@ -205,8 +171,6 @@ struct DFModifyView: View {
                                 viewModel.selectedIndex = index
                                 viewModel.selectedSubject = subject
                             }
-                        //                            .gesture(combinedGesture(subject: subject))
-                        //                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.text {
                     ZStack {
@@ -237,8 +201,6 @@ struct DFModifyView: View {
                                 viewModel.selectedIndex = index
                                 viewModel.selectedSubject = subject
                             }
-                        //                            .gesture(combinedGesture(subject: subject))
-                        //                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }
             }

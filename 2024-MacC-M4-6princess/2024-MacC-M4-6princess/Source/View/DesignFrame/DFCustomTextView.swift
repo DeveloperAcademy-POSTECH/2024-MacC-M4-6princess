@@ -85,12 +85,12 @@ struct DFCustomTextView: UIViewRepresentable {
         let fittingSize = CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
         let contentHeight = textView.sizeThatFits(fittingSize).height
         let textViewHeight = textView.bounds.height
-
+        
         let topInset = max((textViewHeight - contentHeight) / 2, 0)
         textView.contentInset.top = topInset
         textView.contentInset.bottom = 0 // 아래 인셋은 보통 0으로
     }
-
+    
     // Coordinator 클래스: UITextView의 이벤트와 동작을 처리
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: DFCustomTextView // 부모 CustomTextView 참조
@@ -132,7 +132,7 @@ struct DFCustomTextView: UIViewRepresentable {
             }
         }
         
-      
+        
         // 메모리 해제 시 알림 제거
         deinit {
             NotificationCenter.default.removeObserver(self)
@@ -154,7 +154,7 @@ extension DFCustomTextView {
             .compactMap { $0 as? UITextView }
             .first(where: { $0.isFirstResponder })
     }
-
+    
 }
 
 // UIView 확장: 모든 하위 뷰를 재귀적으로 가져오기
@@ -180,8 +180,8 @@ class VerticallyCenteredTextView: UITextView {
         // 차이가 양수일 때만 중앙 정렬, 소수점 이하 버림 처리
         let diff = containerHeight - contentHeight
         let top = diff > 0
-            ? floor(diff / 2)
-            : 0
+        ? floor(diff / 2)
+        : 0
         
         textContainerInset = UIEdgeInsets(
             top: top,

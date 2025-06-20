@@ -327,6 +327,7 @@ class DFModifyViewModel: ObservableObject {
     }
     
     
+    
     //    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
     //
     //        let newImage = StoreImages(context: context)
