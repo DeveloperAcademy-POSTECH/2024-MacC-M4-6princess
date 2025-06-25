@@ -11,6 +11,7 @@ struct DFEditView: View {
     //    @Binding var pickedImage: UIImage?
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
+    @StateObject var modiViewModel: DFModifyViewModel = DFModifyViewModel()
     
     var body: some View {
         ZStack {
@@ -71,12 +72,12 @@ struct DFEditView: View {
                                 viewModel.showPreview.toggle()
                                 viewModel.createResult { success in
                                     if success {
-
+                                        
                                     } else {
                                         viewModel.isRenderFailed = true
                                     }
                                 }
-
+                                
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 4)
@@ -91,7 +92,7 @@ struct DFEditView: View {
                             }
                             .padding(.trailing, 45)
                             .padding(.bottom, 2)
-
+                            
                         }
                         
                         thicknessControl
@@ -156,9 +157,9 @@ struct DFEditView: View {
         //            DFFrameModifyView()
         //        })
         .navigationBarBackButtonHidden()
-//        .toolbar {
-//            toolBarButtons
-//        }
+        //        .toolbar {
+        //            toolBarButtons
+        //        }
         .simultaneousGesture(moveImage)
         .simultaneousGesture(magnification)
     }
@@ -243,12 +244,12 @@ private extension DFEditView {
                     .offset(viewModel.draggedOffSet)
                 
                 
-//                canvas
-//                    .offset(y: -10)
-//                    .opacity(viewModel.showPreview ? 0 : 1)
-//                    .frame(width: image.size.width / scale, height: image.size.height / scale)
-//                    .scaleEffect(viewModel.magnifyScale)
-//                    .offset(viewModel.draggedOffSet)
+                //                canvas
+                //                    .offset(y: -10)
+                //                    .opacity(viewModel.showPreview ? 0 : 1)
+                //                    .frame(width: image.size.width / scale, height: image.size.height / scale)
+                //                    .scaleEffect(viewModel.magnifyScale)
+                //                    .offset(viewModel.draggedOffSet)
             }
             
         }
@@ -277,7 +278,7 @@ private extension DFEditView {
             }
             .accentColor(.pointPink)
             .frame(width: UIScreen.main.bounds.width / 1.2, height: 22)
-//            .padding([.leading, .trailing, .top, .bottom], 10)
+            //            .padding([.leading, .trailing, .top, .bottom], 10)
         }
         .onAppear() {
             print(UIScreen.main.bounds.width)
@@ -355,7 +356,9 @@ private extension DFEditView {
                                     newImage.image = image
                                     newImage.originalImage = frameManager.pickedImage
                                     newImage.maskImage = viewModel.maskImage
+                                    modiViewModel.history.push(imageModel.imageList)
                                     imageModel.imageList.append(newImage)
+                                    modiViewModel.history.push(imageModel.imageList)
                                 }
                                 naviManager.push(screen: Screen.modifyFrame)
                                 viewModel.isRenderFailed = false
@@ -480,6 +483,7 @@ private extension DFEditView {
     private func makeHistory() {
         
         if viewModel.maskImageList.count == 0 {
+            
             viewModel.maskImageList.append(viewModel.maskImage)
         }
         
@@ -490,7 +494,7 @@ private extension DFEditView {
         
         viewModel.appendMaskImage(render.uiImage)
     }
-        
+    
     private func thumbImageCustom() {
         let render = ImageRenderer(content: Circle().frame(width: 16, height: 16).foregroundStyle(.white))
         render.scale = UIScreen.main.scale

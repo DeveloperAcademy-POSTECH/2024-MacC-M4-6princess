@@ -2,7 +2,8 @@ import SwiftUI
 
 struct DFTextView: View {
     @ObservedObject var modiViewModel: DFModifyViewModel
-    @ObservedObject var viewModel = DFTextViewModel()
+    @ObservedObject var textViewModel = DFTextViewModel()
+    @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @EnvironmentObject var imageModel: ImageListModel
     @FocusState var isKeyboardVisible: Bool
     @Environment(\.displayScale) var displayScale
@@ -14,13 +15,13 @@ struct DFTextView: View {
             VStack {
                 Spacer()
                 DFCustomTextView(
-                    viewModel: viewModel,
+                    viewModel: textViewModel,
                     displayScale: displayScale
                 )
                 .frame(width: UIScreen.main.bounds.width * 0.9, height: availableHeight * 0.6)
                 .position(x: UIScreen.main.bounds.width / 2, y: availableHeight / 2)
                 .animation(.easeInOut, value: keyboardResponder.currentHeight)
-                .gesture(viewModel.tab == 2 ? swipeAlignmentGesture : nil)
+                .gesture(textViewModel.tab == 2 ? swipeAlignmentGesture : nil)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("완료") {
@@ -28,11 +29,11 @@ struct DFTextView: View {
                                let textView = window.allSubviews
                                 .compactMap({ $0 as? UITextView })
                                 .first(where: { $0.isFirstResponder }) {
-                                viewModel.captureTextView(from: textView)
+                                textViewModel.captureTextView(from: textView)
                                 /// 이미지와 메타데이터를 코어데이터에 저장
                                 imageToCoredata()
                                 
-                                modiViewModel.style = TextStyle(attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""), txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment, fontSize: viewModel.fontSize)
+                                modiViewModel.style = TextStyle(attributedString: textViewModel.attributedTxt ?? NSAttributedString(string: ""), txt: textViewModel.txt, font: textViewModel.selectedFont, color: textViewModel.selectedColor, alignment: textViewModel.textAlignment, fontSize: textViewModel.fontSize)
                                 
                                 /// 텍스트뷰를 닫음
                                 modiViewModel.showTextView = false
@@ -42,11 +43,11 @@ struct DFTextView: View {
                     }
                 }
                 VStack{
-                    if viewModel.tab == 0 {
+                    if textViewModel.tab == 0 {
                         newFontSelector
                             .padding(.horizontal,10)
                         
-                    } else if viewModel.tab == 1 {
+                    } else if textViewModel.tab == 1 {
                         colorSelector
                             .padding(.horizontal,10)
                     }
@@ -60,7 +61,7 @@ struct DFTextView: View {
                     barSize: CGSize(width: 16, height: 200),
                     minFontSize: 5,
                     maxFontSize: 50,
-                    fontSize: $viewModel.fontSize
+                    fontSize: $textViewModel.fontSize
                 )
                 
                 .padding(5)
@@ -69,7 +70,7 @@ struct DFTextView: View {
         }
         .padding(.bottom, keyboardResponder.currentHeight == 0 ? 20 : keyboardResponder.currentHeight+5)
         .animation(.easeOut(duration: 0.3), value: keyboardResponder.currentHeight)
-        .keyboardHeight($viewModel.keyboardHeight)
+        .keyboardHeight($textViewModel.keyboardHeight)
         .background(
             Color.black.opacity(0.5) // 반투명 검정색
         )

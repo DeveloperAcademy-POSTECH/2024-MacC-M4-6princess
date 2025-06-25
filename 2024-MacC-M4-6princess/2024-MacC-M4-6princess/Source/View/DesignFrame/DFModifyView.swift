@@ -45,7 +45,7 @@ struct DFModifyView: View {
                             newLayerIndicator
                         }
                     }
-                    .gesture(viewModel.backgroundGesture())
+                    .gesture(viewModel.backgroundGesture(imageList: imageModel.imageList))
                     .onTapGesture {
                         viewModel.isTappedImage = false
                         imageModel.imageList.forEach {
@@ -53,6 +53,7 @@ struct DFModifyView: View {
                         }
                     }
                     .mask(Rectangle().frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
+                    
                     DFImageDecoView(viewModel: viewModel)
                         .padding(.top, 58)
                 }
@@ -138,6 +139,7 @@ struct DFModifyView: View {
                                     viewModel.modelListControl(subject: subject)
                                 }
                                 subject.isTapped.toggle()
+                                
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                                 viewModel.selectedIndex = index
@@ -166,6 +168,7 @@ struct DFModifyView: View {
                                     viewModel.modelListControl(subject: subject)
                                 }
                                 subject.isTapped.toggle()
+                                
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                                 viewModel.selectedIndex = index
@@ -196,6 +199,7 @@ struct DFModifyView: View {
                                     viewModel.modelListControl(subject: subject)
                                 }
                                 subject.isTapped.toggle()
+                                
                                 imageModel.imageList.append(subject)
                                 imageModel.imageList.removeLast()
                                 viewModel.selectedIndex = index

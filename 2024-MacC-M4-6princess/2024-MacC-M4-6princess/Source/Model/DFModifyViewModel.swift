@@ -50,42 +50,75 @@ class DFModifyViewModel: ObservableObject {
     var selectedStickerTab = StickerTab.bubble
     
     @Published var style:TextStyle = TextStyle(attributedString: NSAttributedString(string: ""), txt: "", font: .modern, color: ColorPreset.colorPallete[0], alignment: .center, fontSize: 20 )
+    let history = MFUndoManager<SubjectImage>()
+    /// ⭐️ 제스처 시작 여부
+    @Published var isGestureStarted: Bool = false
+    // undo 함수
+    func undo(imageList: inout [SubjectImage]) {
+        history.undo(list: &imageList)
+        
+        if imageList.count > 1 {
+            selectedSubject = imageList.last
+            selectedIndex = imageList.indices.last
+        }
+    }
     
-    func backgroundGesture() -> some Gesture {
+    // redo 함수
+    func redo(imageList: inout [SubjectImage]) {
+        history.redo(list: &imageList)
+        
+        if imageList.count > 1 {
+            selectedSubject = imageList.last
+            selectedIndex = imageList.indices.last
+        }
+    }
+    
+    /// Gesture: Magnify + Drag + Rotate
+    func backgroundGesture(imageList: [SubjectImage]) -> some Gesture {
         
         MagnifyGesture()
             .onChanged { value in
                 if let subject = self.modelList.first, subject.isTapped {
+                    // ⭐️ 최초 변경 시작 시 push
+                    if !self.isGestureStarted {
+                        self.isGestureStarted = true
+                        self.history.push(imageList)
+                    }
                     self.setScaleVolume(value.magnification, subject: subject)
                 }
             }
             .onEnded { value in
                 if let subject = self.modelList.first, subject.isTapped {
                     self.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                    self.isGestureStarted = false
                 }
-                
             }
             .simultaneously(with: DragGesture()
                 .onChanged({ value in
-                    
                     if let subject = self.modelList.first, subject.isTapped {
+                        if !self.isGestureStarted {
+                            self.isGestureStarted = true
+                            self.history.push(imageList)
+                        }
                         self.dragGestureTask(subject: subject, changed: value.translation)
                     }
                 })
                     .onEnded({ value in
-                        
                         if let subject = self.modelList.first {
-                            
                             self.accumulatedOffSet = .zero
                             self.modelListControl(subject: subject)
                             subject.isTapped = true
+                            self.isGestureStarted = false
                         }
                     })
             )
             .simultaneously(with: RotateGesture()
                 .onChanged({ value in
-                    
                     if let subject = self.modelList.first, subject.isTapped {
+                        if !self.isGestureStarted {
+                            self.isGestureStarted = true
+                            self.history.push(imageList)
+                        }
                         if self.current == .zero {
                             self.current = subject.getAngle()
                         }
@@ -95,10 +128,11 @@ class DFModifyViewModel: ObservableObject {
                 })
                     .onEnded({ value in
                         self.current = .zero
+                        self.isGestureStarted = false
                     })
             )
-        
     }
+    
     
     func modelListControl(subject: SubjectImage) {
         
@@ -315,6 +349,7 @@ class DFModifyViewModel: ObservableObject {
         if let rend = render.uiImage {
             if indexOfImageList < imageList.count - 1 {
                 for _ in indexOfImageList+1..<imageList.count {
+                    
                     imageList.removeLast()
                 }
             }

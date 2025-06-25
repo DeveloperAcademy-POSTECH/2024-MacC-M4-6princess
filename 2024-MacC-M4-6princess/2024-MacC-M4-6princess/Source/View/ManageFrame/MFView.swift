@@ -16,93 +16,93 @@ struct MFView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
-//    @EnvironmentObject var layerListViewModel: LayerListViewModel
+    //    @EnvironmentObject var layerListViewModel: LayerListViewModel
     @StateObject var viewModel: MFViewModel
-    
+    @StateObject var modiViewModel: DFModifyViewModel = DFModifyViewModel()
     init() {
-            _viewModel = StateObject(wrappedValue: MFViewModel(context: PersistenceController.shared.container.viewContext))
-        }
+        _viewModel = StateObject(wrappedValue: MFViewModel(context: PersistenceController.shared.container.viewContext))
+    }
     
     var body: some View {
-            ZStack(alignment: .bottom) {
-                VStack(spacing: 0) {
-                    SheetTitleView(naviManager: _naviManager, viewModel: viewModel)
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                SheetTitleView(naviManager: _naviManager, viewModel: viewModel)
+                    .environmentObject(frameManager)
+                    .environmentObject(naviManager)
+                //                        .environmentObject(layerListViewModel)
+                ScrollView {
+                    FrameGridItem(viewModel: viewModel)
                         .environmentObject(frameManager)
                         .environmentObject(naviManager)
-//                        .environmentObject(layerListViewModel)
-                    ScrollView {
-                        FrameGridItem(viewModel: viewModel)
-                            .environmentObject(frameManager)
-                            .environmentObject(naviManager)
-//                            .environmentObject(layerListViewModel)
+                    //                            .environmentObject(layerListViewModel)
+                }
+                
+            }
+            if viewModel.isEditing {
+                HStack(spacing: 10) {
+                    Button {
+                        viewModel.isDeleteAlert = true
+                    } label: {
+                        ZStack {
+                            Rectangle()
+                                .foregroundColor(.pointPink)
+                                .frame(height: 60)
+                                .frame(maxWidth: .infinity)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                            
+                            //                                    .overlay(
+                            //                                        RoundedRectangle(cornerRadius: 10)
+                            //                                            .inset(by: 1)
+                            //                                            .stroke(.pointPink, lineWidth: 2)
+                            //                                    )
+                            Text("프레임 삭제")
+                                .font(.system(size: 17))
+                                .foregroundColor(.white)
+                                .fontWeight(.bold)
+                        }
                     }
                     
                 }
-                if viewModel.isEditing {
-                    HStack(spacing: 10) {
-                        Button {
-                            viewModel.isDeleteAlert = true
-                        } label: {
-                            ZStack {
-                                Rectangle()
-                                    .foregroundColor(.pointPink)
-                                    .frame(height: 60)
-                                    .frame(maxWidth: .infinity)
-                                    .cornerRadius(10)
-                                    .padding(.horizontal, 20)
-                                    
-//                                    .overlay(
-//                                        RoundedRectangle(cornerRadius: 10)
-//                                            .inset(by: 1)
-//                                            .stroke(.pointPink, lineWidth: 2)
-//                                    )
-                                Text("프레임 삭제")
-                                    .font(.system(size: 17))
-                                    .foregroundColor(.white)
-                                    .fontWeight(.bold)
-                            }
-                        }
-                        
-                    }
-                    .background {
-                        Rectangle()
-                            .foregroundColor(.clear)
-                            .frame(width: UIScreen.main.bounds.width, height: 130)
-                            .background(
-                                LinearGradient(
-                                    stops: [
-                                        Gradient.Stop(color: .white.opacity(0), location: 0.00),
-                                        Gradient.Stop(color: .white, location: 0.30),
-                                        Gradient.Stop(color: .white, location: 1.00),
-                                    ],
-                                    startPoint: UnitPoint(x: 0.5, y: 0),
-                                    endPoint: UnitPoint(x: 0.5, y: 1)
-                                )
+                .background {
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: UIScreen.main.bounds.width, height: 130)
+                        .background(
+                            LinearGradient(
+                                stops: [
+                                    Gradient.Stop(color: .white.opacity(0), location: 0.00),
+                                    Gradient.Stop(color: .white, location: 0.30),
+                                    Gradient.Stop(color: .white, location: 1.00),
+                                ],
+                                startPoint: UnitPoint(x: 0.5, y: 0),
+                                endPoint: UnitPoint(x: 0.5, y: 1)
                             )
-                    }
+                        )
                 }
             }
-            .onAppear {
-                viewModel.loadImages()
+        }
+        .onAppear {
+            viewModel.loadImages()
+        }
+        .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
+            Button {
+                viewModel.deleteSelectedImages()
+            } label: {
+                Text("삭제")
+                    .font(.system(size: 17))
+                    .foregroundColor(.blue)
+                    .fontWeight(.semibold)
             }
-            .alert("\(viewModel.selectedImageIds.count)개의 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlert) {
-                Button {
-                    viewModel.deleteSelectedImages()
-                } label: {
-                    Text("삭제")
-                        .font(.system(size: 17))
-                        .foregroundColor(.blue)
-                        .fontWeight(.semibold)
-                }
-                
-                Button("취소", role: .cancel) { }
-            } message: {
-                Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
-            }
-//            .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
-//                MFDetailView()
-//                    .environmentObject(frameManager)
-//            }
+            
+            Button("취소", role: .cancel) { }
+        } message: {
+            Text("프레임을 삭제하면 다시 되돌릴 수 없습니다.")
+        }
+        //            .fullScreenCover(isPresented: $viewModel.isShowMFDetailView) {
+        //                MFDetailView()
+        //                    .environmentObject(frameManager)
+        //            }
         .onAppear{
             Analytics.logEvent("A2_프레임관리", parameters: nil)
         }
@@ -212,26 +212,26 @@ struct GridItemView: View {
         .onTapGesture {
             frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
             frameManager.selectedFrameIdForDetail = imageInfo.id
-//            naviManager.push(screen: Screen.detailFrame)
+            //            naviManager.push(screen: Screen.detailFrame)
             if !viewModel.isEditing {
                 viewModel.selectedImageIds = [imageInfo.id]
-//                viewModel.isShowMFDetailView = true
+                //                viewModel.isShowMFDetailView = true
                 naviManager.push(screen: Screen.detailFrame)
                 Analytics.logEvent("A2_프레임선택", parameters: nil)
             }
         }
-//        .onTapGesture {
-//            if !viewModel.isEditing {
-//                //MFDetailView로 이동
-//                MFView().toggleSelection(for: imageInfo.id)
-//                viewModel.isShowMFDetailView = true
-//                naviManager.push(screen: Screen.manageDetailFrame)
-//                Analytics.logEvent("A2_프레임선택", parameters: nil)
-////                dismiss()
-//            }else {
-//                MFView().toggleSelection(for: imageInfo.id)
-//            }
-//        }
+        //        .onTapGesture {
+        //            if !viewModel.isEditing {
+        //                //MFDetailView로 이동
+        //                MFView().toggleSelection(for: imageInfo.id)
+        //                viewModel.isShowMFDetailView = true
+        //                naviManager.push(screen: Screen.manageDetailFrame)
+        //                Analytics.logEvent("A2_프레임선택", parameters: nil)
+        ////                dismiss()
+        //            }else {
+        //                MFView().toggleSelection(for: imageInfo.id)
+        //            }
+        //        }
         
     }
 }

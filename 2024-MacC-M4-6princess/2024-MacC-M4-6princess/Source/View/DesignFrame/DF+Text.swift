@@ -16,11 +16,11 @@ extension DFTextView{
                 // 스와이프 감지
                 if value.translation.width < 0 { // 왼쪽 스와이프
                     withAnimation {
-                        viewModel.textAlignment = viewModel.computeNextAlignment(for: viewModel.textAlignment, direction: .left)
+                        textViewModel.textAlignment = textViewModel.computeNextAlignment(for: textViewModel.textAlignment, direction: .left)
                     }
                 } else if value.translation.width > 0 { // 오른쪽 스와이프
                     withAnimation {
-                        viewModel.textAlignment = viewModel.computeNextAlignment(for: viewModel.textAlignment, direction: .right)
+                        textViewModel.textAlignment = textViewModel.computeNextAlignment(for: textViewModel.textAlignment, direction: .right)
                     }
                 }
             }
@@ -35,19 +35,19 @@ extension DFTextView{
                         .font(fontStyle.oldApplyFont(size: 18)) // 매칭된 영문 폰트 적용
                         .padding(.horizontal,15)
                         .padding(.vertical,6)
-                        .foregroundColor(viewModel.selectedFont == fontStyle ? .black :.white)
+                        .foregroundColor(textViewModel.selectedFont == fontStyle ? .black :.white)
                         .frame(maxWidth:UIScreen.main.bounds.width/3)
                         .minimumScaleFactor(0.5)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
+                                .fill(textViewModel.selectedFont == fontStyle ? Color.white : Color.clear) // 선택 여부에 따라 배경색 설정
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.white, lineWidth: 1) // 흰색 테두리
                                 )
                         )
                         .onTapGesture {
-                            viewModel.selectedFont = fontStyle
+                            textViewModel.selectedFont = fontStyle
                         }
                 }
             }
@@ -59,18 +59,18 @@ extension DFTextView{
         // fontColor 선택
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(0..<viewModel.colorChip.count, id: \.self) { colorIndex in
+                ForEach(0..<textViewModel.colorChip.count, id: \.self) { colorIndex in
                     Circle()
-                        .frame(width: viewModel.colorNum == colorIndex ? 40 : 30)
-                        .foregroundColor(viewModel.colorChip[colorIndex])
+                        .frame(width: textViewModel.colorNum == colorIndex ? 40 : 30)
+                        .foregroundColor(textViewModel.colorChip[colorIndex])
                         .overlay(
                             Circle()
                                 .stroke(Color.white, lineWidth: 1) // 흰색 테두리와 두께 설정
                         )
                         .onTapGesture {
-                            viewModel.selectedColor = viewModel.colorChip[colorIndex]
+                            textViewModel.selectedColor = textViewModel.colorChip[colorIndex]
                             withAnimation(.easeInOut(duration: 0.36)) {
-                                viewModel.colorNum = colorIndex
+                                textViewModel.colorNum = colorIndex
                             }
                         }
                 }
@@ -99,10 +99,10 @@ extension DFTextView{
                         .frame(width: itemWidth, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.tab == 0 ? Color.white : Color.clear)
+                                .fill(textViewModel.tab == 0 ? Color.white : Color.clear)
                         )
                         .onTapGesture {
-                            viewModel.tab = 0
+                            textViewModel.tab = 0
                         }
                     
                     Image("df.colorChip")
@@ -112,23 +112,23 @@ extension DFTextView{
                         .frame(width: itemWidth, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.tab == 1 ? Color.white : Color.clear)
+                                .fill(textViewModel.tab == 1 ? Color.white : Color.clear)
                         )
                         .onTapGesture {
-                            viewModel.tab = 1
+                            textViewModel.tab = 1
                         }
                     
-                    Image(viewModel.imageForAlignment(viewModel.textAlignment))
+                    Image(textViewModel.imageForAlignment(textViewModel.textAlignment))
                         .resizable()
                         .scaledToFit()
                         .frame(width: itemWidth, height: 30)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(viewModel.tab == 2 ? Color.white : Color.clear)
+                                .fill(textViewModel.tab == 2 ? Color.white : Color.clear)
                         )
                         .onTapGesture {
-                            viewModel.tab = 2
-                            viewModel.toggleTextAlignment()
+                            textViewModel.tab = 2
+                            textViewModel.toggleTextAlignment()
                         }
                 }
                 .frame(maxWidth: .infinity)
@@ -139,11 +139,11 @@ extension DFTextView{
     
     func imageToCoredata() {
         let newImage = SubjectImage()
-        if let image = viewModel.renderedImage {
+        if let image = textViewModel.renderedImage {
             newImage.text = image
             newImage.originalImage = image
-            if let att = viewModel.attributedTxt{
-                newImage.textStyle = TextStyle(attributedString: att, txt: viewModel.txt, font: viewModel.selectedFont, color: viewModel.selectedColor, alignment: viewModel.textAlignment, fontSize: viewModel.fontSize)
+            if let att = textViewModel.attributedTxt{
+                newImage.textStyle = TextStyle(attributedString: att, txt: textViewModel.txt, font: textViewModel.selectedFont, color: textViewModel.selectedColor, alignment: textViewModel.textAlignment, fontSize: textViewModel.fontSize)
             }
             else{
                 
@@ -154,10 +154,12 @@ extension DFTextView{
                     $0.isTapped = false
                 }
             }
+            viewModel.history.push(imageModel.imageList)
             imageModel.imageList.append(newImage)
             modiViewModel.selectedSubject = imageModel.imageList.last
             modiViewModel.selectedIndex = imageModel.imageList.indices.last
             modiViewModel.modelListControl(subject: imageModel.imageList[imageModel.imageList.count-1])
+            
         } else {
             //TODO: 에러 처리 해야함
             print("Image not found")

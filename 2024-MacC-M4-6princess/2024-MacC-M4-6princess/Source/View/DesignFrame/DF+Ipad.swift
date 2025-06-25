@@ -33,7 +33,7 @@ extension DFModifyView{
                     newLayerIndicator
                 }
             }
-            .gesture(viewModel.backgroundGesture())
+            .gesture(viewModel.backgroundGesture(imageList: imageModel.imageList))
             .onTapGesture {
                 viewModel.isTappedImage = false
                 imageModel.imageList.forEach {

@@ -6,6 +6,7 @@ struct DFOverlayBoxView: View {
     @EnvironmentObject var frameManager: FrameManager
     @EnvironmentObject var imageModel: ImageListModel
     @ObservedObject var viewModel: DFOverlayBoxViewModel = DFOverlayBoxViewModel()
+    @StateObject var modiViewModel: DFModifyViewModel = DFModifyViewModel()
     var model: SubjectImage
     var size: CGSize
     
@@ -65,7 +66,10 @@ struct DFOverlayBoxView: View {
                 .offset(viewModel.OffsetCompute(x: -size.width/2, y: -size.height/2, subject: model))
             }
             Button {
+                modiViewModel.history.push(imageModel.imageList)
+                
                 imageModel.imageList.removeAll(where: { $0.id == model.id })
+                
                 
             } label: {
                 ZStack {
@@ -79,34 +83,34 @@ struct DFOverlayBoxView: View {
             }
             .offset(viewModel.OffsetCompute(x: size.width/2, y: -size.height/2, subject: model))
             
-//            Button {
-//                viewModel.isPushedZoom = true
-//            } label: {
-//                ZStack {
-//                    
-//                    Circle()
-//                        .foregroundStyle(Color.white)
-//                        .frame(width: 26, height: 26)
-//                    Image("zoomButton")
-//                        .resizable()
-//                        .frame(width: 20, height: 20)
-//                }
-//                
-//            }
-//            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
-//            .gesture(zoomDrag)
+            //            Button {
+            //                viewModel.isPushedZoom = true
+            //            } label: {
+            //                ZStack {
+            //                    
+            //                    Circle()
+            //                        .foregroundStyle(Color.white)
+            //                        .frame(width: 26, height: 26)
+            //                    Image("zoomButton")
+            //                        .resizable()
+            //                        .frame(width: 20, height: 20)
+            //                }
+            //                
+            //            }
+            //            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
+            //            .gesture(zoomDrag)
             
-//            ZStack {
-//                
-//                Circle()
-//                    .foregroundStyle(Color.white)
-//                    .frame(width: 26, height: 26)
-//                Image("zoomButton")
-//                    .resizable()
-//                    .frame(width: 20, height: 20)
-//            }
-//            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
-//            .gesture(zoomDrag)
+            //            ZStack {
+            //                
+            //                Circle()
+            //                    .foregroundStyle(Color.white)
+            //                    .frame(width: 26, height: 26)
+            //                Image("zoomButton")
+            //                    .resizable()
+            //                    .frame(width: 20, height: 20)
+            //            }
+            //            .offset(viewModel.OffsetCompute(x: size.width/2, y: size.height/2, subject: model))
+            //            .gesture(zoomDrag)
         }
         
     }

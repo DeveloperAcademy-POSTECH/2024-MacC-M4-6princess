@@ -131,52 +131,6 @@ extension DFModifyView{
         }
     }
     
-    func imageListUpdate() {
-        // 길게 누름 상태 초기화
-        if imageModel.imageList.count > 0 {
-            imageModel.imageList.append(imageModel.imageList[0])
-            imageModel.imageList.removeLast()
-        }
-    }
-    
-    func combinedGesture(subject: SubjectImage) -> some Gesture {
-        
-        DragGesture()
-            .onChanged { value in
-                
-                viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                
-            }
-            .onEnded { value in
-                
-                viewModel.accumulatedOffSet = .zero
-                viewModel.modelListControl(subject: subject)
-                subject.isTapped = true
-                imageModel.imageList.append(subject)
-                imageModel.imageList.removeLast()
-                
-                
-            }
-            .simultaneously(with: RotateGesture()
-                .onChanged { value in
-                    if subject.isTapped  {
-                        if viewModel.current == .zero {
-                            viewModel.current = subject.getAngle()
-                        }
-                        viewModel.angle = value.rotation + viewModel.current
-                        subject.setAngle(angle: viewModel.angle)
-                    }
-                }
-            )
-            .simultaneously(with: MagnifyGesture()
-                .onChanged { value in
-                    if subject.isTapped {
-                        viewModel.setScaleVolume(value.magnification, subject: subject)
-                    }
-                }
-            )
-    }
-    
     var toolBarButtons: some View {
         HStack {
             Button {
@@ -198,6 +152,7 @@ extension DFModifyView{
                 }
                 
                 Button {
+                    viewModel.history.push(imageModel.imageList)
                     imageModel.imageList.removeAll()
                     if naviManager.route.count > 3 {
                         naviManager.pop(depth: naviManager.route.count - 1)
@@ -229,7 +184,7 @@ extension DFModifyView{
                         $0.isTapped = false
                     }
                     
-//                    viewModel.saveStateText = "저장 중입니다..."
+                    //                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.saveStateText = NSLocalizedString("저장 중입니다...", comment: "")
                     viewModel.isPushedSaveBtn = true
                     
@@ -237,6 +192,7 @@ extension DFModifyView{
                         
                         viewModel.btnOpacity = 0
                         viewModel.showCamera = true
+                        viewModel.history.push(imageModel.imageList)
                         imageModel.imageList.removeAll()
                         frameManager.resultImage = viewModel.frameImage
                         frameManager.updateFrame = nil
@@ -249,7 +205,7 @@ extension DFModifyView{
                         $0.isTapped = false
                     }
                     
-//                    viewModel.saveStateText = "저장 중입니다..."
+                    //                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.saveStateText = NSLocalizedString("저장 중입니다...", comment: "")
                     viewModel.isPushedSaveBtn = true
                     
@@ -257,6 +213,7 @@ extension DFModifyView{
                         
                         viewModel.btnOpacity = 0
                         viewModel.showCamera = true
+                        viewModel.history.push(imageModel.imageList)
                         imageModel.imageList.removeAll()
                         frameManager.resultImage = viewModel.frameImage
                         frameManager.removedImage = nil
@@ -264,7 +221,7 @@ extension DFModifyView{
                     
                 } else {
                     
-//                    viewModel.saveStateText = "저장할 이미지가 없습니다."
+                    //                    viewModel.saveStateText = "저장할 이미지가 없습니다."
                     viewModel.saveStateText = NSLocalizedString("저장할 이미지가 없습니다.", comment: "")
                     Task {
                         viewModel.btnOpacity = 1

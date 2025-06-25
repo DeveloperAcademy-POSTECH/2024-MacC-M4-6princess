@@ -5,6 +5,7 @@ extension MFView {
     
     func loadSelectedFrame(completionHandler: @escaping () -> Void) {
         
+        modiViewModel.history.push(imageModel.imageList)
         imageModel.imageList.removeAll()
         
         guard let frameId = frameManager.updateFrame else {
@@ -65,7 +66,7 @@ extension MFView {
                 if newImage.image != nil {
                     print("이미지 있음!!")
                 }
-                
+                //                modiViewModel.history.push(imageModel.imageList)
                 imageModel.imageList.append(newImage)
             }
         }

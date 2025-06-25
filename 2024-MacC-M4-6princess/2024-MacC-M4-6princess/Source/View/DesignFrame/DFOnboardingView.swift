@@ -13,7 +13,7 @@ struct DFOnboardingView: View {
                 .ignoresSafeArea()
             
             VStack {
-
+                
                 Spacer()
                 
                 Image("pinch")

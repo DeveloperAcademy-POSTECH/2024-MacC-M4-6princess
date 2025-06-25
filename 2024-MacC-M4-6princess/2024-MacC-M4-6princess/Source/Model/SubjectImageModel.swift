@@ -1,7 +1,8 @@
 import SwiftUI
+import UIKit
+import Foundation
 
-
-class SubjectImage: Identifiable {
+class SubjectImage: Identifiable,NSCopying {
     
     var image: UIImage?
     var originalImage: UIImage?
@@ -11,25 +12,12 @@ class SubjectImage: Identifiable {
     var textStyle: TextStyle?
     var angle: Angle = .degrees(0)
     var offset: CGSize = .zero
-    var scale: CGFloat = 1.0{
-        didSet{
-            print("scale 변경:\(scale)")
-        }
-    }
+    var scale: CGFloat = 1.0
     var originalText: String = ""
-    
     var isTapped: Bool = true
-    
     let id: UUID = UUID()
     var isFullSticker = false
-    
-    //    func setTappedState(_ state: Bool) {
-    //        print(isTapped)
-    //        isTapped = state
-    //        print(isTapped)
-    //
-    //    }
-    
+   
     func getTapState() -> Bool {
         return isTapped
     }
@@ -63,4 +51,20 @@ class SubjectImage: Identifiable {
     func getAngle() -> Angle {
         return angle
     }
+    func copy(with zone: NSZone? = nil) -> Any {
+            let copy = SubjectImage()
+            copy.image = self.image
+            copy.originalImage = self.originalImage
+            copy.maskImage = self.maskImage
+            copy.sticker = self.sticker
+            copy.text = self.text
+            copy.textStyle = self.textStyle
+            copy.angle = self.angle
+            copy.offset = self.offset
+            copy.scale = self.scale
+            copy.originalText = self.originalText
+            copy.isTapped = self.isTapped
+            copy.isFullSticker = self.isFullSticker
+            return copy
+        }
 }

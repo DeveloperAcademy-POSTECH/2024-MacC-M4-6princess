@@ -4,9 +4,47 @@ struct DFImageDecoView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     @ObservedObject var viewModel : DFModifyViewModel
-    
+    @EnvironmentObject var imageModel: ImageListModel
     var body: some View {
+        HStack(spacing: 24) {
             
+            // Undo 버튼
+            Button(action: {
+                viewModel.undo(imageList: &imageModel.imageList)
+            }) {
+                Image(systemName: "arrow.uturn.backward")
+                    .resizable()
+                    .frame(width: 10, height: 10)
+                    .padding()
+                    .background(
+                        (viewModel.history.undoStack.isEmpty ? Color.gray.opacity(0.1) : Color.gray.opacity(0.2))
+                    )
+                    .clipShape(Circle())
+                    .foregroundColor(
+                        viewModel.history.undoStack.isEmpty ? .gray : .primary
+                    )
+            }
+            .disabled(viewModel.history.undoStack.isEmpty) // 아예 비활성화
+            
+            // Redo 버튼
+            Button(action: {
+                viewModel.redo(imageList: &imageModel.imageList)
+            }) {
+                Image(systemName: "arrow.uturn.forward")
+                    .resizable()
+                    .frame(width: 10, height: 10)
+                    .padding()
+                    .background(
+                        (viewModel.history.redoStack.isEmpty ? Color.gray.opacity(0.1) : Color.gray.opacity(0.2))
+                    )
+                    .clipShape(Circle())
+                    .foregroundColor(
+                        viewModel.history.redoStack.isEmpty ? .gray : .primary
+                    )
+            }
+            .disabled(viewModel.history.redoStack.isEmpty) // 아예 비활성화
+        }
+        
         HStack(spacing: 56){
             
             appendImageView

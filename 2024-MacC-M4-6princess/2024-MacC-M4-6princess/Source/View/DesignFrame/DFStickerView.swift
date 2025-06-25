@@ -52,7 +52,7 @@ struct DFStickerView: View {
                         
                         Spacer()
                     }
-//                    .frame(width:UIScreen.main.bounds.width/5)
+                    //                    .frame(width:UIScreen.main.bounds.width/5)
                     
                 }
                 
@@ -86,6 +86,7 @@ struct DFStickerView: View {
                                 }
                                 
                                 imageModel.imageList.forEach { $0.isTapped = false }
+                                viewModel.history.push(imageModel.imageList)
                                 imageModel.imageList.append(newImage)
                                 
                                 Analytics.logEvent("A5_스티커선택", parameters: ["sticker_name": imageName])
@@ -93,6 +94,7 @@ struct DFStickerView: View {
                                 viewModel.selectedSubject = imageModel.imageList.last
                                 viewModel.selectedIndex = imageModel.imageList.indices.last
                                 viewModel.modelListControl(subject: imageModel.imageList.last!)
+                                
                             } else {
                                 print("Image not found")
                             }
@@ -121,7 +123,7 @@ enum StickerTab: String, CaseIterable {
 struct StickerImages {
     static func getStickerImages() -> [StickerTab: [String]] {
         let locale = Locale.current.identifier
-
+        
         let humorStickers: [String]
         switch locale {
         case let id where id.hasPrefix("ja"):
@@ -149,5 +151,5 @@ struct StickerImages {
             .y2k : (1...6).map { String(format: "hype%02d", $0) },
         ]
     }
-
+    
 }

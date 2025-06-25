@@ -14,6 +14,7 @@ struct MFDetailView: View {
     @EnvironmentObject var imageModel: ImageListModel
     @EnvironmentObject var naviManager: NavigationManager
     @ObservedObject private var viewModel: MFDetailViewModel = MFDetailViewModel()
+    @StateObject var modiViewModel: DFModifyViewModel = DFModifyViewModel()
     
     var topBar : some View {
         ZStack{
@@ -168,7 +169,7 @@ struct MFDetailView: View {
 
 extension MFDetailView {
     func loadSelectedFrame(completionHandler: @escaping () -> Void) {
-        
+        modiViewModel.history.push(imageModel.imageList)
         imageModel.imageList.removeAll()
         
         guard let frameId = frameManager.updateFrame else {
@@ -230,7 +231,7 @@ extension MFDetailView {
                 if newImage.image != nil {
                     print("이미지 있음!!")
                 }
-                
+                modiViewModel.history.push(imageModel.imageList)
                 imageModel.imageList.append(newImage)
             }
         }
