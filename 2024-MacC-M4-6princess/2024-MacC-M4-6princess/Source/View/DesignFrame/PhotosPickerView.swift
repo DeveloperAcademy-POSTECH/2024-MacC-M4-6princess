@@ -10,13 +10,60 @@ struct PhotosPickerView: View {
     @EnvironmentObject var naviManager: NavigationManager
     @EnvironmentObject var frameManager: FrameManager
     
-    let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 5), count: 3)
     var body: some View {
         ZStack {
             VStack {
                 toolbarButton
-                ScrollViewWithOffset
-                    .padding(.top, 10)
+//                ScrollViewWithOffset
+//                    .padding(.top, 10)
+                ImageScrollViewRepresentable(images: vm.models) {
+                    print("끝까지 스크롤")
+                    if vm.album.count - vm.currentIndex >= 60 {
+                        vm.currentIndex += 60
+                        vm.fetchedAlbum += 60
+                        print("모델삽입")
+                        
+                    } else {
+                        vm.currentIndex = vm.album.count
+                    }
+                    vm.fetchAlbum()
+                    for i in vm.currentIndex..<vm.album.count {
+                        vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
+                    }
+                    
+                }onImageTap: { index in
+                    print("사진클릭!")
+                    if vm.selectedIndex < 0 {
+                        vm.selectedIndex = index
+                        vm.models[index].isSelected = true
+                        
+                    } else {
+                        if vm.selectedIndex != index {
+                            vm.models[vm.selectedIndex].isSelected = false
+                            vm.selectedIndex = index
+                            vm.models[index].isSelected = true
+                        } else {
+                            vm.selectedIndex = -1
+                            vm.models[index].isSelected = false
+                        }
+                    }
+                    
+                    if vm.selectedIndex >= 0 {
+                        vm.getImage(for: vm.album[vm.selectedIndex]) {
+                            
+                            if let image = vm.outputImage {
+                                frameManager.pickedImage = image
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                if frameManager.pickedImage != nil  && vm.models[index].isSelected {
+                                    naviManager.push(screen: Screen.frameEdit)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.top, 10)
             }
             VStack {
                 toastMessage
@@ -25,16 +72,18 @@ struct PhotosPickerView: View {
             }
         }
         .onAppear {
-            print("w: \(UIScreen.main.bounds.width)")
-            print("h: \(UIScreen.main.bounds.height)")
+            
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
                     //                    DispatchQueue.main.async {
-                    vm.fetchAlbum()
-                    print(vm.album.count)
-                    for i in 0..<vm.album.count {
-                        print("모델 삽입 실행됨")
-                        vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
+                    if vm.firstAppear {
+                        vm.fetchAlbum()
+                        print(vm.album.count)
+                        for i in 0..<vm.album.count {
+                            print("모델 삽입 실행됨")
+                            vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
+                        }
+                        vm.firstAppear = false
                     }
                     //                    }
                 }
@@ -46,115 +95,6 @@ struct PhotosPickerView: View {
         .onChange(of: vm.selectedIndex) {
             if vm.selectedIndex >= 0 {
                 Analytics.logEvent("A3_갤러리사진선택", parameters: nil)
-            }
-        }
-    }
-}
-
-struct ScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = .zero
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value += nextValue()
-    }
-}
-
-extension PhotosPickerView {
-    
-    private var scrollObservableView: some View {
-        GeometryReader { proxy in
-            let offsetY = proxy.frame(in: .global).origin.y
-            Color.clear
-                .preference(
-                    key: ScrollOffsetKey.self,
-                    value: offsetY
-                )
-                .onAppear { // 나타날때 뷰의 최초위치를 저장하는 로직
-                    vm.setOriginOffset(offsetY)
-                }
-        }
-        .frame(height: 0)
-    }
-}
-
-extension PhotosPickerView {
-    
-    var ScrollViewWithOffset: some View {
-        
-        ScrollView() {
-            scrollObservableView
-            LazyVGrid(columns: columns, alignment: .center, spacing: 5) {
-                if vm.models.count != 0 {
-                    ForEach(0..<vm.models.count, id: \.self) { i in
-                        ZStack {
-                            if let image = vm.models[i].image {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: UIScreen.main.bounds.width*0.32, height: UIScreen.main.bounds.width*0.32)
-                                    .onTapGesture {
-                                        
-                                        if vm.selectedIndex < 0 {
-                                            vm.selectedIndex = i
-                                            vm.models[i].isSelected = true
-                                            
-                                        } else {
-                                            if vm.selectedIndex != i {
-                                                vm.models[vm.selectedIndex].isSelected = false
-                                                vm.selectedIndex = i
-                                                vm.models[i].isSelected = true
-                                            } else {
-                                                vm.selectedIndex = -1
-                                                vm.models[i].isSelected = false
-                                            }
-                                        }
-                                        
-                                        if vm.selectedIndex >= 0 {
-                                            vm.getImage(for: vm.album[vm.selectedIndex]) {
-                                                
-                                                if let image = vm.outputImage {
-                                                    frameManager.pickedImage = image
-                                                }
-                                                
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                    if frameManager.pickedImage != nil  && vm.models[i].isSelected {
-                                                        naviManager.push(screen: Screen.frameEdit)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                            }
-                        }
-                    }
-                }
-                
-            }
-            .onReadSize() {
-                
-                vm.setViewSize($0)
-                print("전체 뷰 사이즈 : \(vm.viewSize.height)")
-            }
-        }
-        .onPreferenceChange(ScrollOffsetKey.self) {
-            vm.setOffset($0)
-            Task {
-                if vm.offset < vm.viewSize.height * -0.65 {
-                    
-                    if vm.album.count - vm.currentIndex >= 60 {
-                        vm.currentIndex += 60
-                        vm.fetchedAlbum += 60
-                        
-                    } else {
-                        vm.currentIndex = vm.album.count
-                    }
-                    
-                    vm.fetchAlbum()
-                    print(vm.album.count)
-                    for i in vm.currentIndex..<vm.album.count {
-                        print("모델 삽입 실행됨")
-                        vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
-                    }
-                }
             }
         }
     }
