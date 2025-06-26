@@ -10,7 +10,7 @@ class PhotosPickerViewModel: ObservableObject {
     @Published var messageOpacity: Double = 1
     @Published var currentIndex: Int = 0
     @Published var fetchedAlbum: Int = 60
-    
+    @Published var firstAppear: Bool = true
     
     private let imageManager = PHCachingImageManager()
     var album: PHFetchResult<PHAsset> = PHFetchResult<PHAsset>()
