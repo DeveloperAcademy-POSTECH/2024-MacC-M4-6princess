@@ -73,6 +73,11 @@ struct PhotosPickerView: View {
         }
         .onAppear {
             
+            if vm.selectedIndex >= 0 {
+                vm.models[vm.selectedIndex].isSelected = false
+                vm.selectedIndex = -1
+            }
+            
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
                     //                    DispatchQueue.main.async {
