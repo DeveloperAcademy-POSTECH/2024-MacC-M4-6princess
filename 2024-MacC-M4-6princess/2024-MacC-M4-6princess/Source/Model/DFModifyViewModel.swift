@@ -254,6 +254,7 @@ class DFModifyViewModel: ObservableObject {
         newImage.image = albumImageData
         newImage.uuid = UUID()
         newImage.isSelected = false
+        newImage.createdDate = Date() //최근 프레임 찾는 용도
         
         for i in subjects.imageList {
             let newSubject = Subject(context: context)

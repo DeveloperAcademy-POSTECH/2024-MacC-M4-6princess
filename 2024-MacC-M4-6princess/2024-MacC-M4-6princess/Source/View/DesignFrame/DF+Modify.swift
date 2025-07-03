@@ -262,7 +262,10 @@ extension DFModifyView{
                         imageModel.imageList.removeAll()
                         frameManager.resultImage = viewModel.frameImage
                         frameManager.updateFrame = nil
-                        frameManager.selectedFrame = nil
+                        // 여기서 selectedFrame에 수정한 프레임 UUID 넣어주기
+                        if let updatedUUID = frameManager.selectedFrameIdForDetail ?? frameManager.updateFrame {
+                            frameManager.selectedFrame = updatedUUID
+                        }
                     }
                     
                 } else if let image = frameManager.removedImage {
@@ -282,6 +285,13 @@ extension DFModifyView{
                         imageModel.imageList.removeAll()
                         frameManager.resultImage = viewModel.frameImage
                         frameManager.removedImage = nil
+                        // 여기서 selectedFrame에 최근 생성된 프레임 UUID 찾아서 넣어주기
+                        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+                        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdDate", ascending: false)]
+                        fetchRequest.fetchLimit = 1 //최근 프레임 1개만 가져오기
+                        if let latest = try? managedContext.fetch(fetchRequest).first, let uuid = latest.uuid {
+                            frameManager.selectedFrame = uuid
+                        }
                     }
                     
                 } else {
