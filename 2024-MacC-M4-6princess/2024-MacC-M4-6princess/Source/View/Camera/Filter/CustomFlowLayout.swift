@@ -28,7 +28,7 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         let inset = (collectionView.bounds.width - centerCellSize) / 2
         collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
         
-        // 스크롤 감속률 설정
+        // 스크롤 감속률 설정, 빠르면 임의로 설정해도 됨
         collectionView.decelerationRate = .normal
         
         minimumLineSpacing = standardSpacing
@@ -83,7 +83,7 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
     override var collectionViewContentSize: CGSize {
         guard let collectionView = collectionView else { return .zero }
         
-        // 아이템 개수와 간격을 기반으로 스크롤 가능한 영역 계산
+        // 필터셀 개수와 간격을 기반으로 스크롤 가능한 영역 계산
         let itemCount = collectionView.numberOfItems(inSection: 0)
         
         // 빈 셀을 포함하여 전체 크기 계산

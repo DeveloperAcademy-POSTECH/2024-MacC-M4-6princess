@@ -112,7 +112,8 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
                 let filter = filterImages[filterIndex]
                 if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
                     let isSelected = filter.uuid == currentSelectedFilter
-                    cell.configure(with: uiImage, size: 0, isSelected: isSelected) // size는 더 이상 사용하지 않음
+                    cell.configure(with: uiImage, size: 0, isSelected: isSelected)
+                    // size는 더 이상 사용하지 않으므로 삭제
                 }
             }
             return cell
@@ -148,6 +149,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     //         self.centerOnClosestCell()
     //     })
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+// 스크롤일떄/탭일때로 분기처리 하려 했던 흔적
 //        isUserScrolling = true
     }
     
@@ -181,7 +183,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
             self.collectionView.layoutIfNeeded()
         }) { _ in
-            // Update filter selection after animation
+            // 애니메이션 후 필터 선택
             if indexPath.item == 0 {
                 self.selectedFilter?(nil)
                 self.currentSelectedFilter = nil
@@ -274,6 +276,8 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         //     // 셀 크기 및 테두리 업데이트
         //     self.updateCellSizesAndSpacing()
         // }
+        
+        
         // 탭 시 애니메이션 없이 바로 중앙 정렬
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
         collectionView.layoutIfNeeded()

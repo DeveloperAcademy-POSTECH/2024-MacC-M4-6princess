@@ -24,7 +24,7 @@ class FilterCell: UICollectionViewCell {
 //            width: bounds.width * 0.9,
 //            height: bounds.height * 0.9
 //        )
-// 이미지 뷰를 셀 전체에 맞춤
+//      이미지 뷰를 셀 전체에 맞춤
         imageView.frame = contentView.bounds
         // 원형 모양 설정
         let radius = min(contentView.bounds.width, contentView.bounds.height) / 2

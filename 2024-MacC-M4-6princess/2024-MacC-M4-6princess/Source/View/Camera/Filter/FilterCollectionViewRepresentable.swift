@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-//SwiftUI와 UIKit의 연결점...?
 
 struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @EnvironmentObject var frameManager: FrameManager
@@ -28,19 +27,6 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         )
     }
     
-    //    func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-    //        uiViewController.collectionView.reloadData()
-    //
-    //        // 선택된 필터를 스크롤로 중앙에 위치시키기
-    //        if let selectedFilter = frameManager.selectedFrame,
-    //           let index = uiViewController.filterImages.firstIndex(where: { $0.uuid == selectedFilter }) {
-    //            uiViewController.collectionView.scrollToItem(
-    //                at: IndexPath(item: index + 1, section: 0),
-    //                at: .centeredHorizontally,
-    //                animated: true
-    //            )
-    //        }
-    //    }
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
         // 데이터가 있는지 확인
         guard !uiViewController.filterImages.isEmpty && !filterImages.isEmpty else {
