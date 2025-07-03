@@ -100,6 +100,7 @@ struct MFDetailView: View {
             .frame(height: 102)
             //            .padding(.top, 20)
         }
+        .frame(maxWidth: .infinity)
     }
     
     //    var bodyContentView: some View {
@@ -137,11 +138,18 @@ struct MFDetailView: View {
             VStack(spacing: 0) {
                 topBar
                     .frame(width: geo.size.width, height: 80)
+                    .background(.white)
                 bodyContentView
                 bottomBar
+                    .background(.white)
+            }
+            .background {
+            Image("checkBox")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
             }
         }
-        //        .ignoresSafeArea(edges: .top)
         .navigationBarBackButtonHidden(true)
         .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
@@ -237,3 +245,4 @@ extension MFDetailView {
         
     }
 }
+
