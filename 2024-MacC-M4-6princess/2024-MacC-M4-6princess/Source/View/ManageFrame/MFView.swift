@@ -36,7 +36,6 @@ struct MFView: View {
                             .environmentObject(naviManager)
 //                            .environmentObject(layerListViewModel)
                     }
-                    
                 }
                 if viewModel.isEditing {
                     HStack(spacing: 10) {
@@ -173,8 +172,10 @@ struct FrameGridItem: View {
                     .environmentObject(frameManager)
                     .environmentObject(naviManager)
                     .id(imageInfo.id)
+                
             }
         }
+        
     }
     
 }
@@ -208,6 +209,11 @@ struct GridItemView: View {
                     .padding(.trailing, 10)
                     .padding(.top, 10)
             }
+        }
+        .background {
+            Image("checkBox")
+                .resizable()
+                .scaledToFill()
         }
         .onTapGesture {
             frameManager.toggleSelection(for: imageInfo.id, in: viewModel)
