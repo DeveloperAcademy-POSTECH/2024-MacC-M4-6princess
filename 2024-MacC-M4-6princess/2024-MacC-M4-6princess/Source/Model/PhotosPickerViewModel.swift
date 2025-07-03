@@ -57,8 +57,10 @@ class PhotosPickerViewModel: ObservableObject {
     func getImage(for asset: PHAsset, completionHandler: @escaping () -> Void) {
         let requestOptions = PHImageRequestOptions()
         
+        requestOptions.isNetworkAccessAllowed = true
         requestOptions.deliveryMode = .highQualityFormat
         requestOptions.resizeMode = .exact
+        requestOptions.isSynchronous = false
         
         imageManager.requestImage(for: asset, targetSize: CGSize(width: asset.pixelWidth, height: asset.pixelHeight), contentMode: .aspectFill, options: requestOptions) {
             [self] result, _ in
@@ -77,7 +79,8 @@ class PhotosPickerViewModel: ObservableObject {
 
         let requestOptions = PHImageRequestOptions()
         
-        requestOptions.isSynchronous = true
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.isSynchronous = false
         requestOptions.deliveryMode = .highQualityFormat
         requestOptions.resizeMode = .exact
 //        requestOptions.version = .original
@@ -87,7 +90,6 @@ class PhotosPickerViewModel: ObservableObject {
             if let image = result {
                 DispatchQueue.main.async {
                     self.saveImageArray(index: index, image: image)
-//                    print(image.size)
                 }
             }
         }
