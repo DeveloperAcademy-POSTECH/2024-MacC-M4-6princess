@@ -37,19 +37,10 @@ struct PhotosPickerView: View {
                         vm.selectedIndex = index
                         vm.models[index].isSelected = true
                         
-                    } else {
-                        if vm.selectedIndex != index {
-                            vm.models[vm.selectedIndex].isSelected = false
-                            vm.selectedIndex = index
-                            vm.models[index].isSelected = true
-                        } else {
-                            vm.selectedIndex = -1
-                            vm.models[index].isSelected = false
-                        }
                     }
                     
                     if vm.selectedIndex >= 0 {
-                        vm.getImage(for: vm.album[vm.selectedIndex]) {
+                        vm.getImage(image: vm.models[vm.selectedIndex], for: vm.album[vm.selectedIndex]) {
                             
                             if let image = vm.outputImage {
                                 frameManager.pickedImage = image
@@ -72,6 +63,12 @@ struct PhotosPickerView: View {
             }
         }
         .onAppear {
+            
+            if vm.selectedIndex >= 0 {
+                vm.models[vm.selectedIndex].isSelected = false
+                vm.selectedIndex = -1
+                frameManager.pickedImage = nil
+            }
             
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
