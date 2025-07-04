@@ -24,6 +24,14 @@ class FilterCell: UICollectionViewCell {
 //            width: bounds.width * 0.9,
 //            height: bounds.height * 0.9
 //        )
+//      이미지 뷰를 셀 전체에 맞춤
+        imageView.frame = contentView.bounds
+        // 원형 모양 설정
+        let radius = min(contentView.bounds.width, contentView.bounds.height) / 2
+        self.layer.cornerRadius = radius
+        self.contentView.layer.cornerRadius = radius
+        self.layer.masksToBounds = true
+        self.contentView.layer.masksToBounds = true
     }
     
     override init(frame: CGRect) {
@@ -49,17 +57,17 @@ class FilterCell: UICollectionViewCell {
     func configure(with image: UIImage, size: CGFloat, isSelected: Bool) {
         imageView.image = image
         
-        // 선택된 셀은 항상 58pt, 선택되지 않은 셀은 전달받은 size 사용
-        let finalSize = isSelected ? 58 : size
+        // // 선택된 셀은 항상 58pt, 선택되지 않은 셀은 전달받은 size 사용
+        // let finalSize = isSelected ? 58 : size
         
-        // 셀 크기 설정
-        self.frame.size = CGSize(width: finalSize, height: finalSize)
+        // // 셀 크기 설정
+        // self.frame.size = CGSize(width: finalSize, height: finalSize)
         
-        // 원형 모양 설정
-        self.layer.cornerRadius = finalSize / 2
-        self.contentView.layer.cornerRadius = finalSize / 2
-        self.layer.masksToBounds = true
-        self.contentView.layer.masksToBounds = true
+        // // 원형 모양 설정
+        // self.layer.cornerRadius = finalSize / 2
+        // self.contentView.layer.cornerRadius = finalSize / 2
+        // self.layer.masksToBounds = true
+        // self.contentView.layer.masksToBounds = true
         
         // 선택 상태에 따른 테두리 설정
         if isSelected {
@@ -69,13 +77,7 @@ class FilterCell: UICollectionViewCell {
             self.layer.borderWidth = 1
             self.layer.borderColor = UIColor(named: "PointPink")?.cgColor ?? UIColor.systemPink.cgColor
         }
-        
-        // 즉시 레이아웃 업데이트
-        self.setNeedsLayout()
-        self.layoutIfNeeded()
     }
-    
-    
     
     override func prepareForReuse() {
         super.prepareForReuse()
