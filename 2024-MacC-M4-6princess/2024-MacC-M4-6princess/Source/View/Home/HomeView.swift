@@ -129,11 +129,5 @@ struct HomeGridView: View {
                     .clipped()
             }
         }
-        // 홈 화면도 적용할지 안할지에 따라 이부분은 뺄수도 있습니다
-        .background{
-            Image("checkBox")
-                .resizable()
-                .scaledToFill()
-        }
     }
 }
