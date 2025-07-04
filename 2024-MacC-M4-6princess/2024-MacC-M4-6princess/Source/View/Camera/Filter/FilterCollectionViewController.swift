@@ -183,7 +183,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // 스크롤 중에도 부드러운 애니메이션으로 셀 크기 업데이트
-        // 애니메이션 중복 방지를 위해 즉시 실행
         updateCellSizesOnly()
     }
     
@@ -225,8 +224,8 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             }
         }
         
-        // 레이아웃 업데이트를 부드럽게
-        UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+        // 사람의 스크롤 속도에 맞춘 부드러운 애니메이션
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
             self.collectionView.collectionViewLayout.invalidateLayout()
             self.collectionView.layoutIfNeeded()
         })
@@ -347,8 +346,8 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             }
         }
         
-        // 레이아웃 업데이트를 부드럽게
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+        // 부드러운 레이아웃 업데이트
+        UIView.animate(withDuration: 0.25, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
             self.collectionView.collectionViewLayout.invalidateLayout()
             self.collectionView.layoutIfNeeded()
         })
