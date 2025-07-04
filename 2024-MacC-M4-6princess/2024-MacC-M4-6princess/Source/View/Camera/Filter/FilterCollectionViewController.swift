@@ -64,6 +64,11 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         
         let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+        
+        // 스크롤 후 선택 상태 업데이트
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.updateCellSizesAndSpacing()
+        }
     }
     
     private func setupCollectionView() {
@@ -193,10 +198,20 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
                 let filterIndex = indexPath.item - 1
                 if filterIndex >= 0 && filterIndex < self.filterImages.count {
                     let selectedFilter = self.filterImages[filterIndex]
-                    self.selectedFilter?(selectedFilter.uuid)
-                    self.currentSelectedFilter = selectedFilter.uuid
-                    self.frameManager.selectedFrame = self.currentSelectedFilter
+                    
+                    // UUID가 유효한지 확인
+                    guard let uuid = selectedFilter.uuid else {
+                        print("centerOnClosestCell - 선택된 필터의 UUID가 nil입니다")
+                        return
+                    }
+                    
+                    self.selectedFilter?(uuid)
+                    self.currentSelectedFilter = uuid
+                    self.frameManager.selectedFrame = uuid
                     self.frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+                    
+                    // 디버깅을 위한 로그
+                    print("🎯 centerOnClosestCell - 선택된 프레임: \(uuid), 인덱스: \(filterIndex), 총 프레임 수: \(self.filterImages.count)")
                 }
             }
             
@@ -229,13 +244,24 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             let filterIndex = indexPath.item - 1
             if filterIndex >= 0 && filterIndex < filterImages.count {
                 let selectedFilter = filterImages[filterIndex]
-                self.selectedFilter?(selectedFilter.uuid)
-                currentSelectedFilter = selectedFilter.uuid
-                frameManager.selectedFrame = currentSelectedFilter
+                
+                // UUID가 유효한지 확인
+                guard let uuid = selectedFilter.uuid else {
+                    print("선택된 필터의 UUID가 nil입니다")
+                    return
+                }
+                
+                self.selectedFilter?(uuid)
+                currentSelectedFilter = uuid
+                frameManager.selectedFrame = uuid
+                frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+                
+                // 디버깅을 위한 로그
+                print("🎯 updateCellSizesAndSpacing - 선택된 프레임: \(uuid), 인덱스: \(filterIndex), 총 프레임 수: \(filterImages.count)")
             }
         }
         
-        // 모든 보이는 셀의 크기와 테두리 업데이트
+        // 모든 보이는 셀의 크기와 테두리 업데이트 - UUID 기반으로 안전하게 처리
         for cell in collectionView.visibleCells {
             guard let cellIndexPath = collectionView.indexPath(for: cell) else { continue }
             if let filterCell = cell as? FilterCell {
@@ -243,6 +269,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
                 if filterIndex >= 0 && filterIndex < filterImages.count {
                     let filter = filterImages[filterIndex]
                     if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
+                        // UUID를 직접 비교하여 선택 상태 결정
                         let isSelected = filter.uuid == currentSelectedFilter
                         filterCell.configure(with: uiImage, size: 0, isSelected: isSelected)
                     }
@@ -291,10 +318,20 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             let filterIndex = indexPath.item - 1
             if filterIndex >= 0 && filterIndex < self.filterImages.count {
                 let selectedFilter = self.filterImages[filterIndex]
-                self.selectedFilter?(selectedFilter.uuid)
-                self.currentSelectedFilter = selectedFilter.uuid
-                self.frameManager.selectedFrame = selectedFilter.uuid
+                
+                // UUID가 유효한지 확인
+                guard let uuid = selectedFilter.uuid else {
+                    print("didSelectItemAt - 선택된 필터의 UUID가 nil입니다")
+                    return
+                }
+                
+                self.selectedFilter?(uuid)
+                self.currentSelectedFilter = uuid
+                self.frameManager.selectedFrame = uuid
                 self.frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+                
+                // 디버깅을 위한 로그
+                print("🎯 didSelectItemAt - 선택된 프레임: \(uuid), 인덱스: \(filterIndex), 총 프레임 수: \(self.filterImages.count)")
             }
         }
         self.updateCellSizesAndSpacing()
