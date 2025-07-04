@@ -54,7 +54,7 @@ class PhotosPickerViewModel: ObservableObject {
         
     }
     
-    func getImage(for asset: PHAsset, completionHandler: @escaping () -> Void) {
+    func getImage(image: PickedImageModel, for asset: PHAsset, completionHandler: @escaping () -> Void) {
         let requestOptions = PHImageRequestOptions()
         
         requestOptions.isNetworkAccessAllowed = true
@@ -64,9 +64,11 @@ class PhotosPickerViewModel: ObservableObject {
         
         imageManager.requestImage(for: asset, targetSize: CGSize(width: asset.pixelWidth, height: asset.pixelHeight), contentMode: .aspectFill, options: requestOptions) {
             [self] result, _ in
-            if let image = result {
-                DispatchQueue.main.async {
-                    self.outputImage = image
+            if image.identifier == asset.localIdentifier {
+                if let image = result {
+                    DispatchQueue.main.async {
+                        self.outputImage = image
+                    }
                 }
             }
         }
@@ -76,7 +78,7 @@ class PhotosPickerViewModel: ObservableObject {
         }
     }
     func loadImage(for asset: PHAsset, size: CGSize, index: Int) {
-
+        let identifier = asset.localIdentifier
         let requestOptions = PHImageRequestOptions()
         
         requestOptions.isNetworkAccessAllowed = true
@@ -87,19 +89,22 @@ class PhotosPickerViewModel: ObservableObject {
         
         imageManager.requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: requestOptions) {
             [self] result, _ in
-            if let image = result {
-                DispatchQueue.main.async {
-                    self.saveImageArray(index: index, image: image)
+            if identifier == asset.localIdentifier {
+                
+                if let image = result {
+                    DispatchQueue.main.async {
+                        self.saveImageArray(index: index, image: image, identifier: identifier)
+                    }
                 }
             }
         }
     }
     
-    func saveImageArray(index: Int, image: UIImage) {
+    func saveImageArray(index: Int, image: UIImage, identifier: String?) {
         var model = PickedImageModel()
         model.image = image
         model.index = index
-        
+        model.identifier = identifier
         models.append(model)
     }
 }
