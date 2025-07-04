@@ -15,8 +15,14 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     let viewModel: CameraViewModel
     
     func makeUIViewController(context: Context) -> FilterCollectionViewController {
+        let reversedImages = Array(filterImages.reversed())
+        print("📱 makeUIViewController - 총 프레임 수: \(reversedImages.count)")
+        for (index, image) in reversedImages.enumerated() {
+            print("📱 프레임 \(index): \(image.uuid?.uuidString ?? "nil") - 생성일: \(image.createdDate?.description ?? "nil")")
+        }
+        
         return FilterCollectionViewController(
-            filterImages: filterImages.reversed(),
+            filterImages: reversedImages,
             selectedFilter: { uuid in
                 frameManager.selectedFrame = uuid
                 print("🔥 selectedFilter 클로저 호출됨! uuid: \(uuid?.uuidString ?? "nil")")
@@ -35,7 +41,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         
         // createdDate가 nil이 아닌 필터만 추출하여 정렬(프레임이 아무것도 없을 때)
         let currentFiltersWithDates = uiViewController.filterImages.filter { $0.createdDate != nil }
-        let newFiltersWithDates = filterImages.reversed().filter { $0.createdDate != nil }
+        let newFiltersWithDates = Array(filterImages.reversed()).filter { $0.createdDate != nil }
         
         // 날짜가 있는 필터가 하나도 없으면 비교하지 않음(프레임이 아무것도 없을 때)
         guard !currentFiltersWithDates.isEmpty && !newFiltersWithDates.isEmpty else {
@@ -59,7 +65,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         
         // 날짜 배열이 다르면 업데이트
         if currentDates != newDates {
-            uiViewController.filterImages = filterImages.reversed()
+            uiViewController.filterImages = Array(filterImages.reversed())
             uiViewController.collectionView.reloadData()
         }
 
