@@ -53,7 +53,11 @@ struct MFDetailView: View {
                            let uiImage = UIImage(data: imageData) {
                             frameManager.resultImage = uiImage
                         }
-                        naviManager.pop()
+                        if naviManager.route.count >= 2 {
+                            naviManager.popToRoot()
+                        } else if naviManager.route.count == 1{
+                            naviManager.pop()
+                        }
                         //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
                     } label: {
                         Image("ToolIconCamera")
