@@ -36,8 +36,8 @@ struct DFStickerView: View {
                             if selectedTab == tab {
                                 RoundedRectangle(cornerRadius: 13)
                                     .fill(.gray02)
-                                    .frame(width: 70, height: 26)
-                                    .frame(width:UIScreen.main.bounds.width/6-5)
+//                                    .frame(width: 70, height: 26)
+                                    .frame(width:UIScreen.main.bounds.width/8-5,height:26)
                             }
                             Text(tab.displayName)
                                 .font(.system(size: 15, weight: selectedTab == tab ? .bold : .medium))
@@ -48,12 +48,12 @@ struct DFStickerView: View {
                                     selectedTab = tab
                                     viewModel.selectedStickerTab = tab
                                 }
-//                                .frame(width:UIScreen.main.bounds.width/6-20)
+                            //                                .frame(width:UIScreen.main.bounds.width/6-20)
                         }
                         
                         Spacer()
                     }
-                    .frame(width:UIScreen.main.bounds.width/6-10)
+                    .frame(width:UIScreen.main.bounds.width/8-10)
                     
                 }
                 
@@ -112,7 +112,7 @@ struct DFStickerView: View {
 }
 
 enum StickerTab: String, CaseIterable {
-    case bubble, humor, character,y2k, full,retro
+    case bubble, humor, character,y2k, full,retro,hype,korean
     
     var displayName: String {
         NSLocalizedString("\(self.rawValue)", comment: "\(self.rawValue)")
@@ -147,8 +147,10 @@ struct StickerImages {
             .humor: humorStickers,
             .character: (1...6).map { String(format: "character%02d", $0) },
             .full: fullStickers,
-            .y2k : (1...6).map { String(format: "hype%02d", $0) },
+            .y2k : (1...6).map { String(format: "y2k%02d", $0) },
             .retro : (1...6).map { String(format: "retro%02d", $0) },
+            .hype : (1...15).map { String(format: "hype%02d", $0) },
+            .korean : (1...13).map { String(format: "korean%02d", $0) },
         ]
     }
     
