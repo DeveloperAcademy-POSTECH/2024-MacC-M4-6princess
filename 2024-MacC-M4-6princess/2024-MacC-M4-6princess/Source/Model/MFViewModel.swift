@@ -72,7 +72,7 @@ class MFViewModel: ObservableObject {
             }
             return downsampleImage(UIImage(data: imageData)!,
                                    to: CGSize(width: UIScreen.main.bounds.width / 3,
-                                              height: (UIScreen.main.bounds.width / 3) * (4 / 3)))?.jpegData(compressionQuality: 0.5)
+                                              height: (UIScreen.main.bounds.width / 3) * (4 / 3)))?.pngData()
         } catch {
             print("이미지 로딩 실패: \(error)")
             return nil
@@ -117,7 +117,7 @@ class MFViewModel: ObservableObject {
     ///원본 이미지를 다운샘플링(메모리 줄이기)
     func downsampleImage(_ image: UIImage, to pointSize: CGSize) -> UIImage? {
         let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-        guard let data = image.jpegData(compressionQuality: 1.0),
+        guard let data = image.pngData(),
               let imageSource = CGImageSourceCreateWithData(data as CFData, imageSourceOptions) else {
             return nil
         }

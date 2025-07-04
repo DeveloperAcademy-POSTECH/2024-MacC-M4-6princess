@@ -51,6 +51,17 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
+        
+        // 초기화 시 frameManager에서 선택된 프레임 복원
+        if currentSelectedFilter == nil && frameManager.selectedFrame != nil {
+            currentSelectedFilter = frameManager.selectedFrame
+        }
+        
+        // 디버깅: 모든 프레임의 UUID와 createdDate 출력
+        print("🔍 FilterCollectionViewController viewDidLoad - 총 프레임 수: \(filterImages.count)")
+        for (index, image) in filterImages.enumerated() {
+            print("🔍 프레임 \(index): UUID=\(image.uuid?.uuidString ?? "nil"), createdDate=\(image.createdDate?.description ?? "nil")")
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -59,8 +70,27 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     }
     
     func scrollToSelectedFilter(animated: Bool) {
-        guard let selectedUUID = currentSelectedFilter,
-              let index = filterImages.firstIndex(where: { $0.uuid == selectedUUID }) else { return }
+        // frameManager에서 선택된 프레임이 있지만 currentSelectedFilter가 없으면 복원
+        if currentSelectedFilter == nil && frameManager.selectedFrame != nil {
+            currentSelectedFilter = frameManager.selectedFrame
+        }
+        
+        guard let selectedUUID = currentSelectedFilter else {
+            print("⚠️ 선택된 UUID가 nil")
+            let indexPath = IndexPath(item: 0, section: 0)
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+            return
+        }
+        
+        // UUID가 nil이 아닌 프레임들만 필터링
+        let validImages = filterImages.filter { $0.uuid != nil }
+        guard let index = validImages.firstIndex(where: { $0.uuid == selectedUUID }) else { 
+            print("선택된 프레임을 찾을 수 없음: \(selectedUUID)")
+            // 선택된 프레임이 없으면 EmptyCell로 스크롤
+            let indexPath = IndexPath(item: 0, section: 0)
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+            return 
+        }
         
         let indexPath = IndexPath(item: index + 1, section: 0) // item이 0은 빈 셀이라 +1 해줌
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
@@ -115,10 +145,19 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             let filterIndex = indexPath.item - 1 //
             if filterIndex < filterImages.count {
                 let filter = filterImages[filterIndex]
+                // UUID가 nil이 아닌지 확인
+                guard let uuid = filter.uuid else {
+                    print("⚠️ UUID가 nil인 프레임 발견: 인덱스 \(filterIndex)")
+                    cell.configure(with: UIImage(), size: 0, isSelected: false)
+                    return cell
+                }
+                
                 if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
-                    let isSelected = filter.uuid == currentSelectedFilter
+                    let isSelected = uuid == currentSelectedFilter
                     cell.configure(with: uiImage, size: 0, isSelected: isSelected)
-                    // size는 더 이상 사용하지 않으므로 삭제
+                } else {
+                    print("⚠️ 이미지 데이터가 nil인 프레임: \(uuid)")
+                    cell.configure(with: UIImage(), size: 0, isSelected: false)
                 }
             }
             return cell
@@ -143,38 +182,104 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // Add smooth animation for cell size changes
-        UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
-            self.updateCellSizesAndSpacing()
-        })
+        // 스크롤 중에도 부드러운 애니메이션으로 셀 크기 업데이트
+        updateCellSizesOnly()
     }
-    // func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-    //     // 스크롤이 멈춘 후 빠른 위치 조정
-    //     UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
-    //         self.centerOnClosestCell()
-    //     })
+    
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-// 스크롤일떄/탭일때로 분기처리 하려 했던 흔적
-//        isUserScrolling = true
+        // 드래그 시작 시 중앙이동 비활성화
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        // 스크롤이 멈춘 후 빠른 위치 조정
-        UIView.animate(withDuration: 0.01, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
-            self.centerOnClosestCell()
-        })
+        // 스크롤이 완전히 멈춘 후에만 중앙이동
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.smoothCenterOnClosestCell()
+        }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            // 드래그가 끝난 후 빠른 위치 조정
-            UIView.animate(withDuration: 0.01, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
-                self.centerOnClosestCell()
-            })
+            // 드래그가 끝나고 감속이 없으면 중앙이동
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.smoothCenterOnClosestCell()
+            }
         }
     }
     
-    //가까운 셀을 중앙으로 위치 이동
+    // 스크롤 중에는 셀 크기만 업데이트 (중앙이동 없이)
+    private func updateCellSizesOnly() {
+        // 모든 보이는 셀의 크기와 테두리만 업데이트
+        for cell in collectionView.visibleCells {
+            guard let cellIndexPath = collectionView.indexPath(for: cell) else { continue }
+            if let filterCell = cell as? FilterCell {
+                let filterIndex = cellIndexPath.item - 1
+                if filterIndex >= 0 && filterIndex < filterImages.count {
+                    let filter = filterImages[filterIndex]
+                    if let imageData = filter.image, let uiImage = UIImage(data: imageData) {
+                        // UUID를 직접 비교하여 선택 상태 결정
+                        let isSelected = filter.uuid == currentSelectedFilter
+                        filterCell.configure(with: uiImage, size: 0, isSelected: isSelected)
+                    }
+                }
+            }
+        }
+        
+        // 사람의 스크롤 속도에 맞춘 부드러운 애니메이션
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
+            self.collectionView.collectionViewLayout.invalidateLayout()
+            self.collectionView.layoutIfNeeded()
+        })
+    }
+    
+    // 부드러운 중앙이동 (스크롤 완료 후에만 호출)
+    private func smoothCenterOnClosestCell() {
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        guard let closestCell = collectionView.visibleCells
+            .min(by: { abs($0.frame.midX - centerX) < abs($1.frame.midX - centerX) }),
+              let indexPath = collectionView.indexPath(for: closestCell) else {
+            return
+        }
+        
+        // 부드러운 애니메이션으로 중앙이동
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+            self.collectionView.layoutIfNeeded()
+        }) { _ in
+            // 애니메이션 완료 후 필터 선택
+            if indexPath.item == 0 {
+                self.selectedFilter?(nil)
+                self.currentSelectedFilter = nil
+                self.frameManager.selectedFrame = nil
+                self.frameManager.resultImage = nil
+            } else {
+                let filterIndex = indexPath.item - 1
+                if filterIndex >= 0 && filterIndex < self.filterImages.count {
+                    let selectedFilter = self.filterImages[filterIndex]
+                    
+                    // UUID가 유효한지 확인
+                    guard let uuid = selectedFilter.uuid else {
+                        print("smoothCenterOnClosestCell - 선택된 필터의 UUID가 nil입니다")
+                        return
+                    }
+                    
+                    self.selectedFilter?(uuid)
+                    self.currentSelectedFilter = uuid
+                    self.frameManager.selectedFrame = uuid
+                    self.frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
+                    
+                    // 디버깅을 위한 로그
+                    print("🎯 smoothCenterOnClosestCell - 선택된 프레임: \(uuid), 인덱스: \(filterIndex), 총 프레임 수: \(self.filterImages.count)")
+                }
+            }
+            
+            // 모든 셀의 크기와 테두리 상태 업데이트
+            self.updateCellSizesAndSpacing()
+        }
+        
+        frameManager.isFrameLoading = true
+    }
+    
+    //가까운 셀을 중앙으로 위치 이동 (기존 메서드 - 탭 시 사용)
     private func centerOnClosestCell() {
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
         guard let closestCell = collectionView.visibleCells
@@ -184,7 +289,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
         
         // 빠른 위치 조정 애니메이션
-        UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
             self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
             self.collectionView.layoutIfNeeded()
         }) { _ in
@@ -225,43 +330,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     
     
     private func updateCellSizesAndSpacing() {
-        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        
-        // 중앙에 가장 가까운 셀 찾기
-        guard let closestCell = collectionView.visibleCells
-            .min(by: { abs($0.frame.midX - centerX) < abs($1.frame.midX - centerX) }),
-              let indexPath = collectionView.indexPath(for: closestCell) else {
-            return
-        }
-        
-        // 중앙 셀의 선택 상태 업데이트
-        if indexPath.item == 0 {
-            self.selectedFilter?(nil)
-            currentSelectedFilter = nil
-            frameManager.selectedFrame = nil
-            frameManager.resultImage = nil
-        } else {
-            let filterIndex = indexPath.item - 1
-            if filterIndex >= 0 && filterIndex < filterImages.count {
-                let selectedFilter = filterImages[filterIndex]
-                
-                // UUID가 유효한지 확인
-                guard let uuid = selectedFilter.uuid else {
-                    print("선택된 필터의 UUID가 nil입니다")
-                    return
-                }
-                
-                self.selectedFilter?(uuid)
-                currentSelectedFilter = uuid
-                frameManager.selectedFrame = uuid
-                frameManager.resultImage = selectedFilter.image.flatMap { UIImage(data: $0) }
-                
-                // 디버깅을 위한 로그
-                print("🎯 updateCellSizesAndSpacing - 선택된 프레임: \(uuid), 인덱스: \(filterIndex), 총 프레임 수: \(filterImages.count)")
-            }
-        }
-        
-        // 모든 보이는 셀의 크기와 테두리 업데이트 - UUID 기반으로 안전하게 처리
+        // 모든 보이는 셀의 크기와 테두리만 업데이트 (선택 상태 변경 없이)
         for cell in collectionView.visibleCells {
             guard let cellIndexPath = collectionView.indexPath(for: cell) else { continue }
             if let filterCell = cell as? FilterCell {
@@ -277,7 +346,11 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             }
         }
         
-        collectionView.collectionViewLayout.invalidateLayout()
+        // 부드러운 레이아웃 업데이트
+        UIView.animate(withDuration: 0.25, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+            self.collectionView.collectionViewLayout.invalidateLayout()
+            self.collectionView.layoutIfNeeded()
+        })
     }
     
     

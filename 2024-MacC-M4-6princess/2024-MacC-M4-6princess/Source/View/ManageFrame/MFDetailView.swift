@@ -53,7 +53,11 @@ struct MFDetailView: View {
                            let uiImage = UIImage(data: imageData) {
                             frameManager.resultImage = uiImage
                         }
-                        naviManager.pop()
+                        if naviManager.route.count >= 2 {
+                            naviManager.popToRoot()
+                        } else if naviManager.route.count == 1{
+                            naviManager.pop()
+                        }
                         //카메라뷰로 갈 때 frameManager.resultImage에 탭한 UIImage 넘겨주어야함
                     } label: {
                         Image("ToolIconCamera")
@@ -100,6 +104,7 @@ struct MFDetailView: View {
             .frame(height: 102)
             //            .padding(.top, 20)
         }
+        .frame(maxWidth: .infinity)
     }
     
     //    var bodyContentView: some View {
@@ -137,11 +142,18 @@ struct MFDetailView: View {
             VStack(spacing: 0) {
                 topBar
                     .frame(width: geo.size.width, height: 80)
+                    .background(.white)
                 bodyContentView
                 bottomBar
+                    .background(.white)
+            }
+            .background {
+            Image("checkBox")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
             }
         }
-        //        .ignoresSafeArea(edges: .top)
         .navigationBarBackButtonHidden(true)
         .alert("이 프레임을 삭제할까요?", isPresented: $viewModel.isDeleteAlertDetail) {
             Button {
@@ -237,3 +249,4 @@ extension MFDetailView {
         
     }
 }
+

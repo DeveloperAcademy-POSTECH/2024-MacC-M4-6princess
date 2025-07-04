@@ -6,19 +6,28 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @EnvironmentObject var frameManager: FrameManager
+    @Environment(\.managedObjectContext) var viewContext
     @FetchRequest(entity: StoreImages.entity(),
                   sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)])
     var filterImages: FetchedResults<StoreImages>
     let viewModel: CameraViewModel
     
-    func makeUIViewController(context: Context) -> FilterCollectionViewController {
-        let reversedImages = Array(filterImages.reversed())
+        func makeUIViewController(context: Context) -> FilterCollectionViewController {
+        // UUID가 nil이 아닌 프레임만 필터링
+        let validImages = filterImages.filter { $0.uuid != nil }
+        let reversedImages = Array(validImages.reversed())
         print("📱 makeUIViewController - 총 프레임 수: \(reversedImages.count)")
         for (index, image) in reversedImages.enumerated() {
             print("📱 프레임 \(index): \(image.uuid?.uuidString ?? "nil") - 생성일: \(image.createdDate?.description ?? "nil")")
+        }
+        
+        // frameManager에 선택된 프레임이 있지만 resultImage가 없으면 로드
+        if frameManager.selectedFrame != nil && frameManager.resultImage == nil {
+            loadSelectedFrameFromCoreData()
         }
         
         return FilterCollectionViewController(
@@ -75,7 +84,30 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
             uiViewController.scrollToSelectedFilter(animated: false)
         }
     }
-
-
-
+    
+    // CoreData에서 프레임 로딩 함수
+    private func loadSelectedFrameFromCoreData() {
+        guard let frameId = frameManager.selectedFrame else {
+            frameManager.resultImage = nil
+            return
+        }
+        
+        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try viewContext.fetch(fetchRequest)
+            if let storedImage = results.first, let imageData = storedImage.image {
+                frameManager.resultImage = UIImage(data: imageData)
+                print("✅ 프레임 로딩 성공: \(frameId)")
+            } else {
+                frameManager.resultImage = nil
+                print("❌ 프레임 데이터 없음: \(frameId)")
+            }
+        } catch {
+            print("❌ 프레임 로딩 에러: \(error)")
+            frameManager.resultImage = nil
+        }
+    }
 }
