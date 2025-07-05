@@ -115,7 +115,7 @@ enum StickerTab: String, CaseIterable {
     case bubble, humor, character,y2k, full,retro,hype,korean
     
     var displayName: String {
-        NSLocalizedString("\(self.rawValue)", comment: "\(self.rawValue)")
+        NSLocalizedString("stickerTab.\(self.rawValue)", comment: "")
     }
 }
 
