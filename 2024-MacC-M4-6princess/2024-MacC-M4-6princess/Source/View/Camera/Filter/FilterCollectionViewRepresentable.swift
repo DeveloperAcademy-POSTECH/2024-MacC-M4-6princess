@@ -6,18 +6,32 @@
 //
 
 import SwiftUI
-//SwiftUI와 UIKit의 연결점...?
+import CoreData
 
 struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
     @EnvironmentObject var frameManager: FrameManager
+    @Environment(\.managedObjectContext) var viewContext
     @FetchRequest(entity: StoreImages.entity(),
                   sortDescriptors: [NSSortDescriptor(keyPath: \StoreImages.createdDate, ascending: true)])
     var filterImages: FetchedResults<StoreImages>
     let viewModel: CameraViewModel
     
-    func makeUIViewController(context: Context) -> FilterCollectionViewController {
+        func makeUIViewController(context: Context) -> FilterCollectionViewController {
+        // UUID가 nil이 아닌 프레임만 필터링
+        let validImages = filterImages.filter { $0.uuid != nil }
+        let reversedImages = Array(validImages.reversed())
+        print("📱 makeUIViewController - 총 프레임 수: \(reversedImages.count)")
+        for (index, image) in reversedImages.enumerated() {
+            print("📱 프레임 \(index): \(image.uuid?.uuidString ?? "nil") - 생성일: \(image.createdDate?.description ?? "nil")")
+        }
+        
+        // frameManager에 선택된 프레임이 있지만 resultImage가 없으면 로드
+        if frameManager.selectedFrame != nil && frameManager.resultImage == nil {
+            loadSelectedFrameFromCoreData()
+        }
+        
         return FilterCollectionViewController(
-            filterImages: filterImages.reversed(),
+            filterImages: reversedImages,
             selectedFilter: { uuid in
                 frameManager.selectedFrame = uuid
                 print("🔥 selectedFilter 클로저 호출됨! uuid: \(uuid?.uuidString ?? "nil")")
@@ -28,19 +42,6 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         )
     }
     
-    //    func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
-    //        uiViewController.collectionView.reloadData()
-    //
-    //        // 선택된 필터를 스크롤로 중앙에 위치시키기
-    //        if let selectedFilter = frameManager.selectedFrame,
-    //           let index = uiViewController.filterImages.firstIndex(where: { $0.uuid == selectedFilter }) {
-    //            uiViewController.collectionView.scrollToItem(
-    //                at: IndexPath(item: index + 1, section: 0),
-    //                at: .centeredHorizontally,
-    //                animated: true
-    //            )
-    //        }
-    //    }
     func updateUIViewController(_ uiViewController: FilterCollectionViewController, context: Context) {
         // 데이터가 있는지 확인
         guard !uiViewController.filterImages.isEmpty && !filterImages.isEmpty else {
@@ -49,7 +50,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         
         // createdDate가 nil이 아닌 필터만 추출하여 정렬(프레임이 아무것도 없을 때)
         let currentFiltersWithDates = uiViewController.filterImages.filter { $0.createdDate != nil }
-        let newFiltersWithDates = filterImages.reversed().filter { $0.createdDate != nil }
+        let newFiltersWithDates = Array(filterImages.reversed()).filter { $0.createdDate != nil }
         
         // 날짜가 있는 필터가 하나도 없으면 비교하지 않음(프레임이 아무것도 없을 때)
         guard !currentFiltersWithDates.isEmpty && !newFiltersWithDates.isEmpty else {
@@ -73,7 +74,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         
         // 날짜 배열이 다르면 업데이트
         if currentDates != newDates {
-            uiViewController.filterImages = filterImages.reversed()
+            uiViewController.filterImages = Array(filterImages.reversed())
             uiViewController.collectionView.reloadData()
         }
 
@@ -83,7 +84,30 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
             uiViewController.scrollToSelectedFilter(animated: false)
         }
     }
-
-
-
+    
+    // CoreData에서 프레임 로딩 함수
+    private func loadSelectedFrameFromCoreData() {
+        guard let frameId = frameManager.selectedFrame else {
+            frameManager.resultImage = nil
+            return
+        }
+        
+        let fetchRequest: NSFetchRequest<StoreImages> = StoreImages.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uuid == %@", frameId as CVarArg)
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try viewContext.fetch(fetchRequest)
+            if let storedImage = results.first, let imageData = storedImage.image {
+                frameManager.resultImage = UIImage(data: imageData)
+                print("✅ 프레임 로딩 성공: \(frameId)")
+            } else {
+                frameManager.resultImage = nil
+                print("❌ 프레임 데이터 없음: \(frameId)")
+            }
+        } catch {
+            print("❌ 프레임 로딩 에러: \(error)")
+            frameManager.resultImage = nil
+        }
+    }
 }
