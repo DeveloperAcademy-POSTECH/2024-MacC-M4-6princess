@@ -107,37 +107,37 @@
         <a href="https://www.linkedin.com/in/minkimskylar">
       <img src="/images/skyla.png" width="88" alt="Skylar"/>
         </a><br />
-      <b>Skylar</b><br />PM
+      <a href="https://www.linkedin.com/in/minkimskylar"><b>Skylar</b></a><br />PM
     </td>
     <td align="center">
         <a href="https://www.linkedin.com/in/yurimbae">
       <img src="/images/nana.png" width="88" alt="Nana"/>
         </a><br />
-      <b>Nana</b><br />디자이너
+     <a href="https://www.linkedin.com/in/yurimbae"> <b>Nana</b></a><br />디자이너
     </td>
     <td align="center">
         <a href="https://www.linkedin.com/in/yejin-kang-a8b534209/">
       <img src="/images/sora.png" width="88" alt="Sora"/>
         </a><br />
-      <b>Sora</b><br />디자이너
+      <a href="https://www.linkedin.com/in/yejin-kang-a8b534209"><b>Sora</b></a><br />디자이너
     </td>
     <td align="center">
         <a href="https://github.com/darongzzang">
       <img src="/images/jane.png" width="88" alt="Jane"/>
         </a><br />
-      <b>Jane</b><br />iOS 개발
+     <a href="https://github.com/darongzzang"> <b>Jane</b></a><br />iOS 개발
     </td>
     <td align="center">
         <a href="https://github.com/TakeMos">
       <img src="/images/jamie.png" width="88" alt="Jamie"/>
         </a><br />
-      <b>Jamie</b><br />iOS 개발
+      <a href="https://github.com/TakeMos"><b>Jamie</b></a><br />iOS 개발
     </td>
     <td align="center">
   <a href="https://github.com/piriram">
     <img src="/images/piri.png" width="88" alt="Piri"/>
   </a><br />
-  <b>Piri</b><br />iOS 개발
+ <a href="https://github.com/piriram"> <b>Piri</b></a><br />iOS 개발
 </td>
 
   </tr>
