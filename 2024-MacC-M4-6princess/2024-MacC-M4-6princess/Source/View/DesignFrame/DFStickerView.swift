@@ -36,7 +36,7 @@ struct DFStickerView: View {
                             if selectedTab == tab {
                                 RoundedRectangle(cornerRadius: 13)
                                     .fill(.gray02)
-                                                                    .frame(width: 70, height: 26)
+                                    .frame(width: 70, height: 26)
                                     .frame(width:UIScreen.main.bounds.width/8-5,height:26)
                             }
                             Text(tab.displayName)
@@ -132,7 +132,7 @@ struct StickerImages {
         case let id where id.hasPrefix("en"):
             humorStickers = (1...20).map { String(format: "k-word%02d", $0) }
         default: // 영어 포함
-            humorStickers = (1...20).map { String(format: "humor%02d", $0) }
+            humorStickers = (1...39).map { String(format: "humor%02d", $0) }
         }
         let fullStickers: [String]
         switch locale {
@@ -142,7 +142,7 @@ struct StickerImages {
             fullStickers = (1...3).map { String(format: "zh_full%02d", $0) }
             
         default: // 영어 포함
-            fullStickers = (1...22).map { String(format: "full%02d", $0) }
+            fullStickers = (1...24).map { String(format: "full%02d", $0) }
         }
         let characterStickers: [String]
         switch locale {
