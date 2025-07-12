@@ -140,9 +140,13 @@ struct StickerImages {
             fullStickers = (1...4).map { String(format: "ja_full%02d", $0) }
         case let id where id.hasPrefix("zh"):
             fullStickers = (1...3).map { String(format: "zh_full%02d", $0) }
-            
+        case let id where id.hasPrefix("en"):
+            fullStickers = (1...24)
+                .filter { ![2,3].contains($0) }
+                .map { String(format: "full%02d", $0) }
         default: // 영어 포함
-            fullStickers = (1...24).map { String(format: "full%02d", $0) }
+            fullStickers = (1...24)
+                .map { String(format: "full%02d", $0) }
         }
         let characterStickers: [String]
         switch locale {
