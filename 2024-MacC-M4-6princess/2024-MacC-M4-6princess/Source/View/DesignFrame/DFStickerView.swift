@@ -37,6 +37,7 @@ struct DFStickerView: View {
                                 RoundedRectangle(cornerRadius: 13)
                                     .fill(.gray02)
                                     .frame(width: 70, height: 26)
+                                    .frame(width:UIScreen.main.bounds.width/8-5,height:26)
                             }
                             Text(tab.displayName)
                                 .font(.system(size: 15, weight: selectedTab == tab ? .bold : .medium))
@@ -52,7 +53,7 @@ struct DFStickerView: View {
                         
                         Spacer()
                     }
-//                    .frame(width:UIScreen.main.bounds.width/5)
+                    .frame(width:UIScreen.main.bounds.width/5)
                     
                 }
                 
@@ -62,7 +63,7 @@ struct DFStickerView: View {
             Divider()
             ScrollView {
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 70, maximum: 120), spacing: 10)],
+                    columns: [GridItem(.adaptive(minimum: 80, maximum: 120), spacing: 10)],
                     spacing: 10
                 ) {
                     ForEach(stickers[selectedTab] ?? [], id: \.self) { imageName in
@@ -103,7 +104,7 @@ struct DFStickerView: View {
                         .aspectRatio(1, contentMode: .fit) // 비율 유지
                     }
                 }
-                .padding(.horizontal,20)
+                .padding(.horizontal,10)
             }
             .frame(width:UIScreen.main.bounds.width)
         }
@@ -111,25 +112,27 @@ struct DFStickerView: View {
 }
 
 enum StickerTab: String, CaseIterable {
-    case bubble, humor, character,y2k, full
+    case bubble, humor, character,full
     
     var displayName: String {
-        NSLocalizedString("\(self.rawValue)", comment: "\(self.rawValue)")
+        NSLocalizedString("stickerTab.\(self.rawValue)", comment: "")
     }
 }
 
 struct StickerImages {
     static func getStickerImages() -> [StickerTab: [String]] {
         let locale = Locale.current.identifier
-
+        
         let humorStickers: [String]
         switch locale {
         case let id where id.hasPrefix("ja"):
             humorStickers = (1...17).map { String(format: "ja_humor%02d", $0) }
         case let id where id.hasPrefix("zh"):
             humorStickers = (1...22).map { String(format: "zh_humor%02d", $0) }
+        case let id where id.hasPrefix("en"):
+            humorStickers = (1...20).map { String(format: "k-word%02d", $0) }
         default: // 영어 포함
-            humorStickers = (1...28).map { String(format: "humor%02d", $0) }
+            humorStickers = (1...39).map { String(format: "humor%02d", $0) }
         }
         let fullStickers: [String]
         switch locale {
@@ -137,17 +140,28 @@ struct StickerImages {
             fullStickers = (1...4).map { String(format: "ja_full%02d", $0) }
         case let id where id.hasPrefix("zh"):
             fullStickers = (1...3).map { String(format: "zh_full%02d", $0) }
-            
+        case let id where id.hasPrefix("en"):
+            fullStickers = (1...24)
+                .filter { ![2,3].contains($0) }
+                .map { String(format: "full%02d", $0) }
         default: // 영어 포함
-            fullStickers = (1...10).map { String(format: "full%02d", $0) }
+            fullStickers = (1...24)
+                .map { String(format: "full%02d", $0) }
+        }
+        let characterStickers: [String]
+        switch locale {
+        case let id where id.hasPrefix("en"):
+            characterStickers = (1...30).map { String(format: "character%02d", $0) }
+        default: // 영어 포함
+            characterStickers = (1...24).map { String(format: "character%02d", $0) }
         }
         return [
             .bubble: (1...33).map { String(format: "bubble%02d", $0) },
             .humor: humorStickers,
-            .character: (1...6).map { String(format: "character%02d", $0) },
+            .character: characterStickers,
             .full: fullStickers,
-            .y2k : (1...6).map { String(format: "hype%02d", $0) },
+            
         ]
     }
-
+    
 }

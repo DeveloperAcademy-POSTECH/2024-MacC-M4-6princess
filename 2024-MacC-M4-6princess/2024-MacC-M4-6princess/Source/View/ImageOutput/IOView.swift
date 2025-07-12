@@ -11,6 +11,7 @@ import FirebaseAnalytics
 import UIKit
 import LinkPresentation
 import GoogleMobileAds
+
 // 이미지 편집 메인 화면
 struct IOView: View {
     var bg:UIImage
@@ -22,9 +23,8 @@ struct IOView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack{
-              
+                
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
-//                    Spacer()
                     HStack(alignment: .center, spacing: 14) {
                         Text("갤러리에 저장되었습니다")
                             .font(.system(size:17))
@@ -34,7 +34,7 @@ struct IOView: View {
                     }
                     .padding(.vertical,10)
                     
-                 
+                    
                     Spacer()
                     
                 }
@@ -46,32 +46,22 @@ struct IOView: View {
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray01)
                     }
-//                    .padding(.top, 26)
                 }
                 
                 // 후보정 레이어 편집 뷰
                 canvasView
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3)
                     .onAppear{
-//                        viewModel.currentOrientation = motionManager.currentOrientation
                         viewModel.renderAndSaveViewImage(content: canvasView, motionManager: motionManager, orientation: viewModel.currentOrientation) // 사진을 그리면서 동시에 저장
                         motionManager.stopDeviceMotionUpdates()
                         viewModel.saveAnimate = true
                         print("canvasView onAppear")
                     }
-//                    .applyIf(motionManager.currentOrientation != .portrait && motionManager.currentOrientation != .portraitUpsideDown) { original in
-//                        original.modifier(
-//                            RotatedAndScaledEffect(
-//                                angle: motionManager.rotationAngleCanvasView(for: motionManager.currentOrientation),
-//                                scale: 0.75  //하드코딩 수정필요
-//                            )
-//                        )
-//                    }
                     .scaledToFit()
                 
                 
                 if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
-                  
+                    
                     VStack(alignment: .center, spacing: 8){
                         HStack{
                             // 카메라로 이동 버튼
@@ -90,8 +80,6 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-                                
-                                //                                viewModel.showShareButton.toggle()
                                 viewModel.changeOverlay = true
                             }) {
                                 Image("share.icon")
@@ -102,25 +90,19 @@ struct IOView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                         .padding(.vertical,10)
-                      
+                        
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                             .ignoresSafeArea(.all)
                         
                         
                         
                     }
-                   
+                    
                 }
                 else{
                     VStack(alignment: .center, spacing: 8){
-//                        Text("저장된 사진은 갤러리에서 확인해주세요.")
-//                            .font(.system(size:12))
-//                            .multilineTextAlignment(.center)
-//                            .foregroundColor(.gray01)
-//                            .padding(5)
                         HStack{
                             // 카메라로 이동 버튼
                             Button(action: {
@@ -138,7 +120,6 @@ struct IOView: View {
                                     )
                             }
                             Button(action: {
-//                                viewModel.showShareButton = true
                                 viewModel.changeOverlay = true
                             }
                             ) {
@@ -148,7 +129,6 @@ struct IOView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        //                        .padding(.bottom, 26)
                         .padding(.horizontal, 20)
                         IOBottomBannerAdMob(currentOrientationAnchoredAdaptiveBanner(width:UIScreen.main.bounds.width))
                         Spacer()
@@ -164,8 +144,6 @@ struct IOView: View {
             viewModel.idolImg = idol
             viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
             Analytics.logEvent("A6_사진저장", parameters: nil)
-            
-            print("body onAppear")
         }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(title: Text("오류 발생"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("확인")))
@@ -181,16 +159,13 @@ struct IOView: View {
                 }
             }
         }
-
-
+        
+        
         .overlay(
             Group {
                 
                 if viewModel.changeOverlay, let photo = viewModel.compositeImage {
                     IOShareSheet(isPresented: $viewModel.changeOverlay, shareData: (photo, "title", "Frameet으로 사진 찍어왔음"))
-                        .onAppear{
-                            print("sharesheet start")
-                        }
                 }
             }
         )

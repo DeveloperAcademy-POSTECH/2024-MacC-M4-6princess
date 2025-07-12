@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "full08.svg",
+      "filename" : "full08.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "full08@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "full08@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
