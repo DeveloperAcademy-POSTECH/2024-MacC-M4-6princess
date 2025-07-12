@@ -51,12 +51,12 @@ struct CameraBottomView: View {
                                     .font(.caption)
                                     .multilineTextAlignment(.center)
                                     .lineLimit(2)
-                                    .minimumScaleFactor(0.5)
+                                    .minimumScaleFactor(0.7)
                                     .foregroundColor(.black)
                             }
                         }
                         .padding(.leading, 20)
-                        .frame(width: 70, height: 70)
+                        .frame(width: 70, height: 80)
                         .background(.white)
                         
                         Spacer()
