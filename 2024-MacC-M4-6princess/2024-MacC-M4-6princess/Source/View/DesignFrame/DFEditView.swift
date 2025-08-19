@@ -277,7 +277,6 @@ private extension DFEditView {
             }
             .accentColor(.pointPink)
             .frame(width: UIScreen.main.bounds.width / 1.2, height: 22)
-//            .padding([.leading, .trailing, .top, .bottom], 10)
         }
         .onAppear() {
             print(UIScreen.main.bounds.width)
