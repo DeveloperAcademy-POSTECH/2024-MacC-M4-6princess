@@ -61,7 +61,7 @@ class DFModifyViewModel: ObservableObject {
             }
             .onEnded { value in
                 if let subject = self.modelList.first, subject.isTapped {
-                    self.setScaleValue(minimum: 0.2, maximum: 10, subject: subject)
+                    self.setScaleValue(minimum: 0.1, maximum: 10, subject: subject)
                 }
                 
             }
