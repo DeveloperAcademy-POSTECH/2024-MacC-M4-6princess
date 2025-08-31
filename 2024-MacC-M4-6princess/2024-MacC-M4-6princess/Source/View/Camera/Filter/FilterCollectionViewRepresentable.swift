@@ -20,10 +20,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
         // UUID가 nil이 아닌 프레임만 필터링
         let validImages = filterImages.filter { $0.uuid != nil }
         let reversedImages = Array(validImages.reversed())
-//        print("📱 makeUIViewController - 총 프레임 수: \(reversedImages.count)")
-//        for (index, image) in reversedImages.enumerated() {
-//            print("📱 프레임 \(index): \(image.uuid?.uuidString ?? "nil") - 생성일: \(image.createdDate?.description ?? "nil")")
-//        }
+
         
         // frameManager에 선택된 프레임이 있지만 resultImage가 없으면 로드
         if frameManager.selectedFrame != nil && frameManager.resultImage == nil {
@@ -50,7 +47,7 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
                             }
                         }
                     } catch {
-                        print("❌ 프레임 로딩 에러: \(error)")
+                        print("프레임 로딩 에러: \(error)")
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -123,13 +120,11 @@ struct FilterCollectionViewRepresentable: UIViewControllerRepresentable {
             let results = try viewContext.fetch(fetchRequest)
             if let storedImage = results.first, let imageData = storedImage.image {
                 frameManager.resultImage = UIImage(data: imageData)
-//                print("✅ 프레임 로딩 성공: \(frameId)")
             } else {
                 frameManager.resultImage = nil
-                print("❌ 프레임 데이터 없음: \(frameId)")
             }
         } catch {
-            print("❌ 프레임 로딩 에러: \(error)")
+            print("프레임 로딩 에러: \(error)")
             frameManager.resultImage = nil
         }
     }

@@ -20,7 +20,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     
     var currentSelectedFilter: UUID? {
         didSet {
-            print("currentSelectedFilter: \(currentSelectedFilter?.uuidString ?? "nil")")
             updateSelectedIndexPath()
         }
     }
@@ -74,7 +73,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         scrollToSelectedFilter(animated: false)
     }
     
-    // MARK: - Setup
+    // MARK: - setup 
     
     private func setupCollectionView() {
         let layout = CustomFlowLayout()
@@ -122,7 +121,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         view.bringSubviewToFront(shutterButton)
     }
     
-    // MARK: - CollectionView DataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return filterImages.count + 1 // EmptyCell 포함
@@ -155,7 +153,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
-    // MARK: - CollectionView Delegate
+    // MARK: - Delegate 함수
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         let shutterFrame = shutterButton.convert(shutterButton.bounds, to: collectionView)
@@ -204,7 +202,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
-    // MARK: - Filter Selection
+    // MARK: - 필터 선택
     
     private func selectFilterAtIndex(_ indexPath: IndexPath) {
         if indexPath.item == 0 {
@@ -301,8 +299,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
-    // MARK: - Public Methods
-    
     func addNewFilter(_ newFilter: StoreImages) {
         filterImages.append(newFilter)
         collectionView.reloadData()
@@ -312,7 +308,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         collectionView.scrollToItem(at: newestIndexPath, at: .centeredHorizontally, animated: true)
     }
     
-    // MARK: - Actions
     
     @objc private func shutterButtonTapped() {
         guard frameManager.selectedFrame != nil else {
