@@ -140,6 +140,15 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     //기기의 카메라 렌즈 사양에 따라 카메라(비디오렌즈)를 선택
     func getBestCamera(from devices: [AVCaptureDevice]) -> AVCaptureDevice? {
         // 우선순위에 따라 카메라 선택
+        if let dualWideCamera = devices.first(where: { $0.deviceType == .builtInDualWideCamera }) {
+            return dualWideCamera
+        }
+        if let tripleCamera = devices.first(where: { $0.deviceType == .builtInTripleCamera }) {
+            return tripleCamera
+        }
+        if let dualCamera = devices.first(where: { $0.deviceType == .builtInDualCamera }) {
+            return dualCamera
+        }
         if let ultraWideCamera = devices.first(where: { $0.deviceType == .builtInUltraWideCamera }) {
             return ultraWideCamera
         }
@@ -254,13 +263,29 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         do {
             try device.lockForConfiguration()
             
-            // 줌 범위 확인 및 적용
+            // 광학 줌 단계 확인 (듀얼/트리플 카메라)
+            let zoomFactors = device.virtualDeviceSwitchOverVideoZoomFactors as? [NSNumber] ?? []
+            print("Available zoom factors: \(zoomFactors)") // 사용 가능한 줌 단계 확인
+            
+            // 줌 범위 설정
             let minZoom = device.minAvailableVideoZoomFactor
-            let maxZoom = device.maxAvailableVideoZoomFactor
-            let finalZoom = min(max(zoom, minZoom), maxZoom)
+            let maxZoom = min(device.maxAvailableVideoZoomFactor, 10.0) // 최대 10배로 제한
+            var finalZoom = min(max(zoom, minZoom), maxZoom)
+            
+            // 광학 줌 단계와 가까운 경우 해당 단계로 스냅
+            if !zoomFactors.isEmpty {
+                for factor in zoomFactors {
+                    let zoomFactor = CGFloat(truncating: factor)
+                    if abs(finalZoom - zoomFactor) < 0.3 {  // 0.3 이내면 광학 줌 단계로 스냅
+                        finalZoom = zoomFactor
+                        break
+                    }
+                }
+            }
             
             // 부드러운 줌 적용
-            device.ramp(toVideoZoomFactor: finalZoom, withRate: 100.0)
+            let rate: Double = finalZoom <= 2.0 ? 30.0 : 100.0  // 광학 줌 범위에서는 더 부드럽게
+            device.ramp(toVideoZoomFactor: finalZoom, withRate: Float(rate))
             
             device.unlockForConfiguration()
         } catch {
