@@ -34,6 +34,10 @@ class IOViewModel: ObservableObject {
     /// 뷰를 이미지로 변환 후 저장
     @MainActor
     func renderAndSaveViewImage<T: View>(content: T, motionManager: MotionManager,orientation:UIDeviceOrientation) {
+        guard frameBGSize.width > 0 , frameBGSize.height > 0 else {
+            showAlert(message: "화면 초기화 전입니다. 잠시 후 다시 시도해 주세요")
+            return
+        }
         guard let uiImage = renderImage(content, motionManager) else {
             showAlert(message: "렌더링 실패: 다시 시도해주세요.\n에러가 반복될 시 캡쳐후 제보부탁드립니다.")
             return
@@ -133,7 +137,7 @@ class IOViewModel: ObservableObject {
         func getAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
             let fetchOptions = PHFetchOptions()
             fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
-            let fetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+            let fetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumRegular, options: fetchOptions)
             
             if let album = fetchResult.firstObject {
                 completion(album)
