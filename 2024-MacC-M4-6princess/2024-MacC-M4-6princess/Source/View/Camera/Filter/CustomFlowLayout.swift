@@ -8,12 +8,10 @@
 import UIKit
 
 class CustomFlowLayout: UICollectionViewFlowLayout {
-    // 셀 크기 상수
     let centerCellSize: CGFloat = 58
     let defaultCellSize: CGFloat = 38
     let emptyCellWidth: CGFloat = 58
     
-    // 간격 상수
     let centerCellSpacing: CGFloat = 31
     let defaultCellSpacing: CGFloat = 20
     
@@ -24,13 +22,9 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         super.prepare()
         guard let collectionView = collectionView else { return }
         
-        // 첫 번째와 마지막 셀이 화면 중앙에 올 수 있도록 contentInset 설정
         let inset = (collectionView.bounds.width - centerCellSize) / 2
         collectionView.contentInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
-        
-        // 스크롤 감속률 설정, 빠르면 임의로 설정해도 됨
-        collectionView.decelerationRate = .normal
-        
+        collectionView.decelerationRate = UIScrollView.DecelerationRate(rawValue: 0.6)
         minimumLineSpacing = standardSpacing
     }
     
@@ -41,90 +35,120 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         }
         
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        let centerCell = attributes.min { abs($0.center.x - centerX) < abs($1.center.x - centerX) }
-        guard let centerCell = centerCell else { return attributes }
+        let contentInset = collectionView.contentInset.left
         
-        // 1. 크기 먼저 지정
-        for attribute in attributes {
-            if attribute.indexPath.item == 0 {
-                attribute.size = CGSize(width: emptyCellWidth, height: emptyCellWidth)
-            } else if attribute.indexPath.item == centerCell.indexPath.item {
-                attribute.size = CGSize(width: centerCellSize, height: centerCellSize)
-            } else {
-                attribute.size = CGSize(width: defaultCellSize, height: defaultCellSize)
-            }
-        }
+        // 스크롤 중에는 셀 크기만 조정하고 위치는 변경하지 않음
+        let isScrolling = collectionView.isTracking || collectionView.isDecelerating
         
-        // 2. 위치 재배치 (중앙 셀 기준으로 좌우로 간격 유지)
-        // 중앙 셀의 center.x를 기준으로 좌우로 배치
-        let sorted = attributes.sorted { $0.indexPath.item < $1.indexPath.item }
-        guard let centerIdx = sorted.firstIndex(where: { $0.indexPath.item == centerCell.indexPath.item }) else { return attributes }
-        
-        // 중앙 셀 위치 보정
-        sorted[centerIdx].center.x = centerX
-        
-        // 왼쪽 셀들 배치
-        for i in stride(from: centerIdx - 1, through: 0, by: -1) {
-            let right = sorted[i + 1]
-            let current = sorted[i]
-            let spacing = (i + 1 == centerIdx) ? centerCellSpacing : defaultCellSpacing
-            sorted[i].center.x = right.center.x - (right.size.width + current.size.width) / 2 - spacing
-        }
-        // 오른쪽 셀들 배치
-        for i in (centerIdx + 1)..<sorted.count {
-            let left = sorted[i - 1]
-            let current = sorted[i]
-            let spacing = (i - 1 == centerIdx) ? centerCellSpacing : defaultCellSpacing
-            sorted[i].center.x = left.center.x + (left.size.width + current.size.width) / 2 + spacing
-        }
-        return sorted
-    }
-    
-    override var collectionViewContentSize: CGSize {
-        guard let collectionView = collectionView else { return .zero }
-        
-        // 필터셀 개수와 간격을 기반으로 스크롤 가능한 영역 계산
-        let itemCount = collectionView.numberOfItems(inSection: 0)
-        
-        // 빈 셀을 포함하여 전체 크기 계산
-        let emptyAndSpacing = emptyCellWidth + defaultCellSpacing
-        let defaultCellsWidth = CGFloat(itemCount - 3) * (defaultCellSize + defaultCellSpacing)
-        let centerAndRightWidth = centerCellSize + centerCellSpacing + defaultCellSpacing
-        
-        // 최종 너비 계산
-        let totalWidth = emptyAndSpacing + defaultCellsWidth + centerAndRightWidth
-        
-        // 여유 공간 추가
-        return CGSize(width: totalWidth + defaultCellSize * 2, height: collectionView.bounds.height)
-    }
-    
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        guard let collectionView = collectionView else {
-            return super.targetContentOffset(forProposedContentOffset: proposedContentOffset, withScrollingVelocity: velocity)
-        }
-        
-        let targetRect = CGRect(x: proposedContentOffset.x, y: 0, width: collectionView.bounds.width, height: collectionView.bounds.height)
-        guard let attributes = layoutAttributesForElements(in: targetRect) else {
-            return super.targetContentOffset(forProposedContentOffset: proposedContentOffset, withScrollingVelocity: velocity)
-        }
-        
-        let centerX = proposedContentOffset.x + collectionView.bounds.width / 2
-        
-        var minDistance = CGFloat.greatestFiniteMagnitude
-        var targetOffset = proposedContentOffset
+        // 중앙에 가장 가까운 셀 찾기
+        var closestCell: UICollectionViewLayoutAttributes?
+        var minDistance: CGFloat = CGFloat.greatestFiniteMagnitude
         
         for attribute in attributes {
             let distance = abs(attribute.center.x - centerX)
             if distance < minDistance {
                 minDistance = distance
-                targetOffset.x = attribute.center.x - collectionView.bounds.width / 2
+                closestCell = attribute
             }
         }
         
-        // 애니메이션 속도 조정하는 곳
-        let damping: CGFloat = 0.6
-        let velocityMultiplier: CGFloat = velocity.x * damping
-        targetOffset.x += velocityMultiplier
+        guard let centerCell = closestCell else { return attributes }
+        
+        // 셀 크기 설정
+        for attribute in attributes {
+            if attribute.indexPath.item == 0 {
+                attribute.size = CGSize(width: emptyCellWidth, height: emptyCellWidth)
+            } else {
+                let distance = abs(attribute.center.x - centerX)
+                let maxDistance: CGFloat = 180.0
+                
+                let normalizedDistance = min(distance / maxDistance, 1.0)
+                let sineProgress = sin((1.0 - normalizedDistance) * .pi / 2)
+                let smoothedProgress = sineProgress * sineProgress
+                
+                let interpolatedSize = defaultCellSize + (centerCellSize - defaultCellSize) * smoothedProgress
+                let finalSize = max(defaultCellSize, min(centerCellSize, interpolatedSize))
+                
+                attribute.size = CGSize(width: finalSize, height: finalSize)
+            }
+        }
+        
+        // 스크롤 중이 아닐 때만 셀 위치 재배치
+        if !isScrolling {
+            let sorted = attributes.sorted { $0.indexPath.item < $1.indexPath.item }
+            guard let centerIdx = sorted.firstIndex(where: { $0.indexPath.item == centerCell.indexPath.item }) else { return attributes }
+            
+            sorted[centerIdx].center.x = centerX
+            
+            // 왼쪽 셀들 배치
+            for i in stride(from: centerIdx - 1, through: 0, by: -1) {
+                let right = sorted[i + 1]
+                let current = sorted[i]
+                
+                let rightSizeRatio = (right.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+                let currentSizeRatio = (current.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+                let avgSizeRatio = (rightSizeRatio + currentSizeRatio) / 2
+                
+                let sineSpacingRatio = sin(avgSizeRatio * .pi / 2)
+                let easedSpacingRatio = sineSpacingRatio * sineSpacingRatio
+                
+                let dynamicSpacing = defaultCellSpacing + (centerCellSpacing - defaultCellSpacing) * easedSpacingRatio
+                
+                sorted[i].center.x = right.center.x - (right.size.width + current.size.width) / 2 - dynamicSpacing
+            }
+            
+            // 오른쪽 셀들 배치
+            for i in (centerIdx + 1)..<sorted.count {
+                let left = sorted[i - 1]
+                let current = sorted[i]
+                
+                let leftSizeRatio = (left.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+                let currentSizeRatio = (current.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+                let avgSizeRatio = (leftSizeRatio + currentSizeRatio) / 2
+                
+                let sineSpacingRatio = sin(avgSizeRatio * .pi / 2)
+                let easedSpacingRatio = sineSpacingRatio * sineSpacingRatio
+                
+                let dynamicSpacing = defaultCellSpacing + (centerCellSpacing - defaultCellSpacing) * easedSpacingRatio
+                
+                sorted[i].center.x = left.center.x + (left.size.width + current.size.width) / 2 + dynamicSpacing
+            }
+            
+            return sorted
+        }
+        
+        return attributes
+    }
+    
+    override var collectionViewContentSize: CGSize {
+        guard let collectionView = collectionView else { return .zero }
+        
+        let itemCount = collectionView.numberOfItems(inSection: 0)
+        let emptyAndSpacing = emptyCellWidth + defaultCellSpacing
+        let defaultCellsWidth = CGFloat(itemCount - 3) * (defaultCellSize + defaultCellSpacing)
+        let centerAndRightWidth = centerCellSize + centerCellSpacing + defaultCellSpacing
+        let totalWidth = emptyAndSpacing + defaultCellsWidth + centerAndRightWidth
+        
+        return CGSize(width: totalWidth + defaultCellSize * 2, height: collectionView.bounds.height)
+    }
+    
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
+        guard let collectionView = collectionView else { return proposedContentOffset }
+        
+        let targetRect = CGRect(x: proposedContentOffset.x, y: 0, width: collectionView.bounds.width, height: collectionView.bounds.height)
+        guard let layoutAttributes = layoutAttributesForElements(in: targetRect) else { return proposedContentOffset }
+        
+        let centerX = proposedContentOffset.x + collectionView.bounds.width / 2
+        var closestDistance: CGFloat = .greatestFiniteMagnitude
+        var targetOffset = proposedContentOffset
+        
+        for attribute in layoutAttributes {
+            let distance = abs(attribute.center.x - centerX)
+            if distance < closestDistance {
+                closestDistance = distance
+                targetOffset.x = attribute.center.x - collectionView.bounds.width / 2
+            }
+        }
         
         return targetOffset
     }

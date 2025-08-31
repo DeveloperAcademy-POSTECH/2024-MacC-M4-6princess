@@ -109,14 +109,7 @@ struct CameraView: View {
         }
         .onChange(of: frameManager.isFrameLoading) { newValue in
             if newValue {
-                loadSelectedFrame()
                 frameManager.isFrameLoading = false
-            }
-        }
-        .onChange(of: frameManager.selectedFrame) { oldValue, newValue in
-            // selectedFrame이 변경되면 자동으로 프레임 로드
-            if newValue != nil && frameManager.resultImage == nil {
-                loadSelectedFrame()
             }
         }
         .alert("세로 고정 권장", isPresented: $viewModel.showOrientationAlert) {
