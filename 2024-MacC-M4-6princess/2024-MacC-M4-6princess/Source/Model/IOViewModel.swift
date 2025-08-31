@@ -51,14 +51,27 @@ class IOViewModel: ObservableObject {
         /// 뷰를 uiImage로 변환
         @MainActor
         func renderImage<T:View>(_ content:T, _ motionManager: MotionManager) -> UIImage? {
+            // 원본 크기의 2배로 렌더링
+            let renderWidth = frameBGSize.width * 2
+            let renderHeight = renderWidth * 4/3
             
             let renderer = ImageRenderer(
                 content: content
-                    .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
+                    .frame(width: renderWidth, height: renderHeight)
             )
-            // 해상도
+            
+            // 해상도 설정 (디바이스 스케일 유지)
             renderer.scale = UIScreen.main.scale
-            return renderer.uiImage
+            
+            // 렌더링된 이미지를 원본 크기로 리사이징
+            if let renderedImage = renderer.uiImage {
+                UIGraphicsBeginImageContextWithOptions(CGSize(width: frameBGSize.width, height: frameBGSize.width * 4/3), false, UIScreen.main.scale)
+                renderedImage.draw(in: CGRect(x: 0, y: 0, width: frameBGSize.width, height: frameBGSize.width * 4/3))
+                let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                return resizedImage
+            }
+            return nil
         }
 //        /// 기기의 방향에 따른 이미지 회전을 재조정하여 .up 회전으로 모두 통일
 //        func applyOrientationToImage(uiImage:UIImage,motionManager: MotionManager) -> UIImage {
