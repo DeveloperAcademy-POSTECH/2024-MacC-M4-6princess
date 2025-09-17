@@ -42,7 +42,7 @@ class IOViewModel: ObservableObject {
             showAlert(message: "렌더링 실패: 다시 시도해주세요.\n에러가 반복될 시 캡쳐후 제보부탁드립니다.")
             return
         }
-//        let rotatedImage = applyOrientationToImage(uiImage:uiImage,motionManager:motionManager)
+        //        let rotatedImage = applyOrientationToImage(uiImage:uiImage,motionManager:motionManager)
         self.compositeImage = uiImage
         requestPhotoLibraryPermission { granted in
             if granted {
@@ -55,38 +55,26 @@ class IOViewModel: ObservableObject {
         /// 뷰를 uiImage로 변환
         @MainActor
         func renderImage<T:View>(_ content:T, _ motionManager: MotionManager) -> UIImage? {
-            // 원본 크기의 2배로 렌더링
-            let renderWidth = frameBGSize.width * 2
-            let renderHeight = renderWidth * 4/3
-            
             let renderer = ImageRenderer(
                 content: content
-                    .frame(width: renderWidth, height: renderHeight)
+                    .frame(width: frameBGSize.width, height: frameBGSize.width * 4/3)
             )
             
             // 해상도 설정 (디바이스 스케일 유지)
             renderer.scale = UIScreen.main.scale
+            return renderer.uiImage
             
-            // 렌더링된 이미지를 원본 크기로 리사이징
-            if let renderedImage = renderer.uiImage {
-                UIGraphicsBeginImageContextWithOptions(CGSize(width: frameBGSize.width, height: frameBGSize.width * 4/3), false, UIScreen.main.scale)
-                renderedImage.draw(in: CGRect(x: 0, y: 0, width: frameBGSize.width, height: frameBGSize.width * 4/3))
-                let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
-                return resizedImage
-            }
-            return nil
         }
-//        /// 기기의 방향에 따른 이미지 회전을 재조정하여 .up 회전으로 모두 통일
-//        func applyOrientationToImage(uiImage:UIImage,motionManager: MotionManager) -> UIImage {
-//            
-//            let orientation = motionManager.imageRotate()
-//            if orientation == .up {return uiImage} // 정방형일 때 그대로 내보냄
-//            guard let cgImage = uiImage.cgImage else { return uiImage } // cgImage로 변환 실패시 그대로 내보냄
-//            
-//            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
-//            
-//        }
+        //        /// 기기의 방향에 따른 이미지 회전을 재조정하여 .up 회전으로 모두 통일
+        //        func applyOrientationToImage(uiImage:UIImage,motionManager: MotionManager) -> UIImage {
+        //
+        //            let orientation = motionManager.imageRotate()
+        //            if orientation == .up {return uiImage} // 정방형일 때 그대로 내보냄
+        //            guard let cgImage = uiImage.cgImage else { return uiImage } // cgImage로 변환 실패시 그대로 내보냄
+        //
+        //            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: orientation)
+        //
+        //        }
         
         func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
             PHPhotoLibrary.requestAuthorization { status in
@@ -185,7 +173,7 @@ class IOViewModel: ObservableObject {
                 }
             }
         }
-
+        
         func showAction(message: String, retryAction: (() -> Void)? = nil) {
             let alert = UIAlertController(title: "알림", message: message, preferredStyle: .actionSheet)
             
@@ -202,7 +190,7 @@ class IOViewModel: ObservableObject {
                 rootVC.present(alert, animated: true, completion: nil)
             }
         }
-
+        
         
     }
     
