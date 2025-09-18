@@ -129,7 +129,9 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         let centerAndRightWidth = centerCellSize + centerCellSpacing + defaultCellSpacing
         let totalWidth = emptyAndSpacing + defaultCellsWidth + centerAndRightWidth
         
-        return CGSize(width: totalWidth + defaultCellSize * 2, height: collectionView.bounds.height)
+        // 왼쪽에 추가 여백 확보
+        let extraPadding = collectionView.bounds.width // 화면 크기만큼 추가
+        return CGSize(width: totalWidth + defaultCellSize * 2 + extraPadding, height: collectionView.bounds.height)
     }
     
     override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
