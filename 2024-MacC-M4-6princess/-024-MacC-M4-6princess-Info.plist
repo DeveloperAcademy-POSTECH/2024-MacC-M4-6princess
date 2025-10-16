@@ -6,8 +6,6 @@
 	<string>ca-app-pub-4729766298899130~5471066528</string>
 	<key>GADIsAdManagerApp</key>
 	<true/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>x</string>
