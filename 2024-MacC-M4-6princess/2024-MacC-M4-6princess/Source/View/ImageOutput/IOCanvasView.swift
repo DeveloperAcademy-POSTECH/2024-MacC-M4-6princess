@@ -25,8 +25,10 @@ struct IOCanvasView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .overlay(
                         GeometryReader { geo in
-                            Color.clear.onAppear {
-                                viewModel.frameBGSize = geo.size // 배경 이미지의 실제 표시 크기 저장
+                            Color.clear.onChange(of: geo.size) { newSize in
+                                if viewModel.frameBGSize != newSize {
+                                    viewModel.frameBGSize = newSize
+                                }
                             }
                         }
                     )
@@ -40,9 +42,15 @@ struct IOCanvasView: View {
                     .scaleEffect(currentScale)
                     .position(viewModel.location)
                     .mask(
-                        Rectangle()
-                            .frame(width: viewModel.frameBGSize.width,
-                                   height: viewModel.frameBGSize.height)
+                        Group {
+                            if viewModel.frameBGSize.width > 0 {
+                                Rectangle()
+                                    .frame(width: viewModel.frameBGSize.width,
+                                           height: viewModel.frameBGSize.height)
+                            } else {
+                                Rectangle().opacity(1) // fallback mask
+                            }
+                        }
                     )
             }
             
@@ -59,7 +67,11 @@ struct IOCanvasView: View {
             }
         }
         .onAppear {
-            viewModel.canvasOnAppear(bgImg: viewModel.bgImg!, idolImg: viewModel.idolImg!, bounds: UIScreen.main.bounds.size)
+            if let bg = viewModel.bgImg, let idol = viewModel.idolImg {
+                viewModel.canvasOnAppear(bgImg: bg, idolImg: idol, bounds: UIScreen.main.bounds.size)
+            }
+            // else: images not ready yet
         }
     }
 }
+
