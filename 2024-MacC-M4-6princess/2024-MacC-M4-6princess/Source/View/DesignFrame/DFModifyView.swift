@@ -15,7 +15,7 @@ struct DFModifyView: View {
     
     
     /// 구버전 레이어 관련한 것으로 조만간 파일로 정리한 뒤 삭제할 예정입니다.
-    //    @State var isDragging: Bool = false
+    //  ㅌ @State var isDragging: Bool = false
     //    @State var selectedLayerIndex: Int?
     //    @State var isLongPressed: Bool = false
     //    @State var beforeDragOffsetY: CGFloat = .zero

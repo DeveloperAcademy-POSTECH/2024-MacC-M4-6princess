@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2124F96B2EA3A62B001578C9 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 2124F96A2EA3A62B001578C9 /* RxCocoa */; };
+		2124F96D2EA3A62B001578C9 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2124F96C2EA3A62B001578C9 /* RxSwift */; };
+		2124F9702EA3A637001578C9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2124F96F2EA3A637001578C9 /* SnapKit */; };
+		2124F9732EA3A697001578C9 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2124F9722EA3A697001578C9 /* IQKeyboardManagerSwift */; };
 		4E5AFD0A2E01EC2F00307D91 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5AFD092E01EC2F00307D91 /* FirebaseCrashlytics */; };
 		4EA88E822DE49BF2009C920D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4EA88E802DE49BF2009C920D /* InfoPlist.strings */; };
 		4EB66FB72D8DE9650042B399 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4EB66FB62D8DE9650042B399 /* Localizable.xcstrings */; };
@@ -61,13 +65,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2124F96D2EA3A62B001578C9 /* RxSwift in Frameworks */,
 				89938ADD2D7EC5F800EAD63B /* GoogleMobileAds in Frameworks */,
 				89DC209F2D324E0D00C1BD4E /* FirebaseAppCheck in Frameworks */,
 				898B14F82CFD5F5800EA200A /* FirebaseAnalytics in Frameworks */,
 				4E5AFD0A2E01EC2F00307D91 /* FirebaseCrashlytics in Frameworks */,
 				898B159C2CFD8CCD00EA200A /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 				89DC20A12D324E2D00C1BD4E /* FirebaseStorage in Frameworks */,
+				2124F96B2EA3A62B001578C9 /* RxCocoa in Frameworks */,
 				898B14FA2CFD5F5800EA200A /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				2124F9732EA3A697001578C9 /* IQKeyboardManagerSwift in Frameworks */,
+				2124F9702EA3A637001578C9 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +151,10 @@
 				89DC20A02D324E2D00C1BD4E /* FirebaseStorage */,
 				89938ADC2D7EC5F800EAD63B /* GoogleMobileAds */,
 				4E5AFD092E01EC2F00307D91 /* FirebaseCrashlytics */,
+				2124F96A2EA3A62B001578C9 /* RxCocoa */,
+				2124F96C2EA3A62B001578C9 /* RxSwift */,
+				2124F96F2EA3A637001578C9 /* SnapKit */,
+				2124F9722EA3A697001578C9 /* IQKeyboardManagerSwift */,
 			);
 			productName = "2024-MacC-M4-6princess";
 			productReference = 89A94AAF2CA9B64C00824592 /* 2024-MacC-M4-6princess.app */;
@@ -229,6 +241,9 @@
 			packageReferences = (
 				898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				89938ADB2D7EC5F800EAD63B /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				2124F9692EA3A62B001578C9 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				2124F96E2EA3A637001578C9 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				2124F9712EA3A697001578C9 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 89A94AB02CA9B64C00824592 /* Products */;
@@ -660,6 +675,31 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2124F9692EA3A62B001578C9 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
+		2124F96E2EA3A637001578C9 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		2124F9712EA3A697001578C9 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 7.8.0;
+				minimumVersion = 7.0.1;
+			};
+		};
 		898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -679,6 +719,26 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2124F96A2EA3A62B001578C9 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2124F9692EA3A62B001578C9 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		2124F96C2EA3A62B001578C9 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2124F9692EA3A62B001578C9 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		2124F96F2EA3A637001578C9 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2124F96E2EA3A637001578C9 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		2124F9722EA3A697001578C9 /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2124F9712EA3A697001578C9 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
+		};
 		4E5AFD092E01EC2F00307D91 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 898B14F62CFD5F5800EA200A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
