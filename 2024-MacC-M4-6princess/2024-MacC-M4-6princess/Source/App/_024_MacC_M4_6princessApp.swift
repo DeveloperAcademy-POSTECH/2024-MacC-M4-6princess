@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 import GoogleMobileAds
-
+import IQKeyboardManagerSwift
 
 @main
 struct _024_MacC_M4_6princessApp: App {
@@ -36,7 +36,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
         MobileAds.shared.start(completionHandler: nil)
-        
+        IQKeyboardManager.shared.enable = true
+//               IQKeyboardManager.shared.enableAutoToolbar = false
+        IQKeyboardManager.shared.resignOnTouchOutside = true
+               
         return true
     }
  

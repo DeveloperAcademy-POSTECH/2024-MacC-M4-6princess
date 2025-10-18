@@ -163,31 +163,31 @@ extension UIView {
         return subviews.flatMap { [$0] + $0.allSubviews }
     }
 }
-class VerticallyCenteredTextView: UITextView {
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // 편집 중일 때는 중앙 정렬 해제 (흔들림 방지)
-        guard !isFirstResponder else {
-            textContainerInset.top = 0
-            return
-        }
-        
-        // contentSize.height: 실제 텍스트 전체 높이
-        let contentHeight = contentSize.height
-        let containerHeight = bounds.height
-        
-        // 차이가 양수일 때만 중앙 정렬, 소수점 이하 버림 처리
-        let diff = containerHeight - contentHeight
-        let top = diff > 0
-            ? floor(diff / 2)
-            : 0
-        
-        textContainerInset = UIEdgeInsets(
-            top: top,
-            left: textContainerInset.left,
-            bottom: 0,
-            right: textContainerInset.right
-        )
-    }
-}
+//class VerticallyCenteredTextView: UITextView {
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        
+//        // 편집 중일 때는 중앙 정렬 해제 (흔들림 방지)
+//        guard !isFirstResponder else {
+//            textContainerInset.top = 0
+//            return
+//        }
+//        
+//        // contentSize.height: 실제 텍스트 전체 높이
+//        let contentHeight = contentSize.height
+//        let containerHeight = bounds.height
+//        
+//        // 차이가 양수일 때만 중앙 정렬, 소수점 이하 버림 처리
+//        let diff = containerHeight - contentHeight
+//        let top = diff > 0
+//            ? floor(diff / 2)
+//            : 0
+//        
+//        textContainerInset = UIEdgeInsets(
+//            top: top,
+//            left: textContainerInset.left,
+//            bottom: 0,
+//            right: textContainerInset.right
+//        )
+//    }
+//}
