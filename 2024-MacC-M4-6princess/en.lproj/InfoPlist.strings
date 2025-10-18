@@ -5,8 +5,5 @@
   Created by piri kim on 5/26/25.
   
 */
-
-"NSPhotoLibraryUsageDescription" = "We need access to your photo library to save your photos with your bias.";
-"NSCameraUsageDescription" = "We need camera access to take photos with your bias.";
-
-
+"NSPhotoLibraryUsageDescription" = "Photo library access is required to use this app.";
+"NSCameraUsageDescription" = "Camera access is required to use this app.";

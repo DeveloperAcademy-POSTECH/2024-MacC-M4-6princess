@@ -8,28 +8,16 @@
 import SwiftUI
 import Combine
 
-final class KeyboardHeightResponder: ObservableObject {
-    @Published private(set) var currentHeight: CGFloat = 0
-    
+class KeyboardHeightResponder: ObservableObject {
+    @Published var currentHeight: CGFloat = 0
     private var cancellables = Set<AnyCancellable>()
     
     init() {
-        observeKeyboardNotifications()
-    }
-    
-    deinit {
-        cancellables.removeAll()
-    }
-    
-    // MARK: - Private Methods
-    
-    private func observeKeyboardNotifications() {
-        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
+        NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
             .compactMap { notification -> CGFloat? in
-                guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
-                    return nil
-                }
-                return keyboardFrame.height
+                guard let keyboardRect = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return nil }
+                let safeAreaBottom = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+                return max(keyboardRect.height - safeAreaBottom, 0)
             }
             .sink { [weak self] height in
                 self?.currentHeight = height

@@ -5,5 +5,5 @@
   Created by piri kim on 5/26/25.
   
 */
-"NSPhotoLibraryUsageDescription" = "لحفظ صورك مع نجمك المفضل.";
-"NSCameraUsageDescription" = "نحتاج إلى الوصول إلى الكاميرا لالتقاط الصور مع نجمك المفضل.";
+"NSPhotoLibraryUsageDescription" = "يتطلب هذا التطبيق إذن الوصول إلى مكتبة الصور.";
+"NSCameraUsageDescription" = "يتطلب هذا التطبيق إذن الوصول إلى الكاميرا.";

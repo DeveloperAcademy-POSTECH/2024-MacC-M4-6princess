@@ -5,5 +5,5 @@
   Created by piri kim on 5/26/25.
   
 */
-"NSPhotoLibraryUsageDescription" = "推しとの特別な瞬間を残すために、写真アルバムへのアクセスが必要です。";
-"NSCameraUsageDescription" = "推しとの思い出を撮影するために、カメラへのアクセスが必要です";
+"NSPhotoLibraryUsageDescription" = "このアプリを使用するには写真ライブラリへのアクセスが必要です。";
+"NSCameraUsageDescription" = "このアプリを使用するにはカメラへのアクセスが必要です。";

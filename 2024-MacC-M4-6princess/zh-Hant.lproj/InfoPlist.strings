@@ -5,5 +5,5 @@
   Created by piri kim on 5/26/25.
   
 */
-"NSPhotoLibraryUsageDescription" = "為了保存與您的愛豆合照，我們需要存取您的相簿。";
-"NSCameraUsageDescription" = "為了和您的愛豆一起拍照，我們需要存取您的相機。";
+"NSPhotoLibraryUsageDescription" = "使用此應用程式需要存取相簿。";
+"NSCameraUsageDescription" = "使用此應用程式需要存取相機。";
