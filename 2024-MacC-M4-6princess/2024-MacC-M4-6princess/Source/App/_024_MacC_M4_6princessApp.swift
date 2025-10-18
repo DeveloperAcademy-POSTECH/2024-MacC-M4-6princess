@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 import GoogleMobileAds
-
+import IQKeyboardManagerSwift
 
 @main
 struct _024_MacC_M4_6princessApp: App {
@@ -18,7 +18,6 @@ struct _024_MacC_M4_6princessApp: App {
     @StateObject private var naviManager = NavigationManager()
     let persistenceController = PersistenceController.shared
     
-
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -32,41 +31,58 @@ struct _024_MacC_M4_6princessApp: App {
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
         FirebaseApp.configure()
         MobileAds.shared.start(completionHandler: nil)
         
+        configureIQKeyboardManager()
+        
         return true
     }
- 
-    func application(_ application: UIApplication,
-                     supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        //iPhone과 iPad 모두 세로만 지원
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .portrait
-        } else {
-            return .portrait
-        }
+    
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        // iPhone과 iPad 모두 세로만 지원
+        return .portrait
     }
-
+    
+    // MARK: - Private Methods
+    
+    private func configureIQKeyboardManager() {
+        let iq = IQKeyboardManager.shared
+        
+        // UIKit 뷰 컨트롤러에서 사용 가능하도록 활성화
+        iq.isEnabled = true
+        iq.enableAutoToolbar = false
+        iq.resignOnTouchOutside = true
+        iq.keyboardDistance = 20
+        
+        // DFTextViewController에서는 수동으로 키보드 처리
+        iq.disabledDistanceHandlingClasses = [DFTextViewController.self]
+    }
 }
 
-// FrameSize 모델 정의
-class EnvironmentModel: ObservableObject {
-    var frameWidth: CGFloat = 300
-    var frameHeight: CGFloat = 500
-    var frameRatio: CGFloat = 4/3
+// MARK: - EnvironmentModel
+
+final class EnvironmentModel: ObservableObject {
+    @Published var frameWidth: CGFloat
+    @Published var frameHeight: CGFloat
+    @Published var frameRatio: CGFloat
     
-    // 초기화 메서드 (필요 시 사용 가능)
-    init(width: CGFloat = 100, height: CGFloat = 100,frameRatio: CGFloat = 1) {
+    init(width: CGFloat = 100, height: CGFloat = 100, frameRatio: CGFloat = 1) {
         self.frameWidth = width
         self.frameHeight = height
+        self.frameRatio = frameRatio
     }
     
-    // 사이즈 업데이트 메서드
-    func updateSize(width: CGFloat, height: CGFloat,frameRatio: CGFloat) {
+    func updateSize(width: CGFloat, height: CGFloat, frameRatio: CGFloat) {
         self.frameWidth = width
         self.frameHeight = height
+        self.frameRatio = frameRatio
     }
 }

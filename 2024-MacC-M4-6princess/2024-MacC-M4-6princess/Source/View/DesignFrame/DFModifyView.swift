@@ -12,7 +12,7 @@ struct DFModifyView: View {
     @EnvironmentObject var imageModel: ImageListModel
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
-    
+    @StateObject private var textViewModel = DFTextViewModel()
     
     /// 구버전 레이어 관련한 것으로 조만간 파일로 정리한 뒤 삭제할 예정입니다.
     //    @State var isDragging: Bool = false
@@ -75,9 +75,7 @@ struct DFModifyView: View {
             else{
                 modifyIpad
             }
-            if viewModel.showTextView {
-                DFTextView(modiViewModel:viewModel)
-            }
+            
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
                 DFTextModifyView(
                     modiViewModel: viewModel
@@ -99,6 +97,13 @@ struct DFModifyView: View {
             }
             
         }
+        .fullScreenCover(isPresented: $viewModel.showTextView) {
+                 DFTextViewWrapper(
+                     modiViewModel: viewModel,
+                     viewModel: textViewModel
+                 )
+                 .ignoresSafeArea()
+             }
         .onChange(of: viewModel.showCamera) { newValue in
             if newValue {
                 // 1초 후에 화면 전환

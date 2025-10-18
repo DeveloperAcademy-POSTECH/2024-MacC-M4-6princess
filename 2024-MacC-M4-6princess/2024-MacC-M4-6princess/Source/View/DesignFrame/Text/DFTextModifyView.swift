@@ -78,7 +78,6 @@ struct DFTextModifyView: View {
         }
         .padding(.bottom, keyboardResponder.currentHeight == 0 ? 20 : keyboardResponder.currentHeight+5)
         .animation(.easeOut(duration: 0.3), value: keyboardResponder.currentHeight)
-        .keyboardHeight($viewModel.keyboardHeight)
         .background(
             Color.black.opacity(0.5) // 반투명 검정색
         )

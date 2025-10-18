@@ -5,5 +5,5 @@
   Created by piri kim on 5/26/25.
   
 */
-"NSPhotoLibraryUsageDescription" = "使用此应用需要访问照片库。";
-"NSCameraUsageDescription" = "使用此应用需要访问相机。";
+"NSPhotoLibraryUsageDescription" = "为了保存与您的爱豆合照，我们需要访问您的相册。";
+"NSCameraUsageDescription" = "为了和您的爱豆一起拍照，我们需要访问您的相机。";

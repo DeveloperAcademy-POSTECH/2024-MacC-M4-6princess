@@ -15,7 +15,6 @@ class DFTextViewModel: ObservableObject {
     @Published var fontSize: Double = 20
     @Published var selectedColor: Color = ColorPreset.colorPallete[0]
     @Published var renderedImage: UIImage?
-    @Published var keyboardHeight: CGFloat = 0 // 키보드 높이 상태
     @Published var tab = 0
     @Published var colorNum = 0
     @Published var textAlignment: TextAlignment = .center // 텍스트 정렬 상태
