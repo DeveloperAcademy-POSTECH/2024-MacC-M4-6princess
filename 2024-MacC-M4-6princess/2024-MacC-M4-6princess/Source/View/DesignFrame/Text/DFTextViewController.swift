@@ -9,7 +9,11 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
-import SwiftUI
+
+enum TextEditMode {
+    case create  // 새 텍스트 생성
+    case edit    // 기존 텍스트 수정
+}
 
 final class DFTextViewController: UIViewController {
     
@@ -18,23 +22,35 @@ final class DFTextViewController: UIViewController {
     private let viewModel: DFTextViewModel
     private let modiViewModel: DFModifyViewModel
     private let imageModel: ImageListModel
+    private let frameManager: FrameManager?
     private let displayScale: CGFloat
     private let disposeBag = DisposeBag()
+    
+    private let editMode: TextEditMode
+    private let initialStyle: TextStyle?
     
     // MARK: - UI Components
     
     private lazy var customTextView: VerticallyCenteredTextView = {
         let textView = VerticallyCenteredTextView()
-        textView.attributedText = viewModel.attributedTxt
-        textView.font = viewModel.selectedFont.applyFont(size: viewModel.fontSize)
-        textView.textAlignment = viewModel.textAlignment.nsTextAlignment
-        textView.textColor = UIColor(viewModel.selectedColor)
         textView.backgroundColor = .clear
         textView.isScrollEnabled = true
         textView.delegate = self
         
         if #available(iOS 18.0, *) {
             textView.supportsAdaptiveImageGlyph = true
+        }
+        
+        if let style = initialStyle {
+            textView.attributedText = style.attributedString
+            textView.font = style.font.applyFont(size: style.fontSize)
+            textView.textAlignment = style.alignment.nsTextAlignment
+            textView.textColor = UIColor(style.color)
+        } else {
+            textView.attributedText = viewModel.attributedTxt
+            textView.font = viewModel.selectedFont.applyFont(size: viewModel.fontSize)
+            textView.textAlignment = viewModel.textAlignment.nsTextAlignment
+            textView.textColor = viewModel.selectedUIColor
         }
         
         return textView
@@ -111,9 +127,10 @@ final class DFTextViewController: UIViewController {
     }()
     
     private lazy var textSizeSlider: TextSizeSlider = {
+        let minSize: Double = editMode == .edit ? 20 : 10
         let slider = TextSizeSlider(
             barSize: CGSize(width: 16, height: 200),
-            minFontSize: 10,
+            minFontSize: minSize,
             maxFontSize: 60
         )
         return slider
@@ -131,12 +148,19 @@ final class DFTextViewController: UIViewController {
         viewModel: DFTextViewModel,
         modiViewModel: DFModifyViewModel,
         imageModel: ImageListModel,
-        displayScale: CGFloat
+        frameManager: FrameManager? = nil,
+        displayScale: CGFloat,
+        editMode: TextEditMode = .create,
+        initialStyle: TextStyle? = nil
     ) {
         self.viewModel = viewModel
         self.modiViewModel = modiViewModel
         self.imageModel = imageModel
+        self.frameManager = frameManager
         self.displayScale = displayScale
+        self.editMode = editMode
+        self.initialStyle = initialStyle
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -148,6 +172,7 @@ final class DFTextViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
         setupConstraints()
         setupNavigationBar()
@@ -156,13 +181,45 @@ final class DFTextViewController: UIViewController {
         setupBindings()
         setupGestures()
         
-        // 키보드 자동 표시
         DispatchQueue.main.async { [weak self] in
             self?.customTextView.becomeFirstResponder()
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if let style = initialStyle {
+            loadInitialStyle(style)
+        }
+    }
+    
     // MARK: - Setup
+    
+    private func loadInitialStyle(_ style: TextStyle) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.viewModel.attributedTxt = style.attributedString
+            self.viewModel.txt = style.txt
+            self.viewModel.selectedColor = style.color
+            self.viewModel.selectedUIColor = UIColor(style.color)
+            self.viewModel.selectedFont = style.font
+            self.viewModel.textAlignment = style.alignment
+            self.viewModel.fontSize = style.fontSize
+            
+            if let colorIndex = self.viewModel.colorChip.firstIndex(of: style.color) {
+                self.viewModel.colorNum = colorIndex
+            }
+            
+            self.textSizeSlider.setFontSize(style.fontSize, animated: false)
+            
+            self.updateFontButtons()
+            self.updateColorButtons()
+            self.updateTextViewAlignment()
+            self.updateAlignmentTabImage()
+        }
+    }
     
     private func setupUI() {
         view.backgroundColor = .clear
@@ -181,7 +238,6 @@ final class DFTextViewController: UIViewController {
         tabBarView.addSubview(colorTabButton)
         tabBarView.addSubview(alignmentTabButton)
         
-        // 초기 탭 상태 설정
         updateTabSelection(selectedTab: 0)
     }
     
@@ -191,12 +247,11 @@ final class DFTextViewController: UIViewController {
         }
         
         let screenWidth = UIScreen.main.bounds.width
-        let screenHeight = UIScreen.main.bounds.height
         
         customTextView.snp.makeConstraints { make in
             make.width.equalTo(screenWidth * 0.9)
             make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview().offset(-100)
+            make.centerY.equalToSuperview()
         }
         
         textSizeSlider.snp.makeConstraints { make in
@@ -253,7 +308,6 @@ final class DFTextViewController: UIViewController {
             make.height.equalTo(colorScrollView)
         }
         
-        // 초기 상태: 폰트 스크롤뷰만 표시
         colorScrollView.isHidden = true
     }
     
@@ -289,10 +343,12 @@ final class DFTextViewController: UIViewController {
         button.setTitleColor(isSelected ? .black : .white, for: .normal)
         
         button.rx.tap
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
-                self?.viewModel.selectedFont = fontStyle
-                self?.updateFontButtons()
-                self?.updateTextViewFont()
+                guard let self = self else { return }
+                self.viewModel.selectedFont = fontStyle
+                self.updateFontButtons()
+                self.updateTextViewFont()
             })
             .disposed(by: disposeBag)
         
@@ -305,7 +361,7 @@ final class DFTextViewController: UIViewController {
             colorStackView.addArrangedSubview(button)
         }
     }
-
+    
     private func createColorButton(color: UIColor, index: Int) -> UIButton {
         let button = UIButton(type: .system)
         let size: CGFloat = viewModel.colorNum == index ? 40 : 30
@@ -320,6 +376,7 @@ final class DFTextViewController: UIViewController {
         }
         
         button.rx.tap
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
                 self.viewModel.selectedColor = self.viewModel.colorChip[index]
@@ -332,32 +389,38 @@ final class DFTextViewController: UIViewController {
         
         return button
     }
+    
     private func setupBindings() {
-        // 폰트 사이즈 슬라이더 바인딩
         textSizeSlider.fontSize
             .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] fontSize in
-                self?.viewModel.fontSize = fontSize
-                self?.updateTextViewFont()
+                guard let self = self else { return }
+                self.viewModel.fontSize = fontSize
+                self.updateTextViewFont()
             })
             .disposed(by: disposeBag)
         
-        // 탭 버튼 바인딩
         fontTabButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
-                self?.viewModel.tab = 0
-                self?.updateTabSelection(selectedTab: 0)
+                guard let self = self else { return }
+                self.viewModel.tab = 0
+                self.updateTabSelection(selectedTab: 0)
             })
             .disposed(by: disposeBag)
         
         colorTabButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
-                self?.viewModel.tab = 1
-                self?.updateTabSelection(selectedTab: 1)
+                guard let self = self else { return }
+                self.viewModel.tab = 1
+                self.updateTabSelection(selectedTab: 1)
             })
             .disposed(by: disposeBag)
         
         alignmentTabButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
                 self.viewModel.tab = 2
@@ -368,9 +431,9 @@ final class DFTextViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // 키보드 높이 관찰
         NotificationCenter.default.rx
             .notification(UIResponder.keyboardWillShowNotification)
+            .observe(on: MainScheduler.instance)
             .compactMap { notification -> CGFloat? in
                 guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
                     return nil
@@ -385,6 +448,7 @@ final class DFTextViewController: UIViewController {
         
         NotificationCenter.default.rx
             .notification(UIResponder.keyboardWillHideNotification)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 self?.updateLayoutForKeyboard(height: 0)
             })
@@ -400,9 +464,8 @@ final class DFTextViewController: UIViewController {
     
     @objc private func doneButtonTapped() {
         viewModel.captureTextView(from: customTextView)
-        imageToCoredata()
         
-        modiViewModel.style = TextStyle(
+        let newStyle = TextStyle(
             attributedString: viewModel.attributedTxt ?? NSAttributedString(string: ""),
             txt: viewModel.txt,
             font: viewModel.selectedFont,
@@ -411,7 +474,18 @@ final class DFTextViewController: UIViewController {
             fontSize: viewModel.fontSize
         )
         
-        modiViewModel.showTextView = false
+        modiViewModel.style = newStyle
+        
+        switch editMode {
+        case .create:
+            createNewText()
+            modiViewModel.showTextView = false
+            
+        case .edit:
+            updateExistingText()
+            frameManager?.showTextModifyView = false
+        }
+        
         dismiss(animated: true)
     }
     
@@ -422,13 +496,15 @@ final class DFTextViewController: UIViewController {
         let translation = gesture.translation(in: customTextView)
         let direction: DFTextViewModel.SwipeDirection = translation.x < 0 ? .left : .right
         
-        viewModel.textAlignment = viewModel.computeNextAlignment(
-            for: viewModel.textAlignment,
-            direction: direction
-        )
-        
-        updateTextViewAlignment()
-        updateAlignmentTabImage()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.textAlignment = self.viewModel.computeNextAlignment(
+                for: self.viewModel.textAlignment,
+                direction: direction
+            )
+            self.updateTextViewAlignment()
+            self.updateAlignmentTabImage()
+        }
     }
     
     // MARK: - Helper Methods
@@ -443,123 +519,184 @@ final class DFTextViewController: UIViewController {
     }
     
     private func updateFontButtons() {
-        fontStackView.arrangedSubviews.enumerated().forEach { index, view in
-            guard let button = view as? UIButton else { return }
-            let fontStyle = NewFontStyle.allCases[index]
-            let isSelected = viewModel.selectedFont == fontStyle
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             
-            button.backgroundColor = isSelected ? .white : .clear
-            button.setTitleColor(isSelected ? .black : .white, for: .normal)
+            self.fontStackView.arrangedSubviews.enumerated().forEach { index, view in
+                guard let button = view as? UIButton else { return }
+                let fontStyle = NewFontStyle.allCases[index]
+                let isSelected = self.viewModel.selectedFont == fontStyle
+                
+                button.backgroundColor = isSelected ? .white : .clear
+                button.setTitleColor(isSelected ? .black : .white, for: .normal)
+            }
         }
     }
     
     private func updateColorButtons() {
-        colorStackView.arrangedSubviews.enumerated().forEach { index, view in
-            guard let button = view as? UIButton else { return }
-            let size: CGFloat = viewModel.colorNum == index ? 40 : 30
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             
-            UIView.animate(withDuration: 0.36) {
-                button.snp.updateConstraints { make in
-                    make.width.height.equalTo(size)
+            self.colorStackView.arrangedSubviews.enumerated().forEach { index, view in
+                guard let button = view as? UIButton else { return }
+                let size: CGFloat = self.viewModel.colorNum == index ? 40 : 30
+                
+                UIView.animate(withDuration: 0.36) {
+                    button.snp.updateConstraints { make in
+                        make.width.height.equalTo(size)
+                    }
+                    button.layer.cornerRadius = size / 2
+                    button.superview?.layoutIfNeeded()
                 }
-                button.layer.cornerRadius = size / 2
-                button.superview?.layoutIfNeeded()
             }
         }
     }
     
     private func updateTextViewFont() {
-        let font = viewModel.selectedFont.applyFont(size: viewModel.fontSize)
-        customTextView.font = font
-        
-        if let attributedText = customTextView.attributedText {
-            let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
-            mutableAttributedText.addAttribute(
-                .font,
-                value: font,
-                range: NSRange(location: 0, length: mutableAttributedText.length)
-            )
-            customTextView.attributedText = mutableAttributedText
-            viewModel.attributedTxt = mutableAttributedText
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let font = self.viewModel.selectedFont.applyFont(size: self.viewModel.fontSize)
+            self.customTextView.font = font
+            
+            if let attributedText = self.customTextView.attributedText {
+                let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
+                mutableAttributedText.addAttribute(
+                    .font,
+                    value: font,
+                    range: NSRange(location: 0, length: mutableAttributedText.length)
+                )
+                self.customTextView.attributedText = mutableAttributedText
+                self.viewModel.attributedTxt = mutableAttributedText
+            }
         }
     }
+    
     private func updateTextViewColor() {
-        customTextView.textColor = viewModel.selectedUIColor
-        
-        if let attributedText = customTextView.attributedText {
-            let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
-            mutableAttributedText.addAttribute(
-                .foregroundColor,
-                value: viewModel.selectedUIColor,
-                range: NSRange(location: 0, length: mutableAttributedText.length)
-            )
-            customTextView.attributedText = mutableAttributedText
-            viewModel.attributedTxt = mutableAttributedText
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.customTextView.textColor = self.viewModel.selectedUIColor
+            
+            if let attributedText = self.customTextView.attributedText {
+                let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
+                mutableAttributedText.addAttribute(
+                    .foregroundColor,
+                    value: self.viewModel.selectedUIColor,
+                    range: NSRange(location: 0, length: mutableAttributedText.length)
+                )
+                self.customTextView.attributedText = mutableAttributedText
+                self.viewModel.attributedTxt = mutableAttributedText
+            }
         }
     }
     
     private func updateTextViewAlignment() {
-        customTextView.textAlignment = viewModel.textAlignment.nsTextAlignment
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.customTextView.textAlignment = self.viewModel.textAlignment.nsTextAlignment
+        }
     }
     
     private func updateAlignmentTabImage() {
-        let imageName = viewModel.imageForAlignment(viewModel.textAlignment)
-        let image = UIImage(named: imageName)?.withRenderingMode(.alwaysOriginal)
-        alignmentTabButton.setImage(image, for: .normal)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let imageName = self.viewModel.imageForAlignment(self.viewModel.textAlignment)
+            let image = UIImage(named: imageName)?.withRenderingMode(.alwaysOriginal)
+            self.alignmentTabButton.setImage(image, for: .normal)
+        }
     }
     
     private func updateLayoutForKeyboard(height: CGFloat) {
-        let availableHeight = UIScreen.main.bounds.height - height
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
         
-        UIView.animate(withDuration: 0.3) { [weak self] in
+        let bottomControlsHeight: CGFloat = 120
+        let availableHeight = screenHeight - height - bottomControlsHeight
+        let textViewHeight = availableHeight * 0.6
+        let textViewTop = (availableHeight - textViewHeight) / 2
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) { [weak self] in
             guard let self = self else { return }
             
             self.customTextView.snp.remakeConstraints { make in
-                let screenWidth = UIScreen.main.bounds.width
                 make.width.equalTo(screenWidth * 0.9)
-                make.height.equalTo(availableHeight * 0.6)
+                make.height.equalTo(textViewHeight)
                 make.centerX.equalToSuperview()
-                make.centerY.equalToSuperview().offset(-height / 2)
+                make.top.equalToSuperview().offset(textViewTop)
             }
             
             self.tabBarView.snp.updateConstraints { make in
-                make.bottom.equalTo(self.view.safeAreaLayoutGuide).offset(height == 0 ? -20 : -(height + 5))
+                let bottomPadding: CGFloat = height == 0 ? 20 : 5
+                make.bottom.equalTo(self.view.safeAreaLayoutGuide).offset(-(height + bottomPadding))
             }
             
             self.view.layoutIfNeeded()
         }
     }
     
-    private func imageToCoredata() {
+    // MARK: - Text Operations
+    
+    private func createNewText() {
         let newImage = SubjectImage()
         
-        if let image = viewModel.renderedImage {
-            newImage.text = image
-            newImage.originalImage = image
-            
-            if let att = viewModel.attributedTxt {
-                newImage.textStyle = TextStyle(
-                    attributedString: att,
-                    txt: viewModel.txt,
-                    font: viewModel.selectedFont,
-                    color: viewModel.selectedColor,
-                    alignment: viewModel.textAlignment,
-                    fontSize: viewModel.fontSize
-                )
-            }
-            
-            // 모든 이미지의 선택을 해제
-            imageModel.imageList.forEach { $0.isTapped = false }
-            
-            imageModel.imageList.append(newImage)
-            modiViewModel.selectedSubject = imageModel.imageList.last
-            modiViewModel.selectedIndex = imageModel.imageList.indices.last
-            
-            if let lastImage = imageModel.imageList.last {
-                modiViewModel.modelListControl(subject: lastImage)
-            }
-        } else {
+        guard let image = viewModel.renderedImage else {
             print("Image not found")
+            return
+        }
+        
+        newImage.text = image
+        newImage.originalImage = image
+        
+        if let att = viewModel.attributedTxt {
+            newImage.textStyle = TextStyle(
+                attributedString: att,
+                txt: viewModel.txt,
+                font: viewModel.selectedFont,
+                color: viewModel.selectedColor,
+                alignment: viewModel.textAlignment,
+                fontSize: viewModel.fontSize
+            )
+        }
+        
+        imageModel.imageList.forEach { $0.isTapped = false }
+        imageModel.imageList.append(newImage)
+        modiViewModel.selectedSubject = imageModel.imageList.last
+        modiViewModel.selectedIndex = imageModel.imageList.indices.last
+        
+        if let lastImage = imageModel.imageList.last {
+            modiViewModel.modelListControl(subject: lastImage)
+        }
+    }
+    
+    private func updateExistingText() {
+        let newImage = SubjectImage()
+        
+        guard let image = viewModel.renderedImage else {
+            print("Image not found")
+            return
+        }
+        
+        newImage.text = image
+        newImage.originalImage = image
+        newImage.textStyle = modiViewModel.style
+        
+        if let uuid = frameManager?.textUUID,
+           let index = imageModel.imageList.firstIndex(where: { $0.id == uuid }) {
+            
+            imageModel.imageList[index] = newImage
+            modiViewModel.selectedIndex = index
+            modiViewModel.selectedSubject = newImage
+            modiViewModel.modelListControl(subject: imageModel.imageList[index])
+            
+        } else {
+            print("Error: Could not find text with UUID to update")
+        }
+        
+        imageModel.imageList.forEach {
+            if $0.isTapped {
+                $0.isTapped = false
+            }
         }
     }
 }
@@ -569,15 +706,19 @@ final class DFTextViewController: UIViewController {
 extension DFTextViewController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
-        viewModel.txt = textView.text
-        viewModel.attributedTxt = textView.attributedText
-        
-        textView.textColor = UIColor(viewModel.selectedColor)
-        
-        let contentSize = textView.sizeThatFits(
-            CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
-        )
-        viewModel.captureSize = contentSize
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.viewModel.txt = textView.text
+            self.viewModel.attributedTxt = textView.attributedText
+            
+            textView.textColor = self.viewModel.selectedUIColor
+            
+            let contentSize = textView.sizeThatFits(
+                CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)
+            )
+            self.viewModel.captureSize = contentSize
+        }
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {

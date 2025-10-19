@@ -191,6 +191,7 @@
       }
     },
     "Aa" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1590,6 +1591,7 @@
       }
     },
     "완료" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

@@ -61,7 +61,7 @@ struct DFModifyView: View {
                 modifyIpad
             }
             
-            // 🔥 여기가 변경된 부분입니다!
+            // 새 텍스트 생성
             if viewModel.showTextView {
                 DFTextViewControllerRepresentable(
                     viewModel: DFTextViewModel(),
@@ -71,10 +71,15 @@ struct DFModifyView: View {
                 .ignoresSafeArea()
             }
             
+            // 텍스트 수정
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
-                DFTextModifyView(
-                    modiViewModel: viewModel
+                DFTextViewControllerRepresentable(
+                    viewModel: DFTextViewModel(),
+                    modiViewModel: viewModel,
+                    textStyle: textStyle
                 )
+                .environmentObject(imageModel)
+                .ignoresSafeArea()
             }
             
         }
