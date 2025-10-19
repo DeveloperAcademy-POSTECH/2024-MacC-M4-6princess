@@ -14,48 +14,73 @@ struct PhotosPickerView: View {
         ZStack {
             VStack {
                 toolbarButton
-//                ScrollViewWithOffset
-//                    .padding(.top, 10)
+                
                 ImageScrollViewRepresentable(images: vm.models) {
                     print("끝까지 스크롤")
-                    if vm.album.count - vm.currentIndex >= 60 {
-                        vm.currentIndex += 60
-                        vm.fetchedAlbum += 60
-                        print("모델삽입")
-                        
-                    } else {
-                        vm.currentIndex = vm.album.count
+                    
+                    let nextStart = vm.currentIndex
+                    let nextEnd = min(vm.currentIndex + 60, vm.album.count)
+                    
+                    if nextStart < vm.album.count {
+                        vm.currentIndex = nextEnd
+                        vm.fetchedAlbum = nextEnd
+                        vm.fetchAlbum()
+                        vm.loadImagesInRange(start: nextStart, end: nextEnd)
                     }
-                    vm.fetchAlbum()
-                    for i in vm.currentIndex..<vm.album.count {
-                        vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
+                } onImageTap: { index in
+                    print("=== 탭 이벤트 발생 ===")
+                    print("클릭한 index: \(index)")
+                    print("modelsDict 개수: \(vm.modelsDict.count)")
+                    print("현재 selectedIndex: \(vm.selectedIndex)")
+                    
+                    guard vm.modelsDict[index] != nil else {
+                        print("❌ 모델을 찾을 수 없음")
+                        return
                     }
                     
-                }onImageTap: { index in
-                    print("사진클릭!")
-                    if vm.selectedIndex < 0 {
-                        vm.selectedIndex = index
-                        vm.models[index].isSelected = true
-                        
+                    print("✅ 모델 찾음")
+                    
+                    // ✅ 로직 수정: 항상 새로운 선택으로 업데이트
+                    vm.selectImage(at: index)
+                    print("✅ 선택 완료: selectedIndex=\(vm.selectedIndex)")
+                    
+                    guard index < vm.album.count else {
+                        print("❌ 잘못된 인덱스: \(index) >= \(vm.album.count)")
+                        return
                     }
                     
-                    if vm.selectedIndex >= 0 {
-                        vm.getImage(image: vm.models[vm.selectedIndex], for: vm.album[vm.selectedIndex]) {
+                    let asset = vm.album[index]
+                    print("✅ 고해상도 이미지 로드 시작")
+                    
+                    vm.getImage(at: index, for: asset) {
+                        print("✅ 이미지 로드 완료")
+                        
+                        if let image = vm.outputImage {
+                            frameManager.pickedImage = image
+                            print("✅ frameManager에 이미지 설정 완료")
+                        } else {
+                            print("❌ outputImage가 nil")
+                        }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            let hasImage = frameManager.pickedImage != nil
+                            let hasModel = vm.modelsDict[index] != nil
+                            let isSelected = vm.modelsDict[index]?.isSelected ?? false
                             
-                            if let image = vm.outputImage {
-                                frameManager.pickedImage = image
-                            }
+                            print("이동 체크: hasImage=\(hasImage), hasModel=\(hasModel), isSelected=\(isSelected)")
                             
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                if frameManager.pickedImage != nil  && vm.models[index].isSelected {
-                                    naviManager.push(screen: Screen.frameEdit)
-                                }
+                            if hasImage && hasModel && isSelected {
+                                print("✅ frameEdit로 이동")
+                                naviManager.push(screen: Screen.frameEdit)
+                            } else {
+                                print("❌ 이동 조건 불충족")
                             }
                         }
                     }
                 }
                 .padding(.top, 10)
             }
+            
             VStack {
                 toastMessage
                     .padding(.bottom, UIScreen.main.bounds.height * 0.65)
@@ -63,30 +88,42 @@ struct PhotosPickerView: View {
             }
         }
         .onAppear {
+            print("=== PhotosPickerView onAppear ===")
+            print("vm 인스턴스: \(ObjectIdentifier(vm))")
+            print("현재 selectedIndex: \(vm.selectedIndex)")
+            print("현재 modelsDict 개수: \(vm.modelsDict.count)")
             
-            if vm.selectedIndex >= 0 {
-                vm.models[vm.selectedIndex].isSelected = false
-                vm.selectedIndex = -1
-                frameManager.pickedImage = nil
-            }
+            // ✅ 완전히 초기화
+            vm.resetSelection()
+            frameManager.pickedImage = nil
+            frameManager.removedImage = nil
             
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 if status == .authorized {
-                    //                    DispatchQueue.main.async {
                     if vm.firstAppear {
+                        print("첫 진입, 앨범 로드 시작")
                         vm.fetchAlbum()
-                        print(vm.album.count)
-                        for i in 0..<vm.album.count {
-                            print("모델 삽입 실행됨")
-                            vm.loadImage(for: vm.album[i], size: CGSize(width: UIScreen.main.bounds.width*0.3, height: UIScreen.main.bounds.width*0.3), index: i)
+                        print("앨범 개수: \(vm.album.count)")
+                        
+                        DispatchQueue.main.async {
+                            vm.loadImagesInRange(start: 0, end: 60)
+                            vm.currentIndex = 60
+                            vm.firstAppear = false
                         }
-                        vm.firstAppear = false
+                    } else {
+                        print("재진입, 기존 데이터 사용")
+                        print("기존 modelsDict: \(vm.modelsDict.count)개")
                     }
-                    //                    }
                 }
             }
+            
             vm.changeOpacity()
             Analytics.logEvent("A3_사진선택", parameters: nil)
+        }
+        .onDisappear {
+            print("=== PhotosPickerView onDisappear ===")
+            // ✅ 화면 떠날 때만 캐시 정리
+            vm.clearImageCache()
         }
         .navigationBarBackButtonHidden()
         .onChange(of: vm.selectedIndex) {
@@ -122,12 +159,9 @@ extension PhotosPickerView {
 
 extension PhotosPickerView {
     var toolbarButton: some View {
-        
         HStack {
-            
             Button {
                 naviManager.pop()
-                //                dismiss()
             } label: {
                 Image(systemName: "xmark")
                     .resizable()
@@ -136,6 +170,7 @@ extension PhotosPickerView {
             }
             .disabled(vm.models.isEmpty ? true : false)
             .padding(.leading, UIScreen.main.bounds.width * 0.09)
+            
             Spacer()
             
             Text("사진 선택")
@@ -145,13 +180,7 @@ extension PhotosPickerView {
                 .padding(.trailing, UIScreen.main.bounds.height * 0.075)
             
             Spacer()
-            
-            
         }
         .padding(.top, 20)
     }
-}
-
-#Preview {
-    PhotosPickerView()
 }

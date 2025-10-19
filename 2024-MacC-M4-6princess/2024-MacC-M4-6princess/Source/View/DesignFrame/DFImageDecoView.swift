@@ -21,12 +21,16 @@ struct DFImageDecoView: View {
 extension DFImageDecoView {
     
     var appendImageView: some View {
-        
         VStack {
-            Button  {
+            Button {
+                print("=== 사진 추가 버튼 클릭 ===")
+                
+                // ✅ 진입 전 완전히 초기화
+                frameManager.pickedImage = nil
+                frameManager.removedImage = nil
+                frameManager.changedSubject = nil
                 
                 naviManager.push(screen: Screen.photoPicker)
-                
             } label: {
                 ZStack {
                     Circle()

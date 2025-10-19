@@ -149,7 +149,7 @@ struct DFEditView: View {
             viewModel.showMaskImage(content: pickedImageRender)
             Analytics.logEvent("A4_누끼따기", parameters: nil)
         }
-        .onDisappear{ // ✅
+        .onDisappear{
             frameManager.removedImage = viewModel.resultImage
         }
         //        .navigationDestination(isPresented: $viewModel.isShowModifyFrame, destination: {
@@ -159,6 +159,9 @@ struct DFEditView: View {
 //        .toolbar {
 //            toolBarButtons
 //        }
+        .onDisappear {
+               viewModel.cleanup()
+           }
         .simultaneousGesture(moveImage)
         .simultaneousGesture(magnification)
     }

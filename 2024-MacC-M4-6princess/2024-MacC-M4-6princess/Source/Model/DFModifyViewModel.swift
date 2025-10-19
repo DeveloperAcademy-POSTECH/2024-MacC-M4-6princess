@@ -157,7 +157,7 @@ class DFModifyViewModel: ObservableObject {
             // 저장 완료 메시지 숨기기
             let render = ImageRenderer(content: view.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4/3))
             //            render.scale = scaleCompute(inputImage)
-            render.scale = UIScreen.main.scale + 1
+            render.scale = UIScreen.main.scale
             frameImage = render.uiImage
             addImage(albumImageData: frameImage?.pngData(), context: context, subjects: imageModel)
         }
@@ -327,7 +327,23 @@ class DFModifyViewModel: ObservableObject {
         return resultImage
     }
     
+    // MARK: - Memory Management
     
+    /// 메모리 정리
+    func cleanup() {
+        imageList.removeAll()
+        imageHistory.removeAll()
+        modelList.removeAll()
+        outputImage = nil
+        frameImage = nil
+        
+        print("DFModifyViewModel cleaned up")
+    }
+    
+    // ✅ deinit에서는 cleanup 호출하지 않음
+    deinit {
+        print("DFModifyViewModel deinitialized")
+    }
     //    func addImage(albumImageData: Data?, subjectImageData: Data?, context: NSManagedObjectContext) {
     //
     //        let newImage = StoreImages(context: context)

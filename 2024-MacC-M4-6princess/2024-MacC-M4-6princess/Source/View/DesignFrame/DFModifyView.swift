@@ -116,6 +116,10 @@ struct DFModifyView: View {
             Analytics.logEvent("A5_프레임수정", parameters: nil)
         }
         .onDisappear {
+            // ✅ MainActor 컨텍스트에서 호출
+            viewModel.cleanup()
+            
+            // ✅ Task 취소
             saveStateTask?.cancel()
         }
     }
