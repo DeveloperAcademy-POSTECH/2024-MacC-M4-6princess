@@ -23,6 +23,9 @@ final class TextSizeSlider: UIView {
     private var lastFeedbackFontSize: Int = -1
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     
+    // 🔥 제약조건을 프로퍼티로 저장
+    private var handleCenterYConstraint: Constraint?
+    
     var fontSize: Observable<Double> {
         return fontSizeRelay.asObservable()
     }
@@ -74,12 +77,13 @@ final class TextSizeSlider: UIView {
             make.height.equalTo(barSize.height)
         }
         
+        // 🔥 초기 centerY 제약조건을 설정하고 저장
         handleImageView.snp.makeConstraints { make in
             make.centerX.equalTo(barImageView)
             make.width.height.equalTo(handleSize)
+            // centerY 제약조건을 저장
+            handleCenterYConstraint = make.centerY.equalTo(barImageView.snp.top).offset(computeHandleYPosition()).constraint
         }
-        
-        updateHandlePosition(animated: false)
     }
     
     private func setupGestures() {
@@ -115,17 +119,20 @@ final class TextSizeSlider: UIView {
     
     // MARK: - Helper Methods
     
-    private func updateHandlePosition(animated: Bool) {
+    private func computeHandleYPosition() -> CGFloat {
         let currentFontSize = fontSizeRelay.value
         let normalizedValue = (currentFontSize - minFontSize) / (maxFontSize - minFontSize)
         let minY = handleSize / 2
         let maxY = barSize.height - handleSize / 2
-        let yPosition = minY + (maxY - minY) * CGFloat(1.0 - normalizedValue)
+        return minY + (maxY - minY) * CGFloat(1.0 - normalizedValue)
+    }
+    
+    private func updateHandlePosition(animated: Bool) {
+        let yPosition = computeHandleYPosition()
         
         let updateBlock = {
-            self.handleImageView.snp.updateConstraints { make in
-                make.centerY.equalTo(self.barImageView.snp.top).offset(yPosition)
-            }
+            // 🔥 저장된 제약조건의 constant를 직접 업데이트
+            self.handleCenterYConstraint?.update(offset: yPosition)
             self.layoutIfNeeded()
         }
         

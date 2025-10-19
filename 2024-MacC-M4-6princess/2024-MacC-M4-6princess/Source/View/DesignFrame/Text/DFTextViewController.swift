@@ -300,17 +300,17 @@ final class DFTextViewController: UIViewController {
     }
     
     private func setupColorButtons() {
-        viewModel.colorChip.enumerated().forEach { index, color in
+        viewModel.colorChipUIColor.enumerated().forEach { index, color in
             let button = createColorButton(color: color, index: index)
             colorStackView.addArrangedSubview(button)
         }
     }
-    
-    private func createColorButton(color: Color, index: Int) -> UIButton {
+
+    private func createColorButton(color: UIColor, index: Int) -> UIButton {
         let button = UIButton(type: .system)
         let size: CGFloat = viewModel.colorNum == index ? 40 : 30
         
-        button.backgroundColor = UIColor(color)
+        button.backgroundColor = color
         button.layer.cornerRadius = size / 2
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.white.cgColor
@@ -321,16 +321,17 @@ final class DFTextViewController: UIViewController {
         
         button.rx.tap
             .subscribe(onNext: { [weak self] in
-                self?.viewModel.selectedColor = color
-                self?.viewModel.colorNum = index
-                self?.updateColorButtons()
-                self?.updateTextViewColor()
+                guard let self = self else { return }
+                self.viewModel.selectedColor = self.viewModel.colorChip[index]
+                self.viewModel.selectedUIColor = color
+                self.viewModel.colorNum = index
+                self.updateColorButtons()
+                self.updateTextViewColor()
             })
             .disposed(by: disposeBag)
         
         return button
     }
-    
     private func setupBindings() {
         // 폰트 사이즈 슬라이더 바인딩
         textSizeSlider.fontSize
@@ -482,15 +483,14 @@ final class DFTextViewController: UIViewController {
             viewModel.attributedTxt = mutableAttributedText
         }
     }
-    
     private func updateTextViewColor() {
-        customTextView.textColor = UIColor(viewModel.selectedColor)
+        customTextView.textColor = viewModel.selectedUIColor
         
         if let attributedText = customTextView.attributedText {
             let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
             mutableAttributedText.addAttribute(
                 .foregroundColor,
-                value: UIColor(viewModel.selectedColor),
+                value: viewModel.selectedUIColor,
                 range: NSRange(location: 0, length: mutableAttributedText.length)
             )
             customTextView.attributedText = mutableAttributedText

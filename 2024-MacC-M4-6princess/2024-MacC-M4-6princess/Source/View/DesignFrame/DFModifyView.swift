@@ -13,26 +13,11 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     
-    
-    /// 구버전 레이어 관련한 것으로 조만간 파일로 정리한 뒤 삭제할 예정입니다.
-    //  ㅌ @State var isDragging: Bool = false
-    //    @State var selectedLayerIndex: Int?
-    //    @State var isLongPressed: Bool = false
-    //    @State var beforeDragOffsetY: CGFloat = .zero
-    
     var body: some View {
         
         ZStack {
-            //            if isFirstLaunching == true && !viewModel.showAgain == true {
-            //                DFOnboardingView(isFirstLaunching: $isFirstLaunching, showAgain: $viewModel.showAgain)
-            //                    .zIndex(1)
-            //            }
-            
             Color.clear
-                .contentShape(Rectangle()) // 터치 영역을 전체 ZStack으로 설정
-            //                .onTapGesture {
-            //                    isLongPressed = false // 화면 클릭 시 isLongPressed 초기화
-            //                }
+                .contentShape(Rectangle())
             
             if UIScreen.main.bounds.height/UIScreen.main.bounds.width > 2.0{
                 let extractedExpr: VStack<TupleView<(some View, some View)>> = VStack {
@@ -75,21 +60,28 @@ struct DFModifyView: View {
             else{
                 modifyIpad
             }
+            
+            // 🔥 여기가 변경된 부분입니다!
             if viewModel.showTextView {
-                DFTextView(modiViewModel:viewModel)
+                DFTextViewControllerRepresentable(
+                    viewModel: DFTextViewModel(),
+                    modiViewModel: viewModel
+                )
+                .environmentObject(imageModel)
+                .ignoresSafeArea()
             }
+            
             if frameManager.showTextModifyView, let textStyle = frameManager.selectedTextStyle {
                 DFTextModifyView(
                     modiViewModel: viewModel
-                    
                 )
             }
             
         }
         .sheet(isPresented: $viewModel.showStickerSheet) {
             DFStickerView(viewModel: viewModel)
-                .presentationDetents([.fraction(0.5)]) // 화면의 절반만 차지
-                .presentationDragIndicator(.visible) // 드래그 인디케이터 표시
+                .presentationDetents([.fraction(0.5)])
+                .presentationDragIndicator(.visible)
         }
         .ignoresSafeArea(.keyboard)
         .navigationBarBackButtonHidden()
@@ -97,16 +89,13 @@ struct DFModifyView: View {
             if !viewModel.showTextView && !frameManager.showTextModifyView {
                 toolBarButtons
             }
-            
         }
         .onChange(of: viewModel.showCamera) { newValue in
             if newValue {
-                // 1초 후에 화면 전환
                 DispatchQueue.main.async() {
                     frameManager.showMFView = false
                     naviManager.popToRoot()
                     frameManager.showMFView = false
-                    
                 }
             }
         }
@@ -121,12 +110,8 @@ struct DFModifyView: View {
         }
     }
     
-    
-    
     var imageView: some View {
-        
         ZStack {
-            
             ForEach(imageModel.imageList.indices, id: \.self) { index in
                 let subject = imageModel.imageList[index]
                 
@@ -157,8 +142,6 @@ struct DFModifyView: View {
                                 viewModel.selectedIndex = index
                                 viewModel.selectedSubject = subject
                             }
-                        //                            .gesture(combinedGesture(subject: subject))
-                        //                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.sticker {
                     ZStack {
@@ -166,24 +149,6 @@ struct DFModifyView: View {
                             width: image.size.width / viewModel.scaleCompute(image),
                             height: image.size.height / viewModel.scaleCompute(image)
                         )
-                        //                        var size: CGSize {
-                        //                            if subject.isFullSticker{
-                        //                                return CGSize(width: image.size.width / viewModel.scaleCompute(image), height: image.size.height / viewModel.scaleCompute(image))
-                        //                            }
-                        //                            else if image.size.height > image.size.width {
-                        //                                return CGSize(
-                        //                                    width: UIScreen.main.bounds.height / 3 * (image.size.width / image.size.height),
-                        //                                    height: UIScreen.main.bounds.height / 3
-                        //                                )
-                        //                            } else {
-                        //                                return CGSize(
-                        //                                    width: UIScreen.main.bounds.width / 2,
-                        //                                    height: UIScreen.main.bounds.width / 2 * (image.size.height / image.size.width)
-                        //                                )
-                        //                            }
-                        //                        }
-                        
-                        
                         
                         DFOverlayBoxView(model: subject, size: size)
                             .opacity(subject.isTapped ? 1 : 0)
@@ -205,8 +170,6 @@ struct DFModifyView: View {
                                 viewModel.selectedIndex = index
                                 viewModel.selectedSubject = subject
                             }
-                        //                            .gesture(combinedGesture(subject: subject))
-                        //                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 } else if let image = subject.text {
                     ZStack {
@@ -237,17 +200,12 @@ struct DFModifyView: View {
                                 viewModel.selectedIndex = index
                                 viewModel.selectedSubject = subject
                             }
-                        //                            .gesture(combinedGesture(subject: subject))
-                        //                            .simultaneousGesture(longPressAndDragGesture(for: index))
                     }
                 }
             }
-            
         }
         .onAppear{
-            // 선택된 subject의 레이어 변동창 띄어줌
-            
-            if imageModel.imageList.count > 1{ // 레이어가 한개이하이면 레이어 선택창이 나타나지않음
+            if imageModel.imageList.count > 1{
                 viewModel.selectedSubject = imageModel.imageList.last
                 viewModel.selectedIndex = imageModel.imageList.indices.last
             }
