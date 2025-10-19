@@ -19,7 +19,6 @@ extension DFModifyView{
         for _ in 0..<steps {
             guard currentIndex > 0 else { return 0}
             guard currentIndex < imageModel.imageList.count else { return imageModel.imageList.count - 1}
-            //            print("currentIndex: \(currentIndex),currentIndex - 1: \(currentIndex - 1)")
             imageModel.imageList.swapAt(currentIndex, currentIndex - 1)
             currentIndex -= 1
         }
@@ -33,7 +32,6 @@ extension DFModifyView{
         for _ in 0..<steps {
             guard currentIndex < imageModel.imageList.count - 1 else { return imageModel.imageList.count-1}
             guard currentIndex >= 0 else { return 0}
-            //            print("currentIndex: \(currentIndex),currentIndex + 1: \(currentIndex + 1)")
             imageModel.imageList.swapAt(currentIndex, currentIndex + 1)
             currentIndex += 1
         }
@@ -139,48 +137,24 @@ extension DFModifyView{
         }
     }
     
-    // 1초 길게 누르고 드래그 제스처를 생성하는 함수
-    //    func longPressAndDragGesture(for index: Int) -> some Gesture {
-    //        LongPressGesture(minimumDuration: 0.5) // 1초 동안 길게 누름
-    //            .onEnded { _ in
-    ////                selectedLayerIndex = index
-    //////                imageListUpdate()
-    //
-    //                print("isLongPressed 눌림")
-    //            }
-    //            .simultaneously(with: DragGesture(minimumDistance: 0)
-    //                .onChanged { value in
-    //                    dragOnChanged(value: value, index: index)
-    //                }
-    //                .onEnded { _ in
-    //                    dragOnEnded()
-    ////                    beforeDragOffsetY = .zero
-    //                    imageListUpdate()
-    //                }
-    //            )
-    //    }
-    
-    
     func combinedGesture(subject: SubjectImage) -> some Gesture {
         
         DragGesture()
-            .onChanged { value in
-                
-                viewModel.dragGestureTask(subject: subject, changed: value.translation)
-                
+            .onChanged { [weak viewModel] value in
+                viewModel?.dragGestureTask(subject: subject, changed: value.translation)
             }
-            .onEnded { value in
+            .onEnded { [weak viewModel, weak imageModel] value in
+                guard let viewModel, let imageModel else { return }
                 
                 viewModel.accumulatedOffSet = .zero
                 viewModel.modelListControl(subject: subject)
                 subject.isTapped = true
                 imageModel.imageList.append(subject)
                 imageModel.imageList.removeLast()
-                
-                
             }
             .simultaneously(with: RotateGesture()
-                .onChanged { value in
+                .onChanged { [weak viewModel] value in
+                    guard let viewModel else { return }
                     if subject.isTapped  {
                         if viewModel.current == .zero {
                             viewModel.current = subject.getAngle()
@@ -191,7 +165,8 @@ extension DFModifyView{
                 }
             )
             .simultaneously(with: MagnifyGesture()
-                .onChanged { value in
+                .onChanged { [weak viewModel] value in
+                    guard let viewModel else { return }
                     if subject.isTapped {
                         viewModel.setScaleVolume(value.magnification, subject: subject)
                     }
@@ -251,11 +226,16 @@ extension DFModifyView{
                         $0.isTapped = false
                     }
                     
-//                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.saveStateText = NSLocalizedString("저장 중입니다...", comment: "")
                     viewModel.isPushedSaveBtn = true
                     
-                    viewModel.updateImage(view: imageView, frameManager: frameManager, viewContext: managedContext, imageModel: imageModel) {
+                    viewModel.updateImage(
+                        view: imageView,
+                        frameManager: frameManager,
+                        viewContext: managedContext,
+                        imageModel: imageModel
+                    ) { [weak viewModel, weak imageModel, weak frameManager] in
+                        guard let viewModel, let imageModel, let frameManager else { return }
                         
                         viewModel.btnOpacity = 0
                         viewModel.showCamera = true
@@ -274,11 +254,16 @@ extension DFModifyView{
                         $0.isTapped = false
                     }
                     
-//                    viewModel.saveStateText = "저장 중입니다..."
                     viewModel.saveStateText = NSLocalizedString("저장 중입니다...", comment: "")
                     viewModel.isPushedSaveBtn = true
                     
-                    viewModel.saveImage(view: imageView, inputImage: image, context: managedContext, imageModel: imageModel) {
+                    viewModel.saveImage(
+                        view: imageView,
+                        inputImage: image,
+                        context: managedContext,
+                        imageModel: imageModel
+                    ) { [weak viewModel, weak imageModel, weak frameManager, managedContext] in
+                        guard let viewModel, let imageModel, let frameManager else { return }
                         
                         viewModel.btnOpacity = 0
                         viewModel.showCamera = true
@@ -296,11 +281,12 @@ extension DFModifyView{
                     
                 } else {
                     
-//                    viewModel.saveStateText = "저장할 이미지가 없습니다."
                     viewModel.saveStateText = NSLocalizedString("저장할 이미지가 없습니다.", comment: "")
-                    Task {
+                    saveStateTask?.cancel()
+                    saveStateTask = Task { [weak viewModel] in
+                        guard let viewModel else { return }
                         viewModel.btnOpacity = 1
-                        try await Task.sleep(for: .seconds(1))
+                        try? await Task.sleep(for: .seconds(1))
                         viewModel.btnOpacity = 0
                     }
                 }
@@ -319,61 +305,4 @@ extension DFModifyView{
             
         }
     }
-}
-// 인스타 layer 버전
-extension DFModifyView{
-    // 드래그 중 호출되는 함수 (구버전)
-    //    func dragOnChanged(value: DragGesture.Value, index: Int) {
-    //        if !isDragging {
-    //            selectedLayerIndex = index
-    //            isDragging = true
-    //        }
-    //
-    //        let dragOffsetY = value.translation.height
-    //        // 차이
-    //        let diff = dragOffsetY - beforeDragOffsetY
-    //        /*
-    //         0 -> 50 (backward) => 50
-    //         0 -> -50 (forward) => -50
-    //         */
-    //        var currentStep = Int(diff / 50)
-    //        if diff < 0 && diff > -50 {
-    //            currentStep = 0
-    //        }
-    //        // 밑으로 내리면 -> backward (index 증가)
-    //        // 밑으로 내리면 dragOffsetY가 양수
-    //        // 위로 올리면 -> Forward (index 감소)
-    //        // 위로 올리면 dragOffsetY가 마이너스
-    //
-    //        if let currentIndex = selectedLayerIndex,
-    //           currentStep != 0
-    //        //            currentStep != currentIndex
-    //        {
-    //            if diff > 0 {
-    //                if currentIndex - currentStep < 0{
-    //                    currentStep = currentIndex
-    //                }
-    //                /// 인덱스 감소
-    //                selectedLayerIndex = moveLayerForward(at: currentIndex, steps: abs(currentStep))
-    //                beforeDragOffsetY = dragOffsetY
-    //                imageModel.imageList.append(imageModel.imageList[0])
-    //                imageModel.imageList.removeLast()
-    //            } else {
-    //                if currentStep + currentIndex > imageModel.imageList.count{
-    //                    let diff = currentStep + currentIndex - imageModel.imageList.count
-    //                    currentStep = imageModel.imageList.count - currentIndex
-    //                }
-    //                /// 인덱스 증가
-    //                selectedLayerIndex = moveLayerBackward(at: currentIndex, steps: abs(currentStep))
-    //                beforeDragOffsetY = dragOffsetY
-    //                imageModel.imageList.append(imageModel.imageList[0])
-    //                imageModel.imageList.removeLast()
-    //            }
-    //        }
-    //    }
-    // 드래그 종료 시 호출되는 함수
-    //    func dragOnEnded() {
-    //        isDragging = false
-    //        selectedLayerIndex = nil
-    //    }
 }

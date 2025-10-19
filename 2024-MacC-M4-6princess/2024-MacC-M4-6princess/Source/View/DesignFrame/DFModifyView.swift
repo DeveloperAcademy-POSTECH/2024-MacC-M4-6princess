@@ -13,6 +13,9 @@ struct DFModifyView: View {
     @StateObject var viewModel: DFModifyViewModel = DFModifyViewModel()
     @AppStorage("onboarding") var isFirstLaunching: Bool = true
     
+    // Task 관리를 위한 State 추가
+    @State var saveStateTask: Task<Void, Never>?
+    
     var body: some View {
         
         ZStack {
@@ -95,11 +98,11 @@ struct DFModifyView: View {
                 toolBarButtons
             }
         }
-        .onChange(of: viewModel.showCamera) { newValue in
+        .onChange(of: viewModel.showCamera) { [weak frameManager, weak naviManager] newValue in
             if newValue {
-                DispatchQueue.main.async() {
-                    frameManager.showMFView = false
-                    naviManager.popToRoot()
+                DispatchQueue.main.async { [weak frameManager, weak naviManager] in
+                    frameManager?.showMFView = false
+                    naviManager?.popToRoot()
                 }
             }
         }
@@ -111,6 +114,9 @@ struct DFModifyView: View {
                 }
             }
             Analytics.logEvent("A5_프레임수정", parameters: nil)
+        }
+        .onDisappear {
+            saveStateTask?.cancel()
         }
     }
     
