@@ -100,7 +100,6 @@ struct DFModifyView: View {
                 DispatchQueue.main.async() {
                     frameManager.showMFView = false
                     naviManager.popToRoot()
-                    frameManager.showMFView = false
                 }
             }
         }
