@@ -26,15 +26,12 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     
     var selectedIndexPath: IndexPath? {
         didSet {
-            if let indexPath = selectedIndexPath {
-                collectionView?.isScrollEnabled = true
-                collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.collectionView?.isScrollEnabled = false
-                }
-            }
+            guard let indexPath = selectedIndexPath else { return }
+            collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         }
     }
+    
+    private var isUserInitiatedScroll = false
     
     private func updateSelectedIndexPath() {
         if let uuid = currentSelectedFilter,
@@ -66,10 +63,15 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCollectionView()
-        
+        collectionView.isScrollEnabled = true // <---- 스크롤 허용
         if currentSelectedFilter == nil && frameManager.selectedFrame != nil {
             currentSelectedFilter = frameManager.selectedFrame
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        scrollToSelectedFilter(animated: false)
     }
     
     override func viewDidLayoutSubviews() {
@@ -87,9 +89,9 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.decelerationRate = UIScrollView.DecelerationRate(rawValue: 0.6)
+        collectionView.decelerationRate = .fast
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.isScrollEnabled = false // 수동 스크롤 완전 비활성화
+        collectionView.isScrollEnabled = true
         collectionView.register(FilterCell.self, forCellWithReuseIdentifier: filterCellId)
         collectionView.register(EmptyCell.self, forCellWithReuseIdentifier: emptyCellId)
         
@@ -174,40 +176,50 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         self.selectFilterAtIndex(indexPath)
         
         // 터치한 프레임을 중앙으로 이동하는 애니메이션 (임시로 스크롤 활성화)
-        collectionView.isScrollEnabled = true
         UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.6, options: [.allowUserInteraction, .curveEaseOut], animations: {
             self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
             self.collectionView.layoutIfNeeded()
         }) { _ in
-            // 애니메이션 완료 후 다시 스크롤 비활성화
-            self.collectionView.isScrollEnabled = false
             self.updateCellSelectionState()
         }
     }
     
-    // MARK: - ScrollView Delegate (스크롤 방식 프레임 선택 - 주석처리)
+    // MARK: - ScrollView Delegate (스크롤 방식 프레임 선택)
     
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        if scrollView.isTracking {
-//            UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
-//                self.collectionView.collectionViewLayout.invalidateLayout()
-//            })
-//        }
-//    }
-//    
-//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//            self.selectClosestCellToCenter()
-//        }
-//    }
-//    
-//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        if !decelerate {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-//                self.selectClosestCellToCenter()
-//            }
-//        }
-//    }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isUserInitiatedScroll = true
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if isUserInitiatedScroll || scrollView.isDecelerating {
+            UIView.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveEaseOut], animations: {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+            })
+        }
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        finalizeUserScrollSelection()
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            finalizeUserScrollSelection()
+        }
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        if !isUserInitiatedScroll {
+            updateCellSelectionState()
+        }
+    }
+    
+    private func finalizeUserScrollSelection() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.isUserInitiatedScroll = false
+            self.selectClosestCellToCenter()
+        }
+    }
     
     // MARK: - 필터 선택
     
@@ -238,37 +250,31 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         }
     }
     
-    // 스크롤 방식에서 사용되던 함수 - 주석처리
-//    private func selectClosestCellToCenter() {
-//        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-//        
-//        // 현재 화면에 보이는 셀들 중에서 중앙에 가장 가까운 셀 찾기
-//        guard let layoutAttributes = collectionView.collectionViewLayout.layoutAttributesForElements(in: collectionView.bounds) else { return }
-//        
-//        var closestIndexPath: IndexPath?
-//        var minDistance: CGFloat = CGFloat.greatestFiniteMagnitude
-//        
-//        for attribute in layoutAttributes {
-//            let distance = abs(attribute.center.x - centerX)
-//            if distance < minDistance {
-//                minDistance = distance
-//                closestIndexPath = attribute.indexPath
-//            }
-//        }
-//        
-//        guard let indexPath = closestIndexPath else { return }
-//        
-//        // 가장 가까운 셀을 선택하고 중앙으로 이동
-//        selectFilterAtIndex(indexPath)
-//        
-//        // 자연스러운 중앙 이동 애니메이션
-//        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-//            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
-//            self.collectionView.layoutIfNeeded()
-//        }) { _ in
-//            self.updateCellSelectionState()
-//        }
-//    }
+    // 스크롤 - 중앙이동함수
+    private func selectClosestCellToCenter() {
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        // 현재 화면에 보이는 셀들 중에서 중앙에 가장 가까운 셀 찾기
+        guard let layoutAttributes = collectionView.collectionViewLayout.layoutAttributesForElements(in: collectionView.bounds) else { return }
+        var closestIndexPath: IndexPath?
+        var minDistance: CGFloat = CGFloat.greatestFiniteMagnitude
+        for attribute in layoutAttributes {
+            let distance = abs(attribute.center.x - centerX)
+            if distance < minDistance {
+                minDistance = distance
+                closestIndexPath = attribute.indexPath
+            }
+        }
+        guard let indexPath = closestIndexPath else { return }
+        // 가장 가까운 셀을 선택하고 중앙으로 이동
+        selectFilterAtIndex(indexPath)
+        // 중앙 이동 애니메이션(부드럽게)
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+            self.collectionView.layoutIfNeeded()
+        }) { _ in
+            self.updateCellSelectionState()
+        }
+    }
     
     private func updateCellSelectionState() {
         for cell in collectionView.visibleCells {
@@ -291,14 +297,9 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             currentSelectedFilter = frameManager.selectedFrame
         }
         
-        collectionView.isScrollEnabled = true
-        
         guard let selectedUUID = currentSelectedFilter else {
             let indexPath = IndexPath(item: 0, section: 0)
             collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.collectionView.isScrollEnabled = false
-            }
             return
         }
         
@@ -307,7 +308,6 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
             collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.collectionView.isScrollEnabled = false
                 self.updateCellSelectionState()
             }
         }
@@ -319,11 +319,7 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         collectionView.collectionViewLayout.invalidateLayout()
         
         let newestIndexPath = IndexPath(item: 1, section: 0)
-        collectionView.isScrollEnabled = true
         collectionView.scrollToItem(at: newestIndexPath, at: .centeredHorizontally, animated: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.collectionView.isScrollEnabled = false
-        }
     }
     
     
@@ -351,4 +347,3 @@ class FilterCollectionViewController: UIViewController, UICollectionViewDelegate
         present(alert, animated: true)
     }
 }
-
