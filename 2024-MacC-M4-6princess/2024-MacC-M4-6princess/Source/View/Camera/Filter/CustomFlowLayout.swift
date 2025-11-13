@@ -35,9 +35,6 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         }
         
         let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
-        let contentInset = collectionView.contentInset.left
-        
-        // 스크롤 중에는 셀 크기만 조정하고 위치는 변경하지 않음
         let isScrolling = collectionView.isTracking || collectionView.isDecelerating
         
         // 중앙에 가장 가까운 셀 찾기
@@ -73,51 +70,49 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
             }
         }
         
-        // 스크롤 중이 아닐 때만 셀 위치 재배치
+        // 셀 위치 재배치 (스크롤 중에도 중앙 주위 간격 다르게 유지)
+        var sorted = attributes.sorted { $0.indexPath.item < $1.indexPath.item }
+        guard let centerIdx = sorted.firstIndex(where: { $0.indexPath.item == centerCell.indexPath.item }) else { return attributes }
+        
         if !isScrolling {
-            let sorted = attributes.sorted { $0.indexPath.item < $1.indexPath.item }
-            guard let centerIdx = sorted.firstIndex(where: { $0.indexPath.item == centerCell.indexPath.item }) else { return attributes }
-            
             sorted[centerIdx].center.x = centerX
-            
-            // 왼쪽 셀들 배치
-            for i in stride(from: centerIdx - 1, through: 0, by: -1) {
-                let right = sorted[i + 1]
-                let current = sorted[i]
-                
-                let rightSizeRatio = (right.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
-                let currentSizeRatio = (current.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
-                let avgSizeRatio = (rightSizeRatio + currentSizeRatio) / 2
-                
-                let sineSpacingRatio = sin(avgSizeRatio * .pi / 2)
-                let easedSpacingRatio = sineSpacingRatio * sineSpacingRatio
-                
-                let dynamicSpacing = defaultCellSpacing + (centerCellSpacing - defaultCellSpacing) * easedSpacingRatio
-                
-                sorted[i].center.x = right.center.x - (right.size.width + current.size.width) / 2 - dynamicSpacing
-            }
-            
-            // 오른쪽 셀들 배치
-            for i in (centerIdx + 1)..<sorted.count {
-                let left = sorted[i - 1]
-                let current = sorted[i]
-                
-                let leftSizeRatio = (left.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
-                let currentSizeRatio = (current.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
-                let avgSizeRatio = (leftSizeRatio + currentSizeRatio) / 2
-                
-                let sineSpacingRatio = sin(avgSizeRatio * .pi / 2)
-                let easedSpacingRatio = sineSpacingRatio * sineSpacingRatio
-                
-                let dynamicSpacing = defaultCellSpacing + (centerCellSpacing - defaultCellSpacing) * easedSpacingRatio
-                
-                sorted[i].center.x = left.center.x + (left.size.width + current.size.width) / 2 + dynamicSpacing
-            }
-            
-            return sorted
         }
         
-        return attributes
+        // 왼쪽 셀들 배치
+        for i in stride(from: centerIdx - 1, through: 0, by: -1) {
+            let right = sorted[i + 1]
+            let current = sorted[i]
+            
+            let rightSizeRatio = (right.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+            let currentSizeRatio = (current.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+            let avgSizeRatio = (rightSizeRatio + currentSizeRatio) / 2
+            
+            let sineSpacingRatio = sin(avgSizeRatio * .pi / 2)
+            let easedSpacingRatio = sineSpacingRatio * sineSpacingRatio
+            
+            let dynamicSpacing = defaultCellSpacing + (centerCellSpacing - defaultCellSpacing) * easedSpacingRatio
+            
+            sorted[i].center.x = right.center.x - (right.size.width + current.size.width) / 2 - dynamicSpacing
+        }
+        
+        // 오른쪽 셀들 배치
+        for i in (centerIdx + 1)..<sorted.count {
+            let left = sorted[i - 1]
+            let current = sorted[i]
+            
+            let leftSizeRatio = (left.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+            let currentSizeRatio = (current.size.width - defaultCellSize) / (centerCellSize - defaultCellSize)
+            let avgSizeRatio = (leftSizeRatio + currentSizeRatio) / 2
+            
+            let sineSpacingRatio = sin(avgSizeRatio * .pi / 2)
+            let easedSpacingRatio = sineSpacingRatio * sineSpacingRatio
+            
+            let dynamicSpacing = defaultCellSpacing + (centerCellSpacing - defaultCellSpacing) * easedSpacingRatio
+            
+            sorted[i].center.x = left.center.x + (left.size.width + current.size.width) / 2 + dynamicSpacing
+        }
+        
+        return sorted
     }
     
     override var collectionViewContentSize: CGSize {
