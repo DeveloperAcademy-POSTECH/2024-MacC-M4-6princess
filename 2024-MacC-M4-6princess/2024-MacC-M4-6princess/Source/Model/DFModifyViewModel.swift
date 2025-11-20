@@ -65,23 +65,6 @@ class DFModifyViewModel: ObservableObject {
                 }
                 
             }
-            .simultaneously(with: DragGesture()
-                .onChanged({ value in
-                    
-                    if let subject = self.modelList.first, subject.isTapped {
-                        self.dragGestureTask(subject: subject, changed: value.translation)
-                    }
-                })
-                    .onEnded({ value in
-                        
-                        if let subject = self.modelList.first {
-                            
-                            self.accumulatedOffSet = .zero
-                            self.modelListControl(subject: subject)
-                            subject.isTapped = true
-                        }
-                    })
-            )
             .simultaneously(with: RotateGesture()
                 .onChanged({ value in
                     
