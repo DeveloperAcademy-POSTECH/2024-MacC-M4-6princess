@@ -147,6 +147,18 @@ struct DFModifyView: View {
                             .scaleEffect(subject.getScale())
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
+                            .gesture(DragGesture().onChanged({ value in
+                                if let subject = viewModel.modelList.first, subject.isTapped {
+                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                }
+                            })
+                                .onEnded({ value in
+                                    if let subject = viewModel.modelList.first {
+                                        viewModel.accumulatedOffSet = .zero
+                                        viewModel.modelListControl(subject: subject)
+                                        subject.isTapped = true
+                                    }
+                                }))
                             .onTapGesture {
                                 if !subject.isTapped {
                                     viewModel.modelListControl(subject: subject)
@@ -195,6 +207,18 @@ struct DFModifyView: View {
                             .scaleEffect(subject.getScale())
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
+                            .gesture(DragGesture().onChanged({ value in
+                                if let subject = viewModel.modelList.first, subject.isTapped {
+                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                }
+                            })
+                                .onEnded({ value in
+                                    if let subject = viewModel.modelList.first {
+                                        viewModel.accumulatedOffSet = .zero
+                                        viewModel.modelListControl(subject: subject)
+                                        subject.isTapped = true
+                                    }
+                                }))
                             .onTapGesture {
                                 if !subject.isTapped {
                                     viewModel.modelListControl(subject: subject)
@@ -227,6 +251,18 @@ struct DFModifyView: View {
                             .scaleEffect(subject.getScale())
                             .rotationEffect(subject.getAngle())
                             .offset(subject.getOffset())
+                            .gesture(DragGesture().onChanged({ value in
+                                if let subject = viewModel.modelList.first, subject.isTapped {
+                                    viewModel.dragGestureTask(subject: subject, changed: value.translation)
+                                }
+                            })
+                                .onEnded({ value in
+                                    if let subject = viewModel.modelList.first {
+                                        viewModel.accumulatedOffSet = .zero
+                                        viewModel.modelListControl(subject: subject)
+                                        subject.isTapped = true
+                                    }
+                                }))
                             .onTapGesture {
                                 if !subject.isTapped {
                                     viewModel.modelListControl(subject: subject)
