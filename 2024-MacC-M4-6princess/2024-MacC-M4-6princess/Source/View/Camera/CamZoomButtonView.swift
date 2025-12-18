@@ -49,6 +49,7 @@ struct CamZoomButtonView: View {
         }
     }
     
+    /// 줌 하이라이트 버튼 목록
     private var zoomStops: [ZoomStop] {
         let maxZoom = maxZoomFactor
         let scale = zoomValueScale
@@ -68,6 +69,7 @@ struct CamZoomButtonView: View {
         return stops
     }
     
+    /// 표시용 배율과 실제 적용 배율을 묶어서 스톱 배열에 추가
     private func appendStop(_ displayValue: CGFloat,
                             scale: CGFloat,
                             to stops: inout [ZoomStop],
@@ -85,6 +87,7 @@ struct CamZoomButtonView: View {
         }
     }
     
+    /// 줌 배율을 받아서 .5, 1, 2, 3 중에 가까운 값으로 표시
     private func label(for stop: ZoomStop) -> String {
         let value = stop.displayValue
         if abs(value - 0.5) < 0.01 {
@@ -98,6 +101,7 @@ struct CamZoomButtonView: View {
         return String(format: "%.1f", value)
     }
     
+    /// 현재 줌이 해당 스톱과 가까운지를 표시용 배율 기준으로 판별(하이라이트를 윟해)
     private func isZoomSelected(stop: ZoomStop) -> Bool {
         let tolerance: CGFloat = 0.15
         let currentDisplay = currentDisplayZoom
@@ -108,15 +112,18 @@ struct CamZoomButtonView: View {
         return currentDisplay > stop.displayValue && isLastStop
     }
     
+    /// 초광각 렌즈 활성화 여부 검사
     private var supportsUltraWideLens: Bool {
         guard viewModel.cameraPosition == .back else { return false }
         return viewModel.cameraManager.hasUltraWideLens
     }
     
+    /// 최대 배율 값
     private var maxZoomFactor: CGFloat {
         min(viewModel.cameraManager.maxAvailableZoomFactor, 15.0)
     }
     
+    /// 실제 배율을 보여주는 배율 값으로 변환
     private var zoomValueScale: CGFloat {
         guard supportsUltraWideLens else { return 1.0 }
         let actualUltraWide = viewModel.cameraManager.minAvailableZoomFactor
@@ -130,6 +137,7 @@ struct CamZoomButtonView: View {
         return max(1.0, actualUltraWide / desiredUltraWide)
     }
     
+    /// (광각 지원하는 경우) 보이는 줌 기준 1x로 강제 줌 해버림. default가 1x로 보이게
     private func applyDefaultZoomIfNeeded() {
         guard !didApplyDefaultZoom else { return }
         guard viewModel.cameraManager.videoDeviceInput?.device != nil else { return }
@@ -141,6 +149,7 @@ struct CamZoomButtonView: View {
         viewModel.setZoom(factor: defaultStop.value)
     }
     
+    /// 실제 디바이스 줌을 표시용 배율 기준으로 환산
     private var currentDisplayZoom: CGFloat {
         let scale = viewModel.cameraPosition == .back ? zoomValueScale : 1.0
         let currentActualZoom = viewModel.cameraManager.videoDeviceInput?.device.videoZoomFactor ?? viewModel.currentZoomFactor
