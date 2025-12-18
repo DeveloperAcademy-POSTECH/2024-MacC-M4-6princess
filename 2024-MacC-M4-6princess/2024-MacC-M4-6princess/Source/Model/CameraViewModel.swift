@@ -65,12 +65,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         super.init()
         setupPreviewLayer()
         
-        if cameraManager.deviceType == .builtInWideAngleCamera {
-            self.currentZoomFactor = 2.0
-        }
-        else {
-            self.currentZoomFactor = 1.0
-        }
+        self.currentZoomFactor = 1.0
         _ = motionManager
     }
     
@@ -175,14 +170,11 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     func changeCamera() {
         cameraManager.changeCamera()
         cameraPosition = cameraManager.videoDeviceInput?.device.position ?? .back
+        currentZoomFactor = cameraManager.videoDeviceInput?.device.videoZoomFactor ?? 1.0
         
         // 카메라 전환 시 적절한 초기 줌 팩터 설정
         if cameraPosition == .back {
-            if cameraManager.deviceType == .builtInUltraWideCamera {
-                currentZoomFactor = 2.0
-            } else {
-                currentZoomFactor = 1.0
-            }
+            currentZoomFactor = 1.0
         } else {
             currentZoomFactor = 1.0
         }
@@ -218,42 +210,25 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         
         // 최소/최대 줌 팩터 제한
         if let device = cameraManager.videoDeviceInput?.device {
-            let minZoom: CGFloat = 1.0
-            let maxZoom: CGFloat = device.deviceType == .builtInUltraWideCamera ? 4.0 : 3.0
+            let minZoom = device.minAvailableVideoZoomFactor
+            let maxZoom = device.maxAvailableVideoZoomFactor
             newZoomFactor = min(max(newZoomFactor, minZoom), maxZoom)
             
             // 줌 적용
-            cameraManager.zoom(newZoomFactor)
-            
-            // currentZoomFactor 실시간 업데이트
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                currentZoomFactor = newZoomFactor
+            if let appliedZoom = cameraManager.applyZoomFactor(newZoomFactor) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    currentZoomFactor = appliedZoom
+                }
             }
         }
     }
     
     //해당 factor로 줌을 해주는 함수
     func setZoom(factor: CGFloat) {
-        guard let device = cameraManager.videoDeviceInput?.device else { return }
-        
-        do {
-            try device.lockForConfiguration()
-            let actualZoomFactor = if device.position == .back {
-                if cameraManager.deviceType == .builtInUltraWideCamera {
-                    factor
-                } else {
-                    factor * 2
-                }
-            } else {
-                factor
+        if let appliedZoom = cameraManager.applyZoomFactor(factor) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                currentZoomFactor = appliedZoom
             }
-            
-            device.ramp(toVideoZoomFactor: actualZoomFactor, withRate: 100.0)
-            device.videoZoomFactor = actualZoomFactor
-            device.unlockForConfiguration()
-            currentZoomFactor = factor // 실제 줌 팩터 저장
-        } catch {
-            print("줌 설정 오류: \(error.localizedDescription)")
         }
     }
     
@@ -265,21 +240,18 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     //기기에 따른 줌 범위 설정
     func getZoomRange(for device: AVCaptureDevice) -> ClosedRange<CGFloat> {
-        if device.position == .back {
-            switch device.deviceType {
-            case .builtInUltraWideCamera:
-                return 2.0...4.0
-            case .builtInWideAngleCamera:
-                return 1.0...3.0
-            default:
-                return 1.0...device.maxAvailableVideoZoomFactor
-            }
-        } else {
-            // 전면 카메라는 1.0...3.0 범위 사용
-            return 1.0...3.0
-        }
+        let minZoom = device.minAvailableVideoZoomFactor
+        let maxZoom = device.maxAvailableVideoZoomFactor
+        return minZoom...maxZoom
     }
     
+    var minDeviceZoom: CGFloat {
+        cameraManager.minAvailableZoomFactor
+    }
+    
+    var maxDeviceZoom: CGFloat {
+        cameraManager.maxAvailableZoomFactor
+    }
+
 
 }
-

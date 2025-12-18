@@ -23,6 +23,20 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     @Published var startFactor: CGFloat = 2.0
     @Published var deviceType: AVCaptureDevice.DeviceType
     
+    private let backDevicePriority: [AVCaptureDevice.DeviceType] = [
+        .builtInTripleCamera,
+        .builtInDualWideCamera,
+        .builtInDualCamera,
+        .builtInTelephotoCamera,
+        .builtInWideAngleCamera,
+        .builtInUltraWideCamera
+    ]
+    
+    private let frontDevicePriority: [AVCaptureDevice.DeviceType] = [
+        .builtInTrueDepthCamera,
+        .builtInWideAngleCamera
+    ]
+    
     init(session: AVCaptureSession = AVCaptureSession(),
          videoDeviceInput: AVCaptureDeviceInput? = nil,
          output: AVCapturePhotoOutput = AVCapturePhotoOutput()) {
@@ -85,17 +99,9 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     func setUp() {
         do {
             self.session.beginConfiguration()
+            self.session.sessionPreset = preset
             
-            let discoverySession = AVCaptureDevice.DiscoverySession(
-                deviceTypes: [
-                    .builtInUltraWideCamera,
-                    .builtInWideAngleCamera
-                ],
-                mediaType: .video,
-                position: .back
-            )
-            
-            guard let device = getBestCamera(from: discoverySession.devices) else {
+            guard let device = defaultDevice(for: .back) else {
                 session.commitConfiguration()
                 print("사용 가능한 카메라를 찾을 수 없습니다")
                 return
@@ -112,11 +118,8 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                     
                     do {
                         try device.lockForConfiguration()
-                        if device.deviceType == .builtInUltraWideCamera {
-                            device.videoZoomFactor = 2.0
-                        } else {
-                            device.videoZoomFactor = 1.0
-                        }
+                        let preferredZoom = preferredDefaultZoom(for: device)
+                        device.videoZoomFactor = preferredZoom
                         device.unlockForConfiguration()
                     } catch {
                         print("초기 줌 설정 오류: \(error)")
@@ -124,6 +127,7 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
                 }
                 
                 if self.session.canAddOutput(self.output) {
+                    self.output.isHighResolutionCaptureEnabled = true
                     self.session.addOutput(self.output)
                 }
                 
@@ -136,6 +140,16 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         }
     }
 
+    private func defaultDevice(for position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+        let deviceTypes = position == .back ? backDevicePriority : frontDevicePriority
+        for type in deviceTypes {
+            if let device = AVCaptureDevice.default(type, for: .video, position: position) {
+                return device
+            }
+        }
+        return nil
+    }
+    
     
     //기기의 카메라 렌즈 사양에 따라 카메라(비디오렌즈)를 선택
     func getBestCamera(from devices: [AVCaptureDevice]) -> AVCaptureDevice? {
@@ -169,28 +183,10 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         
         let newPosition: AVCaptureDevice.Position = currentInput.device.position == .front ? .back : .front
         
-        // 후면 카메라로 전환할 때는 항상 UltraWide 카메라를 먼저 시도
-        let targetDeviceType: AVCaptureDevice.DeviceType = (newPosition == .back) ? .builtInUltraWideCamera : .builtInWideAngleCamera
-        
-        guard let newDevice = AVCaptureDevice.default(targetDeviceType, for: .video, position: newPosition),
+        guard let newDevice = defaultDevice(for: newPosition),
               let newInput = try? AVCaptureDeviceInput(device: newDevice) else {
-            // UltraWide 카메라가 없는 경우 WideAngle로 폴백
-            guard let fallbackDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition),
-                  let fallbackInput = try? AVCaptureDeviceInput(device: fallbackDevice) else { return }
-            
-            if session.canAddInput(fallbackInput) {
-                session.addInput(fallbackInput)
-                self.videoDeviceInput = fallbackInput
-                self.deviceType = .builtInWideAngleCamera
-                
-                do {
-                    try fallbackDevice.lockForConfiguration()
-                    // WideAngle 카메라일 때는 1.0으로 설정
-                    fallbackDevice.videoZoomFactor = 1.0
-                    fallbackDevice.unlockForConfiguration()
-                } catch {
-                    print("줌 설정 오류: \(error)")
-                }
+            if session.canAddInput(currentInput) {
+                session.addInput(currentInput)
             }
             session.commitConfiguration()
             return
@@ -199,18 +195,12 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         if session.canAddInput(newInput) {
             session.addInput(newInput)
             self.videoDeviceInput = newInput
-            self.deviceType = targetDeviceType
+            self.deviceType = newDevice.deviceType
             
             do {
                 try newDevice.lockForConfiguration()
-                if newPosition == .back {
-                    // UltraWide 카메라일 때는 2.0으로 설정
-                    let zoomFactor = (newDevice.deviceType == .builtInUltraWideCamera) ? 2.0 : 1.0
-                    newDevice.videoZoomFactor = zoomFactor
-                    newDevice.ramp(toVideoZoomFactor: zoomFactor, withRate: 1.0)
-                } else {
-                    newDevice.videoZoomFactor = 1.0
-                }
+                let preferredZoom = preferredDefaultZoom(for: newDevice)
+                newDevice.videoZoomFactor = preferredZoom
                 newDevice.unlockForConfiguration()
             } catch {
                 print("카메라 전환 시 줌 설정 오류: \(error)")
@@ -248,8 +238,6 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
         let settings = AVCapturePhotoSettings()
         settings.flashMode = .off
         
-        //여기서 이미지의 회전이 일어난 후 output에 넣어주기?
-        
         // 메인 스레드에서 실행
         DispatchQueue.main.async {
             self.output.capturePhoto(with: settings, delegate: delegate)
@@ -257,41 +245,108 @@ class CameraManager: NSObject, AVCapturePhotoCaptureDelegate {
     }
     
     //줌 범위를 확인하고 부드럽게 해주는 줌 모션을 관리하는 함수
-    func zoom(_ zoom: CGFloat) {
-        guard let device = self.videoDeviceInput?.device else { return }
+    @discardableResult
+    func applyZoomFactor(_ factor: CGFloat) -> CGFloat? {
+        guard let device = self.videoDeviceInput?.device else { return nil }
         
         do {
             try device.lockForConfiguration()
             
-            // 광학 줌 단계 확인 (듀얼/트리플 카메라)
-            let zoomFactors = device.virtualDeviceSwitchOverVideoZoomFactors as? [NSNumber] ?? []
-            print("Available zoom factors: \(zoomFactors)") // 사용 가능한 줌 단계 확인
-            
-            // 줌 범위 설정
             let minZoom = device.minAvailableVideoZoomFactor
-            let maxZoom = min(device.maxAvailableVideoZoomFactor, 10.0) // 최대 10배로 제한
-            var finalZoom = min(max(zoom, minZoom), maxZoom)
+            let maxZoom = min(device.maxAvailableVideoZoomFactor, 10.0)
+            var finalZoom = min(max(factor, minZoom), maxZoom)
             
-            // 광학 줌 단계와 가까운 경우 해당 단계로 스냅
+            let zoomFactors = device.virtualDeviceSwitchOverVideoZoomFactors as? [NSNumber] ?? []
             if !zoomFactors.isEmpty {
                 for factor in zoomFactors {
                     let zoomFactor = CGFloat(truncating: factor)
-                    if abs(finalZoom - zoomFactor) < 0.3 {  // 0.3 이내면 광학 줌 단계로 스냅
+                    if abs(finalZoom - zoomFactor) < 0.1 {
                         finalZoom = zoomFactor
                         break
                     }
                 }
             }
             
-            // 부드러운 줌 적용
-            let rate: Double = finalZoom <= 2.0 ? 30.0 : 100.0  // 광학 줌 범위에서는 더 부드럽게
+            let rate: Double = finalZoom <= 2.0 ? 40.0 : 100.0
             device.ramp(toVideoZoomFactor: finalZoom, withRate: Float(rate))
             
             device.unlockForConfiguration()
+            return finalZoom
         } catch {
             print("줌 설정 오류: \(error.localizedDescription)")
+            return nil
         }
     }
+    
+    var minAvailableZoomFactor: CGFloat {
+        videoDeviceInput?.device.minAvailableVideoZoomFactor ?? 1.0
+    }
+    
+    var maxAvailableZoomFactor: CGFloat {
+        videoDeviceInput?.device.maxAvailableVideoZoomFactor ?? 3.0
+    }
+    
+    private var activeLensTypes: [AVCaptureDevice.DeviceType] {
+        guard let device = videoDeviceInput?.device else { return [] }
+        let constituents = device.constituentDevices
+        if constituents.isEmpty {
+            return [device.deviceType]
+        }
+        return constituents.map { $0.deviceType }
+    }
+    
+    var hasUltraWideLens: Bool {
+        guard let device = videoDeviceInput?.device else { return false }
+        return deviceHasUltraWide(device)
+    }
+    
+    var hasTelephotoLens: Bool {
+        if activeLensTypes.contains(.builtInTelephotoCamera) {
+            return true
+        }
+        guard let deviceType = videoDeviceInput?.device.deviceType else { return false }
+        switch deviceType {
+        case .builtInTripleCamera, .builtInDualCamera, .builtInTelephotoCamera:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var ultraWideZoomFactor: CGFloat {
+        hasUltraWideLens ? 0.5 : minAvailableZoomFactor
+    }
+    
+    var telephotoZoomFactor: CGFloat {
+        if hasTelephotoLens {
+            return min(2.0, maxAvailableZoomFactor)
+        }
+        return min(2.0, maxAvailableZoomFactor)
+    }
+    
+    private func deviceHasUltraWide(_ device: AVCaptureDevice) -> Bool {
+        let constituents = device.constituentDevices
+        if !constituents.isEmpty {
+            return constituents.contains { $0.deviceType == .builtInUltraWideCamera }
+        }
+        
+        switch device.deviceType {
+        case .builtInTripleCamera, .builtInDualWideCamera, .builtInUltraWideCamera:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    private func preferredDefaultZoom(for device: AVCaptureDevice) -> CGFloat {
+        let minZoom = device.minAvailableVideoZoomFactor
+        let maxZoom = min(device.maxAvailableVideoZoomFactor, 10.0)
+        
+        guard deviceHasUltraWide(device) else {
+            return min(maxZoom, max(1.0, minZoom))
+        }
+        
+        let desired = max(1.0, minZoom * 2.0)
+        return min(maxZoom, desired)
+    }
 }
-
-

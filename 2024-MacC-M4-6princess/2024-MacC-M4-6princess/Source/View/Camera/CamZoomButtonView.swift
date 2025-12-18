@@ -1,112 +1,28 @@
 import SwiftUI
 import AVFoundation
+import Combine
 
 struct CamZoomButtonView: View {
     @ObservedObject var viewModel: CameraViewModel
     @StateObject var motionManager = MotionManager()
+    @State private var didApplyDefaultZoom = false
     
-    enum ZoomOption: Double {
-        case ultraWide = 1.0  // 실제 줌 팩터값은 1.0으로 유지
-        case wide = 2.0
-        case telephoto = 3.0
-        case maxZoom = 4.0
-        
-        func isSelected(viewModel: CameraViewModel) -> Bool {
-            let factor = viewModel.currentZoomFactor
-            let isUltraWide = viewModel.cameraManager.deviceType == .builtInUltraWideCamera
-            
-            switch self {
-            case .ultraWide:
-                return isUltraWide && factor == 1.0
-            case .wide:
-                return (!isUltraWide && factor == 1.0) || (isUltraWide && factor == 2.0)
-            case .telephoto:
-                return factor == 3.0
-            case .maxZoom:
-                return factor == 4.0
-            }
-        }
-        
-//        func displayText(for position: AVCaptureDevice.Position) -> String {
-//            if position == .back {
-//                switch self {
-//                case .ultraWide: return ".5"  // 표시만 0.5x
-//                case .wide: return "1"
-//                case .telephoto: return "2"
-//                case .maxZoom: return "3"
-//                }
-//            } else {
-//                switch self {
-//                case .ultraWide: return "1"
-//                case .wide: return "2"
-//                case .telephoto: return "3"
-//                case .maxZoom: return "3"
-//                }
-//            }
-//        }
-        func displayText(for position: AVCaptureDevice.Position, currentZoom: CGFloat, isUltraWide: Bool) -> String {
-                if position == .back {
-                    if isUltraWide {
-                        // UltraWide 카메라일 때의 표시 로직
-                        switch currentZoom {
-                        case 1.0..<1.9:  // 실시간 줌 팩터 표시
-                            return ".5"
-                        case 1.9..<2.9:  // 1x 표시 구간
-                            return "1"
-                        case 2.9..<3.9:  // 2x 표시 구간
-                            return "2"
-                        default:         // 3x 표시 구간
-                            return "3"
-                        }
-                    } else {
-                        switch currentZoom {
-                        case 1.0..<1.9:
-                            return "1"
-                        case 1.9..<2.9:
-                            return "2"
-                        default:
-                            return "3"
-                        }
-                    }
-                } else {
-                    switch self {
-                    case .ultraWide: return "1"
-                    case .wide: return "2"
-                    case .telephoto: return "3"
-                    case .maxZoom: return "3"
-                    }
-                }
-            }
-        
-        func zoomFactor(for position: AVCaptureDevice.Position) -> Double {
-            if position == .back {
-                switch self {
-                case .ultraWide: return 1.0  // 실제 줌 팩터는 1.0 유지
-                case .wide: return 2.0
-                case .telephoto: return 3.0
-                case .maxZoom: return 4.0
-                }
-            } else {
-                switch self {
-                case .ultraWide: return 1.0
-                case .wide: return 2.0
-                case .telephoto: return 3.0
-                case .maxZoom: return 3.0
-                }
-            }
-        }
+    struct ZoomStop: Identifiable, Hashable {
+        let value: CGFloat        // 실제로 적용할 줌 값
+        let displayValue: CGFloat // 사용자에게 보여줄 값
+        var id: CGFloat { value }
     }
     
     var body: some View {
         HStack(spacing: 14) {
-            ForEach(availableZoomOptions, id: \.rawValue) { option in
+            ForEach(zoomStops) { stop in
+                let target = stop.value
+                let label = label(for: stop)
                 ZoomButton(
-                    text: option.displayText(for: viewModel.cameraPosition,
-                                             currentZoom: isZoomSelected(option: option, currentZoom: viewModel.currentZoomFactor) ? viewModel.currentZoomFactor : option.zoomFactor(for: viewModel.cameraPosition),
-                                             isUltraWide: viewModel.cameraManager.deviceType == .builtInUltraWideCamera),
-                    isSelected: isZoomSelected(option: option, currentZoom: viewModel.currentZoomFactor)
+                    text: label,
+                    isSelected: isZoomSelected(stop: stop)
                 ) {
-                    viewModel.setZoom(factor: option.zoomFactor(for: viewModel.cameraPosition))
+                    viewModel.setZoom(factor: target)
                 }
                 .frame(width: 24, height: 24)
                 .padding(.vertical, 8)
@@ -117,42 +33,119 @@ struct CamZoomButtonView: View {
         .background(.black.opacity(0.2))
         .cornerRadius(19)
         .padding(.bottom, 20)
+        .onAppear {
+            applyDefaultZoomIfNeeded()
+        }
+        .onChange(of: viewModel.cameraPosition) { _ in
+            didApplyDefaultZoom = false
+            applyDefaultZoomIfNeeded()
+        }
+        .onReceive(viewModel.cameraManager.$videoDeviceInput) { _ in
+            didApplyDefaultZoom = false
+            applyDefaultZoomIfNeeded()
+        }
+        .onReceive(viewModel.$currentZoomFactor) { _ in
+            applyDefaultZoomIfNeeded()
+        }
     }
     
-    private var availableZoomOptions: [ZoomOption] {
-        let isUltraWide = viewModel.cameraManager.deviceType == .builtInUltraWideCamera
-        let isBackCamera = viewModel.cameraPosition == .back
-        
-        if isBackCamera {
-            return isUltraWide ?
-            [.ultraWide, .wide, .telephoto, .maxZoom] :
-            [.wide, .telephoto, .maxZoom]
-        } else {
-            return [.ultraWide, .wide, .telephoto]
-        }
-    }
-    private func isZoomSelected(option: ZoomOption, currentZoom: CGFloat) -> Bool {
-        let isUltraWide = viewModel.cameraManager.deviceType == .builtInUltraWideCamera
+    private var zoomStops: [ZoomStop] {
+        let maxZoom = maxZoomFactor
+        let scale = zoomValueScale
+        var stops: [ZoomStop] = []
         
         if viewModel.cameraPosition == .back {
-            if isUltraWide {
-                switch option {
-                case .ultraWide: return currentZoom >= 1.0 && currentZoom < 1.9
-                case .wide: return currentZoom >= 1.9 && currentZoom < 2.9
-                case .telephoto: return currentZoom >= 2.9 && currentZoom < 3.9
-                case .maxZoom: return currentZoom >= 3.9
-                }
-            } else {
-                switch option {
-                case .wide: return currentZoom >= 1.0 && currentZoom < 1.9
-                case .telephoto: return currentZoom >= 1.9 && currentZoom < 2.9
-                case .maxZoom: return currentZoom >= 2.9
-                default: return false
-                }
+            let desiredStops: [CGFloat] = supportsUltraWideLens ? [0.5, 1.0, 2.0, 3.0] : [1.0, 2.0, 3.0]
+            desiredStops.forEach { value in
+                appendStop(value, scale: scale, to: &stops, maxZoom: maxZoom)
             }
         } else {
-            return currentZoom == option.rawValue
+            [1.0, 2.0, 3.0].forEach { value in
+                appendStop(value, scale: 1.0, to: &stops, maxZoom: maxZoom)
+            }
         }
+        
+        return stops
+    }
+    
+    private func appendStop(_ displayValue: CGFloat,
+                            scale: CGFloat,
+                            to stops: inout [ZoomStop],
+                            maxZoom: CGFloat,
+                            condition: Bool = true,
+                            actualValue: CGFloat? = nil) {
+        guard condition else { return }
+        guard scale > 0 else { return }
+        
+        let targetValue = actualValue ?? (displayValue * scale)
+        guard targetValue <= maxZoom + 0.01 else { return }
+        
+        if stops.first(where: { abs($0.value - targetValue) < 0.05 }) == nil {
+            stops.append(ZoomStop(value: targetValue, displayValue: displayValue))
+        }
+    }
+    
+    private func label(for stop: ZoomStop) -> String {
+        let value = stop.displayValue
+        if abs(value - 0.5) < 0.01 {
+            return ".5"
+        }
+        
+        if abs(value.rounded() - value) < 0.05 {
+            return "\(Int(value.rounded()))"
+        }
+        
+        return String(format: "%.1f", value)
+    }
+    
+    private func isZoomSelected(stop: ZoomStop) -> Bool {
+        let tolerance: CGFloat = 0.15
+        let currentDisplay = currentDisplayZoom
+        if abs(currentDisplay - stop.displayValue) < tolerance {
+            return true
+        }
+        let isLastStop = zoomStops.last?.id == stop.id
+        return currentDisplay > stop.displayValue && isLastStop
+    }
+    
+    private var supportsUltraWideLens: Bool {
+        guard viewModel.cameraPosition == .back else { return false }
+        return viewModel.cameraManager.hasUltraWideLens
+    }
+    
+    private var maxZoomFactor: CGFloat {
+        min(viewModel.cameraManager.maxAvailableZoomFactor, 15.0)
+    }
+    
+    private var zoomValueScale: CGFloat {
+        guard supportsUltraWideLens else { return 1.0 }
+        let actualUltraWide = viewModel.cameraManager.minAvailableZoomFactor
+        let desiredUltraWide: CGFloat = 0.5
+        
+        guard actualUltraWide > 0 else { return 1.0 }
+        if abs(actualUltraWide - desiredUltraWide) < 0.01 {
+            return 1.0
+        }
+        
+        return max(1.0, actualUltraWide / desiredUltraWide)
+    }
+    
+    private func applyDefaultZoomIfNeeded() {
+        guard !didApplyDefaultZoom else { return }
+        guard viewModel.cameraManager.videoDeviceInput?.device != nil else { return }
+        guard let defaultStop = zoomStops.first(where: { abs($0.displayValue - 1.0) < 0.01 }) else { return }
+        if abs(currentDisplayZoom - defaultStop.displayValue) <= 0.05 {
+            didApplyDefaultZoom = true
+            return
+        }
+        viewModel.setZoom(factor: defaultStop.value)
+    }
+    
+    private var currentDisplayZoom: CGFloat {
+        let scale = viewModel.cameraPosition == .back ? zoomValueScale : 1.0
+        let currentActualZoom = viewModel.cameraManager.videoDeviceInput?.device.videoZoomFactor ?? viewModel.currentZoomFactor
+        guard scale > 0 else { return currentActualZoom }
+        return currentActualZoom / scale
     }
 }
 
